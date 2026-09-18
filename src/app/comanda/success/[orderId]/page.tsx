@@ -522,6 +522,18 @@ export default function SuccessPage() {
               </div>
             </CardContent>
           </Card>
+
+        {/* The same one-password account offer as after a card payment: the
+            proof is in, the data is in the order, nothing else is needed. */}
+        <AccountOfferCard
+          orderId={order.id}
+          email={email}
+          serviceSlug={order.service_slug}
+          alreadyLinked={!!order.user_id}
+          hasIdentityDocuments={(order.customer_data?.personal?.uploadedDocuments ?? []).some(
+            (doc) => isIdentityDocumentType(doc?.type ?? '')
+          )}
+        />
         </div>
       </div>
     );

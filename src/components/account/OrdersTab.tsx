@@ -67,6 +67,8 @@ export interface Order {
   totalPrice: number;
   createdAt: string;
   paidAt: string | null;
+  /** Bank transfer: the proof is uploaded and waits for us, not for the customer. */
+  proofUnderReview: boolean;
   estimatedCompletionDate: string | null;
   estimatedDays: number | null;
   tracking: { number: string; url: string | null; status: string | null } | null;
@@ -123,6 +125,8 @@ interface ApiOrder {
   created_at?: string;
   createdAt?: string;
   paidAt?: string | null;
+  paymentStatus?: string;
+  hasPaymentProof?: boolean;
   estimatedCompletionDate?: string | null;
   estimatedDays?: number | null;
   tracking?: { number: string; url: string | null; status: string | null } | null;
@@ -146,6 +150,7 @@ function toOrder(row: ApiOrder): Order {
     totalPrice: row.total_price ?? row.totalAmount ?? 0,
     createdAt: row.created_at || row.createdAt || new Date().toISOString(),
     paidAt: row.paidAt ?? null,
+    proofUnderReview: row.paymentStatus === 'awaiting_verification' && !!row.hasPaymentProof,
     estimatedCompletionDate: row.estimatedCompletionDate ?? null,
     estimatedDays: row.estimatedDays ?? null,
     tracking: row.tracking ?? null,
@@ -328,11 +333,17 @@ export default function OrdersTab({ initialOrders, className }: OrdersTabProps) 
 }
 
 function OrderCard({ order }: { order: Order }) {
-  const status = customerStatus(order.status);
+  // Proof uploaded: the ball is with us, not the customer — the card must not
+  // say „Trimite dovada plății" over a proof already sent (feedback #12).
+  const status = order.proofUnderReview
+    ? { ...customerStatus(order.status), label: 'Dovadă primită – în verificare', hint: 'Verificăm dovada și pornim lucrul; nu mai ai nimic de făcut.' }
+    : customerStatus(order.status);
   const tone = STATUS_TONE_CLASSES[status.tone];
   const StatusIcon = TONE_ICON[status.tone];
 
-  const nextStep = customerNextStep(order.status);
+  const nextStep = order.proofUnderReview
+    ? { actor: 'noi' as const, text: 'Verificăm dovada plății și pornim lucrul.', needsCustomerAction: false, action: undefined }
+    : customerNextStep(order.status);
   const actor = nextStep ? ACTOR[nextStep.actor] : null;
   const ActorIcon = actor?.icon;
 

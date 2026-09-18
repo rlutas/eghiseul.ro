@@ -20,6 +20,7 @@ import {
 } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import type { UserPrefillData } from '@/lib/account/prefill';
 import type {
   ModularWizardState,
   ModularStep,
@@ -257,55 +258,6 @@ type ModularWizardAction =
 // PREFILL DATA TYPE
 // ============================================================================
 
-interface UserPrefillData {
-  personal: {
-    cnp: string;
-    firstName: string;
-    lastName: string;
-    birthDate: string;
-    birthPlace: string;
-    phone: string;
-    address: AddressState | null;
-    // Document info from KYC
-    documentSeries?: string;
-    documentNumber?: string;
-    documentExpiry?: string;
-    documentType?: string | null;
-  };
-  contact: {
-    email: string;
-    phone: string;
-    preferredContact: string;
-  };
-  // Company data from profile
-  company?: {
-    cui: string;
-    name: string;
-    type: string;
-    registrationNumber: string;
-    address: string;
-    isActive: boolean;
-    vatPayer: boolean;
-    verified: boolean;
-  } | null;
-  kyc_documents: Record<string, {
-    id: string;
-    file_url: string;
-    verified_at: string;
-    expires_at: string | null;
-    is_expiring_soon: boolean;
-    is_expired: boolean;
-  }>;
-  billing_profiles: Array<{
-    id: string;
-    type: string;
-    label: string;
-    billing_data: Record<string, unknown>;
-    is_default: boolean;
-  }>;
-  kyc_verified: boolean;
-  has_valid_kyc: boolean;
-}
 
 // ============================================================================
 // CACHE TYPE
@@ -775,6 +727,10 @@ function modularWizardReducer(
         contact: newContact,
         personalKyc: newPersonalKyc,
         companyKyc: newCompanyKyc,
+        // What the account has already verified: the kyc-documents step is
+        // hidden for a complete account (front + selfie) when the service
+        // asks for nothing more.
+        accountKyc: { valid: !!prefill.has_valid_kyc },
         // Don't mark as dirty - this is initial load, not user edit
       };
     }
@@ -792,6 +748,7 @@ function modularWizardReducer(
         // Keep service configuration
         serviceSlug: state.serviceSlug,
         serviceId: state.serviceId,
+        accountKyc: state.accountKyc,
         verificationConfig: state.verificationConfig,
         steps,
         // Initialize modules based on config
@@ -982,8 +939,23 @@ function debounce<T extends (...args: unknown[]) => unknown>(
 // PROVIDER COMPONENT
 // ============================================================================
 
-export function ModularWizardProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(modularWizardReducer, initialState);
+export function ModularWizardProvider({
+  children,
+  initialPrefill,
+}: {
+  children: ReactNode;
+  /**
+   * The signed-in customer's account data, read by the order page on the
+   * server. `null` = signed out (or phone mode); `undefined` = the caller did
+   * not look, fetch it client-side as before.
+   */
+  initialPrefill?: UserPrefillData | null;
+}) {
+  // Applied in the reducer's initialiser, so the contact step's first render
+  // already shows the account's email and phone — no empty form first.
+  const [state, dispatch] = useReducer(modularWizardReducer, initialState, (base) =>
+    initialPrefill ? modularWizardReducer(base, { type: 'PREFILL_FROM_PROFILE', payload: initialPrefill }) : base
+  );
   const router = useRouter();
   const pathname = usePathname();
 
@@ -997,9 +969,12 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
   const saveAbortControllerRef = useRef<AbortController | null>(null);
 
   // Prefill data state
-  const [prefillData, setPrefillData] = useState<UserPrefillData | null>(null);
-  const [isPrefilled, setIsPrefilled] = useState(false);
-  const prefillLoadedRef = useRef(false);
+  const [prefillData, setPrefillData] = useState<UserPrefillData | null>(initialPrefill ?? null);
+  const [isPrefilled, setIsPrefilled] = useState(!!initialPrefill);
+  // With server-provided data there is nothing to fetch; the effect below
+  // only re-applies it once the service is initialised (personalKyc exists).
+  const prefillLoadedRef = useRef(initialPrefill !== undefined);
+  const initialPrefillRef = useRef(initialPrefill);
 
   // Validation feedback counter (vezi context type).
   const [validationAttempt, setValidationAttempt] = useState(0);
@@ -1826,11 +1801,21 @@ export function ModularWizardProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Auto-load prefill data when service is initialized
+  // Auto-load prefill data when service is initialized — or, when the page
+  // already supplied it, re-apply it so the modules created by INIT_SERVICE
+  // (personalKyc, companyKyc) receive their fields too. The reducer merges
+  // with „draft wins", so a second application changes nothing it should not.
+  const serverPrefillAppliedRef = useRef(false);
   useEffect(() => {
-    if (state.serviceSlug && !prefillLoadedRef.current && state.isInitialized) {
-      loadPrefillData();
+    if (!state.serviceSlug || !state.isInitialized) return;
+    if (initialPrefillRef.current) {
+      if (!serverPrefillAppliedRef.current) {
+        serverPrefillAppliedRef.current = true;
+        dispatch({ type: 'PREFILL_FROM_PROFILE', payload: initialPrefillRef.current });
+      }
+      return;
     }
+    if (!prefillLoadedRef.current) loadPrefillData();
   }, [state.serviceSlug, state.isInitialized, loadPrefillData]);
 
   // ────────────────────────────────────────────────────────────────────

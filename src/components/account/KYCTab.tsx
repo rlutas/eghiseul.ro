@@ -607,48 +607,6 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
   const missingDocs = idType ? missingDocumentsFor(idType, storedTypes) : [];
   const isComplete = !!idType && missingDocs.length === 0;
 
-  // Get overall KYC status badge
-  const getOverallStatusBadge = () => {
-    if (isExpired) {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-medium">
-          <AlertTriangle className="w-4 h-4" />
-          Expirat
-        </span>
-      );
-    }
-    if (isExpiring && isComplete) {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-medium">
-          <Clock className="w-4 h-4" />
-          Expiră în {daysUntilExpiry} zile
-        </span>
-      );
-    }
-    if (isComplete && isVerified) {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">
-          <CheckCircle className="w-4 h-4" />
-          Verificat complet
-        </span>
-      );
-    }
-    if (documents.length > 0 && missingDocs.length > 0) {
-      return (
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-sm font-medium">
-          <Clock className="w-4 h-4" />
-          Incomplet — lipsește {missingDocs.map(t => DOCUMENT_TYPES[t].label.toLowerCase()).join(', ')}
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-100 text-neutral-600 text-sm font-medium">
-        <Clock className="w-4 h-4" />
-        Neverificat
-      </span>
-    );
-  };
-
   // Render compact document row. `required` comes from the chosen identity
   // document, so the same row can be mandatory in one flow and optional in
   // another (the back of a CI: required for the new one, never for a buletin).
@@ -974,34 +932,61 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
         </div>
       )}
 
-      {/* Overall Status Card */}
-      <div className="bg-white rounded-2xl border border-neutral-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className={cn(
-              'w-12 h-12 rounded-xl flex items-center justify-center',
-              isVerified && isComplete ? 'bg-green-100' : isExpired ? 'bg-red-100' : documents.length > 0 ? 'bg-amber-100' : 'bg-neutral-100'
-            )}>
-              <Shield className={cn(
-                'w-6 h-6',
-                isVerified && isComplete ? 'text-green-600' : isExpired ? 'text-red-600' : documents.length > 0 ? 'text-amber-600' : 'text-neutral-500'
-              )} />
-            </div>
-            <div>
-              <h3 className="font-semibold text-secondary-900">Verificare identitate</h3>
-              <p className="text-sm text-neutral-500">
-                {isVerified && isComplete
-                  ? 'Poți plasa comenzi rapid'
-                  : !idType
-                  ? 'Alege actul de identitate pe care îl deții'
-                  : missingDocs.length > 0
-                  ? `Mai ai de încărcat: ${missingDocs.map(t => DOCUMENT_TYPES[t].label.toLowerCase()).join(', ')}`
-                  : 'Documentele sunt încărcate'}
-              </p>
-            </div>
+      {/* Overall Status Card — stacked: title, ONE status line, ONE action
+          (feedback 18.09.2026, #17: the pill and the subtitle fought for the
+          same line on a phone). */}
+      <div className="bg-white rounded-2xl border border-neutral-200 p-5 sm:p-6">
+        <div className="flex items-start gap-3">
+          <div className={cn(
+            'flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl',
+            isVerified && isComplete ? 'bg-green-100' : isExpired ? 'bg-red-100' : documents.length > 0 ? 'bg-amber-100' : 'bg-neutral-100'
+          )}>
+            <Shield className={cn(
+              'w-6 h-6',
+              isVerified && isComplete ? 'text-green-600' : isExpired ? 'text-red-600' : documents.length > 0 ? 'text-amber-600' : 'text-neutral-500'
+            )} />
           </div>
-          {getOverallStatusBadge()}
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-secondary-900">Verificare identitate</h3>
+            <p className={cn(
+              'mt-1 text-sm font-medium',
+              isExpired ? 'text-red-700' : isVerified && isComplete ? 'text-green-700' : documents.length > 0 ? 'text-amber-800' : 'text-neutral-600'
+            )}>
+              {isExpired
+                ? 'Expirat — re-scanează actul'
+                : isVerified && isComplete
+                ? isExpiring
+                  ? `Verificat — expiră în ${daysUntilExpiry} zile`
+                  : 'Verificat'
+                : documents.length > 0 && missingDocs.length > 0
+                ? `În verificare — lipsește ${missingDocs.map(t => DOCUMENT_TYPES[t].label.toLowerCase()).join(', ')}`
+                : documents.length > 0
+                ? 'În verificare'
+                : 'Neverificat'}
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-neutral-500">
+              {isVerified && isComplete
+                ? 'Comenzile cu act de identitate nu-ți mai cer actul și selfie-ul.'
+                : 'Actul și selfie-ul se cer și în comandă, la serviciile care au nevoie de ele.'}
+            </p>
+          </div>
         </div>
+
+        {!(isVerified && isComplete) && !isExpired && (
+          <button
+            type="button"
+            onClick={() => {
+              if (!idType) {
+                setIsPickingIdType(true);
+                return;
+              }
+              document.getElementById('kyc-documents-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+            className="mt-4 inline-flex min-h-[44px] w-full items-center justify-center rounded-xl bg-primary-500 px-4 text-sm font-semibold text-secondary-900 hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 sm:w-auto"
+          >
+            {!idType ? 'Alege actul' : 'Încarcă ce lipsește'}
+          </button>
+        )}
 
         {expiresAt && isVerified && !isExpired && (
           <div className={cn(
@@ -1084,7 +1069,7 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
       )}
 
       {/* Identity documents — driven by the document the customer says they hold */}
-      <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
+      <div id="kyc-documents-card" className="scroll-mt-24 bg-white rounded-2xl border border-neutral-200 overflow-hidden">
         <div className="px-4 py-3 border-b border-neutral-100 bg-neutral-50">
           <h4 className="font-semibold text-secondary-900 flex items-center gap-2 text-sm">
             <Scan className="w-4 h-4 text-primary-500" />

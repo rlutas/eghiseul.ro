@@ -1,8 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Check, Sparkles } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowRight, Check, FileText } from 'lucide-react';
 import { formatMissing } from '@/lib/account/service-readiness';
+import { serviceIconBySlug } from '@/config/services-nav';
+import { SpecimenInfoButton } from '@/components/orders/specimen-info-button';
 
 export interface AccountServiceRow {
   slug: string;
@@ -13,6 +16,8 @@ export interface AccountServiceRow {
   group: string;
   ready: boolean;
   missing: string[];
+  /** „Așa arată documentul" — the wizard's specimen, when the service has one. */
+  specimen?: { src: string; alt: string } | null;
 }
 
 /**
@@ -64,39 +69,72 @@ export default function ServicesTab({
             {group}
           </h4>
           <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden divide-y divide-neutral-100">
-            {rows.map((service) => (
-              <Link
-                key={service.slug}
-                href={orderHref(service.slug)}
-                className="flex items-start gap-3 p-4 min-h-[64px] hover:bg-neutral-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-              >
-                <span
-                  className={`mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full ${
-                    service.ready ? 'bg-green-100 text-green-700' : 'bg-primary-100 text-primary-700'
-                  }`}
+            {rows.map((service) => {
+              const Icon = serviceIconBySlug(service.slug) ?? FileText;
+              return (
+                <div
+                  key={service.slug}
+                  className="flex items-start gap-3 p-4 min-h-[64px] hover:bg-neutral-50 transition-colors"
                 >
-                  {service.ready ? <Check className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
-                </span>
-
-                <span className="min-w-0 flex-1">
-                  <span className="flex flex-wrap items-baseline gap-x-2">
-                    <span className="font-semibold text-secondary-900">{service.name}</span>
-                    {service.price != null && (
-                      <span className="text-sm font-medium text-neutral-500">
-                        de la {service.price} RON
+                  {/* The site's own icon for the service; the ready state is
+                      the colour, plus a small tick when everything is on file. */}
+                  <span className="relative mt-0.5 flex-shrink-0">
+                    <span
+                      className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+                        service.ready ? 'bg-green-50 text-green-700' : 'bg-primary-50 text-primary-700'
+                      }`}
+                    >
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    {service.ready && (
+                      <span className="absolute -right-1 -bottom-1 flex h-4 w-4 items-center justify-center rounded-full bg-green-600 text-white ring-2 ring-white">
+                        <Check className="h-2.5 w-2.5" aria-hidden="true" />
                       </span>
                     )}
                   </span>
-                  <span className="block text-sm text-neutral-600 mt-0.5">
-                    {service.ready
-                      ? 'Avem toate datele tale — completezi doar detaliile cererii.'
-                      : `Îți vom cere în formular: ${formatMissing(service.missing)}.`}
-                  </span>
-                </span>
 
-                <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-neutral-400" />
-              </Link>
-            ))}
+                  <span className="min-w-0 flex-1">
+                    <Link
+                      href={orderHref(service.slug)}
+                      className="group flex items-start justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded"
+                    >
+                      <span className="min-w-0">
+                        <span className="flex flex-wrap items-baseline gap-x-2">
+                          <span className="font-semibold text-secondary-900 group-hover:underline">{service.name}</span>
+                          {service.price != null && (
+                            <span className="text-sm font-medium text-neutral-500">
+                              de la {service.price} RON
+                            </span>
+                          )}
+                        </span>
+                        <span className="block text-sm text-neutral-600 mt-0.5">
+                          {service.ready
+                            ? 'Avem toate datele tale — completezi doar detaliile cererii.'
+                            : `Îți vom cere în formular: ${formatMissing(service.missing)}.`}
+                        </span>
+                      </span>
+                      <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-neutral-400" />
+                    </Link>
+                    {service.specimen && (
+                      <span className="mt-2 flex items-center gap-2">
+                        <Image
+                          src={service.specimen.src}
+                          alt=""
+                          width={36}
+                          height={48}
+                          className="h-12 w-9 rounded border border-neutral-200 object-cover object-top"
+                        />
+                        <SpecimenInfoButton
+                          src={service.specimen.src}
+                          alt={service.specimen.alt}
+                          label="Vezi cum arată documentul"
+                        />
+                      </span>
+                    )}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </section>
       ))}

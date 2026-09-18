@@ -49,6 +49,7 @@ interface TimelineEvent {
   event: string;
   note: string | null;
   createdAt: string;
+  label?: string;
 }
 
 interface OrderData {
@@ -147,6 +148,9 @@ interface OrderData {
     country?: string;
   } | null;
   paymentStatus: string;
+  hasPaymentProof?: boolean;
+  paymentProofUrl?: string | null;
+  processingDays?: number | null;
   paymentIntentId: string | null;
   deliveryTrackingNumber: string | null;
   contractUrl: string | null;
@@ -272,7 +276,15 @@ export default function OrderDetailPage() {
   };
 
   const getTimelineConfig = (status: string) => {
-    return TIMELINE_STATUS_CONFIG[status] || { label: status, color: 'bg-neutral-100 text-neutral-800', icon: Clock };
+    // Never the raw key: the API sends the customer's label; this is the icon
+    // and colour, with the customer status wording as the last fallback.
+    return (
+      TIMELINE_STATUS_CONFIG[status] || {
+        label: customerStatus(status).label,
+        color: 'bg-neutral-100 text-neutral-800',
+        icon: Clock,
+      }
+    );
   };
 
   const handleDocumentDownload = async (doc: OrderDocument) => {
@@ -323,7 +335,10 @@ export default function OrderDetailPage() {
   const status = customerStatus(order.status);
   const statusTone = STATUS_TONE_CLASSES[status.tone];
   const StatusIcon = TONE_ICON[status.tone];
-  const paymentConfig = PAYMENT_STATUS_CONFIG[order.paymentStatus] || PAYMENT_STATUS_CONFIG.unpaid;
+  const paymentConfig =
+    order.paymentStatus === 'awaiting_verification' && order.hasPaymentProof
+      ? { label: 'Dovadă primită – în verificare', color: 'text-blue-700', bgColor: 'bg-blue-100' }
+      : PAYMENT_STATUS_CONFIG[order.paymentStatus] || PAYMENT_STATUS_CONFIG.unpaid;
 
   const customerName = order.customerData?.company?.companyName
     || `${order.customerData?.personal?.firstName || order.customerData?.contact?.firstName || ''} ${order.customerData?.personal?.lastName || order.customerData?.contact?.lastName || ''}`.trim()
@@ -428,11 +443,6 @@ export default function OrderDetailPage() {
                         {formatPrice(order.breakdown.basePrice)} RON
                       </p>
                     </div>
-                    {order.service?.description && (
-                      <p className="text-sm text-neutral-600 mt-2 leading-relaxed">
-                        {order.service.description}
-                      </p>
-                    )}
                   </div>
                 </div>
               </div>
@@ -440,8 +450,15 @@ export default function OrderDetailPage() {
               {/* Options */}
               {order.selectedOptions && order.selectedOptions.length > 0 && order.selectedOptions.map((option, index) => {
                 const optionPrice = option.price_modifier ?? option.priceModifier ?? option.price ?? option.option_price ?? 0;
-                const optionName = option.name || option.option_name || option.optionName || 'Opțiune';
-                const optionDesc = option.description || option.option_description || option.optionDescription;
+                const rawName = option.name || option.option_name || option.optionName || 'Opțiune';
+                // „⚡ Urgent – N zile lucrătoare" instead of the marketing text
+                // (feedback 18.09.2026, #14).
+                const optionCode = (option as { code?: string; optionCode?: string }).code ?? (option as { optionCode?: string }).optionCode;
+                const isUrgent = /urgent/i.test(rawName) || optionCode === 'urgenta';
+                const optionName = isUrgent
+                  ? `⚡ Urgent${order.processingDays ? ` – ${order.processingDays} zile lucrătoare` : ''}`
+                  : rawName;
+                const optionDesc = isUrgent ? null : (option.description || option.option_description || option.optionDescription);
                 return (
                   <div key={index} className="p-4 flex items-start gap-4">
                     <div className="w-10 h-10 rounded-lg bg-neutral-100 flex items-center justify-center flex-shrink-0">
@@ -824,10 +841,32 @@ export default function OrderDetailPage() {
                 <div>
                   <p className="font-medium text-secondary-900">{paymentConfig.label}</p>
                   <p className="text-sm text-neutral-500">
-                    {order.paymentStatus === 'paid' ? 'Plătit cu cardul' : 'Status plată'}
+                    {order.paymentStatus === 'paid'
+                      ? 'Plătit cu cardul'
+                      : order.hasPaymentProof
+                        ? 'O verificăm și pornim lucrul; nu mai ai nimic de făcut.'
+                        : 'Status plată'}
                   </p>
                 </div>
               </div>
+              {/* The proof the customer uploaded, shown back — it was invisible
+                  here and the page still asked for it (feedback 18.09.2026, #12). */}
+              {order.paymentProofUrl && (
+                <a
+                  href={order.paymentProofUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 flex items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-2 hover:bg-neutral-100"
+                >
+                  {/\.(png|jpe?g|webp)(\?|$)/i.test(order.paymentProofUrl) ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={order.paymentProofUrl} alt="Dovada plății" className="h-14 w-14 rounded-lg object-cover" />
+                  ) : (
+                    <span className="flex h-14 w-14 items-center justify-center rounded-lg bg-white"><FileText className="h-5 w-5 text-neutral-500" /></span>
+                  )}
+                  <span className="text-sm font-medium text-secondary-900">Dovada plății trimisă de tine</span>
+                </a>
+              )}
             </div>
           </div>
 
@@ -862,6 +901,7 @@ export default function OrderDetailPage() {
                   {timeline.map((event, index) => {
                     const config = getTimelineConfig(event.status);
                     const Icon = config.icon;
+                    const label = event.label ?? config.label;
                     return (
                       <div key={event.id || index} className="flex gap-3">
                         <div className="flex flex-col items-center">
@@ -873,7 +913,7 @@ export default function OrderDetailPage() {
                           )}
                         </div>
                         <div className="pb-4 flex-1 min-w-0">
-                          <p className="font-medium text-secondary-900">{config.label}</p>
+                          <p className="font-medium text-secondary-900">{label}</p>
                           {event.note && (
                             <p className="text-sm text-neutral-500 mt-0.5">{event.note}</p>
                           )}

@@ -267,6 +267,18 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
           </div>
         </div>
 
+        {/* With the contact already known, the first question is who is
+            applying — a person or a company (feedback 18.09.2026, #4). */}
+        {requiresClientType && (
+          <ClientTypeSelector
+            options={clientTypeOptions}
+            selectedType={state.clientType}
+            onSelect={handleClientTypeSelect}
+            getIcon={getClientTypeIcon}
+            basePrice={priceBreakdown.basePrice}
+          />
+        )}
+
         {/* Contact summary */}
         <div className="bg-white border border-neutral-200 rounded-xl p-6 space-y-4">
           <div className="flex items-center justify-between">
@@ -307,17 +319,6 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
             </div>
           </div>
         </div>
-
-        {/* Client Type still required even when contact is prefilled */}
-        {requiresClientType && (
-          <ClientTypeSelector
-            options={clientTypeOptions}
-            selectedType={state.clientType}
-            onSelect={handleClientTypeSelect}
-            getIcon={getClientTypeIcon}
-            basePrice={priceBreakdown.basePrice}
-          />
-        )}
 
         {/* Citizenship + Purpose also required when contact is prefilled */}
         {showsCitizenship && (

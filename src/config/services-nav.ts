@@ -114,3 +114,20 @@ export const SERVICES_NAV: ServiceNavGroup[] = [
     ],
   },
 ];
+
+/**
+ * The same icon the header menu uses, looked up by service slug — so the
+ * account catalogue reads like the site (feedback 18.09.2026, #2/#16).
+ */
+export function serviceIconBySlug(slug: string): LucideIcon | null {
+  const href = serviceUrl(slug);
+  for (const group of SERVICES_NAV) {
+    for (const item of group.items) {
+      if (item.href === href) return item.icon;
+      for (const child of item.children ?? []) {
+        if (child.href === href) return child.icon;
+      }
+    }
+  }
+  return null;
+}

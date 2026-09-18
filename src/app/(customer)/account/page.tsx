@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { after } from 'next/server'
+import { getServiceSpecimen } from '@/config/service-specimens'
 import { LogoutButton } from '@/components/shared/logout-button'
 import { AccountTabs } from '@/components/account'
 import { ProfileChecklist } from '@/components/account/ProfileChecklist'
@@ -149,12 +150,27 @@ export default async function AccountPage() {
     auto: 'Auto',
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: serviceRows } = await (createPublicClient() as any)
-    .from('services')
-    .select('slug, name, short_description, description, base_price, category, verification_config')
-    .eq('is_active', true)
-    .order('display_order', { ascending: true })
+  // The catalogue and, for its order, what people actually bought in the
+  // last 90 days (feedback 18.09.2026: „sortare după cele mai populare").
+  const [{ data: serviceRows }, { data: recentPaid }] = await Promise.all([
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (createPublicClient() as any)
+      .from('services')
+      .select('id, slug, name, short_description, description, base_price, category, verification_config')
+      .eq('is_active', true)
+      .order('display_order', { ascending: true }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (createAdminClient() as any)
+      .from('orders')
+      .select('service_id')
+      .eq('payment_status', 'paid')
+      .gte('paid_at', ninetyDaysAgoIso())
+      .limit(5000),
+  ])
+  const paidCountByService = new Map<string, number>()
+  for (const row of (recentPaid ?? []) as Array<{ service_id: string | null }>) {
+    if (row.service_id) paidCountByService.set(row.service_id, (paidCountByService.get(row.service_id) ?? 0) + 1)
+  }
 
   const accountData = {
     hasPersonalData: !!(profile?.first_name && profile?.last_name && profile?.cnp),
@@ -171,7 +187,13 @@ export default async function AccountPage() {
   // `category` in the mapping below. Stable, so everything else keeps the
   // catalogue's own `display_order`; with no answer it is a no-op.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sortedServiceRows = sortByInterest((serviceRows ?? []) as any[], serviceInterests)
+  // Most ordered first (stable: ties keep `display_order`), then the
+  // customer's own interests bump their categories to the top.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const byPopularity = [...((serviceRows ?? []) as any[])].sort(
+    (a, b) => (paidCountByService.get(b.id) ?? 0) - (paidCountByService.get(a.id) ?? 0)
+  )
+  const sortedServiceRows = sortByInterest(byPopularity, serviceInterests)
 
   const accountServices: AccountServiceRow[] = sortedServiceRows
     .filter((row) => !HIDDEN_SLUGS.has(row.slug))
@@ -185,6 +207,7 @@ export default async function AccountPage() {
         group: GROUP_TITLES[row.category as string] ?? 'Alte servicii',
         ready: readiness.ready,
         missing: readiness.missing,
+        specimen: getServiceSpecimen(row.slug),
       }
     })
 
@@ -304,4 +327,9 @@ function billingSummaryLine(
   const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '')
   if (row.type === 'persoana_juridica') return str(d.companyName) || str(row.label) || null
   return formatPersonName(str(d.lastName), str(d.firstName)) || str(row.label) || null
+}
+
+/** Computed outside render so the purity lint is honest about it. */
+function ninetyDaysAgoIso(): string {
+  return new Date(Date.now() - 90 * 86_400_000).toISOString()
 }

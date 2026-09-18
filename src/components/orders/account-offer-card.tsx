@@ -15,6 +15,7 @@ import {
   UserPlus,
   Zap,
 } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -229,23 +230,30 @@ export function AccountOfferCard({
 
   const validityDays = serviceSlug ? DOCUMENT_VALIDITY_DAYS[serviceSlug] : undefined;
 
+  // The four reasons to have an account, stated as what the customer gets —
+  // not a checkbox (feedback 18.09.2026, #18). The KYC line only where an
+  // identity document was actually scanned: 20 of the 31 services never ask
+  // for one, and promising to keep it to a constatator customer is false.
   const benefits: Array<{ icon: typeof Download; text: string }> = [
     {
+      icon: Zap,
+      text: 'Completare automată la următoarea comandă: nume, adresă, date de facturare — nu le mai scrii.',
+    },
+    ...(hasIdentityDocuments
+      ? [
+          {
+            icon: ShieldCheck,
+            text: 'Identitatea verificată o singură dată: actul și selfie-ul rămân în cont, nu le mai faci la fiecare cerere.',
+          },
+        ]
+      : []),
+    {
       icon: Download,
-      text: 'Descarci documentul și factura oricând, din cont — nu doar din emailul pe care ți-l trimitem.',
+      text: 'Istoricul comenzilor și documentele într-un singur loc, de descărcat oricând — nu doar din email.',
     },
     {
       icon: Radar,
-      text: 'Vezi în ce stadiu e comanda fără să mai cauți emailul cu linkul de status.',
-    },
-    {
-      icon: Zap,
-      // „actul scanat" only where one was actually scanned: 20 of the 31
-      // services never ask for an identity document, and promising to keep one
-      // to someone who ordered a certificat constatator is simply false.
-      text: hasIdentityDocuments
-        ? 'La o comandă viitoare datele sunt deja completate: nume, adresă, date de facturare și actul scanat.'
-        : 'La o comandă viitoare datele sunt deja completate: nume, adresă, date de facturare.',
+      text: 'Stadiul comenzii în timp real, fără să cauți emailul cu linkul de status.',
     },
   ];
   if (validityDays) {

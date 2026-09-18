@@ -463,20 +463,28 @@ function OrderStatusContent() {
                           .replace(/\s*\([^()]*\(adaugă în aceeași comandă\)\)\s*$/i, '')
                           .replace(/\s*\(adaugă în aceeași comandă\)\s*$/i, '')
                           .trim();
+                        const isUrgent = /urgent/i.test(cleanName);
                         return (
                           <p key={idx} className="text-sm text-muted-foreground">
-                            + {cleanName}
+                            {isUrgent
+                              ? `⚡ Urgent${orderData.processingDays ? ` – ${orderData.processingDays} zile lucrătoare` : ''}`
+                              : `+ ${cleanName}`}
                             {(opt.quantity || 1) > 1 && ` x${opt.quantity}`}
                           </p>
                         );
                       })}
                     </div>
                   )}
+                  {/* Only who the document is for; the invoice's company is a
+                      billing detail, not the applicant (feedback #13). */}
                   {(orderData.companyName || orderData.clientName) && (
                     <p className="text-sm text-muted-foreground mt-1">
                       {orderData.clientType === 'PJ'
-                        ? <>Persoană juridică — <span className="font-medium text-foreground">{orderData.companyName}</span></>
-                        : <>Persoană fizică — <span className="font-medium text-foreground">{orderData.clientName}</span></>}
+                        ? <>Pentru firma <span className="font-medium text-foreground">{orderData.companyName}</span></>
+                        : <>Pentru <span className="font-medium text-foreground">{orderData.clientName}</span></>}
+                      {orderData.billingCompanyName && (
+                        <> · factură pe <span className="font-medium text-foreground">{orderData.billingCompanyName}</span></>
+                      )}
                     </p>
                   )}
                   {orderData.purpose && (

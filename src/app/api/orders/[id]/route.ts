@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { normalizeOrderOptions } from '@/lib/orders/normalize'
 import { calculateEstimatedCompletion } from '@/lib/delivery-calculator'
+import { customerTimeline, timelineLabel, type RawHistoryRow } from '@/lib/orders/customer-timeline'
+import { getDownloadUrl } from '@/lib/aws/s3'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -101,6 +103,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .eq('order_id', order.id)
       .eq('visible_to_client', true)
       .order('created_at', { ascending: true })
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const proofKey = (order as any).payment_proof_url as string | null
+    let paymentProofUrl: string | null = null
+    if (proofKey && proofKey.startsWith('orders/')) {
+      try {
+        paymentProofUrl = await getDownloadUrl(proofKey, 3600)
+      } catch (proofError) {
+        console.warn('[orders/[id]] could not sign the payment proof:', proofError)
+      }
+    }
 
     // Fetch order history for timeline
     const { data: history } = await supabase
@@ -249,6 +262,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       // The proof itself stays private; whether one exists decides the copy.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       hasPaymentProof: !!(order as any).payment_proof_url,
+      // A short-lived link to the proof the customer uploaded, so the order
+      // page can show it back (owner-only route; same signing as the admin).
+      paymentProofUrl,
       paymentIntentId: order.stripe_payment_intent_id,
       deliveryTrackingNumber: order.delivery_tracking_number || null,
       contractUrl: order.contract_url,
@@ -263,27 +279,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       internalNotes: order.internal_status_notes || null
     }
 
-    // Build timeline from history - extract status from new_value when available
+    // The customer's timeline: hidden rows dropped, one entry per stage,
+    // labels in the customer's words (the trigger row + the route's row for
+    // the same change used to show twice, raw — feedback 18.09.2026 #15).
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const timeline = (history || []).map((h: any) => {
-      const newValue = h.new_value as { status?: string; payment_status?: string } | null
-
-      // Determine status to show based on event type
-      let status = newValue?.status || h.event_type
-      if (h.event_type === 'payment_confirmed') {
-        status = 'payment_confirmed'
-      } else if (h.event_type === 'order_created' || h.event_type === 'draft_created') {
-        status = 'order_created'
-      }
-
-      return {
-        id: h.id,
-        status,
-        event: h.event_type,
-        note: h.notes,
-        createdAt: h.created_at,
-      }
-    })
+    const timeline: Array<{ id: string; status: string; event: string; label?: string; note: string | null; createdAt: string }> =
+      customerTimeline((history || []) as RawHistoryRow[])
 
     // Add initial order creation if not in timeline
     if (timeline.length === 0 || !timeline.find(t => t.event === 'order_created' || t.event === 'draft_created')) {
@@ -291,8 +292,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         id: 'initial',
         status: 'order_created',
         event: 'order_created',
-        note: 'Comanda a fost plasată',
-        createdAt: order.created_at,
+        label: timelineLabel('order_created'),
+        note: null,
+        createdAt: (order.created_at ?? new Date().toISOString()) as string,
       })
     }
 
@@ -303,8 +305,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         id: 'payment',
         status: 'payment_confirmed',
         event: 'payment_confirmed',
-        note: 'Plata a fost confirmată',
-        createdAt: order.updated_at || order.created_at,
+        label: timelineLabel('payment_confirmed'),
+        note: null,
+        createdAt: (order.updated_at || order.created_at) as string,
       }
       if (insertIndex === -1) {
         timeline.push(paymentEvent)

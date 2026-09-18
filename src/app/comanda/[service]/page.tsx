@@ -9,6 +9,8 @@ import { Loader2 } from 'lucide-react';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
 import { OrderFlowDisclosure } from '@/components/legal/order-flow-disclosure';
+import { createClient } from '@/lib/supabase/server';
+import { buildUserPrefillData, type UserPrefillData } from '@/lib/account/prefill';
 
 // Fetch service by slug
 async function getService(slug: string): Promise<{ service: Service; options: ServiceOption[] } | null> {
@@ -77,9 +79,10 @@ function WizardLoading() {
 
 interface OrderPageProps {
   params: Promise<{ service: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function OrderPage({ params }: OrderPageProps) {
+export default async function OrderPage({ params, searchParams }: OrderPageProps) {
   const { service: serviceSlug } = await params;
 
   // Fetch service data
@@ -105,12 +108,28 @@ export default async function OrderPage({ params }: OrderPageProps) {
       />
     ) : undefined;
 
+  // The signed-in customer's account data, so the wizard's first paint
+  // already carries it (feedback 18.09.2026, #3). Not in phone mode: the team
+  // is signed in with ITS account and the order is the caller's.
+  const phoneMode = (await searchParams)?.telefonic === '1';
+  let initialPrefill: UserPrefillData | null = null;
+  if (!phoneMode) {
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) initialPrefill = await buildUserPrefillData(supabase, user);
+    } catch (prefillError) {
+      console.warn('[comanda] prefill unavailable, the wizard will fetch it:', prefillError);
+      initialPrefill = null;
+    }
+  }
+
   return (
     // Header renders its own fixed-header spacer — no pt needed here (a
     // duplicate pt-16 stacked ~64px of dead space above the form).
     <main className="min-h-screen bg-neutral-50">
       <Suspense fallback={<WizardLoading />}>
-        <ModularWizardProvider>
+        <ModularWizardProvider initialPrefill={initialPrefill}>
           <ModularOrderWizard
             initialService={serviceData.service}
             initialOptions={serviceData.options}

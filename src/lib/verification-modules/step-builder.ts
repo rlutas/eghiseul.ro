@@ -278,13 +278,24 @@ export function buildWizardSteps(
     };
 
     // Apply same condition as personal-data step
+    let baseCondition: ((state: ModularWizardState) => boolean) | undefined;
     if (personalKycCondition) {
-      kycStep.condition = createConditionFunction(personalKycCondition);
+      baseCondition = createConditionFunction(personalKycCondition);
     } else if (hasClientTypeSelection) {
-      kycStep.condition = (state: ModularWizardState) => {
+      baseCondition = (state: ModularWizardState) => {
         return state.clientType === 'PF' || state.clientType === 'PJ';
       };
     }
+    // A signed-in account that already holds the identity document AND the
+    // selfie (unexpired) is not asked for them again — unless the service
+    // needs extra uploads of its own (cazier auto: the driving licence).
+    // `/submit` verifies the same set server-side before honouring it.
+    const extraDocs = verificationConfig.personalKyc.extraDocuments ?? [];
+    kycStep.condition = (state: ModularWizardState) => {
+      if (baseCondition && !baseCondition(state)) return false;
+      if (state.accountKyc?.valid && extraDocs.length === 0) return false;
+      return true;
+    };
 
     steps.push(kycStep);
   }

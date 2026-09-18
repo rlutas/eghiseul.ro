@@ -748,6 +748,9 @@ export interface ModularWizardState {
 
   // Initialization flag (true after cache check is complete)
   isInitialized: boolean;
+
+  /** From the signed-in account: identity document + selfie on file, unexpired. */
+  accountKyc?: { valid: boolean } | null;
 }
 
 /**

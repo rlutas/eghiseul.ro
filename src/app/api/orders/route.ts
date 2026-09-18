@@ -343,6 +343,8 @@ export async function GET(request: NextRequest) {
         // What the account needs to answer "where is it, do I have to do
         // something, where are my documents" without a second round-trip.
         paidAt: order.paid_at,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        hasPaymentProof: !!(order as any).payment_proof_url,
         // The SAME date the order's own page shows. The card used to be able to
         // compute its own from `estimated_days`, which would have given the
         // customer two different promises for one order — the persisted date

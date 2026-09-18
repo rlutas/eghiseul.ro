@@ -174,6 +174,50 @@ const CF_BILLING_OPTIONS: BillingOption[] = [
   },
 ];
 
+/** One saved billing profile (or „Alte date") as a selectable card. */
+function SavedProfileCard({
+  selected,
+  icon: Icon,
+  title,
+  lines,
+  onClick,
+}: {
+  selected: boolean;
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  lines: Array<string | null>;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'relative text-left p-3 sm:p-4 rounded-xl border-2 transition-all bg-white',
+        selected ? 'border-primary-500 bg-primary-50 shadow-md' : 'border-neutral-200 hover:border-primary-300'
+      )}
+    >
+      {selected && (
+        <CheckCircle className="absolute top-2 right-2 sm:top-3 sm:right-3 w-5 h-5 text-primary-600" />
+      )}
+      <div className="flex items-start gap-3">
+        <div className={cn(
+          'w-10 h-10 rounded-full flex items-center justify-center shrink-0',
+          selected ? 'bg-primary-200' : 'bg-neutral-100'
+        )}>
+          <Icon className={cn('w-5 h-5', selected ? 'text-primary-700' : 'text-neutral-600')} />
+        </div>
+        <div className="min-w-0 pr-6">
+          <p className="font-semibold text-secondary-900 text-sm truncate">{title}</p>
+          {lines.filter(Boolean).map((line) => (
+            <p key={line as string} className="text-xs text-neutral-500 mt-0.5 truncate">{line}</p>
+          ))}
+        </div>
+      </div>
+    </button>
+  );
+}
+
 export default function BillingStepModular({ onValidChange }: BillingStepProps) {
   const { state, updateBilling, prefillData, validationAttempt } = useModularWizard();
   const { billing, personalKyc, companyKyc, clientType, constatator, serviceSlug } = state;
@@ -242,6 +286,36 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // Whether the PF fields currently on screen came from that saved profile
   // (drives the same green notice the PJ branch shows).
   const [usedSavedPfProfile, setUsedSavedPfProfile] = useState(false);
+
+  // Saved-profile chooser (feedback 18.09.2026, #7). A customer whose account
+  // already holds billing data sees ONLY those profiles plus „Alte date", and
+  // a chosen profile shows as a one-line summary — not the three source cards
+  // and a form of disabled fields. Nothing changes for guests or phone mode
+  // (no saved profiles → the classic chooser).
+  const savedPjData = savedPjProfile?.billing_data as Record<string, string> | undefined;
+  const hasSavedPj = !!(savedPjData?.cui && savedPjData?.companyName);
+  const hasSavedPf = !!savedPfPrefill;
+  const hasSavedProfiles = hasSavedPf || hasSavedPj;
+  type SavedChoice = 'pf' | 'pj' | 'other' | null;
+  const [savedChoice, setSavedChoice] = useState<SavedChoice>(() => {
+    // A restored draft: recognise which profile it carries, if any.
+    if (!hasSavedProfiles) return 'other';
+    if (billing?.source === 'company' && billing?.cui && savedPjData?.cui &&
+        billing.cui.replace(/\D/g, '') === savedPjData.cui.replace(/\D/g, '')) return 'pj';
+    if ((billing?.source === 'self' || billing?.source === 'other_pf') && billing?.cnp &&
+        savedPfPrefill?.cnp && billing.cnp === savedPfPrefill.cnp) return 'pf';
+    if (billing?.source && (billing?.companyName || billing?.firstName || billing?.lastName)) return 'other';
+    return null;
+  });
+  // Data written by the wizard itself (PJ order → the firm from the request,
+  // constatator → the firm from the certificate) is „alte date", not a saved
+  // profile: keep the classic chooser visible for it.
+  useEffect(() => {
+    if (savedChoice === null && billing?.source && (billing?.companyName || billing?.firstName)) {
+      setSavedChoice('other');
+    }
+  }, [savedChoice, billing?.source, billing?.companyName, billing?.firstName]);
+  const showChooser = !hasSavedProfiles || savedChoice === 'other';
 
   // Get prefill data from personal KYC (memoized to avoid new object refs each render).
   // Address is kept STRUCTURED — Oblio needs street/locality/county separately.
@@ -579,6 +653,58 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     handleSourceSelect(option.source);
   }, [handleSourceSelect, updateBilling]);
 
+  // Saved profiles: apply one wholesale. PF stays editable (source other_pf),
+  // PJ counts as verified — the profile was saved from an ANAF lookup.
+  const applySavedPf = useCallback(() => {
+    if (!savedPfPrefill) return;
+    setSavedChoice('pf');
+    setForeignToggle(false);
+    setCompanyMode('request');
+    const pfFields = {
+      firstName: savedPfPrefill.firstName,
+      lastName: savedPfPrefill.lastName,
+      cnp: savedPfPrefill.cnp,
+      address: savedPfPrefill.address,
+      city: savedPfPrefill.city,
+      county: savedPfPrefill.county,
+      postalCode: savedPfPrefill.postalCode,
+      country: savedPfPrefill.country || 'Romania',
+    };
+    updateBilling({
+      source: 'other_pf',
+      type: 'persoana_fizica',
+      ...pfFields,
+      companyName: undefined, cui: undefined, regCom: undefined,
+      companyAddress: undefined, cuiVerified: undefined,
+      isValid: isPfBillingComplete(pfFields, { cnpOptional: isCarteFunciara }),
+    });
+    setUsedSavedPfProfile(true);
+    setCuiSuccess(false);
+    setCuiError(null);
+  }, [savedPfPrefill, updateBilling, isCarteFunciara]);
+
+  const applySavedPj = useCallback(() => {
+    if (!savedPjData?.cui || !savedPjData?.companyName) return;
+    setSavedChoice('pj');
+    setForeignToggle(false);
+    setCompanyMode('request');
+    updateBilling({
+      source: 'company',
+      type: 'persoana_juridica',
+      firstName: undefined, lastName: undefined, cnp: undefined,
+      address: undefined, city: undefined, county: undefined, postalCode: undefined,
+      companyName: savedPjData.companyName,
+      cui: savedPjData.cui,
+      regCom: savedPjData.regCom || '',
+      companyAddress: savedPjData.companyAddress || savedPjData.address || '',
+      cuiVerified: true,
+      isValid: true,
+    });
+    setUsedSavedPfProfile(false);
+    setCuiSuccess(true);
+    setCuiError(null);
+  }, [savedPjData, updateBilling]);
+
   // Update field
   const updateField = useCallback((field: keyof BillingState, value: string) => {
     updateBilling({ [field]: value });
@@ -707,7 +833,56 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
           Date pentru facturare
         </h3>
 
-        <div className={cn(
+        {hasSavedProfiles && (
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
+            {hasSavedPf && savedPfPrefill && (
+              <SavedProfileCard
+                selected={savedChoice === 'pf'}
+                icon={User}
+                title={[savedPfPrefill.lastName, savedPfPrefill.firstName].filter(Boolean).join(' ') || 'Persoană fizică'}
+                lines={[
+                  savedPfPrefill.cnp ? `CNP ${savedPfPrefill.cnp}` : null,
+                  [savedPfPrefill.city, savedPfPrefill.county].filter(Boolean).join(', ') || null,
+                ]}
+                onClick={applySavedPf}
+              />
+            )}
+            {hasSavedPj && savedPjData && (
+              <SavedProfileCard
+                selected={savedChoice === 'pj'}
+                icon={Building2}
+                title={savedPjData.companyName}
+                lines={[`CUI ${savedPjData.cui}`, savedPjData.companyAddress || savedPjData.address || null]}
+                onClick={applySavedPj}
+              />
+            )}
+            <SavedProfileCard
+              selected={savedChoice === 'other'}
+              icon={Users}
+              title="Alte date"
+              lines={['Altă persoană sau altă firmă']}
+              onClick={() => setSavedChoice('other')}
+            />
+          </div>
+        )}
+
+        {hasSavedProfiles && (savedChoice === 'pf' || savedChoice === 'pj') && billing?.isValid && (
+          <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+            <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>
+              Factura se emite pe datele salvate în contul tău.{' '}
+              <button
+                type="button"
+                onClick={() => setSavedChoice('other')}
+                className="underline underline-offset-2 font-medium"
+              >
+                Modifică
+              </button>
+            </span>
+          </div>
+        )}
+
+        {showChooser && <div className={cn(
           'grid gap-3 sm:gap-4',
           billingOptions.length === 2 ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'
         )}>
@@ -756,7 +931,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
               </div>
             );
           })}
-        </div>
+        </div>}
 
         {showStepErrors && !selectedSource && (
           <p data-wizard-error className="text-sm text-red-500 flex items-center gap-1">
@@ -766,8 +941,10 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         )}
       </div>
 
-      {/* Persoană Fizică Fields (self or other_pf) */}
-      {(selectedSource === 'self' || selectedSource === 'other_pf') && (
+      {/* Persoană Fizică Fields (self or other_pf). A chosen saved profile that
+          is still incomplete (rows saved before localitate/județ existed) keeps
+          the form open so the customer fills in what is missing. */}
+      {(showChooser || !billing?.isValid) && (selectedSource === 'self' || selectedSource === 'other_pf') && (
         <div className="space-y-4 p-4 bg-neutral-50 rounded-xl">
           <h4 className="font-medium text-secondary-900">
             {selectedSource === 'self' && !isCarteFunciara ? 'Date facturare (din act)' : 'Date facturare (persoană fizică)'}
@@ -999,7 +1176,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       )}
 
       {/* Persoană Juridică Fields */}
-      {selectedSource === 'company' && (
+      {(showChooser || !billing?.isValid) && selectedSource === 'company' && (
         <div className="space-y-4 p-4 bg-neutral-50 rounded-xl">
           <h4 className="font-medium text-secondary-900">Date facturare (persoană juridică)</h4>
 
@@ -1083,51 +1260,23 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
 
           {/* Company data appears only after a successful ANAF verification and
               is read-only (official record — the invoice must match it; hand
-              edits produced unverifiable data and blocked payment). */}
+              edits produced unverifiable data and blocked payment). Shown as
+              text, not as a form of disabled inputs (feedback 18.09.2026, #7). */}
           {billing?.cuiVerified && (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="companyName" className="text-secondary-900 font-medium">
-                  Denumire firmă
-                </Label>
-                <Input
-                  id="companyName"
-                  type="text"
-                  value={billing?.companyName || ''}
-                  readOnly
-                  disabled
-                  className="bg-neutral-100"
-                />
+            <dl className="rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm space-y-1.5">
+              <div className="flex gap-2">
+                <dt className="w-28 shrink-0 text-neutral-500">Denumire</dt>
+                <dd className="font-medium text-secondary-900">{billing?.companyName || '—'}</dd>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="regCom" className="text-secondary-900 font-medium">
-                  Nr. Registrul Comerțului
-                </Label>
-                <Input
-                  id="regCom"
-                  type="text"
-                  value={billing?.regCom || ''}
-                  readOnly
-                  disabled
-                  className="bg-neutral-100"
-                />
+              <div className="flex gap-2">
+                <dt className="w-28 shrink-0 text-neutral-500">Reg. Com.</dt>
+                <dd className="text-secondary-900">{billing?.regCom || '—'}</dd>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="companyAddress" className="text-secondary-900 font-medium">
-                  Sediu social
-                </Label>
-                <Input
-                  id="companyAddress"
-                  type="text"
-                  value={billing?.companyAddress || ''}
-                  readOnly
-                  disabled
-                  className="bg-neutral-100"
-                />
+              <div className="flex gap-2">
+                <dt className="w-28 shrink-0 text-neutral-500">Sediu social</dt>
+                <dd className="text-secondary-900">{billing?.companyAddress || '—'}</dd>
               </div>
-            </>
+            </dl>
           )}
 
           {/* Bancă + IBAN câmpuri eliminate 2026-05-28 — nu sunt necesare
