@@ -14,9 +14,15 @@ describe('isoDate', () => {
     // `validateCNP` returns a LOCAL midnight. `toISOString()` on that, from
     // Romania (+02/+03), lands on the previous day — which is how a CNP of
     // 920702 filled in „1 July 1992".
+    //
+    // The second assertion only shows the slip east of UTC; CI runs in UTC,
+    // where `toISOString()` happens to agree with the wall clock. So it is
+    // guarded rather than dropped: it documents the bug where it can be seen.
     const localMidnight = new Date(1992, 6, 2, 0, 0, 0);
     expect(isoDate(localMidnight)).toBe('1992-07-02');
-    expect(localMidnight.toISOString().slice(0, 10)).not.toBe('1992-07-02');
+    if (localMidnight.getTimezoneOffset() < 0) {
+      expect(localMidnight.toISOString().slice(0, 10)).not.toBe('1992-07-02');
+    }
   });
 
   it('pads single-digit months and days', () => {
