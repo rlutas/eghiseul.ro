@@ -10,6 +10,35 @@
 const FROM_DEFAULT = process.env.RESEND_FROM ?? 'eGhișeul.ro <contact@eghiseul.ro>';
 const REPLY_TO_DEFAULT = process.env.RESEND_REPLY_TO ?? 'contact@eghiseul.ro';
 
+/**
+ * Domains Resend has verified for this account (SPF + DKIM). A `from` on any
+ * other domain is rejected by Resend with 403 and the email is LOST — which
+ * is exactly what would happen to documentero.ro order emails until its
+ * domain is verified (19.09.2026: no MX/TXT on the domain yet). Until then
+ * the brand's `from` falls back to the default sender, with a log line, so
+ * the customer still gets the email. Set
+ * `RESEND_VERIFIED_DOMAINS=eghiseul.ro,documentero.ro` once verified.
+ */
+const VERIFIED_DOMAINS = (process.env.RESEND_VERIFIED_DOMAINS ?? 'eghiseul.ro')
+  .split(',')
+  .map((d) => d.trim().toLowerCase())
+  .filter(Boolean);
+
+function domainOf(from: string): string {
+  const m = from.match(/<([^>]+)>/);
+  const addr = (m ? m[1] : from).trim();
+  return addr.split('@')[1]?.toLowerCase() ?? '';
+}
+
+/** The `from` Resend will accept: the requested one when its domain is verified, else the default. */
+export function resolveFrom(from: string | undefined): string {
+  if (!from) return FROM_DEFAULT;
+  const domain = domainOf(from);
+  if (VERIFIED_DOMAINS.includes(domain)) return from;
+  console.warn(`[email/resend] from domain "${domain}" not in RESEND_VERIFIED_DOMAINS — sending as default sender`);
+  return FROM_DEFAULT;
+}
+
 export interface SendEmailInput {
   to: string;
   subject: string;
@@ -59,7 +88,7 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
   }
 
   const body = {
-    from: input.from ?? FROM_DEFAULT,
+    from: resolveFrom(input.from),
     to: [input.to],
     subject: input.subject,
     html: input.html,

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/resend';
+import { appBaseForOrder, brandForOrder } from '@/lib/brand/for-order';
 import { attachPaymentProof } from '@/lib/orders/attach-payment-proof';
 import { verifyPaymentProofToken } from '@/lib/orders/payment-proof-token';
 import {
@@ -196,7 +197,7 @@ async function sendBankTransferEmails(orderId: string, hasProof: boolean): Promi
 
   const { data: order } = await admin
     .from('orders')
-    .select('id, friendly_order_id, order_number, total_price, customer_data, services(name)')
+    .select('id, friendly_order_id, order_number, total_price, customer_data, platform, services(name)')
     .eq('id', orderId)
     .single();
   if (!order) return;
@@ -215,10 +216,13 @@ async function sendBankTransferEmails(orderId: string, hasProof: boolean): Promi
   const phone = cd?.contact?.phone || null;
   const firstName = cd?.contact?.firstName || cd?.personal?.firstName || cd?.billing?.firstName || null;
   const service = Array.isArray(order.services) ? order.services[0] : order.services;
-  const serviceName = service?.name || 'Serviciu eGhișeul.ro';
+  // The ORDER's brand (orders.platform), never the host: status link, header,
+  // sender and legal line all follow it (test order E-260919-HJ9X9, 19.09.2026).
+  const brand = brandForOrder(order);
+  const serviceName = service?.name || `Serviciu ${brand.name}`;
   const friendly = order.friendly_order_id || order.order_number || orderId;
   const amountRon = Number(order.total_price) || 0;
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
+  const base = appBaseForOrder(order);
 
   if (email && (ibanRon || ibanEur)) {
     const input = {
@@ -233,9 +237,11 @@ async function sendBankTransferEmails(orderId: string, hasProof: boolean): Promi
       swift: bank.swift || null,
       statusUrl: `${base}/comanda/status/?order=${encodeURIComponent(friendly)}&email=${encodeURIComponent(email)}`,
       hasProof,
+      brand,
     };
     await sendEmail({
       to: email,
+      from: brand.emailFrom,
       subject: buildBankTransferPendingSubject(input),
       html: buildBankTransferPendingHtml(input),
       text: buildBankTransferPendingText(input),
@@ -256,7 +262,8 @@ async function sendBankTransferEmails(orderId: string, hasProof: boolean): Promi
     customerEmail: email || '(lipsă)',
     customerPhone: phone,
     hasProof,
-    adminUrl: `${base}/admin/orders/${orderId}`,
+    adminUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro'}/admin/orders/${orderId}`,
+    brand,
   };
   await sendEmail({
     to: adminTo,

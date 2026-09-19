@@ -13,6 +13,7 @@
  *   - team: an order is waiting for the money to be matched in the statement.
  */
 import { brandedEmailHtml, ctaButton, infoRows, escHtml } from './branded-layout';
+import type { Brand } from '@/lib/brand/brands';
 
 export interface BankTransferPendingInput {
   customerFirstName?: string | null;
@@ -29,6 +30,8 @@ export interface BankTransferPendingInput {
   statusUrl: string;
   /** True when the customer already attached a proof of payment in checkout. */
   hasProof: boolean;
+  /** The ORDER's brand (documentero or eghiseul) — header, colors, legal line. */
+  brand?: Brand;
 }
 
 export function buildBankTransferPendingSubject(input: BankTransferPendingInput): string {
@@ -44,6 +47,7 @@ export function buildBankTransferPendingHtml(input: BankTransferPendingInput): s
     : 'De îndată ce banii intră în cont, îți confirmăm pe email și punem comanda în lucru.';
 
   return brandedEmailHtml({
+    brand: input.brand,
     preheader: `Transfer bancar ${input.amountRon.toFixed(2)} RON pentru comanda ${input.orderNumber}`,
     content: `
         <p style="margin:0 0 10px;font-size:13px;color:#64748b;">Comanda <span style="font-family:monospace;font-weight:700;color:#0f172a;">${escHtml(input.orderNumber)}</span></p>
@@ -100,6 +104,7 @@ export interface BankTransferAdminInput {
   customerPhone?: string | null;
   hasProof: boolean;
   adminUrl: string;
+  brand?: Brand;
 }
 
 export function buildBankTransferAdminSubject(input: BankTransferAdminInput): string {
@@ -108,6 +113,7 @@ export function buildBankTransferAdminSubject(input: BankTransferAdminInput): st
 
 export function buildBankTransferAdminHtml(input: BankTransferAdminInput): string {
   return brandedEmailHtml({
+    brand: input.brand,
     preheader: `${input.orderNumber} așteaptă confirmarea încasării prin transfer bancar`,
     content: `
         <h1 style="margin:0 0 12px;color:#0B1B33;font-size:20px;">Comandă cu plată prin transfer bancar</h1>

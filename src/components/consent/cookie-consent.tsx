@@ -220,9 +220,16 @@ export function CookieConsent() {
           Folosim cookie-uri strict necesare pentru funcționare (autentificare, plăți, preferința ta
           de aici) și, doar cu acordul tău, cookie-uri de analiză (Google Analytics) ca să înțelegem
           ce pagini ajută. Nu vindem date. Detalii:{' '}
-          <Link href="/politica-cookies/" className="font-semibold text-primary-600 underline">
-            Politica de cookie-uri
-          </Link>
+          {brand.id === 'eghiseul' ? (
+            <Link href="/politica-cookies/" className="font-semibold text-primary-600 underline">
+              Politica de cookie-uri
+            </Link>
+          ) : (
+            // Legal pages are the group's, on eghiseul.ro, until documentero has its own (Brand.legalBaseUrl).
+            <a href={`${brand.legalBaseUrl}/politica-cookies/`} className="font-semibold text-primary-600 underline">
+              Politica de cookie-uri
+            </a>
+          )}
           . Îți poți schimba opțiunea oricând din „Setări cookie-uri” (footer).
         </p>
 

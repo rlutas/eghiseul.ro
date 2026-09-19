@@ -527,15 +527,19 @@ export default function SuccessPage() {
 
         {/* The same one-password account offer as after a card payment: the
             proof is in, the data is in the order, nothing else is needed. */}
-        <AccountOfferCard
-          orderId={order.id}
-          email={email}
-          serviceSlug={order.service_slug}
-          alreadyLinked={!!order.user_id}
-          hasIdentityDocuments={(order.customer_data?.personal?.uploadedDocuments ?? []).some(
-            (doc) => isIdentityDocumentType(doc?.type ?? '')
-          )}
-        />
+        {/* documentero sells without a customer account (Raul, 19.09.2026):
+            the offer is eghiseul-only; the status link works either way. */}
+        {brand.id === 'eghiseul' && (
+          <AccountOfferCard
+            orderId={order.id}
+            email={email}
+            serviceSlug={order.service_slug}
+            alreadyLinked={!!order.user_id}
+            hasIdentityDocuments={(order.customer_data?.personal?.uploadedDocuments ?? []).some(
+              (doc) => isIdentityDocumentType(doc?.type ?? '')
+            )}
+          />
+        )}
         </div>
       </div>
     );
@@ -747,15 +751,19 @@ export default function SuccessPage() {
         {/* Account offer — an offer, not a wall: it renders nothing for a
             signed-in visitor or an order already linked to an account, and
             the buttons above keep working either way. */}
-        <AccountOfferCard
-          orderId={order.id}
-          email={email}
-          serviceSlug={order.service_slug}
-          alreadyLinked={!!order.user_id}
-          hasIdentityDocuments={(order.customer_data?.personal?.uploadedDocuments ?? []).some(
-            (doc) => isIdentityDocumentType(doc?.type ?? '')
-          )}
-        />
+        {/* documentero sells without a customer account (Raul, 19.09.2026):
+            the offer is eghiseul-only; the status link works either way. */}
+        {brand.id === 'eghiseul' && (
+          <AccountOfferCard
+            orderId={order.id}
+            email={email}
+            serviceSlug={order.service_slug}
+            alreadyLinked={!!order.user_id}
+            hasIdentityDocuments={(order.customer_data?.personal?.uploadedDocuments ?? []).some(
+              (doc) => isIdentityDocumentType(doc?.type ?? '')
+            )}
+          />
+        )}
       </div>
       <OrderFlowDisclosure />
     </div>
