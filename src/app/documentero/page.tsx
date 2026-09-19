@@ -1,12 +1,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { HeaderDocumentero } from '@/components/documentero/header';
-import { Arrow, Btn, Card, Check, Eyebrow, FaqList, H2, Initials, PhoneSignatureMock, Section } from '@/components/documentero/ui';
+import { Arrow, Btn, Card, Check, Eyebrow, FaqList, H2, PhoneSignatureMock, Section } from '@/components/documentero/ui';
+import { ReviewersStack, ReviewsDocumentero } from '@/components/documentero/reviews';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { documenteroHomeGraph } from '@/lib/seo/documentero-schema';
 import { getAllPricing, lei } from '@/lib/documentero/services';
 import { HOME_FAQ } from '@/lib/documentero/content';
-import { SOCIAL_PROOF } from '@/lib/seo/constants';
 import { DOCUMENTERO_INDEXABLE } from '@/config/documentero-nav';
 
 export const revalidate = 3600;
@@ -77,17 +77,7 @@ export default async function DocumenteroHome() {
               <Btn href="#acte">Alege actul</Btn>
               <Btn href="#cum" primary={false}>Cum funcționează</Btn>
             </div>
-            <div className="flex items-center gap-3.5 pt-1.5">
-              <div className="flex">
-                <Initials text="A" size={40} />
-                <span className="-ml-3 inline-flex"><Initials text="M" tone={1} size={40} /></span>
-                <span className="-ml-3 inline-flex"><Initials text="D" tone={2} size={40} /></span>
-              </div>
-              <span className="text-[14px] text-d-muted">
-                <strong className="text-d-ink">{SOCIAL_PROOF.ratingValue.toString().replace('.', ',')} din 5</strong> · peste{' '}
-                {SOCIAL_PROOF.roundedDown} de recenzii Google · eDigitalizare SRL, din 2023
-              </span>
-            </div>
+            <ReviewersStack />
           </div>
           <div className="relative lg:col-span-6">
             <Image
@@ -198,7 +188,7 @@ export default async function DocumenteroHome() {
               <Eyebrow>Ce primești</Eyebrow>
               <h2 className="m-0 text-[32px] font-bold leading-[1.05] tracking-[-0.03em] sm:text-[40px]">Un singur preț, cu tot inclus. Fără surprize la final.</h2>
               <ul className="m-0 flex list-none flex-col gap-3 p-0 text-[16px]">
-                {['Onorariul avocatului și împuternicirea avocațială', 'Depunerea și ridicarea de la starea civilă', 'Scan pe email + originalul pe hârtie securizată', 'Factură, status în cont, TVA inclus'].map((t) => (
+                {['Onorariul avocatului și împuternicirea avocațială', 'Depunerea și ridicarea de la starea civilă', 'Scan pe email + originalul pe hârtie securizată', 'Factură, status pe email și pe pagina de urmărire, TVA inclus'].map((t) => (
                   <li key={t} className="flex items-center gap-2.5"><Check className="shrink-0 text-d-acc" /> {t}</li>
                 ))}
               </ul>
@@ -240,26 +230,7 @@ export default async function DocumenteroHome() {
           </div>
         </Section>
 
-        {/* Reviews — real Google reviews go here; initials, no invented faces. */}
-        <Section className="mt-20 flex flex-col gap-7 lg:mt-[88px]">
-          <H2>Ce spun clienții</H2>
-          <div className="grid gap-5 md:grid-cols-3">
-            {[
-              ['[Recenzie Google reală 1, cu acordul clientului]', 'A.', 'Torino, Italia · certificat de naștere', 0],
-              ['[Recenzie Google reală 2]', 'M.', 'Cluj · certificat de celibat', 1],
-              ['[Recenzie Google reală 3]', 'D.', 'Madrid, Spania · extras multilingv', 2],
-            ].map(([t, i, s, tone]) => (
-              <Card key={String(i)} className="flex flex-col gap-4 p-6">
-                <div className="flex gap-0.5 text-d-acc" aria-label="5 din 5 stele">★★★★★</div>
-                <blockquote className="m-0 text-[17px] leading-[1.55]">„{t}”</blockquote>
-                <figcaption className="flex items-center gap-3">
-                  <Initials text={String(i)} tone={tone as 0 | 1 | 2} />
-                  <div className="flex flex-col"><span className="text-[14px] font-bold">[Prenume {i}]</span><span className="text-[12px] text-d-muted">{s}</span></div>
-                </figcaption>
-              </Card>
-            ))}
-          </div>
-        </Section>
+        <ReviewsDocumentero />
 
         {/* FAQ */}
         <Section id="faq" className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">

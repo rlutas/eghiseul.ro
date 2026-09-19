@@ -58,7 +58,7 @@ export default async function ExtrasMultilingvPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
-      <HeaderDocumentero active="Extras multilingv" />
+      <HeaderDocumentero active="/extras-multilingv/" />
       <main id="main-content">
         <ServiceHero
           crumb="Extras multilingv de naștere"

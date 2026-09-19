@@ -62,9 +62,16 @@ pentru email `public/images/brand/documentero-email-logo.png` (165×40 în heade
 
 ## Structura paginilor
 
-Toate paginile publice au același header (semn + wordmark, cinci linkuri,
-„Contul meu”, „Comandă online”) și același footer (descriere, certificate,
-ghiduri, companie, linia legală cu firma, ANPC, neafiliere).
+Toate paginile publice au același header (semn + wordmark; linkurile în
+ordinea Certificat naștere · Certificat căsătorie · Certificat celibat ·
+Extras multilingv cu dropdown naștere/căsătorie, fiecare cu „Comandă” către
+formularul lui · Ghiduri; „Urmărește comanda” — NU „Contul meu”, documentero
+vinde fără cont; „Comandă online”; meniu `<details>` sub 1280 px) și același
+footer (descriere, certificate, ghiduri, companie, iar jos: firma + Telefonul
+Consumatorului la stânga, badge-urile ANPC SAL/SOL la dreapta, neafiliere).
+Recenziile de pe acasă sunt cele reale din profilul Google al eGhișeul.ro,
+filtrate pe stare civilă, cu pozele de profil ale clienților
+(`src/lib/documentero/reviews.ts`).
 
 - Acasă: hero cu poză + card de status, selector „Ce act ai nevoie?” (cinci
   carduri), bandă de încredere, trei pași cu poze, bandă întunecată cu prețul și
@@ -91,7 +98,8 @@ apare „Cargus”), export WebP la 1600 px lățime, `alt` descriptiv.
 
 Sloturile marcate „FOTO REALĂ” (echipa, avocata, autorul) se umplu doar cu
 fotografii reale. Recenziile se preiau din profilul Google, cu inițiale, fără
-chipuri.
+chipuri — decizie înlocuită pe 19.09: Raul a cerut pozele de profil reale de pe
+Google, deci recenziile au poza clientului, nu inițiale.
 
 Ilustrațiile desenate în CSS (telefonul cu semnătura la pasul 1, certificatul pe
 masă) se refac ca SVG-uri statice în implementare.

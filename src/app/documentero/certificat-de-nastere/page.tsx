@@ -69,7 +69,7 @@ export default async function NasterePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
-      <HeaderDocumentero active="Certificat de naștere" />
+      <HeaderDocumentero active="/certificat-de-nastere/" />
       <main id="main-content">
         <ServiceHero
           crumb="Certificat de naștere"

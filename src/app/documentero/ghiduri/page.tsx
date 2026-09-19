@@ -26,7 +26,7 @@ export default function GhiduriPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
-      <HeaderDocumentero active="Ghiduri" />
+      <HeaderDocumentero active="/ghiduri/" />
       <main id="main-content">
         <Section className="mt-12 flex flex-col gap-5">
           <nav aria-label="breadcrumb" className="flex gap-2 text-[13px] text-d-muted">

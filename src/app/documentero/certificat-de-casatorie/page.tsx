@@ -67,7 +67,7 @@ export default async function CasatoriePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
-      <HeaderDocumentero active="Căsătorie" />
+      <HeaderDocumentero active="/certificat-de-casatorie/" />
       <main id="main-content">
         <ServiceHero
           crumb="Certificat de căsătorie"

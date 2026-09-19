@@ -60,6 +60,9 @@ const nextConfig: NextConfig = {
         { source: '/', has: onDocumentero, destination: '/documentero' },
         { source: '/robots.txt', has: onDocumentero, destination: '/documentero/robots.txt' },
         { source: '/sitemap.xml', has: onDocumentero, destination: '/documentero/sitemap.xml' },
+        // Browsers and crawlers that ignore <link rel="icon"> ask for
+        // /favicon.ico; on this host it is documentero's, not eghiseul's.
+        { source: '/favicon.ico', has: onDocumentero, destination: '/images/documentero/favicon.ico' },
         {
           source: `/:path((?!(?:${SHARED})(?:/|$)).+)`,
           has: onDocumentero,

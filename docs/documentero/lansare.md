@@ -31,8 +31,12 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
 - [ ] Pagini legale proprii (T&C, confidențialitate, anulare, cookies) cu
   brandul documentero; până atunci footerul și disclosure-ul trimit la cele de
   pe eghiseul.ro (`Brand.legalBaseUrl`).
-- [ ] Assets: logo SVG (normal, alb), favicon, apple-icon, OG implicit, logo
-  pentru email; cele trei fotografii refăcute fără mărci și exportate WebP.
+- [x] Favicon + apple-icon proprii (19.09: `src/app/documentero/icon.png`,
+  `apple-icon.png`, `public/images/documentero/favicon.ico`; excepție în
+  `proxy.ts`).
+- [ ] Assets rămase: logo SVG (normal, alb), OG implicit
+  `/og/documentero-default.png`, logo pentru email; cele trei fotografii
+  refăcute fără mărci și exportate WebP.
 - [x] `registryPlatform` din brandul comenzii la alocarea numerelor (19.09).
 - [ ] Emailurile secundare cu `brand`; textele „eghiseul.ro” rămase în KYC,
   auth, cont.
@@ -46,7 +50,9 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
 
 - [ ] Textele finale pentru cele patru pagini de serviciu, trecute prin
   humanizer și prin testul de similaritate.
-- [ ] Trei recenzii Google alese, cu inițiale.
+- [x] Recenzii Google reale (19.09): 9 recenzii 5★ despre stare civilă din
+  profilul eGhișeul.ro, cu pozele de profil, în `src/lib/documentero/reviews.ts`;
+  nota de proveniență + data citirii sub carduri.
 - [x] Poza avocatei (Tarța Ana Gabriela, avocat-tarta.ro) în `public/images/documentero/`;
   textul de pe „Despre” e factual, din site-ul ei. Rămâne: poză reală a echipei.
 - [ ] Numărul real de acte obținute (înlocuiește `[N]` în „Despre”).

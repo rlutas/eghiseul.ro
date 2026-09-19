@@ -26,6 +26,13 @@ const WORDPRESS_GONE = /^\/(wp-admin|wp-content|wp-includes|wp-json)(\/|$)|^\/(w
  * never touches the rewritten requests.
  */
 const DOCUMENTERO_INTERNAL = /^\/documentero(\/|$)/
+/**
+ * The only files under `/documentero/` that must stay reachable: the icons
+ * Next.js emits from `src/app/documentero/icon.png` and `apple-icon.png`
+ * (their <link> href is the segment path, `/documentero/icon.png?<hash>`).
+ * Without this the documentero tab showed eghiseul's favicon (19.09.2026).
+ */
+const DOCUMENTERO_STATIC_ICON = /^\/documentero\/(icon|apple-icon)\d*\.(png|svg|ico)$/
 
 export async function proxy(request: NextRequest) {
   if (WORDPRESS_GONE.test(request.nextUrl.pathname)) {
@@ -34,7 +41,10 @@ export async function proxy(request: NextRequest) {
       headers: { 'X-Robots-Tag': 'noindex' },
     })
   }
-  if (DOCUMENTERO_INTERNAL.test(request.nextUrl.pathname)) {
+  if (
+    DOCUMENTERO_INTERNAL.test(request.nextUrl.pathname) &&
+    !DOCUMENTERO_STATIC_ICON.test(request.nextUrl.pathname)
+  ) {
     return new NextResponse(null, {
       status: 404,
       headers: { 'X-Robots-Tag': 'noindex' },

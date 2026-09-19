@@ -67,7 +67,7 @@ export default async function CelibatPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
-      <HeaderDocumentero active="Celibat" />
+      <HeaderDocumentero active="/certificat-de-celibat/" />
       <main id="main-content">
         <ServiceHero
           crumb="Certificat de celibat"

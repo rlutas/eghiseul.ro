@@ -58,7 +58,7 @@ export default async function GhidPierdutPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
-      <HeaderDocumentero active="Ghiduri" />
+      <HeaderDocumentero active="/ghiduri/" />
       <main id="main-content">
         <Section className="mt-10 grid gap-8 lg:grid-cols-12">
           <article className="flex flex-col gap-5 lg:col-span-8">

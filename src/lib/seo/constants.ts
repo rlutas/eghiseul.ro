@@ -273,11 +273,11 @@ export const ORGANIZATION = {
  * citește de AICI.
  *
  * ⚠️ Actualizare: cere numărul curent din profilul Google și schimbă DOAR aici.
- * Ultima verificare: 09.09.2026 (Raul, captură din profilul Google: 4,9 / 464).
+ * Ultima verificare: 19.09.2026 (Google Maps, profilul eGhișeul.ro: 4,9 / 470).
  */
 export const SOCIAL_PROOF = {
   ratingValue: 4.9,
-  reviewCount: 464,
+  reviewCount: 470,
   /** Formă „peste 450" — rotunjit în jos la zeci, ca să rămână adevărat între actualizări. */
   get roundedDown(): number {
     return Math.floor(this.reviewCount / 10) * 10;
