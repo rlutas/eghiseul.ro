@@ -1,5 +1,21 @@
 import type { NextConfig } from 'next';
 
+/**
+ * Hosts served as documentero.ro (the second brand). The real domains plus
+ * preview/local hosts from DOCUMENTERO_EXTRA_HOSTS. Used by rewrites (route the
+ * host to its group) and redirects (eghiseul's 301s must not fire there).
+ */
+const DOCUMENTERO_HOSTS = [
+  'documentero.ro',
+  'www.documentero.ro',
+  ...(process.env.DOCUMENTERO_EXTRA_HOSTS ?? '')
+    .split(',')
+    .map((h) => h.trim().toLowerCase())
+    .filter(Boolean),
+];
+const DOCUMENTERO_HOST_RE = `(?:${DOCUMENTERO_HOSTS.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`;
+const onDocumentero = [{ type: 'host' as const, value: DOCUMENTERO_HOST_RE }];
+
 const nextConfig: NextConfig = {
   // Knowledge Center (/admin/ghid) citește markdown-ul din `docs/` la runtime.
   // Vercel împachetează în funcție DOAR fișierele urmărite static, iar
@@ -38,16 +54,6 @@ const nextConfig: NextConfig = {
    * eghiseul.ro/documentero/… can never be crawled as a duplicate.
    */
   async rewrites() {
-    const hosts = [
-      'documentero.ro',
-      'www.documentero.ro',
-      ...(process.env.DOCUMENTERO_EXTRA_HOSTS ?? '')
-        .split(',')
-        .map((h) => h.trim().toLowerCase())
-        .filter(Boolean),
-    ];
-    const hostRe = `(?:${hosts.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`;
-    const onDocumentero = [{ type: 'host' as const, value: hostRe }];
     const SHARED = 'api|_next|comanda|account|orders|auth|completare|reincarca-poza|documentero|images|og|icons|fonts|favicon\\.ico|icon\\.png|apple-icon\\.png|manifest\\.json|\\.well-known';
     return {
       beforeFiles: [
@@ -68,7 +74,10 @@ const nextConfig: NextConfig = {
   },
 
   async redirects() {
-    return [
+    // Every rule below is eghiseul.ro history (WordPress URLs, cleanup 301s).
+    // On documentero.ro the same paths are different pages (/despre/,
+    // /certificat-de-celibat/), so none of these may fire there.
+    const rules = [
       // Rute de auth care au fost trimise în emailuri, dar n-au existat niciodată
       // ca pagini (404 până pe 17.09.2026). Le ținem redirectate temporar pentru
       // linkurile deja ajunse în inboxul clienților.
@@ -327,6 +336,7 @@ const nextConfig: NextConfig = {
       { source: '/category/informatii-utile/extras-de-carte-funciara', destination: '/servicii/extras-de-carte-funciara/', permanent: true },
       { source: '/cookies-policy', destination: '/politica-cookies/', permanent: true },
     ];
+    return rules.map((r) => ({ ...r, missing: [...(('missing' in r && Array.isArray(r.missing)) ? r.missing : []), ...onDocumentero] }));
   },
 
   // Baseline security headers on every route. HSTS is already added by Vercel

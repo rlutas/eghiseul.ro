@@ -1,5 +1,6 @@
 import { BRANDS } from '@/lib/brand/brands';
 import { DOCUMENTERO_SITEMAP } from '@/config/documentero-sitemap';
+import { DOCUMENTERO_INDEXABLE } from '@/config/documentero-nav';
 
 /**
  * sitemap.xml for documentero.ro — CURATED, not generated from routes
@@ -8,7 +9,8 @@ import { DOCUMENTERO_SITEMAP } from '@/config/documentero-sitemap';
  */
 export function GET(): Response {
   const base = BRANDS.documentero.baseUrl;
-  const urls = DOCUMENTERO_SITEMAP.map(
+  // Until launch the site is noindex everywhere; an empty sitemap says the same thing.
+  const urls = (DOCUMENTERO_INDEXABLE ? DOCUMENTERO_SITEMAP : []).map(
     (e) =>
       `  <url><loc>${base}${e.path}</loc>${e.lastModified ? `<lastmod>${e.lastModified}</lastmod>` : ''}<changefreq>${e.changeFrequency ?? 'monthly'}</changefreq><priority>${(e.priority ?? 0.7).toFixed(1)}</priority></url>`
   );

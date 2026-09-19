@@ -31,11 +31,11 @@ export function OrderFlowDisclosure() {
         <p className="text-[12px] leading-relaxed text-neutral-500">
           eDigitalizare SRL · CUI RO49278701 · Reg. Com. J2023001097301 · Jud. Satu Mare, Com.
           Odoreu, Str. Salcâmilor nr. 2 ·{' '}
-          <Link href="/termeni-si-conditii/" className="underline underline-offset-2 hover:text-neutral-700">
+          <Link href={`${brand.legalBaseUrl}/termeni-si-conditii/`} className="underline underline-offset-2 hover:text-neutral-700">
             Termeni și condiții
           </Link>{' '}
           ·{' '}
-          <Link href="/politica-de-confidentialitate/" className="underline underline-offset-2 hover:text-neutral-700">
+          <Link href={`${brand.legalBaseUrl}/politica-de-confidentialitate/`} className="underline underline-offset-2 hover:text-neutral-700">
             Confidențialitate
           </Link>{' '}
           ·{' '}

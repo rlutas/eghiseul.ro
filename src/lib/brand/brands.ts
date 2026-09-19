@@ -56,6 +56,11 @@ export interface Brand {
   registryPlatform: RegistryPlatform;
   /** One-line disclosure used in email footers and order screens. */
   legalTagline: string;
+  /**
+   * Absolute origin of the legal pages (T&C, confidențialitate, anulare).
+   * documentero points at eghiseul.ro until it has its own texts.
+   */
+  legalBaseUrl: string;
 }
 
 export const DEFAULT_BRAND_ID: BrandId = 'eghiseul';
@@ -85,6 +90,7 @@ export const BRANDS: Record<BrandId, Brand> = {
     ogDefault: '/og/default.png',
     serviceSlugs: null,
     registryPlatform: 'eghiseul',
+    legalBaseUrl: 'https://eghiseul.ro',
     legalTagline:
       'eDigitalizare SRL · CUI RO49278701 · eGhișeul.ro este un serviciu privat de asistență la obținerea de documente; nu suntem instituție de stat.',
   },
@@ -98,12 +104,14 @@ export const BRANDS: Record<BrandId, Brand> = {
     whatsappNumber: '40757708181',
     emailFrom: 'documentero.ro <contact@documentero.ro>',
     emailLogoUrl: 'https://documentero.ro/images/brand/documentero-email-logo.png',
-    emailHeaderBg: '#1C1A17',
-    emailCtaBg: '#C8401F',
-    emailCtaFg: '#FFFFFF',
+    // Paleta C1 (docs/documentero/design.md): pădure, mentă.
+    emailHeaderBg: '#0F2A22',
+    emailCtaBg: '#2FBF8F',
+    emailCtaFg: '#0F2A22',
     ogDefault: '/og/documentero-default.png',
     serviceSlugs: DOCUMENTERO_SERVICE_SLUGS,
     registryPlatform: 'documentero',
+    legalBaseUrl: 'https://eghiseul.ro',
     legalTagline:
       'eDigitalizare SRL · CUI RO49278701 · documentero.ro este un serviciu privat de asistență la obținerea actelor de stare civilă; nu suntem instituție de stat.',
   },
