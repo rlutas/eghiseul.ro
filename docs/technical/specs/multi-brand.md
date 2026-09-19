@@ -117,6 +117,20 @@ linia legală.
   primește șablonul `%s | eGhiseul.ro` din root).
 - `src/app/documentero/layout.tsx` are `metadataBase` și titlul implicit
   documentero; `verification.google` se completează când există proprietatea GSC.
+- Rutele partajate (`(order)`: checkout, success, status, cont) iau titlul din
+  `generateMetadata` al layout-ului `(order)` — pe documentero `title.absolute`
+  + șablon `%s | documentero.ro`, `noindex`; pe eghiseul returnează `{}` și
+  rămâne root-ul. Fără asta tab-ul arăta „eGhișeul.ro” (19.09).
+- Iconițe: convențiile de fișier din segmentul RĂDĂCINĂ (`src/app/icon.png`,
+  `apple-icon.png`) se injectează pe orice pagină, deci documentero are
+  `src/app/documentero/icon.png` + `apple-icon.png` (Next păstrează iconițele
+  statice ale celui mai adânc segment). `proxy.ts` exceptează exact aceste două
+  căi de la 404-ul pe `/documentero/*`; `/favicon.ico` e rescris pe host către
+  `public/images/documentero/favicon.ico`, iar cel eghiseul stă în
+  `public/favicon.ico` (nu mai e injectat ca `<link>`).
+- Header documentero: `DOCUMENTERO_NAV` + `DOCUMENTERO_SERVICES_MENU`
+  (`src/config/documentero-nav.ts`) — „Servicii” cu mega-meniu, fără cont;
+  urmărirea comenzii e `/comanda/status/` (`DOCUMENTERO_TRACK_HREF`).
 - Sitemap documentero e CURATORIAT: `src/config/documentero-sitemap.ts`. O
   pagină intră acolo doar când e scrisă și gata de index. Placeholder-ul de
   acasă e `noindex`.
@@ -152,7 +166,8 @@ Teste: `tests/unit/lib/brand/brands.test.ts`.
 
 ## Rămase (în ordinea în care dor)
 
-1. Alocarea numerelor de Barou cu `platform` din comandă (vezi mai sus).
+1. ~~Alocarea numerelor de Barou cu `platform` din comandă~~ — făcut 19.09
+   (`registryPlatform` din brandul comenzii; registrul `003` aplicat).
 2. Emailurile din fluxul de comandă care încă nu primesc `brand` (transfer
    bancar, document gata, completare, reîncărcare poză, recovery).
 3. Texte cu „eghiseul.ro” în wizard/KYC/login (`SelfieLegalNotice`, paginile

@@ -16,14 +16,20 @@ tehnic, cum arată, ce conținut are și ce mai e de făcut până la lansare.
 | Lansare: ce lipsește, în ordine, cine face | [`lansare.md`](lansare.md) |
 | Prompturile pentru pozele care lipsesc (le generează Raul) | [`prompturi-poze.md`](prompturi-poze.md) |
 
-## Stare (19.09.2026)
+## Stare (19.09.2026, seara)
 
-- Fundația tehnică e pe `main` din 19.09 (rutare, brand, migrarea 181, emailuri,
-  admin). `documentero.ro` răspunde cu placeholder `noindex` până se scriu paginile.
-- Designul e complet în canvas (12 artboard-uri): acasă, trei pagini de serviciu,
-  formular (3 ecrane + mobil), ghiduri, ghid, despre, contact, mobil, logo.
-  Paleta C1 și logo-ul „d cu colț îndoit” sunt alese de Raul.
-- Nu e lansat. Lista de blocaje: [`lansare.md`](lansare.md).
+- Fundația tehnică e pe `main` (rutare, brand, migrarea 181, emailuri, admin,
+  registrul `003`). `documentero.ro` e live cu DNS pe Vercel, HTTPS, favicon
+  propriu; toate paginile sunt încă `noindex` (`DOCUMENTERO_INDEXABLE`).
+- Paginile publice sunt implementate: acasă (hub cu toate actele), naștere,
+  căsătorie, celibat, extras multilingv, ghiduri + primul ghid, despre, contact.
+  Header cu mega-meniu „Servicii”, footer cu ANPC, recenzii Google reale cu
+  poze, animații light, ritm de spațiere unificat.
+- Comanda de test `E-260919-ADXE7` a trecut wizardul și e în checkout
+  (`pending`, `platform='documentero'`); plata și verificările de după plată
+  sunt la Raul (vezi [`lansare.md`](lansare.md)).
+- Nu e lansat. Lista de blocaje, bifată: [`lansare.md`](lansare.md).
+  Jurnal: [`../changelog/`](../changelog/README.md) (intrările din 19.09).
 
 ## Reguli scurte
 
