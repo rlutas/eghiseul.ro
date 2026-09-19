@@ -76,6 +76,7 @@ export async function GET(request: NextRequest) {
         delivery_tracking_number,
         delivery_method,
         is_test,
+        platform,
         customer_data,
         selected_options,
         created_at,
@@ -120,6 +121,14 @@ export async function GET(request: NextRequest) {
       query = (query as any).eq('is_test', false);
     }
     // 'all' → no filter
+
+    // Brand filter (`?platform=eghiseul|documentero`) — the two public sites
+    // share this list; the chip narrows it to one of them.
+    const platformFilter = searchParams.get('platform');
+    if (platformFilter === 'eghiseul' || platformFilter === 'documentero') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      query = (query as any).eq('platform', platformFilter);
+    }
 
     // Service filter — exact match on service_id (UUID). The UI passes the
     // service id from the services dropdown.

@@ -13,8 +13,16 @@
 
 import type { Metadata } from 'next';
 import { BASE_URL, ORGANIZATION } from './constants';
+import { BRANDS, type Brand, type BrandId } from '@/lib/brand/brands';
 
 export interface PageMetadataInput {
+  /**
+   * Which public site the page belongs to. Default eghiseul (BASE_URL,
+   * eGhișeul.ro as siteName) — every existing page is unchanged. documentero
+   * pages pass `brand: 'documentero'` and get absolute canonical/OG URLs on
+   * documentero.ro.
+   */
+  brand?: Brand | BrandId;
   /** Browser tab title + SERP headline. Aim 50-60 chars. */
   title: string;
   /** SERP snippet. Aim 140-160 chars. */
@@ -35,13 +43,21 @@ export interface PageMetadataInput {
 }
 
 export function buildPageMetadata(input: PageMetadataInput): Metadata {
-  const url = `${BASE_URL}${input.path}`;
+  const brand: Brand | null = !input.brand
+    ? null
+    : typeof input.brand === 'string'
+      ? BRANDS[input.brand]
+      : input.brand;
+  const base = brand?.baseUrl ?? BASE_URL;
+  const url = `${base}${input.path}`;
   // Fallback la imaginea OG default când pagina nu specifică una proprie,
   // altfel openGraph de aici suprascrie default-ul din root layout fără imagine.
-  const ogImage = `${BASE_URL}${input.ogImage ?? '/og/default.png'}`;
+  const ogImage = `${base}${input.ogImage ?? brand?.ogDefault ?? '/og/default.png'}`;
 
   return {
-    title: input.title,
+    // Brand pages carry the whole title: the root layout's `%s | eGhiseul.ro`
+    // template must not be appended to a documentero page.
+    title: brand && brand.id !== 'eghiseul' ? { absolute: input.title } : input.title,
     description: input.description,
     alternates: { canonical: url },
     openGraph: {
@@ -49,7 +65,7 @@ export function buildPageMetadata(input: PageMetadataInput): Metadata {
       url,
       title: input.title,
       description: input.description,
-      siteName: ORGANIZATION.name,
+      siteName: brand?.name ?? ORGANIZATION.name,
       locale: 'ro_RO',
       images: [{ url: ogImage, width: 1200, height: 630 }],
     },

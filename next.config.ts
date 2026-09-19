@@ -22,6 +22,51 @@ const nextConfig: NextConfig = {
   // post-launch would invalidate ~26M impressions of cached results.
   trailingSlash: true,
 
+  /**
+   * documentero.ro — the second brand served by this deployment (2026-09-19,
+   * docs/technical/specs/multi-brand.md). Host-based, decided HERE and not in
+   * middleware, so eghiseul requests pay nothing for it.
+   *
+   * On the documentero host every public path is served from the
+   * `src/app/documentero/` route group; a path that has no page there
+   * (calculatoare, blog, cazier…) simply 404s — the two sites never show each
+   * other's content. The wizard, checkout, status, account, auth and /api are
+   * shared as-is (their brand comes from the host via src/lib/brand/server.ts
+   * and, once an order exists, from orders.platform).
+   *
+   * On any other host the internal group path is hidden, so
+   * eghiseul.ro/documentero/… can never be crawled as a duplicate.
+   */
+  async rewrites() {
+    const hosts = [
+      'documentero.ro',
+      'www.documentero.ro',
+      ...(process.env.DOCUMENTERO_EXTRA_HOSTS ?? '')
+        .split(',')
+        .map((h) => h.trim().toLowerCase())
+        .filter(Boolean),
+    ];
+    const hostRe = `(?:${hosts.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`;
+    const onDocumentero = [{ type: 'host' as const, value: hostRe }];
+    const SHARED = 'api|_next|comanda|account|orders|auth|completare|reincarca-poza|documentero|images|og|icons|fonts|favicon\\.ico|icon\\.png|apple-icon\\.png|manifest\\.json|\\.well-known';
+    return {
+      beforeFiles: [
+        { source: '/', has: onDocumentero, destination: '/documentero' },
+        { source: '/robots.txt', has: onDocumentero, destination: '/documentero/robots.txt' },
+        { source: '/sitemap.xml', has: onDocumentero, destination: '/documentero/sitemap.xml' },
+        {
+          source: `/:path((?!(?:${SHARED})(?:/|$)).+)`,
+          has: onDocumentero,
+          destination: '/documentero/:path',
+        },
+        // The internal group path (`/documentero/…` typed literally, on any
+        // host) is refused in src/proxy.ts — middleware sees the ORIGINAL
+        // path, whereas a rewrite rule here would also catch the requests
+        // the rules above just rewrote.
+      ],
+    };
+  },
+
   async redirects() {
     return [
       // Rute de auth care au fost trimise în emailuri, dar n-au existat niciodată

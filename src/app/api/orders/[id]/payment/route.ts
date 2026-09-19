@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { appBaseForOrder } from '@/lib/brand/for-order'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createHostedCheckoutSession } from '@/lib/stripe'
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { data, error: orderError } = await serviceClient
       .from('orders')
       .select(`
-        id, user_id, order_number, friendly_order_id, total_price, base_price, options_price, delivery_price, delivery_method, coupon_code, discount_amount, selected_options, payment_status, stripe_payment_intent_id, created_at, customer_data,
+        id, user_id, order_number, friendly_order_id, total_price, base_price, options_price, delivery_price, delivery_method, coupon_code, discount_amount, selected_options, payment_status, stripe_payment_intent_id, created_at, customer_data, platform,
         services (
           name
         )
@@ -361,9 +362,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         : null,
     })
 
-    // Origin for return_url — has to be absolute. Falls back to localhost
-    // for dev when NEXT_PUBLIC_APP_URL isn't set.
-    const origin = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    // Origin for return_url — has to be absolute, and on the BRAND the order
+    // was placed on (orders.platform): a documentero customer must come back
+    // to documentero.ro after Stripe, whatever host this request came in on.
+    // eghiseul keeps the NEXT_PUBLIC_APP_URL dev override (localhost fallback).
+    const origin = (order as { platform?: string | null }).platform === 'documentero'
+      ? appBaseForOrder(order as { platform?: string | null })
+      : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000')
 
     const session = await createHostedCheckoutSession({
       customer: stripeCustomer,

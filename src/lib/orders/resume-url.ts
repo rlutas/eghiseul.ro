@@ -12,6 +12,9 @@
  * e adevărat, inclusiv pentru cuponul dat la telefon.
  */
 
+import { appBaseForOrder } from '@/lib/brand/for-order';
+
+/** eghiseul origin (legacy callers without an order at hand). */
 export function appBase(): string {
   return process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
 }
@@ -23,12 +26,15 @@ export function buildResumeUrl(order: {
   serviceSlug: string | null;
   email: string;
   couponCode?: string | null;
+  /** `orders.platform` — the link must open on the brand the order was placed on. */
+  platform?: string | null;
 }): string {
+  const base0 = appBaseForOrder(order);
   if (order.status === 'draft' && order.serviceSlug && order.friendly_order_id) {
     const qs = new URLSearchParams({ order: order.friendly_order_id, email: order.email });
     if (order.couponCode) qs.set('coupon', order.couponCode);
-    return `${appBase()}/comanda/${order.serviceSlug}?${qs.toString()}`;
+    return `${base0}/comanda/${order.serviceSlug}?${qs.toString()}`;
   }
-  const base = `${appBase()}/comanda/checkout/${order.id}`;
+  const base = `${base0}/comanda/checkout/${order.id}`;
   return order.couponCode ? `${base}?coupon=${encodeURIComponent(order.couponCode)}` : base;
 }

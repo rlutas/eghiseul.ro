@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
   const { data: candidates, error: fetchError } = await supabase
     .from('orders')
     .select(
-      'id, order_number, friendly_order_id, status, total_price, customer_data, updated_at, recovery_email_step, recovery_email_last_sent_at, services(name, slug, processing_config)'
+      'id, order_number, friendly_order_id, status, total_price, customer_data, updated_at, recovery_email_step, recovery_email_last_sent_at, platform, services(name, slug, processing_config)'
     )
     .in('status', ['abandoned', 'draft'])
     .lt('recovery_email_step', FINAL_STEP)
@@ -187,6 +187,7 @@ export async function POST(request: NextRequest) {
         serviceSlug,
         email,
         couponCode,
+        platform: (order as { platform?: string | null }).platform ?? null,
       }),
       'recovery',
       `recovery-step${step}`

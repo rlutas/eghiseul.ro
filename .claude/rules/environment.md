@@ -12,6 +12,10 @@ Lista completă cu capcane. Sursa de adevăr pentru chei: `.env.example`; valori
 
 ```env
 # Core
+# Al doilea brand (documentero.ro) — vezi docs/technical/specs/multi-brand.md.
+# Ambele OPȚIONALE; producția merge fără ele (hosturile reale sunt în cod).
+DOCUMENTERO_EXTRA_HOSTS=        # hosturi extra pentru rewrite (build-time), ex: documentero.local:3000
+BRAND_HOST_OVERRIDES=           # hosturi extra pentru brandFromHost (runtime), ex: documentero=documentero.local:3000
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=

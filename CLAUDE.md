@@ -24,6 +24,7 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 | **Changelog (ce s-a livrat, pe sesiuni)** | `docs/changelog/` — randat echipei în admin la `/admin/ghid` (Knowledge Center); fiecare intrare începe cu `## Pentru echipă`, vezi `.claude/rules/documentation.md` |
 | **SEO (location pages, clustere, keywords, GSC)** | `docs/seo/README.md` |
 | **🔴 Recuperare după spam update (plan + reguli)** | `docs/seo/2026-09-recuperare-spam-update/` + `.claude/rules/content-and-seo.md` |
+| **documentero.ro (al doilea brand, același deploy)** | `docs/technical/specs/multi-brand.md` — rutare pe host, `src/lib/brand/`, `orders.platform`; analiza: `docs/seo/2026-09-19-site-satelit-stare-civila.md` |
 | **WebMCP (tools pentru agenți AI)** | `docs/technical/webmcp.md` |
 | **Cum adaug serviciu nou** | `docs/technical/specs/modular-wizard-guide.md` |
 | **API endpoints** | `docs/technical/api/` + `docs/README.md` (summary) |
@@ -68,6 +69,15 @@ Procedură nouă pentru echipă → `docs/admin/<slug>.md` + `CURATED_GUIDES` î
 
 ### Database Operations
 Vezi `.claude/rules/database.md` pentru reguli detaliate. Ghid complet: `docs/deployment/DATABASE_MIGRATIONS.md`
+
+### Două branduri (eghiseul.ro + documentero.ro)
+
+Același repo/deploy. Paginile publice eghiseul stau în `src/app/(eghiseul)/`,
+rutele partajate (wizard, cont, auth) în `src/app/(order)/`, documentero în
+`src/app/documentero/` (rewrite pe host în `next.config.ts`). Brandul CERERII
+vine din host (`getBrand()` / `useBrand()`), brandul COMENZII din
+`orders.platform` (`brandForOrder()`) — emailuri, Stripe, linkuri. NU citi
+`headers()` din paginile statice eghiseul. Detalii: `docs/technical/specs/multi-brand.md`.
 
 ### Admin Panel
 

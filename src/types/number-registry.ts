@@ -23,7 +23,7 @@ export interface NumberRangeWithStats extends NumberRange {
 }
 
 /** Platforms consuming the central registry. */
-export type RegistryPlatform = 'eghiseul' | 'cazierjudiciaronline' | 'ecazier';
+export type RegistryPlatform = 'eghiseul' | 'cazierjudiciaronline' | 'ecazier' | 'documentero';
 
 export interface NumberRegistryEntry {
   id: string;

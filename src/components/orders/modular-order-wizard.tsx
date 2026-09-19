@@ -35,6 +35,7 @@ import BillingStepModular from './steps-modular/billing-step';
 import { ReviewStepModular } from './steps-modular/review-step';
 import { SystemStatus } from '@/components/services/system-status';
 import { instantPlatformProvider, platformStatusProvider } from '@/lib/services/platform-services';
+import { useBrand } from '@/lib/brand/client';
 
 // Loading fallback
 function StepLoading() {
@@ -75,6 +76,10 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
   // stare afișat pe mobil deasupra formularului.
   const statusProvider = platformStatusProvider(initialService?.slug);
   const isInstantService = !!instantPlatformProvider(initialService?.slug);
+
+  // Which public site this wizard is embedded in (eghiseul / documentero) —
+  // only the wording changes; the flow is identical.
+  const brand = useBrand();
 
   const [stepValid, setStepValid] = useState(false);
   // Componenta modulului curent, ÎMPREUNĂ cu pasul pentru care a fost
@@ -628,8 +633,8 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
             <a
               href={whatsappUrl(
                 state.friendlyOrderId
-                  ? `Bună! Am nevoie de ajutor cu comanda ${state.friendlyOrderId} (eghiseul.ro).`
-                  : 'Bună! Am nevoie de ajutor să finalizez o comandă pe eghiseul.ro.'
+                  ? `Bună! Am nevoie de ajutor cu comanda ${state.friendlyOrderId} (${brand.domain}).`
+                  : `Bună! Am nevoie de ajutor să finalizez o comandă pe ${brand.domain}.`
               )}
               target="_blank"
               rel="noopener noreferrer"

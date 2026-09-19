@@ -101,7 +101,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       phone_contact_notes: notes,
     })
     .eq('id', id)
-    .select('id, friendly_order_id, order_number, status, total_price, customer_data, services(name, slug)')
+    .select('id, friendly_order_id, order_number, status, total_price, customer_data, platform, services(name, slug)')
     .single();
 
   if (updateError) {
@@ -176,6 +176,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         serviceSlug,
         email,
         couponCode: coupon.code,
+        platform: (order as { platform?: string | null }).platform ?? null,
       }),
       'phone',
       'phone-followup'

@@ -17,10 +17,26 @@ import { updateSession } from '@/lib/supabase/middleware'
  */
 const WORDPRESS_GONE = /^\/(wp-admin|wp-content|wp-includes|wp-json)(\/|$)|^\/(wp-login\.php|xmlrpc\.php|wp-cron\.php)$/
 
+/**
+ * `src/app/documentero/` is the documentero.ro route group, reached ONLY via
+ * the host rewrite in next.config.ts (documentero.ro/x → /documentero/x).
+ * Typed literally — on eghiseul.ro (a duplicate of the other site) or on
+ * documentero.ro (the same page under two URLs) — it does not exist.
+ * Middleware sees the path as the user sent it, before the rewrite, so this
+ * never touches the rewritten requests.
+ */
+const DOCUMENTERO_INTERNAL = /^\/documentero(\/|$)/
+
 export async function proxy(request: NextRequest) {
   if (WORDPRESS_GONE.test(request.nextUrl.pathname)) {
     return new NextResponse(null, {
       status: 410,
+      headers: { 'X-Robots-Tag': 'noindex' },
+    })
+  }
+  if (DOCUMENTERO_INTERNAL.test(request.nextUrl.pathname)) {
+    return new NextResponse(null, {
+      status: 404,
       headers: { 'X-Robots-Tag': 'noindex' },
     })
   }
@@ -59,6 +75,9 @@ export const config = {
     '/completare/:path*',
     '/reincarca-poza/:path*',
     '/api/:path*',
+    // Grupul intern documentero — literal, nu prin rewrite-ul de host.
+    '/documentero',
+    '/documentero/:path*',
     // Rutele moarte de WordPress — prinse ca să răspundă 410, nu 403.
     '/wp-admin/:path*',
     '/wp-content/:path*',

@@ -13,7 +13,9 @@ import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { PAGE_LAST_MODIFIED, pageLastModified } from '@/lib/seo/last-modified';
 
-const APP_DIR = join(process.cwd(), 'src', 'app');
+// Paginile publice eghiseul stau în grupul de rute `(eghiseul)` din 19.09.2026
+// (două branduri, un deploy — src/lib/brand/); grupul nu apare în URL.
+const APP_DIR = join(process.cwd(), 'src', 'app', '(eghiseul)');
 
 /** Slug → data din `const DATE_MODIFIED = '...'` a paginii, citită de pe disc. */
 function datesFromPages(): Record<string, string> {

@@ -5,6 +5,8 @@
  * /comanda/status/ pre-completat cu numărul comenzii + emailul.
  */
 
+import { BRANDS, brandById, type Brand, type BrandId } from '@/lib/brand/brands';
+
 export interface OrderConfirmationEmailInput {
   friendlyOrderId: string;
   serviceName: string;
@@ -13,6 +15,8 @@ export interface OrderConfirmationEmailInput {
   /** ISO date — estimated completion, shown as a friendly RO date if present. */
   estimatedDate?: string | null;
   statusUrl: string;
+  /** The order's brand (`brandForOrder(order)`); default eghiseul. */
+  brand?: Brand | BrandId;
 }
 
 function esc(s: string): string {
@@ -25,7 +29,8 @@ export function renderOrderConfirmationEmail(input: OrderConfirmationEmailInput)
   text: string;
 } {
   const { friendlyOrderId, serviceName, totalRon, customerName, estimatedDate, statusUrl } = input;
-  const subject = `Confirmare comandă ${friendlyOrderId} — eGhișeul.ro`;
+  const brand: Brand = !input.brand ? BRANDS.eghiseul : typeof input.brand === 'string' ? brandById(input.brand) : input.brand;
+  const subject = `Confirmare comandă ${friendlyOrderId} — ${brand.name}`;
   const hello = customerName ? `Bună, ${esc(customerName)}!` : 'Bună ziua!';
   const estimatedRow = estimatedDate
     ? `<tr><td style="padding:6px 0;color:#64748b;font-size:14px;">Termen estimat</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#0f172a;font-size:14px;">${esc(
@@ -37,11 +42,8 @@ export function renderOrderConfirmationEmail(input: OrderConfirmationEmailInput)
   <div style="display:none;max-height:0;overflow:hidden;">Comanda ${esc(friendlyOrderId)} a fost confirmată. Mulțumim pentru încredere!</div>
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;">
-      <tr><td style="background:#0B1B33;padding:22px 28px;">
-        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-          <td style="vertical-align:middle;padding-right:10px;"><img src="https://eghiseul.ro/icon.png" alt="" width="30" height="30" style="display:block;border:0;border-radius:8px;"></td>
-          <td style="vertical-align:middle;"><span style="color:#ffffff;font-size:18px;font-weight:800;">eGhiseul<span style="color:#ECB95F;">.ro</span></span></td>
-        </tr></table>
+      <tr><td style="background:${brand.emailHeaderBg};padding:22px 28px;">
+        <img src="${esc(brand.emailLogoUrl)}" alt="${esc(brand.name)}" width="165" height="40" style="display:block;border:0;height:40px;width:auto;">
       </td></tr>
       <tr><td style="padding:28px;">
         <h1 style="margin:0 0 6px;font-size:20px;color:#0f172a;">Comanda ta a fost confirmată ✅</h1>
@@ -53,19 +55,19 @@ export function renderOrderConfirmationEmail(input: OrderConfirmationEmailInput)
           <tr><td style="padding:6px 0 12px;color:#64748b;font-size:14px;">Total achitat</td><td style="padding:6px 0 12px;text-align:right;font-weight:800;color:#0f172a;font-size:15px;">${totalRon.toFixed(2)} RON</td></tr>
         </table>
         <table role="presentation" cellpadding="0" cellspacing="0" width="100%"><tr><td align="center">
-          <a href="${esc(statusUrl)}" style="display:inline-block;background:#ECB95F;color:#0B1B33;font-weight:800;font-size:15px;text-decoration:none;padding:14px 28px;border-radius:12px;">Verifică statusul comenzii</a>
+          <a href="${esc(statusUrl)}" style="display:inline-block;background:${brand.emailCtaBg};color:${brand.emailCtaFg};font-weight:800;font-size:15px;text-decoration:none;padding:14px 28px;border-radius:12px;">Verifică statusul comenzii</a>
         </td></tr></table>
-        <p style="margin:22px 0 0;color:#94a3b8;font-size:12px;line-height:1.6;">Te ținem la curent pe email la fiecare pas important. Întrebări? Răspundem rapid pe <a href="https://eghiseul.ro/contact" style="color:#0B1B33;">WhatsApp (pagina de contact)</a> sau la <a href="mailto:contact@eghiseul.ro" style="color:#0B1B33;">contact@eghiseul.ro</a>.</p>
+        <p style="margin:22px 0 0;color:#94a3b8;font-size:12px;line-height:1.6;">Te ținem la curent pe email la fiecare pas important. Întrebări? Răspundem rapid pe <a href="${brand.baseUrl}/contact" style="color:${brand.emailHeaderBg};">WhatsApp (pagina de contact)</a> sau la <a href="mailto:${brand.contactEmail}" style="color:${brand.emailHeaderBg};">${brand.contactEmail}</a>.</p>
       </td></tr>
       <tr><td style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:16px 28px;">
-        <p style="margin:0;color:#94a3b8;font-size:11px;line-height:1.6;">eDigitalizare SRL · CUI RO49278701 · eGhișeul.ro este un serviciu privat de asistență la obținerea de documente; nu suntem instituție de stat.</p>
+        <p style="margin:0;color:#94a3b8;font-size:11px;line-height:1.6;">${esc(brand.legalTagline)}</p>
       </td></tr>
     </table>
   </td></tr></table>
 </body></html>`;
 
   const text = [
-    `Comanda ta a fost confirmată — eGhișeul.ro`,
+    `Comanda ta a fost confirmată — ${brand.name}`,
     ``,
     `Număr comandă: ${friendlyOrderId}`,
     `Serviciu: ${serviceName}`,
@@ -74,7 +76,7 @@ export function renderOrderConfirmationEmail(input: OrderConfirmationEmailInput)
     ``,
     `Verifică statusul comenzii: ${statusUrl}`,
     ``,
-    `Întrebări? WhatsApp +40 757 708 181 · contact@eghiseul.ro`,
+    `Întrebări? WhatsApp ${brand.phoneDisplay} · ${brand.contactEmail}`,
   ]
     .filter(Boolean)
     .join('\n');

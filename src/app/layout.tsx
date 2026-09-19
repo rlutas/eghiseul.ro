@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/providers/query-provider";
-import { Header } from "@/components/shared/header";
-import { WhatsAppFloat } from "@/components/shared/whatsapp-float";
 import { CookieConsent } from "@/components/consent/cookie-consent";
 import { AttributionTracker } from "@/components/analytics/attribution-tracker";
 
@@ -74,9 +72,11 @@ export default function RootLayout({
           Sari la conținut
         </a>
         <QueryProvider>
-          <Header />
+          {/* Header + WhatsApp float live in the route-group layouts:
+              `(eghiseul)` (static eghiseul chrome), `(order)` (chrome chosen
+              per host, shared wizard/account) and `documentero/` — two brands,
+              one deployment. See src/lib/brand/. */}
           {children}
-          <WhatsAppFloat />
           <CookieConsent />
           {/* Atribuire proprie (ce canal aduce comenzi). Nu e profilare
               cross-site și nu implică terți, deci nu depinde de consimțământul

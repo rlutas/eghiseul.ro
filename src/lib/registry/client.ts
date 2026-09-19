@@ -18,7 +18,7 @@
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-export type RegistryPlatform = 'eghiseul' | 'cazierjudiciaronline' | 'ecazier';
+export type RegistryPlatform = 'eghiseul' | 'cazierjudiciaronline' | 'ecazier' | 'documentero';
 export type RegistryNumberType = 'contract' | 'delegation';
 
 export interface AllocateNumberParams {

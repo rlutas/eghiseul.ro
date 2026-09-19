@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useBrand } from '@/lib/brand/client';
 
 /**
  * Nota de neafiliere + datele firmei, pentru ECRANELE DE COMANDĂ.
@@ -9,14 +12,18 @@ import Link from 'next/link';
  * identitate și date de card nu conțineau nicio mențiune că suntem un serviciu
  * privat, niciun link ANPC și niciun dat de firmă (audit 09.09.2026).
  *
+ * Ecranele de comandă sunt partajate de eghiseul.ro și documentero.ro; numele
+ * site-ului vine din brandul cererii (`useBrand`), firma e aceeași.
+ *
  * Ținut compact: e o bandă de subsol, nu un banner care mănâncă din conversie.
  */
 export function OrderFlowDisclosure() {
+  const brand = useBrand();
   return (
     <div className="border-t border-neutral-200 bg-neutral-50">
       <div className="container mx-auto max-w-[1200px] px-4 py-6 space-y-2">
         <p className="text-[13px] leading-relaxed text-neutral-600">
-          eGhișeul.ro este un <strong className="font-semibold">serviciu privat de asistență și
+          {brand.name} este un <strong className="font-semibold">serviciu privat de asistență și
           intermediere</strong> — nu suntem instituție de stat și nu suntem afiliați autorităților.
           Documentele sunt emise exclusiv de autoritățile competente din România, iar serviciul
           nostru este opțional: documentele pot fi solicitate și direct la instituțiile emitente.

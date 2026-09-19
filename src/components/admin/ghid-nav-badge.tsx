@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { GHID_SEEN_EVENT, GHID_SEEN_KEY } from '@/app/admin/ghid/mark-seen';
+import { GHID_SEEN_EVENT, GHID_SEEN_KEY } from '@/app/(eghiseul)/admin/ghid/mark-seen';
 
 /**
  * Badge cu numărul livrărilor nevăzute, pe itemul „Ghid & noutăți" din meniu.

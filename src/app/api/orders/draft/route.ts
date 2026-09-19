@@ -3,6 +3,7 @@ import { timingSafeEqual } from 'crypto';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { generateOrderId, validateOrderId } from '@/lib/order-id';
+import { brandFromRequest } from '@/lib/brand/server';
 
 // Draft order data interface (minimal validation, flexible structure)
 interface DraftOrderData {
@@ -364,6 +365,10 @@ export async function POST(request: NextRequest) {
       payment_status: 'unpaid',
       // Pasul curent din wizard (vezi nota de la updatePayload).
       current_step: data.current_step || 'contact',
+      // Brandul pe care s-a plasat comanda (eghiseul | documentero) — din
+      // hostul cererii, NU din body. Scris o singură dată, la creare; de aici
+      // citesc emailurile, Stripe și linkurile de reluare (brandForOrder).
+      platform: brandFromRequest(request).id,
     };
 
     // Atribuire — scrisă DOAR aici, la creare. Update-urile ulterioare ale

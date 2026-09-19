@@ -1,17 +1,18 @@
 'use client';
 
 import { MessageCircle } from 'lucide-react';
+import { useBrand } from '@/lib/brand/client';
 
 // Hardcoded on purpose — the support number lives in the code, not in a Vercel
 // env var, so it's always correct on the site without extra configuration.
 const SUPPORT_PHONE = '+40 757 708 181';
 
 /** wa.me link with a prefilled message that includes the order code + site so
- *  support instantly knows which order (and that it came from eghiseul.ro). */
-function buildWhatsappUrl(orderCode?: string): string {
+ *  support instantly knows which order (and which brand it came from). */
+function buildWhatsappUrl(site: string, orderCode?: string): string {
   const msg = orderCode
-    ? `Bună! Am o întrebare despre comanda ${orderCode} (eghiseul.ro).`
-    : 'Bună! Am o întrebare despre o comandă de pe eghiseul.ro.';
+    ? `Bună! Am o întrebare despre comanda ${orderCode} (${site}).`
+    : `Bună! Am o întrebare despre o comandă de pe ${site}.`;
   return `https://wa.me/${SUPPORT_PHONE.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`;
 }
 
@@ -25,7 +26,8 @@ function buildWhatsappUrl(orderCode?: string): string {
  * card sits right under the status header.
  */
 export function HelpContactCard({ orderCode }: { orderCode?: string }) {
-  const whatsappUrl = buildWhatsappUrl(orderCode);
+  const brand = useBrand();
+  const whatsappUrl = buildWhatsappUrl(brand.domain, orderCode);
   return (
     <div className="rounded-lg border border-green-200 bg-green-50 p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

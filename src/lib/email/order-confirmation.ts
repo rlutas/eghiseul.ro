@@ -10,6 +10,7 @@
 import { sendEmail } from '@/lib/email/resend';
 import { renderOrderConfirmationEmail } from '@/lib/email/templates/order-confirmation';
 import { brandedEmailHtml, ctaButton, infoRows, escHtml } from '@/lib/email/templates/branded-layout';
+import { appBaseForOrder, brandForOrder } from '@/lib/brand/for-order';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AdminClient = any;
@@ -75,7 +76,7 @@ export async function sendOrderConfirmationIfNeeded(adminClient: AdminClient, or
     .eq('id', orderId)
     .is('confirmation_email_sent_at', null)
     .eq('payment_status', 'paid')
-    .select('id, friendly_order_id, service_id, total_price, estimated_completion_date, customer_data, services(name)')
+    .select('id, friendly_order_id, service_id, total_price, estimated_completion_date, customer_data, platform, services(name)')
     .maybeSingle();
 
   if (claimError) {
@@ -95,19 +96,23 @@ export async function sendOrderConfirmationIfNeeded(adminClient: AdminClient, or
     const friendly = claimed.friendly_order_id || orderId;
     const firstName = cd?.contact?.firstName || cd?.personal?.firstName || cd?.billing?.firstName || null;
     const service = Array.isArray(claimed.services) ? claimed.services[0] : claimed.services;
-    const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
+    // The ORDER's brand (orders.platform): a documentero customer gets a
+    // documentero email with a documentero status link.
+    const brand = brandForOrder(claimed);
+    const base = appBaseForOrder(claimed);
     const statusUrl = `${base}/comanda/status/?order=${encodeURIComponent(friendly)}&email=${encodeURIComponent(email)}`;
 
     const mail = renderOrderConfirmationEmail({
       friendlyOrderId: friendly,
-      serviceName: service?.name || 'Serviciu eGhișeul.ro',
+      serviceName: service?.name || `Serviciu ${brand.name}`,
       totalRon: Number(claimed.total_price) || 0,
       customerName: firstName,
       estimatedDate: claimed.estimated_completion_date || null,
       statusUrl,
+      brand,
     });
 
-    await sendEmail({ to: email, subject: mail.subject, html: mail.html, text: mail.text });
+    await sendEmail({ to: email, subject: mail.subject, html: mail.html, text: mail.text, from: brand.emailFrom });
     console.log(`[order-confirmation] sent for ${friendly} → ${email}`);
 
     // Heads-up colaborator (după emailul clientului; nu afectează claim-ul).
