@@ -1,0 +1,100 @@
+# Conținut și SEO pentru documentero.ro
+
+Sursa cifrelor: Search Console eghiseul.ro, ultimele trei luni înainte de
+19.09.2026 (`docs/seo/2026-09-recuperare-spam-update/gsc/full-3luni/`), plus
+exporturile Semrush din iunie (`docs/seo/keywords/certificat-nastere/`,
+`docs/seo/keywords/certificat-casatorie/`). Cifrele sunt clicuri pe trei luni
+pe eghiseul; documentero pornește de la zero și le ia încet.
+
+## Ce caută oamenii
+
+| Interogare | Clicuri | Afișări | Poziție | Pagina documentero |
+|---|---|---|---|---|
+| duplicat certificat de nastere online | 317 | 1.943 | 2,5 | acasă (hub naștere) |
+| certificat de nastere online | 101 | 846 | 4,3 | acasă |
+| certificat de casatorie online | 62 | 357 | 2,5 | /certificat-de-casatorie/ |
+| schimbare certificat nastere vechi (+ „in tip nou”) | 118 | 772 | 3,2 | ghid „model vechi” |
+| certificat de nastere pierdut (+ variante) | 94 | 2.041 | 7,3 | ghid „pierdut” |
+| certificat de nastere multilingv online | 47 | 241 | 2,0 | /extras-multilingv/ |
+| certificat de celibat online | 47 | 299 | 2,7 | /certificat-de-celibat/ |
+| duplicat certificat de casatorie online | 37 | 237 | 2,1 | /certificat-de-casatorie/ |
+| certificat de celibat romania | 33 | 270 | 3,2 | /certificat-de-celibat/ |
+| certificat de nastere international | 44 | 473 | 4,1 | /extras-multilingv/ |
+| extras multilingv certificat de nastere | 14 | 489 | 4,5 | /extras-multilingv/ |
+| certificat de casatorie | 12 | 2.059 | 4,1 | /certificat-de-casatorie/ |
+
+Volume Semrush pentru orientare: „certificat de nastere” 1.900/lună,
+„duplicat certificat de nastere online” 1.000, „certificat de nastere pierdut”
+590, „schimbare certificat nastere vechi” 480, „acte necesare certificat
+nastere” 390, „certificat de casatorie” 1.600, „eliberare duplicat certificat de
+casatorie” 1.000. Dificultatea e mică peste tot (KD 7–20).
+
+## Paginile de la lansare și cuvintele lor
+
+| URL pe documentero.ro | Titlu (≤ 60) | Cuvinte principale |
+|---|---|---|
+| `/` | Certificat de Naștere Online, Duplicat prin Avocat — documentero.ro | certificat de nastere online, duplicat certificat de nastere online |
+| `/certificat-de-casatorie/` | Certificat de Căsătorie Online: Duplicat, cu Mențiune de Divorț | certificat de casatorie online, duplicat certificat de casatorie online |
+| `/certificat-de-celibat/` | Certificat de Celibat Online (Anexa 9) pentru Străinătate | certificat de celibat online, certificat de celibat romania |
+| `/extras-multilingv/` | Extras Multilingv Certificat de Naștere: Acceptat în UE | certificat de nastere multilingv online, certificat de nastere international |
+| `/ghiduri/` | Ghiduri de stare civilă | (index) |
+| `/ghiduri/certificat-de-nastere-pierdut/` | Certificat de naștere pierdut: ce faci în 2026 | certificat de nastere pierdut, am pierdut certificatul de nastere |
+| `/despre/`, `/contact/`, legal | | (E-E-A-T, nu SEO) |
+
+Extrasul multilingv de căsătorie e o secțiune pe pagina de extras, nu o pagină
+separată: perechea de pe eghiseul avea similaritate 0,75 și nu a adus decât 56
+de clicuri în trei luni.
+
+## Ghiduri, în ordinea publicării (1–2 pe săptămână)
+
+1. Certificat de naștere pierdut: ce faci în 2026 (pierdut 590 + variante).
+2. Certificatul vechi, tipizat, mai e valabil? (schimbare 480; pe eghiseul e
+   singurul articol de stare civilă care încă merge, poziția 1,8).
+3. Acte necesare pentru duplicatul certificatului de naștere (390 + 320).
+4. Valabilitatea certificatului de celibat: 6 luni sau 90 de zile.
+5. Acte pentru căsătoria în străinătate, pe țări.
+6. Transcrierea certificatului de naștere emis în străinătate (diaspora).
+7. Apostila pe acte de stare civilă și când nu e nevoie de ea.
+8. Duplicat certificat de căsătorie cu mențiunea de divorț.
+
+Sectoarele din București (2.350 volum pe cluster) se tratează ca un tabel în
+ghidul de acte necesare, nu ca pagini.
+
+## Cum se scrie
+
+- Propoziții scurte, la persoana a doua, cu ce se întâmplă de fapt la ghișeu.
+  Fără „stă drept mărturie”, fără triade forțate, fără em-dash, fără „nu doar…
+  ci și”. Ghidul e `~/.claude/skills/humanizer`.
+- Verbul: noi obținem, instituția eliberează. Pe fiecare pagină: „serviciu
+  privat”, „poți cere și direct, la ghișeu”, prețul la ghișeu (0 lei sau taxă
+  locală) lângă prețul nostru. Tabelul „la ghișeu sau prin noi” există exact
+  pentru asta.
+- Cifre reale, cu sursă: termenul legal de 30 de zile, art. 10 din Legea
+  119/1996, Regulamentul (UE) 2016/1191, prețurile din `services` și
+  `service_options`. Nimic inventat: nici recenzii, nici număr de comenzi
+  (placeholder `[N]` până îl avem).
+- Fiecare pagină ≥ 20 de linkuri interne primite când site-ul e complet:
+  header, footer, „ai nevoie și de”, „ghiduri pe subiect”, linkuri în text.
+- Testul de similaritate: Jaccard cu numele mascate < 0,65 față de pagina soră
+  de pe eghiseul și față de celelalte pagini documentero. Scriptul e în
+  `docs/seo/2026-09-recuperare-spam-update/research/data/05-scripts/`.
+
+## Schema și metadate
+
+- `buildPageMetadata({ brand: 'documentero', ... })` pentru canonical, OG,
+  titlu absolut.
+- `Organization` documentero: `name` documentero.ro, aceeași `legalName`, CUI,
+  adresă, `parentOrganization` eghiseul.ro. Fără `aggregateRating`.
+- `Service` + `Product` cu `offers` reale pe paginile de serviciu; `Article` cu
+  autor real (pagina de autor de pe eghiseul) pe ghiduri; `FAQPage` doar dacă
+  întrebările sunt pe pagină.
+- Sitemap curatoriat în `src/config/documentero-sitemap.ts`; robots închide
+  `/comanda/`, `/account/`, `/auth/`, `/api/`.
+
+## Legătura cu eghiseul
+
+Declarată, nu ascunsă: „parte din grupul eghiseul.ro” în footer și în Despre,
+`sameAs`/`parentOrganization` în schema. Din eghiseul spre documentero: un link
+în footer și unul pe pagina de serviciu naștere („ghidul complet”). Paginile de
+stare civilă de pe eghiseul rămân; se mută cu 301 doar când documentero le
+depășește pe aceleași interogări.

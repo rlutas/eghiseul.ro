@@ -24,7 +24,7 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 | **Changelog (ce s-a livrat, pe sesiuni)** | `docs/changelog/` — randat echipei în admin la `/admin/ghid` (Knowledge Center); fiecare intrare începe cu `## Pentru echipă`, vezi `.claude/rules/documentation.md` |
 | **SEO (location pages, clustere, keywords, GSC)** | `docs/seo/README.md` |
 | **🔴 Recuperare după spam update (plan + reguli)** | `docs/seo/2026-09-recuperare-spam-update/` + `.claude/rules/content-and-seo.md` |
-| **documentero.ro (al doilea brand, același deploy)** | `docs/technical/specs/multi-brand.md` — rutare pe host, `src/lib/brand/`, `orders.platform`; analiza: `docs/seo/2026-09-19-site-satelit-stare-civila.md` |
+| **documentero.ro (al doilea brand, același deploy)** | `docs/documentero/README.md` (dosarul: design, conținut/SEO, formular, lansare) + `docs/technical/specs/multi-brand.md` (rutare pe host, `src/lib/brand/`, `orders.platform`) |
 | **WebMCP (tools pentru agenți AI)** | `docs/technical/webmcp.md` |
 | **Cum adaug serviciu nou** | `docs/technical/specs/modular-wizard-guide.md` |
 | **API endpoints** | `docs/technical/api/` + `docs/README.md` (summary) |

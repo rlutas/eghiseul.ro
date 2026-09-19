@@ -42,7 +42,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 
 ## 🔑 Referințe rapide (din CLAUDE.md)
 - **Cum adaug un serviciu nou:** [`technical/specs/modular-wizard-guide.md`](technical/specs/modular-wizard-guide.md)
-- **Două branduri, un deploy (eghiseul.ro + documentero.ro):** [`technical/specs/multi-brand.md`](technical/specs/multi-brand.md)
+- **documentero.ro (al doilea brand): dosarul site-ului** — de ce, design, conținut/SEO, formular, lansare: [`documentero/`](documentero/README.md); legătura tehnică: [`technical/specs/multi-brand.md`](technical/specs/multi-brand.md)
 - **Document generation:** [`technical/specs/admin-document-system.md`](technical/specs/admin-document-system.md)
 - **Convenția cu topograful (angajament de execuție):** [`technical/specs/conventie-topograf.md`](technical/specs/conventie-topograf.md)
 - **Solicită documente (cerere de la client + standby):** [`technical/specs/document-request-system.md`](technical/specs/document-request-system.md)
