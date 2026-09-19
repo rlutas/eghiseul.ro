@@ -78,7 +78,7 @@ export const ONORARIU_PER_COMANDA = 15;
 
 export const TVA = 1.21;
 
-export type Platform = 'eghiseul' | 'cjo';
+export type Platform = 'eghiseul' | 'documentero' | 'cjo';
 
 export interface DecontRow {
   id: string;
@@ -114,7 +114,7 @@ async function loadEghiseul(range: { start: string; end: string } | null, warnin
   let query = admin
     .from('orders')
     .select(
-      'id, order_number, status, paid_at, is_test, base_price, options_price, delivery_price, discount_amount, total_price, refunded_amount, additional_paid_amount, selected_options, customer_data, services!inner(slug, name)'
+      'id, order_number, status, paid_at, is_test, platform, base_price, options_price, delivery_price, discount_amount, total_price, refunded_amount, additional_paid_amount, selected_options, customer_data, services!inner(slug, name)'
     )
     .in('services.slug', CAZIER_SLUGS)
     .eq('payment_status', 'paid')
@@ -188,7 +188,9 @@ async function loadEghiseul(range: { start: string; end: string } | null, warnin
     const svc = Array.isArray(o.services) ? o.services[0] : o.services;
     rows.push({
       id: o.id,
-      platform: 'eghiseul',
+      // Same DB, two brands: documentero orders are labelled so the decont
+      // shows where each came from (2026-09-19).
+      platform: o.platform === 'documentero' ? 'documentero' : 'eghiseul',
       orderNumber: o.order_number,
       paidAt: o.paid_at,
       client,
@@ -334,7 +336,9 @@ export function summarize(rows: DecontRow[]) {
 }
 
 export function platformLabel(p: Platform | 'eghiseul' | 'cjo'): string {
-  return p === 'cjo' ? 'cazierjudiciaronline' : 'eghiseul';
+  if (p === 'cjo') return 'cazierjudiciaronline';
+  if (p === 'documentero') return 'documentero';
+  return 'eghiseul';
 }
 
 /** Cât din partea cabinetului mai rămâne după un retur parțial.

@@ -20,6 +20,17 @@
   /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  /* documentero.ro (al doilea brand) — tokens `d-*`, vezi docs/documentero/design.md */
+  --font-bricolage: var(--font-bricolage);
+  --color-d-ink: var(--d-ink);
+  --color-d-acc: var(--d-acc);
+  --color-d-bg: var(--d-bg);
+  --color-d-card: var(--d-card);
+  --color-d-line: var(--d-line);
+  --color-d-muted: var(--d-muted);
+  --color-d-soft: var(--d-soft);
+  --color-d-body: var(--d-body);
+  --color-d-dark-muted: var(--d-dark-muted);
 
   /* Radius Scales */
   --radius-sm: calc(var(--radius) - 4px);    /* 8px */
@@ -176,6 +187,17 @@
 
   /* Base Radius (12-20px rounded corners) */
   --radius: 0.75rem; /* 12px */
+
+  /* documentero.ro — paleta C1 (docs/documentero/design.md) */
+  --d-ink: #0F2A22;
+  --d-acc: #2FBF8F;
+  --d-bg: #FBF9F4;
+  --d-card: #FFFFFF;
+  --d-line: #DCE3DE;
+  --d-muted: #4F5E58;
+  --d-soft: #DDF4EA;
+  --d-body: #26332E;
+  --d-dark-muted: #B9CBC3;
 
   /* ========================================
      PRIMARY: Gold/Auriu (#ECB95F)

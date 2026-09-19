@@ -231,6 +231,7 @@ export default function AdminOrdersPage() {
   useEffect(() => {
     const p = new URLSearchParams();
     if (urlTest !== 'hide') p.set('test', urlTest);
+    if (urlPlatform) p.set('platform', urlPlatform);
     if (urlService !== 'all') p.set('service', urlService);
     if (urlSearch) p.set('search', urlSearch);
     const qs = p.toString();
@@ -240,7 +241,7 @@ export default function AdminOrdersPage() {
         if (d.success) setCounts(d.data as OrdersCounts);
       })
       .catch(() => {});
-  }, [urlTest, urlService, urlSearch]);
+  }, [urlTest, urlService, urlSearch, urlPlatform]);
 
   // Load service options once for the dropdown.
   useEffect(() => {

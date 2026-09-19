@@ -52,6 +52,7 @@ const COLUMNS = [
   'Creat la',
   'Plătit la',
   'Test',
+  'Platformă',
 ] as const;
 
 function tsvEscape(value: unknown): string {
@@ -99,6 +100,7 @@ export async function GET(request: NextRequest) {
         payment_status,
         payment_method,
         is_test,
+        platform,
         courier_provider,
         delivery_tracking_number,
         customer_data,
@@ -189,6 +191,7 @@ export async function GET(request: NextRequest) {
         row.created_at ?? '',
         row.paid_at ?? '',
         row.is_test ? 'test' : '',
+        row.platform ?? 'eghiseul',
       ].map(tsvEscape).join('\t'));
     }
 

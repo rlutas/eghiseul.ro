@@ -23,6 +23,7 @@ import {
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
 import { isForeignBillingCountry } from '@/lib/orders/billing-validation';
 import { allocateNumber, getRegistryClient, formatRegistryNumber } from '@/lib/registry/client';
+import { brandForOrder } from '@/lib/brand/for-order';
 import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
 
 /**
@@ -317,7 +318,7 @@ export async function autoGenerateOrderDocuments(
         // type) — regeneration never wastes a number.
         const allocated = await allocateNumber({
           type: 'contract',
-          platform: 'eghiseul',
+          platform: brandForOrder(order).registryPlatform,
           orderRef: friendlyOrderRef,
           clientName: clientData.name,
           clientEmail: clientData.email || undefined,
@@ -532,7 +533,7 @@ export async function autoGenerateOrderDocuments(
     try {
       const allocated = await allocateNumber({
         type: 'delegation',
-        platform: 'eghiseul',
+        platform: brandForOrder(order).registryPlatform,
         orderRef: friendlyOrderRef,
         clientName: clientData.name,
         clientEmail: clientData.email || undefined,

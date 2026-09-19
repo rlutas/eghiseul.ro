@@ -53,6 +53,8 @@ export async function GET(request: NextRequest) {
     const testFilter = parseTestFilter(searchParams.get('test'));
     const service = searchParams.get('service') || '';
     const search = searchParams.get('search') || '';
+    const platformFilter = searchParams.get('platform');
+    const platform = platformFilter === 'eghiseul' || platformFilter === 'documentero' ? platformFilter : '';
 
     const hiddenList = `(${HIDDEN_FROM_DEFAULT.map((s) => `"${s}"`).join(',')})`;
     const processingList = `(${PROCESSING_GROUP.map((s) => `"${s}"`).join(',')})`;
@@ -68,6 +70,7 @@ export async function GET(request: NextRequest) {
         .select('*', { count: 'exact', head: true });
       if (testFilter === 'hide') q = q.eq('is_test', false);
       if (testFilter === 'only') q = q.eq('is_test', true);
+      if (platform) q = q.eq('platform', platform);
       if (service) q = q.eq('service_id', service);
       if (search) {
         q = q.or(

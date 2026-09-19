@@ -5,6 +5,7 @@ import { requirePermission } from '@/lib/admin/permissions';
 import { generateDocument, type DocumentContext, type ClientData, type CompanyData, type LawyerData } from '@/lib/documents/generator';
 import { uploadFile, generateDocumentKey, downloadFile, deleteFile, getClientSignatureBase64 } from '@/lib/aws/s3';
 import { allocateNumber, findExistingNumber, getRegistryClient } from '@/lib/registry/client';
+import { brandForOrder } from '@/lib/brand/for-order';
 import { isPJForDocumentGeneration } from '@/lib/documents/delegation-items';
 import { computeCerereItems } from '@/lib/documents/cerere-items';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
@@ -320,7 +321,7 @@ export async function POST(
         // Idempotent: reuses the existing allocation on regeneration.
         const allocated = await allocateNumber({
           type: 'contract',
-          platform: 'eghiseul',
+          platform: brandForOrder(order).registryPlatform,
           orderRef: registryOrderRef,
           clientName: clientData.name,
           clientEmail: clientData.email || undefined,
@@ -351,7 +352,7 @@ export async function POST(
         // Idempotent per (order, service_type) — regeneration reuses.
         const allocated = await allocateNumber({
           type: 'delegation',
-          platform: 'eghiseul',
+          platform: brandForOrder(order).registryPlatform,
           orderRef: registryOrderRef,
           clientName: clientData.name,
           clientEmail: clientData.email || undefined,
