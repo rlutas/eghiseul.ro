@@ -12,15 +12,34 @@ import { WhatsAppFloat } from '@/components/shared/whatsapp-float';
 import { HeaderDocumentero } from '@/components/documentero/header';
 import { BrandProvider } from '@/lib/brand/client';
 import { getBrand } from '@/lib/brand/server';
+import { CookieConsent } from '@/components/consent/cookie-consent';
+import { Bricolage_Grotesque } from 'next/font/google';
+
+/** documentero's face on the shared routes (wizard, checkout, cont). */
+const bricolage = Bricolage_Grotesque({ subsets: ['latin', 'latin-ext'], variable: '--font-bricolage', display: 'swap', axes: ['opsz'] });
 
 export default async function OrderLayout({ children }: { children: React.ReactNode }) {
   const brand = await getBrand();
   const isDocumentero = brand.id === 'documentero';
-  return (
-    <BrandProvider brandId={brand.id}>
+  const body = (
+    <>
       {isDocumentero ? <HeaderDocumentero /> : <Header />}
       {children}
       {!isDocumentero && <WhatsAppFloat />}
+      <CookieConsent />
+    </>
+  );
+  return (
+    <BrandProvider brandId={brand.id}>
+      {isDocumentero ? (
+        // Re-colors every shared component through the brand tokens in
+        // globals.css ([data-brand="documentero"]): gold → mint, navy → forest.
+        <div data-brand="documentero" className={`${bricolage.variable} min-h-screen bg-neutral-50`}>
+          {body}
+        </div>
+      ) : (
+        body
+      )}
     </BrandProvider>
   );
 }

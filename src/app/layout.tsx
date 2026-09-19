@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/providers/query-provider";
-import { CookieConsent } from "@/components/consent/cookie-consent";
 import { AttributionTracker } from "@/components/analytics/attribution-tracker";
 
 const inter = Inter({
@@ -76,8 +75,8 @@ export default function RootLayout({
               `(eghiseul)` (static eghiseul chrome), `(order)` (chrome chosen
               per host, shared wizard/account) and `documentero/` — two brands,
               one deployment. See src/lib/brand/. */}
+          {/* CookieConsent stă în layout-urile de grup, ca să citească brandul. */}
           {children}
-          <CookieConsent />
           {/* Atribuire proprie (ce canal aduce comenzi). Nu e profilare
               cross-site și nu implică terți, deci nu depinde de consimțământul
               pentru cookies de marketing — spre deosebire de GA4, care e

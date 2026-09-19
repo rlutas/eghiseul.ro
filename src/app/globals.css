@@ -396,6 +396,65 @@
   --shadow-large: 0 20px 50px rgba(6, 16, 31, 0.15);
 }
 
+/* ========================================
+   documentero.ro — pe hostul documentero, TOT ce e sub [data-brand="documentero"]
+   (wizard, checkout, status, cont) ia paleta C1: auriul devine mentă, navy-ul
+   devine pădure, gri-ul devine fildeș. Componentele comune nu se schimbă;
+   doar tokenii. docs/documentero/design.md
+   ======================================== */
+[data-brand="documentero"] {
+  --primary-50: #EAF8F2;
+  --primary-100: #DDF4EA;
+  --primary-200: #BFE9D6;
+  --primary-300: #96DCBE;
+  --primary-400: #62CEA5;
+  --primary-500: #2FBF8F; /* Mentă */
+  --primary-600: #23A379;
+  --primary-700: #1B8461;
+  --primary-800: #15664B;
+  --primary-900: #0F4B38;
+  --primary-950: #0A3327;
+  --primary: var(--primary-500);
+  --primary-foreground: #0F2A22;
+
+  --secondary-50: #EEF3F0;
+  --secondary-100: #DCE3DE;
+  --secondary-200: #B9CBC3;
+  --secondary-300: #8FAAA0;
+  --secondary-400: #5F857A;
+  --secondary-500: #3D6357;
+  --secondary-600: #2B4B41;
+  --secondary-700: #1E3A32;
+  --secondary-800: #16302A;
+  --secondary-900: #0F2A22; /* Pădure */
+  --secondary-950: #0A1C17;
+  --secondary: var(--secondary-100);
+  --secondary-foreground: var(--secondary-900);
+
+  --neutral-50: #FBF9F4;  /* Fildeș */
+  --neutral-100: #F3F1EA;
+  --neutral-200: #DCE3DE;
+  --neutral-300: #C5CFC9;
+  --neutral-400: #93A19A;
+  --neutral-500: #6B7A74;
+  --neutral-600: #4F5E58;
+  --neutral-700: #3A4843;
+  --neutral-800: #26332E;
+  --neutral-900: #172120;
+  --neutral-950: #0B1210;
+
+  --background: #FBF9F4;
+  --card: #FFFFFF;
+  --border: #DCE3DE;
+  --input: #DCE3DE;
+  --ring: #2FBF8F;
+  --accent: #DDF4EA;
+  --accent-foreground: #0F2A22;
+  --muted: #F3F1EA;
+  --muted-foreground: #4F5E58;
+  font-family: var(--font-bricolage), var(--font-inter), system-ui, sans-serif;
+}
+
 .dark {
   /* ========================================
      DARK MODE (Optional - Future Phase)

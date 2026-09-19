@@ -7,6 +7,7 @@
  */
 import { Header } from '@/components/shared/header';
 import { WhatsAppFloat } from '@/components/shared/whatsapp-float';
+import { CookieConsent } from '@/components/consent/cookie-consent';
 
 export default function EghiseulLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,6 +15,7 @@ export default function EghiseulLayout({ children }: { children: React.ReactNode
       <Header />
       {children}
       <WhatsAppFloat />
+      <CookieConsent />
     </>
   );
 }

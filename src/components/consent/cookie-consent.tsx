@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useBrand } from '@/lib/brand/client';
 import Link from 'next/link';
 import {
   CONSENT_OPEN_EVENT,
@@ -166,6 +167,7 @@ function applyConsent(state: ConsentState) {
  * re-opens the banner via CONSENT_OPEN_EVENT.
  */
 export function CookieConsent() {
+  const brand = useBrand();
   const [visible, setVisible] = useState(false);
   const [customize, setCustomize] = useState(false);
   const [analytics, setAnalytics] = useState(true);
@@ -213,7 +215,7 @@ export function CookieConsent() {
       className="fixed inset-x-0 bottom-0 z-[70] p-3 sm:p-4"
     >
       <div className="mx-auto max-w-3xl rounded-2xl border border-neutral-200 bg-white p-4 shadow-[0_12px_40px_rgba(6,16,31,0.25)] sm:p-5">
-        <p className="text-sm font-bold text-secondary-900">Cookie-uri pe eGhișeul.ro</p>
+        <p className="text-sm font-bold text-secondary-900">Cookie-uri pe {brand.name}</p>
         <p className="mt-1 text-xs leading-relaxed text-neutral-600">
           Folosim cookie-uri strict necesare pentru funcționare (autentificare, plăți, preferința ta
           de aici) și, doar cu acordul tău, cookie-uri de analiză (Google Analytics) ca să înțelegem
