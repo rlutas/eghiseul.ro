@@ -90,7 +90,7 @@ export default async function CasatoriePage() {
           note="Prețul final se vede înainte de plată. Curierul se adaugă la ultimul pas."
         />
 
-        <Section id="divort" className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+        <Section id="divort" className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-3 lg:col-span-4">
             <Eyebrow>Când ai nevoie de duplicat</Eyebrow>
             <H2 className="sm:text-[36px]">Patru situații, aceeași cerere</H2>
@@ -132,7 +132,7 @@ export default async function CasatoriePage() {
           ]}
         />
 
-        <Section className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+        <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-3 lg:col-span-4">
             <Eyebrow>Întrebări frecvente</Eyebrow>
             <H2 className="sm:text-[36px]">Despre duplicatul certificatului de căsătorie</H2>

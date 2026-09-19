@@ -20,7 +20,11 @@ export function H2({ children, className = '' }: { children: ReactNode; classNam
 }
 
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`rounded-[20px] border border-d-line bg-d-card ${className}`}>{children}</div>;
+  return (
+    <div className={`rounded-[20px] border border-d-line bg-d-card transition-[transform,box-shadow,border-color] duration-300 ease-out ${className}`}>
+      {children}
+    </div>
+  );
 }
 
 export function Arrow() {
@@ -50,7 +54,7 @@ export function Btn({
   primary?: boolean;
   className?: string;
 }) {
-  const base = 'inline-flex h-14 items-center gap-2.5 rounded-xl px-6 text-[17px] font-bold transition-opacity hover:opacity-90';
+  const base = 'inline-flex h-14 items-center gap-2.5 rounded-xl px-6 text-[17px] font-bold transition-[transform,opacity,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:opacity-90 hover:shadow-[0_10px_24px_rgba(15,42,34,0.12)] active:translate-y-0';
   const look = primary ? 'bg-d-acc text-d-ink' : 'border-[1.5px] border-d-line bg-d-card text-d-ink font-semibold';
   return (
     <Link href={href} className={`${base} ${look} ${className}`}>
@@ -60,9 +64,26 @@ export function Btn({
   );
 }
 
-export function Section({ children, className = '', id }: { children: ReactNode; className?: string; id?: string }) {
+/**
+ * Page section: the content column plus the scroll-reveal hook (`data-reveal`,
+ * see reveal.tsx). `reveal={false}` for a hero that animates on its own.
+ * Vertical rhythm lives in `className` — the scale is 24/32 (96/128 px)
+ * between sections, 20/28 for sub-sections, 10 for a strip glued to the
+ * block above it.
+ */
+export function Section({
+  children,
+  className = '',
+  id,
+  reveal = true,
+}: {
+  children: ReactNode;
+  className?: string;
+  id?: string;
+  reveal?: boolean;
+}) {
   return (
-    <section id={id} className={`mx-auto w-full max-w-[1312px] px-4 sm:px-6 lg:px-8 ${className}`}>
+    <section id={id} data-reveal={reveal ? '' : undefined} className={`mx-auto w-full max-w-[1312px] px-4 sm:px-6 lg:px-8 ${className}`}>
       {children}
     </section>
   );
@@ -238,7 +259,7 @@ export function SeoBlock({
 }) {
   return (
     <>
-      <Section className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+      <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
         <div className="flex flex-col gap-4 lg:col-span-7">
           <H2 className="sm:text-[36px]">{title}</H2>
           <Prose paras={intro} />
@@ -249,7 +270,7 @@ export function SeoBlock({
           <span className="text-[13px] text-d-muted">Nu ai nevoie de programare și nici de certificatul vechi.</span>
         </Card>
       </Section>
-      <Section className="mt-16 flex flex-col gap-5 lg:mt-[72px]">
+      <Section className="mt-20 flex flex-col gap-5 lg:mt-28">
         <H2 className="sm:text-[32px]">La ghișeu sau prin noi: ce diferă</H2>
         <CompareTable rows={rows} />
         <p className="m-0 text-[14px] text-d-muted">
@@ -257,7 +278,7 @@ export function SeoBlock({
           urmărirea, făcute de un avocat.
         </p>
       </Section>
-      <Section className="mt-16 grid gap-6 lg:mt-[72px] lg:grid-cols-12">
+      <Section className="mt-20 grid gap-6 lg:mt-28 lg:grid-cols-12">
         <div className="flex flex-col gap-3 lg:col-span-4">
           <Eyebrow>Diaspora</Eyebrow>
           <H2 className="sm:text-[32px]">{diasporaTitle}</H2>
@@ -266,7 +287,7 @@ export function SeoBlock({
           <Prose paras={diaspora} />
         </div>
       </Section>
-      <Section className="mt-16 flex flex-col gap-4 lg:mt-[72px]">
+      <Section className="mt-20 flex flex-col gap-4 lg:mt-28">
         <H2 className="sm:text-[28px]">Ghiduri pe subiect</H2>
         <div className="grid gap-4 sm:grid-cols-3">
           {guides.map((g) => (

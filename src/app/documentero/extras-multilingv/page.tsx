@@ -84,7 +84,7 @@ export default async function ExtrasMultilingvPage() {
           </div>
         </Section>
 
-        <Section className="mt-20 grid items-center gap-8 lg:mt-[88px] lg:grid-cols-12">
+        <Section className="mt-24 grid items-center gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="h-[300px] overflow-hidden rounded-3xl sm:h-[420px] lg:col-span-6">
             <Image src="/images/documentero/curier-livrare-plic.webp" alt="Curierul predă plicul cu extrasul" width={1264} height={848} className="h-full w-full object-cover" sizes="(min-width: 1024px) 640px, 100vw" />
           </div>
@@ -100,7 +100,7 @@ export default async function ExtrasMultilingvPage() {
           </div>
         </Section>
 
-        <Section id="casatorie" className="mt-20 lg:mt-[88px]">
+        <Section id="casatorie" className="mt-24 lg:mt-32">
           <Card className="grid items-center gap-6 p-7 lg:grid-cols-12 lg:p-10">
             <div className="flex flex-col gap-3 lg:col-span-8">
               <Eyebrow>Extras multilingv de căsătorie</Eyebrow>
@@ -114,7 +114,7 @@ export default async function ExtrasMultilingvPage() {
           </Card>
         </Section>
 
-        <Section id="limite" className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+        <Section id="limite" className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-3 lg:col-span-4">
             <Eyebrow>Când NU e suficient</Eyebrow>
             <H2 className="sm:text-[36px]">Trei cazuri în care ai nevoie de altceva</H2>
@@ -160,7 +160,7 @@ export default async function ExtrasMultilingvPage() {
           ]}
         />
 
-        <Section className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+        <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-3 lg:col-span-4">
             <Eyebrow>Întrebări frecvente</Eyebrow>
             <H2 className="sm:text-[36px]">Despre extrasul multilingv</H2>

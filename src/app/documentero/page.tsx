@@ -59,27 +59,27 @@ export default async function DocumenteroHome() {
       <HeaderDocumentero />
       <main id="main-content">
         {/* Hero: the brand promise, then the document picker right under it */}
-        <Section className="mt-12 grid items-center gap-10 lg:mt-[72px] lg:grid-cols-12">
+        <Section reveal={false} className="mt-12 grid items-center gap-10 lg:mt-20 lg:grid-cols-12">
           <div className="flex flex-col gap-6 lg:col-span-6">
-            <div className="inline-flex items-center gap-2.5 self-start rounded-full bg-d-soft px-3.5 py-2 text-[13px] font-bold">
+            <div className="d-rise inline-flex items-center gap-2.5 self-start rounded-full bg-d-soft px-3.5 py-2 text-[13px] font-bold">
               <span className="h-2 w-2 rounded-full bg-d-acc" />
               Acte de stare civilă · depuse de avocat · livrate prin curier
             </div>
-            <h1 className="m-0 text-[40px] font-bold leading-[1] tracking-[-0.035em] sm:text-[56px] lg:text-[64px]">
+            <h1 className="d-rise m-0 text-[40px] font-bold leading-[1] tracking-[-0.035em] sm:text-[56px] lg:text-[64px]" style={{ animationDelay: '80ms' }}>
               Actele de stare civilă, obținute de un avocat și aduse la ușa ta.
             </h1>
-            <p className="m-0 max-w-[560px] text-[17px] leading-[1.55] text-d-muted sm:text-[19px]">
+            <p className="d-rise m-0 max-w-[560px] text-[17px] leading-[1.55] text-d-muted sm:text-[19px]" style={{ animationDelay: '160ms' }}>
               Certificat de naștere, de căsătorie, dovadă de celibat sau extras multilingv pentru UE. Completezi în 5
               minute, semnezi pe telefon, avocatul nostru depune cererea la starea civilă. Originalul vine prin curier,
               oriunde în România sau în lume.
             </p>
-            <div className="flex flex-wrap items-center gap-3.5">
+            <div className="d-rise flex flex-wrap items-center gap-3.5" style={{ animationDelay: '240ms' }}>
               <Btn href="#acte">Alege actul</Btn>
               <Btn href="#cum" primary={false}>Cum funcționează</Btn>
             </div>
-            <ReviewersStack />
+            <div className="d-rise" style={{ animationDelay: '320ms' }}><ReviewersStack /></div>
           </div>
-          <div className="relative lg:col-span-6">
+          <div className="d-rise relative lg:col-span-6" style={{ animationDelay: '200ms' }}>
             <Image
               src="/images/documentero/client-acasa-certificat.webp"
               alt="Clientă acasă, cu certificatul primit prin curier"
@@ -104,16 +104,16 @@ export default async function DocumenteroHome() {
         </Section>
 
         {/* Document picker: the real navigation of the site */}
-        <Section id="acte" className="mt-16 flex flex-col gap-6 lg:mt-20">
+        <Section id="acte" className="mt-20 flex flex-col gap-6 lg:mt-24">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <H2 className="sm:text-[40px]">Ce act ai nevoie?</H2>
             <span className="max-w-[420px] text-[15px] text-d-muted">Toate se obțin de la starea civilă, prin avocat, cu împuternicire semnată pe telefon. Fiecare are pagina ei, cu prețul, actele și termenul.</span>
           </div>
           <div className="grid gap-5 md:grid-cols-3">
             {acte.slice(0, 3).map((a) => (
-              <Link key={a.t} href={a.h} className="group flex flex-col overflow-hidden rounded-[20px] border border-d-line bg-d-card hover:border-d-acc">
+              <Link key={a.t} href={a.h} className="group flex flex-col overflow-hidden rounded-[20px] border border-d-line bg-d-card transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1 hover:border-d-acc hover:shadow-[0_24px_48px_rgba(15,42,34,0.10)]">
                 <div className="h-[180px] overflow-hidden">
-                  <Image src={a.img!} alt={a.alt} width={1264} height={848} className="h-full w-full object-cover transition-transform group-hover:scale-[1.02]" sizes="(min-width: 768px) 420px, 100vw" />
+                  <Image src={a.img!} alt={a.alt} width={1264} height={848} className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]" sizes="(min-width: 768px) 420px, 100vw" />
                 </div>
                 <div className="flex flex-1 flex-col gap-2.5 p-6">
                   <span className="text-[12px] font-bold uppercase tracking-[0.06em] text-d-acc">{a.k}</span>
@@ -129,7 +129,7 @@ export default async function DocumenteroHome() {
           </div>
           <div className="grid gap-5 md:grid-cols-2">
             {acte.slice(3).map((a) => (
-              <Link key={a.t} href={a.h} className="flex items-center justify-between gap-6 rounded-[20px] border border-d-line bg-d-card p-6 hover:border-d-acc">
+              <Link key={a.t} href={a.h} className="flex items-center justify-between gap-6 rounded-[20px] border border-d-line bg-d-card p-6 transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1 hover:border-d-acc hover:shadow-[0_24px_48px_rgba(15,42,34,0.10)]">
                 <span className="flex flex-col gap-1.5">
                   <span className="text-[12px] font-bold uppercase tracking-[0.06em] text-d-acc">{a.k}</span>
                   <span className="text-[18px] font-bold leading-[1.2] tracking-[-0.02em]">{a.t}</span>
@@ -145,7 +145,7 @@ export default async function DocumenteroHome() {
         </Section>
 
         {/* Trust strip */}
-        <Section className="mt-14">
+        <Section className="mt-10">
           <Card className="grid gap-6 p-6 sm:grid-cols-2 lg:grid-cols-4 lg:px-7">
             {[
               ['≤ 30 zile', 'termen legal de eliberare'],
@@ -162,7 +162,7 @@ export default async function DocumenteroHome() {
         </Section>
 
         {/* Steps */}
-        <Section id="cum" className="mt-20 flex flex-col gap-8 lg:mt-[88px]">
+        <Section id="cum" className="mt-24 flex flex-col gap-8 lg:mt-32">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <H2 className="max-w-[640px] sm:text-[44px]">Trei pași. Tu faci primul, noi restul.</H2>
             <p className="m-0 max-w-[380px] text-[16px] leading-[1.55] text-d-muted">Comanda se salvează pe măsură ce o completezi. Poți reveni oricând, de pe alt dispozitiv.</p>
@@ -182,7 +182,7 @@ export default async function DocumenteroHome() {
         </Section>
 
         {/* Dark band: prices at a glance */}
-        <Section className="mt-20 lg:mt-[88px]">
+        <Section className="mt-24 lg:mt-32">
           <div className="grid items-center gap-8 rounded-[28px] bg-d-ink p-7 text-d-bg sm:p-10 lg:grid-cols-12 lg:p-14">
             <div className="flex flex-col gap-5 lg:col-span-6">
               <Eyebrow>Ce primești</Eyebrow>
@@ -214,7 +214,7 @@ export default async function DocumenteroHome() {
         </Section>
 
         {/* Why through a lawyer */}
-        <Section className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+        <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-3 lg:col-span-4">
             <Eyebrow>De ce documentero</Eyebrow>
             <H2 className="sm:text-[36px]">Serviciu privat, cu un avocat în spate și fără promisiuni goale.</H2>
@@ -233,7 +233,7 @@ export default async function DocumenteroHome() {
         <ReviewsDocumentero />
 
         {/* FAQ */}
-        <Section id="faq" className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+        <Section id="faq" className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-3 lg:col-span-4">
             <Eyebrow>Întrebări frecvente</Eyebrow>
             <H2 className="sm:text-[36px]">Ce ne întreabă clienții înainte să comande</H2>

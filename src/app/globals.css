@@ -611,3 +611,37 @@
     }
   }
 }
+
+/* ========================================
+   documentero.ro — mișcare (docs/documentero/design.md, „premium light”)
+   Reveal la scroll pe fiecare <Section> (data-reveal, src/components/documentero/reveal.tsx)
+   și intrarea în trepte a hero-ului (.d-rise). Ascunderea trăiește DOAR sub
+   `scripting: enabled`: un crawler fără JS (GPTBot, ClaudeBot) vede tot.
+   ======================================== */
+@media (scripting: enabled) {
+  [data-brand="documentero"] [data-reveal] {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  [data-brand="documentero"] [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+  [data-brand="documentero"] [data-reveal].no-anim {
+    transition: none;
+  }
+}
+[data-brand="documentero"] .d-rise {
+  animation: d-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes d-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-brand="documentero"] [data-reveal] { transform: none; transition-duration: 0.3s; }
+  [data-brand="documentero"] .d-rise { animation-duration: 0.3s; }
+  @keyframes d-rise { from { opacity: 0; transform: none; } to { opacity: 1; } }
+}

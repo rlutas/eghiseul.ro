@@ -34,7 +34,7 @@ export default function ContactPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
       <HeaderDocumentero />
       <main id="main-content">
-        <Section className="mt-12 grid gap-10 lg:mt-16 lg:grid-cols-12">
+        <Section className="mt-12 grid gap-10 lg:mt-20 lg:grid-cols-12">
           <div className="flex flex-col gap-5 lg:col-span-5">
             <Eyebrow>Contact</Eyebrow>
             <h1 className="m-0 text-[36px] font-bold leading-[1.02] tracking-[-0.035em] sm:text-[56px]">Întreabă înainte să comanzi. Răspundem în orele de program.</h1>
@@ -58,7 +58,7 @@ export default function ContactPage() {
           </Card>
         </Section>
 
-        <Section className="mt-16 grid gap-5 md:grid-cols-2">
+        <Section className="mt-20 grid gap-5 md:grid-cols-2">
           <Card className="flex flex-col gap-2.5 rounded-2xl p-7">
             <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-d-muted">Biroul</span>
             <span className="text-[20px] font-bold">{ORGANIZATION.office.locality}, {ORGANIZATION.office.street}</span>

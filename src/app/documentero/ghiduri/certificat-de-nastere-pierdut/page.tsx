@@ -124,7 +124,7 @@ export default async function GhidPierdutPage() {
           </aside>
         </Section>
 
-        <Section className="mt-16 flex flex-col gap-5">
+        <Section className="mt-20 flex flex-col gap-5">
           <H2 className="sm:text-[28px]">Citește și</H2>
           <div className="grid gap-5 md:grid-cols-3">
             {related.map((g) => (

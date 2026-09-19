@@ -53,7 +53,7 @@ export default function DesprePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
       <HeaderDocumentero />
       <main id="main-content">
-        <Section className="mt-12 grid items-center gap-10 lg:mt-16 lg:grid-cols-12">
+        <Section className="mt-12 grid items-center gap-10 lg:mt-20 lg:grid-cols-12">
           <div className="flex flex-col gap-5 lg:col-span-6">
             <Eyebrow>Despre noi</Eyebrow>
             <h1 className="m-0 text-[36px] font-bold leading-[1.02] tracking-[-0.035em] sm:text-[56px]">O firmă din Satu Mare, un avocat, și drumurile pe care nu le mai faci tu.</h1>
@@ -76,7 +76,7 @@ export default function DesprePage() {
           </div>
         </Section>
 
-        <Section className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+        <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-3 lg:col-span-4">
             <Eyebrow>Cine depune</Eyebrow>
             <H2 className="sm:text-[36px]">Avocatul care semnează fiecare cerere</H2>
@@ -98,7 +98,7 @@ export default function DesprePage() {
           </Card>
         </Section>
 
-        <Section className="mt-20 flex flex-col gap-7 lg:mt-[88px]">
+        <Section className="mt-24 flex flex-col gap-7 lg:mt-32">
           <H2 className="sm:text-[36px]">Cum lucrăm</H2>
           <div className="grid gap-5 md:grid-cols-3">
             {[
@@ -114,7 +114,7 @@ export default function DesprePage() {
           </div>
         </Section>
 
-        <Section className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+        <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-3 lg:col-span-4">
             <Eyebrow>Cine scrie ghidurile</Eyebrow>
             <H2 className="sm:text-[36px]">Autorul</H2>
@@ -132,7 +132,7 @@ export default function DesprePage() {
           </Card>
         </Section>
 
-        <Section className="mt-20 grid gap-5 lg:mt-[88px] md:grid-cols-2">
+        <Section className="mt-24 grid gap-5 lg:mt-32 md:grid-cols-2">
           <Card className="flex flex-col gap-2.5 rounded-2xl p-7">
             <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-d-muted">Firma</span>
             <span className="text-[20px] font-bold">{ORGANIZATION.legalName}</span>

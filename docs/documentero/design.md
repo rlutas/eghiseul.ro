@@ -62,11 +62,12 @@ pentru email `public/images/brand/documentero-email-logo.png` (165×40 în heade
 
 ## Structura paginilor
 
-Toate paginile publice au același header (semn + wordmark; linkurile în
-ordinea Certificat naștere · Certificat căsătorie · Certificat celibat ·
-Extras multilingv cu dropdown naștere/căsătorie, fiecare cu „Comandă” către
-formularul lui · Ghiduri; „Urmărește comanda” — NU „Contul meu”, documentero
-vinde fără cont; „Comandă online”; meniu `<details>` sub 1280 px) și același
+Toate paginile publice au același header (semn + wordmark; „Servicii” cu
+mega-meniu — toate cele cinci acte, cu iconiță, o linie de context, link la
+pagină și „Comandă” către formular — apoi Ghiduri · Despre · Contact;
+„Urmărește comanda” — NU „Contul meu”, documentero vinde fără cont; „Comandă
+online”; meniu `<details>` sub 1024 px; a doua variantă, 19.09: cele cinci
+linkuri directe făceau bara înghesuită) și același
 footer (descriere, certificate, ghiduri, companie, iar jos: firma + Telefonul
 Consumatorului la stânga, badge-urile ANPC SAL/SOL la dreapta, neafiliere).
 Recenziile de pe acasă sunt cele reale din profilul Google al eGhișeul.ro,
@@ -103,3 +104,14 @@ Google, deci recenziile au poza clientului, nu inițiale.
 
 Ilustrațiile desenate în CSS (telefonul cu semnătura la pasul 1, certificatul pe
 masă) se refac ca SVG-uri statice în implementare.
+
+## Mișcare (19.09)
+
+„Premium light”: fiecare `<Section>` intră cu fade + 18 px în sus la primul
+scroll în viewport (`data-reveal`, un singur `IntersectionObserver`,
+`src/components/documentero/reveal.tsx`); hero-ul intră în trepte de 80 ms
+(`.d-rise`); cardurile se ridică 4 px la hover, butoanele 2 px; mega-meniul
+alunecă 4 px. Ascunderea de dinaintea reveal-ului stă DOAR sub
+`@media (scripting: enabled)`, deci crawlerele fără JS văd tot;
+`prefers-reduced-motion` păstrează doar fade-ul. Ritm vertical: 96/128 px între
+secțiuni, 80/112 între sub-secțiuni, 40 pentru o bandă lipită de blocul de sus.

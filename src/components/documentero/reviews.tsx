@@ -88,7 +88,7 @@ export function ReviewersStack({ count = 4 }: { count?: number }) {
 export function ReviewsDocumentero({ limit = 6 }: { limit?: number }) {
   const items = DOCUMENTERO_REVIEWS.slice(0, limit);
   return (
-    <Section className="mt-20 flex flex-col gap-7 lg:mt-[88px]">
+    <Section className="mt-24 flex flex-col gap-7 lg:mt-32">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-3">
           <Eyebrow>Recenzii Google</Eyebrow>

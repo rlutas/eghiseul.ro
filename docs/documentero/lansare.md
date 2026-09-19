@@ -65,9 +65,20 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
 
 - [ ] `curl -H "Host: documentero.ro"` pe `/`, `/robots.txt`, `/sitemap.xml`,
   `/calculator/` (404), `/documentero/` (404) pe producție.
-- [ ] O comandă de test plătită pe documentero.ro: email de confirmare cu
-  brandul documentero, `success_url` pe documentero.ro, număr alocat cu
-  `platform='documentero'`, factură emisă, comanda vizibilă în admin cu chip.
+- [~] O comandă de test pe documentero.ro. 19.09 (local, DB de producție):
+  wizardul complet cu header/temă documentero, `E-260919-ADXE7` creată cu
+  `platform='documentero'`, ajunsă în checkout (`pending`, neplătită) —
+  **plata o face Raul** (card → apoi anulare/refund, sau transfer bancar →
+  „Confirmă plata” din admin). Rămân de verificat DUPĂ plată: emailul de
+  confirmare cu brandul documentero, `success_url`, numărul alocat cu
+  `platform='documentero'`, factura, chipul din admin.
+  Găsite în test: titlul tab-ului pe checkout/status cădea pe eghiseul
+  (reparat, `generateMetadata` în layout-ul `(order)`); specimenul
+  certificatului din wizard are logo eGhișeul; textul de la selfie pomenește
+  „certificat constatator, extras de carte funciară”; contractul de prestări
+  trimite la T&C de pe eghiseul.ro (până la paginile legale proprii);
+  previzualizările KYC sunt goale după reîncărcarea paginii (`src=""`, bug
+  general, nu de brand).
 - [ ] Rich Results Test pe acasă și pe o pagină de serviciu.
 - [ ] `curl -A Googlebot`: conținutul e în HTML, nu după Suspense.
 - [ ] Screaming Frog cu Crawl Analysis: inlinks ≥ 20 pe pagină, fără

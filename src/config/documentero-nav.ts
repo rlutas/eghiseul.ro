@@ -3,26 +3,24 @@
  * search engines. Public URLs on the documentero host (no `/documentero/`
  * prefix — that is the internal route-group path, rewritten in next.config.ts).
  */
-export interface DocumenteroNavChild {
+export type DocumenteroServiceIcon = 'nastere' | 'casatorie' | 'celibat' | 'ue';
+
+export interface DocumenteroServiceMenuItem {
   label: string;
-  /** One-line hint shown under the label in the dropdown. */
+  /** One line under the label in the mega menu. */
   hint: string;
-  /** Public page for this variant. */
+  /** Public page for this service. */
   href: string;
-  /** DB service slug — the dropdown's "Comandă" link goes straight to its wizard. */
+  /** DB service slug — the menu's "Comandă" link goes straight to its wizard. */
   orderSlug: string;
+  icon: DocumenteroServiceIcon;
 }
 
 export interface DocumenteroNavItem {
   label: string;
   href: string;
-  /** DB service slug for the "Comandă" button; guides have none. */
-  orderSlug?: string;
-  /**
-   * Variants shown in a dropdown (desktop) or indented (mobile). The parent
-   * link still goes to `href`; each child goes to its own page + wizard.
-   */
-  children?: DocumenteroNavChild[];
+  /** When set, the item opens the services mega menu instead of being a plain link. */
+  mega?: boolean;
 }
 
 /**
@@ -33,35 +31,29 @@ export interface DocumenteroNavItem {
 export const DOCUMENTERO_INDEXABLE = false;
 
 /**
- * Header menu, in the order Raul asked for (19.09.2026): the three
- * certificates, then the multilingual extract with its two variants, then
- * guides. No account entry — documentero has no customer account in the
- * menu; order tracking is the `/comanda/status/` page, as on eghiseul.
+ * All five services, as listed in the "Servicii" mega menu (header, desktop
+ * and mobile). Order = what sells most first. Each has its page and its
+ * wizard; the mega menu shows both.
+ */
+export const DOCUMENTERO_SERVICES_MENU: DocumenteroServiceMenuItem[] = [
+  { label: 'Certificat de naștere', hint: 'Duplicat: pierdut, deteriorat, model vechi', href: '/certificat-de-nastere/', orderSlug: 'certificat-nastere', icon: 'nastere' },
+  { label: 'Certificat de căsătorie', hint: 'Duplicat, inclusiv cu mențiunea de divorț', href: '/certificat-de-casatorie/', orderSlug: 'certificat-casatorie', icon: 'casatorie' },
+  { label: 'Certificat de celibat', hint: 'Anexa 9, pentru căsătorie în străinătate', href: '/certificat-de-celibat/', orderSlug: 'certificat-celibat', icon: 'celibat' },
+  { label: 'Extras multilingv de naștere', hint: 'Formularul UE, fără traducere și apostilă', href: '/extras-multilingv/', orderSlug: 'extras-multilingv-certificat-nastere', icon: 'ue' },
+  { label: 'Extras multilingv de căsătorie', hint: 'Aceeași procedură, pentru actul de căsătorie', href: '/extras-multilingv/#casatorie', orderSlug: 'extras-multilingv-certificat-casatorie', icon: 'ue' },
+];
+
+/**
+ * Header menu (Raul, 19.09.2026, second pass): the five service links made
+ * the bar cramped, so services live in ONE "Servicii" mega menu; the rest
+ * are plain links. No account entry — documentero sells without an account;
+ * order tracking is the `/comanda/status/` page, as on eghiseul.
  */
 export const DOCUMENTERO_NAV: DocumenteroNavItem[] = [
-  { label: 'Certificat naștere', href: '/certificat-de-nastere/', orderSlug: 'certificat-nastere' },
-  { label: 'Certificat căsătorie', href: '/certificat-de-casatorie/', orderSlug: 'certificat-casatorie' },
-  { label: 'Certificat celibat', href: '/certificat-de-celibat/', orderSlug: 'certificat-celibat' },
-  {
-    label: 'Extras multilingv',
-    href: '/extras-multilingv/',
-    orderSlug: 'extras-multilingv-certificat-nastere',
-    children: [
-      {
-        label: 'Extras multilingv de naștere',
-        hint: 'Formularul UE al actului de naștere',
-        href: '/extras-multilingv/',
-        orderSlug: 'extras-multilingv-certificat-nastere',
-      },
-      {
-        label: 'Extras multilingv de căsătorie',
-        hint: 'Formularul UE al actului de căsătorie',
-        href: '/extras-multilingv/#casatorie',
-        orderSlug: 'extras-multilingv-certificat-casatorie',
-      },
-    ],
-  },
+  { label: 'Servicii', href: '/#acte', mega: true },
   { label: 'Ghiduri', href: '/ghiduri/' },
+  { label: 'Despre', href: '/despre/' },
+  { label: 'Contact', href: '/contact/' },
 ];
 
 /** Public path of the order wizard for a documentero service. */

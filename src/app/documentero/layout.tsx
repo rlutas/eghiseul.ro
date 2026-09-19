@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Bricolage_Grotesque } from 'next/font/google';
 import { FooterDocumentero } from '@/components/documentero/footer';
+import { RevealObserver } from '@/components/documentero/reveal';
 import { BrandProvider } from '@/lib/brand/client';
 import { CookieConsent } from '@/components/consent/cookie-consent';
 import { BRANDS } from '@/lib/brand/brands';
@@ -48,6 +49,7 @@ export default function DocumenteroLayout({ children }: { children: React.ReactN
       >
         {children}
         <FooterDocumentero />
+        <RevealObserver />
         <CookieConsent />
       </div>
     </BrandProvider>

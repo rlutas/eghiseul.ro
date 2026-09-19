@@ -93,7 +93,7 @@ export default async function NasterePage() {
           note="Opțiunile se aleg în formular; prețul final se vede înainte de plată. Curierul se adaugă la final."
         />
 
-        <Section id="situatii" className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+        <Section id="situatii" className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-4 lg:col-span-5">
             <Eyebrow>Situații frecvente</Eyebrow>
             <H2>Oricare ar fi motivul, procedura e aceeași: un duplicat nou.</H2>
@@ -137,7 +137,7 @@ export default async function NasterePage() {
           ]}
         />
 
-        <Section className="mt-20 lg:mt-[88px]">
+        <Section className="mt-24 lg:mt-32">
           <Card className="grid items-center gap-6 p-7 lg:grid-cols-12 lg:p-10">
             <div className="flex flex-col gap-3 lg:col-span-8">
               <Eyebrow>Pentru Uniunea Europeană</Eyebrow>
@@ -151,7 +151,7 @@ export default async function NasterePage() {
           </Card>
         </Section>
 
-        <Section className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+        <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-3 lg:col-span-4">
             <Eyebrow>Întrebări frecvente</Eyebrow>
             <H2 className="sm:text-[36px]">Despre duplicatul certificatului de naștere</H2>

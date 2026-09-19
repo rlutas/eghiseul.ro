@@ -61,7 +61,7 @@ export default function GhiduriPage() {
           ))}
         </Section>
 
-        <Section className="mt-16">
+        <Section className="mt-20">
           <div className="flex flex-wrap items-center justify-between gap-6 rounded-3xl bg-d-ink p-8 text-d-bg sm:p-10">
             <div className="flex flex-col gap-2">
               <span className="text-[26px] font-bold tracking-[-0.03em] sm:text-[28px]">Nu găsești cazul tău?</span>

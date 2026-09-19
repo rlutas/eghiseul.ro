@@ -60,10 +60,10 @@ export function ServiceHero({
       </nav>
       <div className="grid items-start gap-8 lg:grid-cols-12">
         <div className="flex flex-col gap-5 lg:col-span-7">
-          <Eyebrow>{eyebrow}</Eyebrow>
-          <h1 className="m-0 text-[36px] font-bold leading-[1.02] tracking-[-0.035em] sm:text-[48px] lg:text-[56px]">{title}</h1>
-          <p className="m-0 max-w-[640px] text-[17px] leading-[1.55] text-d-muted sm:text-[19px]">{intro}</p>
-          <div className="flex flex-wrap items-center gap-3.5">
+          <div className="d-rise"><Eyebrow>{eyebrow}</Eyebrow></div>
+          <h1 style={{ animationDelay: '80ms' }} className="d-rise m-0 text-[36px] font-bold leading-[1.02] tracking-[-0.035em] sm:text-[48px] lg:text-[56px]">{title}</h1>
+          <p style={{ animationDelay: '160ms' }} className="d-rise m-0 max-w-[640px] text-[17px] leading-[1.55] text-d-muted sm:text-[19px]">{intro}</p>
+          <div style={{ animationDelay: '240ms' }} className="d-rise flex flex-wrap items-center gap-3.5">
             <Btn href={orderHref}>{cta} · {lei(price)} lei</Btn>
             <Btn href={secondary.href} primary={false}>{secondary.label}</Btn>
           </div>
@@ -77,7 +77,7 @@ export function ServiceHero({
           </div>
           {media && <div className="mt-2 h-[240px] overflow-hidden rounded-[20px] sm:h-[300px]">{media}</div>}
         </div>
-        <aside className="flex flex-col gap-4 rounded-3xl border border-d-line bg-d-card p-7 shadow-[0_20px_50px_rgba(15,42,34,0.08)] lg:sticky lg:top-24 lg:col-span-4 lg:col-start-9">
+        <aside style={{ animationDelay: '200ms' }} className="d-rise flex flex-col gap-4 rounded-3xl border border-d-line bg-d-card p-7 shadow-[0_20px_50px_rgba(15,42,34,0.08)] lg:sticky lg:top-24 lg:col-span-4 lg:col-start-9">
           <div className="flex flex-col gap-1.5">
             <span className="text-[14px] font-semibold text-d-muted">{priceLabel}</span>
             <div className="flex items-baseline gap-2"><span className="text-[52px] font-extrabold leading-none tracking-[-0.05em]">{lei(price)}</span><span className="text-[18px] font-bold">lei</span></div>

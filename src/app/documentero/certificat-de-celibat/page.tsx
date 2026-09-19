@@ -91,7 +91,7 @@ export default async function CelibatPage() {
           note="Opțiunile se aleg în formular; prețul final se vede înainte de plată. Curierul se adaugă la final."
         />
 
-        <Section className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+        <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-3 lg:col-span-4">
             <Eyebrow>Cine îl cere</Eyebrow>
             <H2 className="sm:text-[36px]">Patru situații în care ai nevoie de el</H2>
@@ -106,7 +106,7 @@ export default async function CelibatPage() {
           </div>
         </Section>
 
-        <Section id="valabilitate" className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+        <Section id="valabilitate" className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-5 lg:col-span-7">
             <Eyebrow>Valabilitate</Eyebrow>
             <H2 className="sm:text-[36px]">6 luni în România, 90 de zile în afară. Amândouă sunt adevărate.</H2>
@@ -126,7 +126,7 @@ export default async function CelibatPage() {
           </div>
         </Section>
 
-        <Section className="mt-20 flex flex-col gap-7 lg:mt-[88px]">
+        <Section className="mt-24 flex flex-col gap-7 lg:mt-32">
           <H2 className="sm:text-[32px]">Cum îl obținem pentru tine</H2>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {[
@@ -171,7 +171,7 @@ export default async function CelibatPage() {
           ]}
         />
 
-        <Section className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+        <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-3 lg:col-span-4">
             <Eyebrow>Întrebări frecvente</Eyebrow>
             <H2 className="sm:text-[36px]">Despre certificatul de celibat</H2>
@@ -179,7 +179,7 @@ export default async function CelibatPage() {
           <div className="lg:col-span-8"><FaqList items={FAQ} /></div>
         </Section>
 
-        <Section className="mt-20 flex flex-col gap-5 lg:mt-[88px]">
+        <Section className="mt-24 flex flex-col gap-5 lg:mt-32">
           <H2 className="sm:text-[28px]">Ai nevoie și de</H2>
           <div className="grid gap-5 md:grid-cols-3">
             {[
