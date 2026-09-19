@@ -31,15 +31,21 @@ casatorie” 1.000. Dificultatea e mică peste tot (KD 7–20).
 
 ## Paginile de la lansare și cuvintele lor
 
+Decizie Raul (19.09, seara): acasă e o **pagină de prezentare** a brandului,
+cu toate actele; fiecare act are pagina lui. Extrasul multilingv rămâne o
+pagină proprie (cluster propriu în GSC), dar apare și ca opțiune pe paginile de
+naștere și de căsătorie.
+
 | URL pe documentero.ro | Titlu (≤ 60) | Cuvinte principale |
 |---|---|---|
-| `/` | Certificat de Naștere Online, Duplicat prin Avocat — documentero.ro | certificat de nastere online, duplicat certificat de nastere online |
+| `/` | Acte de Stare Civilă Online, prin Avocat — documentero.ro | brand, „acte de stare civila online”; trimite spre cele 5 pagini |
+| `/certificat-de-nastere/` | Certificat de Naștere Online: Duplicat prin Avocat, Livrat Acasă | certificat de nastere online, duplicat certificat de nastere online |
 | `/certificat-de-casatorie/` | Certificat de Căsătorie Online: Duplicat, cu Mențiune de Divorț | certificat de casatorie online, duplicat certificat de casatorie online |
-| `/certificat-de-celibat/` | Certificat de Celibat Online (Anexa 9) pentru Străinătate | certificat de celibat online, certificat de celibat romania |
-| `/extras-multilingv/` | Extras Multilingv Certificat de Naștere: Acceptat în UE | certificat de nastere multilingv online, certificat de nastere international |
+| `/certificat-de-celibat/` | Certificat de Celibat Online (Anexa 9), pentru Străinătate | certificat de celibat online, certificat de celibat romania |
+| `/extras-multilingv/` (+ `#casatorie`) | Extras Multilingv Certificat de Naștere: Acceptat în UE | certificat de nastere multilingv online, certificat de nastere international, extras multilingv certificat de casatorie |
 | `/ghiduri/` | Ghiduri de stare civilă | (index) |
 | `/ghiduri/certificat-de-nastere-pierdut/` | Certificat de naștere pierdut: ce faci în 2026 | certificat de nastere pierdut, am pierdut certificatul de nastere |
-| `/despre/`, `/contact/`, legal | | (E-E-A-T, nu SEO) |
+| `/despre/`, `/contact/` | | (E-E-A-T, nu SEO) |
 
 Extrasul multilingv de căsătorie e o secțiune pe pagina de extras, nu o pagină
 separată: perechea de pe eghiseul avea similaritate 0,75 și nu a adus decât 56

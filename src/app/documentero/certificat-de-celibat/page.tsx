@@ -183,7 +183,7 @@ export default async function CelibatPage() {
           <H2 className="sm:text-[28px]">Ai nevoie și de</H2>
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              ['Certificat de naștere, duplicat', 'Îl cer împreună cu celibatul aproape toate statele.', '/'],
+              ['Certificat de naștere, duplicat', 'Îl cer împreună cu celibatul aproape toate statele.', '/certificat-de-nastere/'],
               ['Extras multilingv de naștere', 'În UE înlocuiește traducerea și apostila.', '/extras-multilingv/'],
               ['Ghid: certificat de naștere pierdut', 'Pașii, actele, termenul real.', '/ghiduri/certificat-de-nastere-pierdut/'],
             ].map(([t, d, h]) => (

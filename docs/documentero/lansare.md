@@ -23,8 +23,9 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
 ## Cod (eu)
 
 - [ ] Variabile CSS pe `[data-brand="documentero"]` și tema pe wizard/cont.
-- [x] Paginile publice implementate în `src/app/documentero/` (19.09): acasă,
-  căsătorie, celibat, extras multilingv, ghiduri, primul ghid, despre, contact.
+- [x] Paginile publice implementate în `src/app/documentero/` (19.09): acasă
+  (prezentare, toate actele), naștere, căsătorie, celibat, extras multilingv,
+  ghiduri, primul ghid, despre, contact.
   Toate `noindex` până la `DOCUMENTERO_INDEXABLE = true`
   (`src/config/documentero-nav.ts`).
 - [ ] Pagini legale proprii (T&C, confidențialitate, anulare, cookies) cu

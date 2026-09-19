@@ -18,7 +18,7 @@ export interface DocumenteroNavItem {
 export const DOCUMENTERO_INDEXABLE = false;
 
 export const DOCUMENTERO_NAV: DocumenteroNavItem[] = [
-  { label: 'Certificat de naștere', href: '/', orderSlug: 'certificat-nastere' },
+  { label: 'Certificat de naștere', href: '/certificat-de-nastere/', orderSlug: 'certificat-nastere' },
   { label: 'Căsătorie', href: '/certificat-de-casatorie/', orderSlug: 'certificat-casatorie' },
   { label: 'Celibat', href: '/certificat-de-celibat/', orderSlug: 'certificat-celibat' },
   { label: 'Extras multilingv', href: '/extras-multilingv/', orderSlug: 'extras-multilingv-certificat-nastere' },
@@ -33,7 +33,7 @@ export function documenteroOrderHref(orderSlug: string): string {
 /** Footer columns. Legal pages are the group's, hosted on eghiseul.ro until documentero gets its own. */
 export const DOCUMENTERO_FOOTER = {
   certificate: [
-    { label: 'Certificat de naștere', href: '/' },
+    { label: 'Certificat de naștere', href: '/certificat-de-nastere/' },
     { label: 'Certificat de căsătorie', href: '/certificat-de-casatorie/' },
     { label: 'Certificat de celibat', href: '/certificat-de-celibat/' },
     { label: 'Extras multilingv naștere', href: '/extras-multilingv/' },

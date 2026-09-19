@@ -35,7 +35,7 @@ export function HeaderDocumentero({ active }: { active?: string }) {
             Contul meu
           </Link>
           <Link
-            href="/comanda/certificat-nastere/"
+            href="/#acte"
             className="inline-flex h-11 items-center rounded-[10px] bg-d-ink px-5 text-[15px] font-bold text-d-bg hover:opacity-90"
           >
             Comandă online

@@ -1,19 +1,19 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { HeaderDocumentero } from '@/components/documentero/header';
-import { Arrow, Btn, Card, CertificateMock, Check, Eyebrow, FaqList, H2, Initials, PhoneSignatureMock, Section } from '@/components/documentero/ui';
+import { Arrow, Btn, Card, Check, Eyebrow, FaqList, H2, Initials, PhoneSignatureMock, Section } from '@/components/documentero/ui';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { documenteroHomeGraph } from '@/lib/seo/documentero-schema';
-import { getAllPricing, lei, optionPrice } from '@/lib/documentero/services';
+import { getAllPricing, lei } from '@/lib/documentero/services';
 import { HOME_FAQ } from '@/lib/documentero/content';
 import { SOCIAL_PROOF } from '@/lib/seo/constants';
 import { DOCUMENTERO_INDEXABLE } from '@/config/documentero-nav';
 
 export const revalidate = 3600;
 
-const TITLE = 'Certificat de Naștere Online, Duplicat prin Avocat — documentero.ro';
+const TITLE = 'Acte de Stare Civilă Online, prin Avocat — documentero.ro';
 const DESCRIPTION =
-  'Duplicat certificat de naștere, căsătorie, celibat sau extras multilingv, obținut de un avocat de la starea civilă și livrat prin curier, în România sau în străinătate. Fără programare, fără notar.';
+  'Certificat de naștere, de căsătorie, dovadă de celibat și extrase multilingve, obținute de un avocat de la starea civilă și livrate prin curier, în România sau în străinătate. Semnezi pe telefon, fără programare, fără notar.';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -24,13 +24,11 @@ export const metadata = buildPageMetadata({
   noindex: !DOCUMENTERO_INDEXABLE,
 });
 
-const SITUATIONS = [
-  ['L-am pierdut sau mi-a fost furat', 'Fără declarație la poliție. Se cere direct duplicatul.'],
-  ['E deteriorat sau plastifiat', 'Plastifierea îl face nevalabil. Vechiul se predă la eliberare.'],
-  ['Am modelul vechi', 'Pentru pașaport sau străinătate vrei modelul nou, cu CNP.'],
-  ['Locuiesc în străinătate', 'Semnezi de acolo. Livrăm oriunde, opțional cu apostilă.'],
-  ['Pentru copilul meu', 'Părintele cere duplicatul minorului.'],
-  ['Pentru un părinte decedat', 'Pentru succesiune. Îți spunem ce document ai nevoie.'],
+const WHY = [
+  ['Un avocat depune, nu tu', 'Legea 119/1996 permite avocaților să ceară acte de stare civilă cu împuternicire avocațială. Semnezi pe telefon, fără notar, fără programare.'],
+  ['Un preț, cu tot inclus', 'Onorariu, împuternicire, depunere, ridicare, scan pe email. Curierul îl alegi la final. Nicio taxă de stat, fiindcă nu există.'],
+  ['Spunem ce e realist', 'Termenul legal e 30 de zile. Te anunțăm la fiecare schimbare de stare, nu promitem „3 zile” ca să vindem.'],
+  ['Oriunde ai fi', 'Curier în România și internațional. Pentru UE, extrasul multilingv înlocuiește traducerea și apostila.'],
 ] as const;
 
 export default async function DocumenteroHome() {
@@ -40,16 +38,13 @@ export default async function DocumenteroHome() {
   const celibat = p['certificat-celibat'];
   const mlN = p['extras-multilingv-certificat-nastere'];
   const mlC = p['extras-multilingv-certificat-casatorie'];
-  const apostila = optionPrice(nastere, 'apostila_haga', 198);
-  const traducere = optionPrice(nastere, 'traducere', 178.5);
-  const extras = optionPrice(nastere, 'extras_multilingv', 398);
 
   const acte = [
-    { k: 'Naștere', t: 'Certificat de naștere', d: 'Duplicat: pierdut, deteriorat, model vechi.', pr: nastere.basePrice, h: '/comanda/certificat-nastere/', first: true },
-    { k: 'Căsătorie', t: 'Certificat de căsătorie', d: 'Duplicat, inclusiv cu mențiunea de divorț.', pr: casatorie.basePrice, h: '/certificat-de-casatorie/' },
-    { k: 'Celibat', t: 'Dovadă de celibat (Anexa 9)', d: 'Pentru căsătorie sau ședere în străinătate.', pr: celibat.basePrice, h: '/certificat-de-celibat/' },
-    { k: 'UE', t: 'Extras multilingv naștere', d: 'Acceptat în UE fără traducere sau apostilă.', pr: mlN.basePrice, h: '/extras-multilingv/' },
-    { k: 'UE', t: 'Extras multilingv căsătorie', d: 'Formularul standard UE, Reg. 2016/1191.', pr: mlC.basePrice, h: '/extras-multilingv/#casatorie' },
+    { k: 'Naștere', t: 'Certificat de naștere', d: 'Duplicat: pierdut, deteriorat, model vechi, pentru străinătate.', pr: nastere.basePrice, h: '/certificat-de-nastere/', img: '/images/documentero/client-acasa-certificat.webp', alt: 'Clientă cu certificatul de naștere primit' },
+    { k: 'Căsătorie', t: 'Certificat de căsătorie', d: 'Duplicat, inclusiv cu mențiunea de divorț sau pentru schimbarea numelui.', pr: casatorie.basePrice, h: '/certificat-de-casatorie/', img: '/images/documentero/curier-livrare-plic.webp', alt: 'Curierul predă plicul' },
+    { k: 'Celibat', t: 'Dovadă de celibat (Anexa 9)', d: 'Pentru căsătorie, ședere sau notar în străinătate. Apostilă și traducere opționale.', pr: celibat.basePrice, h: '/certificat-de-celibat/', img: '/images/documentero/avocat-ghiseu-stare-civila.webp', alt: 'Avocata la ghișeul de stare civilă' },
+    { k: 'UE', t: 'Extras multilingv de naștere', d: 'Formularul standard UE: acceptat fără traducere și fără apostilă în toată Uniunea.', pr: mlN.basePrice, h: '/extras-multilingv/', img: null, alt: '' },
+    { k: 'UE', t: 'Extras multilingv de căsătorie', d: 'Aceeași procedură, pentru actul de căsătorie.', pr: mlC.basePrice, h: '/extras-multilingv/#casatorie', img: null, alt: '' },
   ];
 
   const steps = [
@@ -61,9 +56,9 @@ export default async function DocumenteroHome() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(documenteroHomeGraph(HOME_FAQ)) }} />
-      <HeaderDocumentero active="Certificat de naștere" />
+      <HeaderDocumentero />
       <main id="main-content">
-        {/* Hero */}
+        {/* Hero: the brand promise, then the document picker right under it */}
         <Section className="mt-12 grid items-center gap-10 lg:mt-[72px] lg:grid-cols-12">
           <div className="flex flex-col gap-6 lg:col-span-6">
             <div className="inline-flex items-center gap-2.5 self-start rounded-full bg-d-soft px-3.5 py-2 text-[13px] font-bold">
@@ -71,12 +66,12 @@ export default async function DocumenteroHome() {
               Acte de stare civilă · depuse de avocat · livrate prin curier
             </div>
             <h1 className="m-0 text-[40px] font-bold leading-[1] tracking-[-0.035em] sm:text-[56px] lg:text-[64px]">
-              Certificatul de naștere, de căsătorie sau de celibat, fără drum la starea civilă.
+              Actele de stare civilă, obținute de un avocat și aduse la ușa ta.
             </h1>
             <p className="m-0 max-w-[560px] text-[17px] leading-[1.55] text-d-muted sm:text-[19px]">
-              Completezi în 5 minute și semnezi pe telefon. Avocatul nostru depune cererea la primăria care păstrează
-              actul, iar originalul ajunge la tine prin curier, oriunde în România sau în lume. Duplicat, extras
-              multilingv pentru UE sau dovadă de celibat: aceeași procedură.
+              Certificat de naștere, de căsătorie, dovadă de celibat sau extras multilingv pentru UE. Completezi în 5
+              minute, semnezi pe telefon, avocatul nostru depune cererea la starea civilă. Originalul vine prin curier,
+              oriunde în România sau în lume.
             </p>
             <div className="flex flex-wrap items-center gap-3.5">
               <Btn href="#acte">Alege actul</Btn>
@@ -97,7 +92,7 @@ export default async function DocumenteroHome() {
           <div className="relative lg:col-span-6">
             <Image
               src="/images/documentero/client-acasa-certificat.webp"
-              alt="Clientă acasă, cu certificatul de naștere primit prin curier"
+              alt="Clientă acasă, cu certificatul primit prin curier"
               width={1152}
               height={928}
               priority
@@ -118,23 +113,39 @@ export default async function DocumenteroHome() {
           </div>
         </Section>
 
-        {/* Document picker */}
-        <Section id="acte" className="mt-14 flex flex-col gap-5">
+        {/* Document picker: the real navigation of the site */}
+        <Section id="acte" className="mt-16 flex flex-col gap-6 lg:mt-20">
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <H2 className="sm:text-[36px]">Ce act ai nevoie?</H2>
-            <span className="text-[15px] text-d-muted">Toate se obțin de la starea civilă, prin avocat, cu împuternicire semnată pe telefon.</span>
+            <H2 className="sm:text-[40px]">Ce act ai nevoie?</H2>
+            <span className="max-w-[420px] text-[15px] text-d-muted">Toate se obțin de la starea civilă, prin avocat, cu împuternicire semnată pe telefon. Fiecare are pagina ei, cu prețul, actele și termenul.</span>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {acte.map((a) => (
-              <Link
-                key={a.t}
-                href={a.h}
-                className={`flex min-h-[190px] flex-col gap-2.5 rounded-2xl border-[1.5px] bg-d-card p-5 hover:border-d-acc ${a.first ? 'border-d-acc' : 'border-d-line'}`}
-              >
-                <span className="text-[12px] font-bold uppercase tracking-[0.06em] text-d-acc">{a.k}</span>
-                <span className="text-[18px] font-bold leading-[1.2] tracking-[-0.02em]">{a.t}</span>
-                <span className="text-[13px] leading-[1.5] text-d-muted">{a.d}</span>
-                <span className="mt-auto flex items-center justify-between text-[15px] font-bold">
+          <div className="grid gap-5 md:grid-cols-3">
+            {acte.slice(0, 3).map((a) => (
+              <Link key={a.t} href={a.h} className="group flex flex-col overflow-hidden rounded-[20px] border border-d-line bg-d-card hover:border-d-acc">
+                <div className="h-[180px] overflow-hidden">
+                  <Image src={a.img!} alt={a.alt} width={1264} height={848} className="h-full w-full object-cover transition-transform group-hover:scale-[1.02]" sizes="(min-width: 768px) 420px, 100vw" />
+                </div>
+                <div className="flex flex-1 flex-col gap-2.5 p-6">
+                  <span className="text-[12px] font-bold uppercase tracking-[0.06em] text-d-acc">{a.k}</span>
+                  <span className="text-[20px] font-bold leading-[1.2] tracking-[-0.02em]">{a.t}</span>
+                  <span className="text-[14px] leading-[1.5] text-d-muted">{a.d}</span>
+                  <span className="mt-auto flex items-center justify-between pt-2 text-[16px] font-bold">
+                    <span>{lei(a.pr)} lei</span>
+                    <span className="text-d-acc"><Arrow /></span>
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="grid gap-5 md:grid-cols-2">
+            {acte.slice(3).map((a) => (
+              <Link key={a.t} href={a.h} className="flex items-center justify-between gap-6 rounded-[20px] border border-d-line bg-d-card p-6 hover:border-d-acc">
+                <span className="flex flex-col gap-1.5">
+                  <span className="text-[12px] font-bold uppercase tracking-[0.06em] text-d-acc">{a.k}</span>
+                  <span className="text-[18px] font-bold leading-[1.2] tracking-[-0.02em]">{a.t}</span>
+                  <span className="text-[14px] leading-[1.5] text-d-muted">{a.d}</span>
+                </span>
+                <span className="flex shrink-0 flex-col items-end gap-1 text-[16px] font-bold">
                   <span>{lei(a.pr)} lei</span>
                   <span className="text-d-acc"><Arrow /></span>
                 </span>
@@ -180,7 +191,7 @@ export default async function DocumenteroHome() {
           </div>
         </Section>
 
-        {/* Dark band: what you get + price */}
+        {/* Dark band: prices at a glance */}
         <Section className="mt-20 lg:mt-[88px]">
           <div className="grid items-center gap-8 rounded-[28px] bg-d-ink p-7 text-d-bg sm:p-10 lg:grid-cols-12 lg:p-14">
             <div className="flex flex-col gap-5 lg:col-span-6">
@@ -191,26 +202,41 @@ export default async function DocumenteroHome() {
                   <li key={t} className="flex items-center gap-2.5"><Check className="shrink-0 text-d-acc" /> {t}</li>
                 ))}
               </ul>
-              <p className="m-0 text-[14px] text-d-dark-muted">
-                Curierul se alege la ultimul pas. Apostila ({lei(apostila)} lei), traducerea ({lei(traducere)} lei) și extrasul multilingv ({lei(extras)} lei) sunt opționale.
-              </p>
+              <p className="m-0 text-[14px] text-d-dark-muted">Curierul se alege la ultimul pas. Apostila, traducerea și extrasul multilingv sunt opționale, cu prețul afișat pe fiecare pagină.</p>
             </div>
-            <div className="flex flex-col gap-4 rounded-[20px] bg-d-card p-7 text-d-ink lg:col-span-5 lg:col-start-8">
-              <span className="text-[14px] font-semibold text-d-muted">Duplicat certificat de naștere</span>
-              <div className="flex items-baseline gap-2"><span className="text-[56px] font-extrabold leading-none tracking-[-0.05em] sm:text-[64px]">{lei(nastere.basePrice)}</span><span className="text-[20px] font-bold">lei</span></div>
-              <div className="h-px bg-d-line" />
-              <div className="grid grid-cols-2 gap-2.5 text-[14px]">
-                {[
-                  ['Căsătorie', `${lei(casatorie.basePrice)} lei`],
-                  ['Celibat (Anexa 9)', `${lei(celibat.basePrice)} lei`],
-                  ['Extras multilingv naștere', `${lei(mlN.basePrice)} lei`],
-                  ['Extras multilingv căsătorie', `${lei(mlC.basePrice)} lei`],
-                ].map(([a, b]) => (
-                  <div key={a} className="flex flex-col"><span className="text-d-muted">{a}</span><span className="font-bold">{b}</span></div>
-                ))}
-              </div>
-              <Link href="/comanda/certificat-nastere/" className="inline-flex h-[54px] items-center justify-center rounded-xl bg-d-acc text-[16px] font-bold text-d-ink hover:opacity-90">Începe comanda</Link>
+            <div className="flex flex-col gap-3 rounded-[20px] bg-d-card p-7 text-d-ink lg:col-span-5 lg:col-start-8">
+              <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-d-muted">Prețuri, TVA inclus</span>
+              {[
+                ['Certificat de naștere, duplicat', nastere.basePrice, '/certificat-de-nastere/'],
+                ['Certificat de căsătorie, duplicat', casatorie.basePrice, '/certificat-de-casatorie/'],
+                ['Dovadă de celibat (Anexa 9)', celibat.basePrice, '/certificat-de-celibat/'],
+                ['Extras multilingv de naștere', mlN.basePrice, '/extras-multilingv/'],
+                ['Extras multilingv de căsătorie', mlC.basePrice, '/extras-multilingv/#casatorie'],
+              ].map(([t, pr, h]) => (
+                <Link key={String(t)} href={String(h)} className="flex items-center justify-between border-t border-d-line py-3 text-[15px] hover:text-d-acc">
+                  <span className="font-semibold">{t}</span>
+                  <span className="font-bold">{lei(Number(pr))} lei</span>
+                </Link>
+              ))}
+              <Link href="#acte" className="mt-1 inline-flex h-[52px] items-center justify-center rounded-xl bg-d-acc text-[16px] font-bold text-d-ink hover:opacity-90">Alege actul</Link>
             </div>
+          </div>
+        </Section>
+
+        {/* Why through a lawyer */}
+        <Section className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
+          <div className="flex flex-col gap-3 lg:col-span-4">
+            <Eyebrow>De ce documentero</Eyebrow>
+            <H2 className="sm:text-[36px]">Serviciu privat, cu un avocat în spate și fără promisiuni goale.</H2>
+            <p className="m-0 text-[15px] leading-[1.6] text-d-muted">Nu suntem instituție. Actele le poți cere și singur, gratuit, la ghișeu. Noi vindem drumul și dosarul făcute corect, de cineva care le face în fiecare zi.</p>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:col-span-8">
+            {WHY.map(([t, d]) => (
+              <Card key={t} className="flex flex-col gap-2.5 rounded-2xl p-6">
+                <span className="text-[19px] font-bold">{t}</span>
+                <span className="text-[15px] leading-[1.55] text-d-muted">{d}</span>
+              </Card>
+            ))}
           </div>
         </Section>
 
@@ -231,23 +257,6 @@ export default async function DocumenteroHome() {
                   <div className="flex flex-col"><span className="text-[14px] font-bold">[Prenume {i}]</span><span className="text-[12px] text-d-muted">{s}</span></div>
                 </figcaption>
               </Card>
-            ))}
-          </div>
-        </Section>
-
-        {/* Situations */}
-        <Section className="mt-20 grid gap-8 lg:mt-[88px] lg:grid-cols-12">
-          <div className="flex flex-col gap-4 lg:col-span-5">
-            <H2>Oricare ar fi motivul, procedura e aceeași.</H2>
-            <p className="m-0 text-[16px] leading-[1.55] text-d-muted">Din 2023, duplicatul se poate cere de la orice primărie. Noi mergem oricum acolo unde e actul.</p>
-            <CertificateMock />
-          </div>
-          <div className="grid content-start gap-4 sm:grid-cols-2 lg:col-span-7">
-            {SITUATIONS.map(([t, d]) => (
-              <Link key={t} href="/ghiduri/certificat-de-nastere-pierdut/" className="flex flex-col gap-1.5 rounded-2xl border border-d-line bg-d-card p-5 hover:border-d-acc">
-                <span className="text-[17px] font-bold">{t}</span>
-                <span className="text-[14px] leading-[1.5] text-d-muted">{d}</span>
-              </Link>
             ))}
           </div>
         </Section>
