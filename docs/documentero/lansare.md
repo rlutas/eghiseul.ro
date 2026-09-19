@@ -15,25 +15,28 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   `src/app/documentero/layout.tsx` (`verification.google`).
 - [ ] GA4: stream nou pentru documentero.ro; `AttributionTracker` trimite
   `platform`.
-- [ ] Registrul central: rulat `supabase/registry/003_platform_documentero.sql`
-  pe proiectul `registru-barou-central` (`ksqkttalapjlgugshuks`). Fără el,
-  prima alocare de număr pentru o comandă documentero pică pe CHECK.
+- [x] Registrul central: `003_platform_documentero.sql` aplicat pe
+  `registru-barou-central` (19.09, 13:40).
 - [ ] Oblio: aceeași serie (decizie 19.09); de confirmat cu contabilul textul
   de pe factură (numele brandului în descriere).
 
 ## Cod (eu)
 
 - [ ] Variabile CSS pe `[data-brand="documentero"]` și tema pe wizard/cont.
-- [ ] Paginile publice din canvas implementate în `src/app/documentero/`:
-  acasă, căsătorie, celibat, extras multilingv, ghiduri, primul ghid, despre,
-  contact, legal (componente comune cu `brand`).
+- [x] Paginile publice implementate în `src/app/documentero/` (19.09): acasă,
+  căsătorie, celibat, extras multilingv, ghiduri, primul ghid, despre, contact.
+  Toate `noindex` până la `DOCUMENTERO_INDEXABLE = true`
+  (`src/config/documentero-nav.ts`).
+- [ ] Pagini legale proprii (T&C, confidențialitate, anulare, cookies) cu
+  brandul documentero; până atunci footerul și disclosure-ul trimit la cele de
+  pe eghiseul.ro (`Brand.legalBaseUrl`).
 - [ ] Assets: logo SVG (normal, alb), favicon, apple-icon, OG implicit, logo
   pentru email; cele trei fotografii refăcute fără mărci și exportate WebP.
-- [ ] `registryPlatform` din brandul comenzii la alocarea numerelor.
+- [x] `registryPlatform` din brandul comenzii la alocarea numerelor (19.09).
 - [ ] Emailurile secundare cu `brand`; textele „eghiseul.ro” rămase în KYC,
   auth, cont.
-- [ ] `Organization` documentero în schema; `Service`/`Product` pe paginile de
-  serviciu; `Article` pe ghiduri.
+- [x] `Organization` documentero în schema; `Service`/`Product` pe paginile de
+  serviciu; `Article` pe ghid (`src/lib/seo/documentero-schema.ts`).
 - [ ] Sitemap curatoriat completat pagină cu pagină; placeholder-ul `noindex`
   scos de pe acasă abia când hub-ul e scris.
 - [ ] Link declarat din eghiseul (footer + pagina de serviciu naștere).
@@ -43,7 +46,8 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
 - [ ] Textele finale pentru cele patru pagini de serviciu, trecute prin
   humanizer și prin testul de similaritate.
 - [ ] Trei recenzii Google alese, cu inițiale.
-- [ ] Poză reală a echipei și a avocatei, plus textul ei pentru „Despre”.
+- [x] Poza avocatei (Tarța Ana Gabriela, avocat-tarta.ro) în `public/images/documentero/`;
+  textul de pe „Despre” e factual, din site-ul ei. Rămâne: poză reală a echipei.
 - [ ] Numărul real de acte obținute (înlocuiește `[N]` în „Despre”).
 - [ ] Primul ghid („certificat de naștere pierdut”) scris complet.
 

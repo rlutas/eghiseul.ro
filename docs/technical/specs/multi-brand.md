@@ -36,9 +36,19 @@ documentero.ro/comanda|account|auth|completare|reincarca-poza|api → PARTAJATE,
   blocare ar fi prins și cererile abia rescrise).
 - Hosturi suplimentare (preview, local): `DOCUMENTERO_EXTRA_HOSTS` (pentru
   rewrite, la build) + `BRAND_HOST_OVERRIDES` (pentru `brandFromHost`, la
-  runtime). Exemplu local: `DOCUMENTERO_EXTRA_HOSTS=documentero.local:3000`,
-  `BRAND_HOST_OVERRIDES=documentero=documentero.local:3000`, plus
-  `127.0.0.1 documentero.local` în `/etc/hosts`.
+  runtime). ⚠️ `has: host` din rewrites compară hostname-ul FĂRĂ port, iar
+  `brandFromHost` primește header-ul cu port: listează ambele forme. Local, fără
+  `/etc/hosts`:
+
+  ```bash
+  DOCUMENTERO_EXTRA_HOSTS="documentero.127.0.0.1.nip.io,documentero.127.0.0.1.nip.io:3000" \
+  BRAND_HOST_OVERRIDES="documentero=documentero.127.0.0.1.nip.io,documentero.127.0.0.1.nip.io:3000" \
+  npx next dev -p 3000   # apoi http://documentero.127.0.0.1.nip.io:3000/
+  ```
+- Redirecturile din `next.config.ts` sunt istoria eghiseul (WordPress, cleanup
+  301); toate primesc `missing: host documentero`, altfel `/despre/` și
+  `/certificat-de-celibat/` de pe documentero erau redirecționate (prins la
+  smoke, 19.09).
 
 ## Grupurile de rute
 
@@ -79,9 +89,9 @@ linia legală.
   document gata, link completare, recovery/abandon, cerere de reîncărcare.
 - `buildResumeUrl({ …, platform })` (recovery cron, follow-up telefonic).
 - Registrul central: `allocateNumber({ platform: brandForOrder(order).registryPlatform })`
-  — ⚠️ încă hardcodat `'eghiseul'` în `lib/documents/auto-generate.ts` și
-  `api/admin/orders/[id]/generate-document`; de schimbat înainte de prima
-  comandă documentero cu avocat (toate cele 5 servicii au avocat).
+  în `lib/documents/auto-generate.ts` și `api/admin/orders/[id]/generate-document`
+  (19.09). Decontul avocatei (`lib/admin/avocat-decont.ts`) etichetează rândurile
+  documentero; `/api/admin/orders/counts` și exportul CSV primesc `platform`.
 
 ## Baza de date
 
@@ -110,9 +120,14 @@ linia legală.
 - Sitemap documentero e CURATORIAT: `src/config/documentero-sitemap.ts`. O
   pagină intră acolo doar când e scrisă și gata de index. Placeholder-ul de
   acasă e `noindex`.
-- Schema `Organization` pentru documentero: de scris odată cu paginile
-  (același `legalName`/CUI/adresă, `parentOrganization`/`sameAs` → eghiseul.ro;
-  fără `aggregateRating`).
+- Schema documentero: `src/lib/seo/documentero-schema.ts` (`Organization` cu
+  `parentOrganization` eghiseul.ro, `WebSite`, `Service`+`Product` pe servicii,
+  `Article` cu autorul real pe ghiduri, `FAQPage` pe acasă; fără `aggregateRating`).
+- Paginile publice: `src/app/documentero/` (acasă, `certificat-de-casatorie`,
+  `certificat-de-celibat`, `extras-multilingv`, `ghiduri`, `ghiduri/<slug>`,
+  `despre`, `contact`), componente în `src/components/documentero/`, prețuri din
+  DB prin `src/lib/documentero/services.ts`, `noindex` până la
+  `DOCUMENTERO_INDEXABLE` (`src/config/documentero-nav.ts`).
 
 ## Cum adaugi un al treilea brand
 
