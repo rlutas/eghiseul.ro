@@ -14,6 +14,7 @@ tehnic, cum arată, ce conținut are și ce mai e de făcut până la lansare.
 | Conținut și SEO: ce pagină pe ce cuvinte, titluri, linking, sitemap, cadență | [`continut-si-seo.md`](continut-si-seo.md) |
 | Formularul de comandă: pașii, ce diferă față de eghiseul, ce rămâne comun | [`formular.md`](formular.md) |
 | Lansare: ce lipsește, în ordine, cine face | [`lansare.md`](lansare.md) |
+| Prompturile pentru pozele care lipsesc (le generează Raul) | [`prompturi-poze.md`](prompturi-poze.md) |
 
 ## Stare (19.09.2026)
 
