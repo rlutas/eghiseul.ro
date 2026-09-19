@@ -4,13 +4,16 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
 
 ## Conturi și infrastructură (Raul)
 
-- [ ] Domeniul `documentero.ro` cumpărat, plus `.eu` și `.net` defensiv;
+- [x] Domeniul `documentero.ro` cumpărat (19.09, DNS pe Vercel, HTTPS live);
+  rămân `.eu` și `.net` defensiv;
   `faracoada.ro` ca slogan/campanie, nu ca site.
-- [ ] Domeniul adăugat la proiectul Vercel `eghiseul-ro`; `www` redirecționat
-  spre apex (308). Fără `www` pe webhookuri.
+- [x] Domeniul adăugat la proiectul Vercel `eghiseul-ro` (19.09). ⚠️ `www`
+  răspunde 200 în loc de 308 spre apex — de setat redirectul în Vercel.
+  Fără `www` pe webhookuri.
 - [ ] Resend: domeniul `documentero.ro` verificat (SPF, DKIM), ca
-  `contact@documentero.ro` să poată trimite. Zoho: alias sau cutie pentru
-  primire.
+  `contact@documentero.ro` să poată trimite. La 19.09 `dig` nu vede niciun
+  MX/TXT pe domeniu, deci Resend va refuza `from`-ul documentero. Zoho: alias
+  sau cutie pentru primire.
 - [ ] Search Console: proprietate de tip Domain; tokenul de verificare intră în
   `src/app/documentero/layout.tsx` (`verification.google`).
 - [ ] GA4: stream nou pentru documentero.ro; `AttributionTracker` trimite
@@ -22,7 +25,7 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
 
 ## Cod (eu)
 
-- [ ] Variabile CSS pe `[data-brand="documentero"]` și tema pe wizard/cont.
+- [x] Variabile CSS pe `[data-brand="documentero"]` și tema pe wizard/cont (19.09, `697aa49`).
 - [x] Paginile publice implementate în `src/app/documentero/` (19.09): acasă
   (prezentare, toate actele), naștere, căsătorie, celibat, extras multilingv,
   ghiduri, primul ghid, despre, contact.

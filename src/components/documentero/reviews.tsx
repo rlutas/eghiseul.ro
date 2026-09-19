@@ -82,7 +82,8 @@ export function ReviewersStack({ count = 4 }: { count?: number }) {
 /**
  * "Ce spun clienții" — six real Google reviews about civil-status documents,
  * with the reviewers' Google photos, and the honest provenance line: the
- * profile is eGhișeul.ro's, the group brand that handles the same orders.
+ * profile belongs to eDigitalizare SRL, the company behind documentero.ro
+ * (named as the company, not as the sister brand — Raul, 19.09).
  */
 export function ReviewsDocumentero({ limit = 6 }: { limit?: number }) {
   const items = DOCUMENTERO_REVIEWS.slice(0, limit);
@@ -127,8 +128,8 @@ export function ReviewsDocumentero({ limit = 6 }: { limit?: number }) {
 
       <div className="flex flex-col gap-3 text-[13px] text-d-muted sm:flex-row sm:items-center sm:justify-between">
         <p className="m-0 max-w-[720px] leading-relaxed">
-          Recenzii publice de pe profilul Google al eGhișeul.ro, platforma din același grup: aceeași echipă și același
-          avocat obțin actele de stare civilă comandate pe documentero.ro. Citite la {DOCUMENTERO_REVIEWS_COLLECTED}.
+          Recenzii publice de pe profilul Google al eDigitalizare SRL, firma din spatele documentero.ro: aceeași echipă
+          și același avocat obțin actele de stare civilă comandate aici. Citite la {DOCUMENTERO_REVIEWS_COLLECTED}.
         </p>
         <a href={GOOGLE_REVIEW_WRITE_URL} target="_blank" rel="noopener noreferrer" className="shrink-0 font-semibold text-d-ink underline underline-offset-4 hover:text-d-acc">
           Lasă o recenzie pe Google

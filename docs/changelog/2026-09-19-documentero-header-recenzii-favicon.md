@@ -15,8 +15,9 @@ Pe documentero.ro apar acum lucrurile lui, nu ale eghiseul-ului:
 - **Recenziile de pe prima pagină sunt reale**, de pe profilul Google al
   eGhișeul.ro: nouă recenzii de 5 stele despre acte de stare civilă (naștere,
   căsătorie, celibat, extras multilingv), cu pozele de profil ale clienților
-  și cu mențiunea că profilul e al platformei din același grup. Nota sub
-  recenzii spune data la care au fost citite.
+  și cu mențiunea că profilul Google e al firmei (eDigitalizare SRL). Textele
+  recenziilor NU pomenesc eghiseul.ro (unde clientul l-a scris, fraza e tăiată
+  cu „…”, nu rescrisă). Nota sub recenzii spune data la care au fost citite.
 - **Numărul de recenzii afișat** pe ambele site-uri e acum 470 (verificat azi
   pe Google Maps).
 - **Footerul** are jos, ca pe eghiseul, sigla ANPC SAL și cea de soluționare
@@ -90,5 +91,9 @@ iconițele documentero, `/documentero/icon.png` 200, `/favicon.ico` 200 pe
 ambele hosturi, `/comanda/status/` 200 cu header documentero; capturi la
 1440 / 390 / 360 px (dropdown, meniu mobil, recenzii, footer).
 
-Rămân (checklist în `docs/documentero/lansare.md`): OG implicit
-`/og/documentero-default.png`, logo pentru email, logo SVG alb.
+Rămân (checklist complet în `docs/documentero/lansare.md`): Resend pe
+domeniul documentero (fără MX/TXT la 19.09), Search Console + GA4, pagini
+legale proprii, OG implicit `/og/documentero-default.png`, logo pentru email
+și SVG alb, textele „eghiseul.ro” din emailurile secundare/KYC/auth, sitemap
+curatoriat + scoaterea `noindex`, link declarat din eghiseul, comanda de test
+plătită pe documentero.ro.

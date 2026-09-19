@@ -6,13 +6,14 @@
  * read from Google Maps on 19.09.2026 (4,9 ★ / 470 reviews). Only 5★
  * reviews about CIVIL-STATUS documents (birth/marriage certificate, proof of
  * celibacy, multilingual extract), text verbatim except for the trims marked
- * with „…”. Avatars are the reviewers' public Google profile photos, saved
- * at 160 px in public/images/documentero/recenzii/.
+ * with „…”. Raul's rule (19.09): the review TEXTS must not name eghiseul.ro —
+ * where a reviewer wrote it, that clause is trimmed with „…”, never rewritten.
+ * Avatars are the reviewers' public Google profile photos, saved at 160 px in public/images/documentero/recenzii/.
  *
  * Content rule (.claude/rules/content-and-seo.md §3): nothing invented — no
  * rating without a source, no relative dates („acum 4 zile” freezes and
- * lies), no reviews for a product that has none. The page says these come
- * from the eGhișeul.ro profile and links to it.
+ * lies), no reviews for a product that has none. The page says the profile
+ * is eDigitalizare SRL's (the company behind documentero.ro) and links to it.
  *
  * Refresh: Google Maps → eGhișeul.ro → Recenzii → sort by newest; keep the
  * ones about stare civilă, replace the avatar files, update the date below.
@@ -41,7 +42,7 @@ export const DOCUMENTERO_REVIEWS: DocumenteroReview[] = [
     name: 'Turiac Silvia',
     avatar: '/images/documentero/recenzii/turiac-silvia.jpg',
     service: 'Certificat de celibat · Olanda',
-    text: 'Am avut nevoie urgentă de un certificat de celibat în Olanda. Am fost foarte plăcut surprinsă de profesionalism, comunicare și rapiditatea de care au dat dovadă angajații de la eghiseul.ro, mai ales în situația în care aveam nevoie de acest certificat în mod urgent. Complimentele mele!',
+    text: 'Am avut nevoie urgentă de un certificat de celibat în Olanda. Am fost foarte plăcut surprinsă de profesionalism, comunicare și rapiditate … mai ales în situația în care aveam nevoie de acest certificat în mod urgent. Complimentele mele!',
   },
   {
     name: 'Amalia Marin',
