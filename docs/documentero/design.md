@@ -113,5 +113,7 @@ scroll în viewport (`data-reveal`, un singur `IntersectionObserver`,
 (`.d-rise`); cardurile se ridică 4 px la hover, butoanele 2 px; mega-meniul
 alunecă 4 px. Ascunderea de dinaintea reveal-ului stă DOAR sub
 `@media (scripting: enabled)`, deci crawlerele fără JS văd tot;
-`prefers-reduced-motion` păstrează doar fade-ul. Ritm vertical: 96/128 px între
+`prefers-reduced-motion` păstrează doar fade-ul. Observatorul se re-atașează la
+fiecare schimbare de rută (`usePathname`) și prin `MutationObserver`, altfel la
+navigarea client-side secțiunile rămâneau invizibile (bug 20.09). Ritm vertical: 96/128 px între
 secțiuni, 80/112 între sub-secțiuni, 40 pentru o bandă lipită de blocul de sus.
