@@ -65,7 +65,8 @@ export default function DesprePage() {
               {[
                 ['2023', 'anul de la care lucrăm'],
                 [`${SOCIAL_PROOF.ratingValue.toString().replace('.', ',')} / 5`, `peste ${SOCIAL_PROOF.roundedDown} de recenzii Google`],
-                ['[N]', 'acte de stare civilă obținute'],
+                // Real figure: paid civil-status orders on the new platform, DB count 20.09.2026 (44 since 07.07.2026). Update by hand.
+                ['40+', 'acte de stare civilă din iulie 2026'],
               ].map(([a, b]) => (
                 <div key={a} className="flex flex-col gap-0.5"><span className="text-[30px] font-bold tracking-[-0.03em]">{a}</span><span className="text-[13px] text-d-muted">{b}</span></div>
               ))}

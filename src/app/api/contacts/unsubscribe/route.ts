@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { getBrand } from '@/lib/brand/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,22 +26,25 @@ export async function POST(req: NextRequest) {
 
 async function handleUnsubscribe(req: NextRequest) {
   const token = req.nextUrl.searchParams.get('token')?.trim() || '';
+  // The confirmation page speaks for the host it was opened on (the link in a
+  // documentero email points at documentero.ro/api/... — same route, own chrome).
+  const brand = await getBrand();
 
   const page = (title: string, body: string, ok: boolean) =>
     new NextResponse(
       `<!doctype html><html lang="ro"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex"><title>${title} — eGhișeul.ro</title>
+<meta name="robots" content="noindex"><title>${title} — ${brand.name}</title>
 <style>body{font-family:system-ui,sans-serif;background:#f8fafc;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0}
 .card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:40px;max-width:440px;text-align:center;box-shadow:0 4px 16px rgba(6,16,31,.06)}
 h1{font-size:20px;color:#0f172a;margin:0 0 8px}p{color:#475569;font-size:14px;line-height:1.6;margin:0 0 20px}
 a{display:inline-block;background:${ok ? '#ECB95F' : '#e2e8f0'};color:#0f172a;font-weight:600;text-decoration:none;padding:10px 20px;border-radius:10px;font-size:14px}</style>
-</head><body><div class="card"><h1>${title}</h1><p>${body}</p><a href="https://eghiseul.ro/">Înapoi la eGhișeul.ro</a></div></body></html>`,
+</head><body><div class="card"><h1>${title}</h1><p>${body}</p><a href="${brand.baseUrl}/">Înapoi la ${brand.name}</a></div></body></html>`,
       { status: ok ? 200 : 400, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
     );
 
   if (!token || token.length > 100) {
-    return page('Link invalid', 'Linkul de dezabonare nu este valid. Dacă problema persistă, scrie-ne la contact@eghiseul.ro.', false);
+    return page('Link invalid', `Linkul de dezabonare nu este valid. Dacă problema persistă, scrie-ne la ${brand.contactEmail}.`, false);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,7 +56,7 @@ a{display:inline-block;background:${ok ? '#ECB95F' : '#e2e8f0'};color:#0f172a;fo
     .maybeSingle();
 
   if (!contact) {
-    return page('Link invalid', 'Linkul de dezabonare nu este valid sau a expirat. Scrie-ne la contact@eghiseul.ro și te dezabonăm manual.', false);
+    return page('Link invalid', `Linkul de dezabonare nu este valid sau a expirat. Scrie-ne la ${brand.contactEmail} și te dezabonăm manual.`, false);
   }
 
   if (contact.marketing_status !== 'unsubscribed') {
@@ -62,13 +66,13 @@ a{display:inline-block;background:${ok ? '#ECB95F' : '#e2e8f0'};color:#0f172a;fo
       .eq('id', contact.id);
     if (error) {
       console.error('[contacts] unsubscribe failed:', error.message);
-      return page('Eroare', 'Nu am putut procesa dezabonarea. Încearcă din nou sau scrie-ne la contact@eghiseul.ro.', false);
+      return page('Eroare', `Nu am putut procesa dezabonarea. Încearcă din nou sau scrie-ne la ${brand.contactEmail}.`, false);
     }
   }
 
   return page(
     'Te-ai dezabonat',
-    'Nu vei mai primi emailuri de marketing de la eGhișeul.ro. Emailurile despre comenzile tale active nu sunt afectate.',
+    `Nu vei mai primi emailuri de marketing de la ${brand.name}. Emailurile despre comenzile tale active nu sunt afectate.`,
     true
   );
 }

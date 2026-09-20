@@ -160,6 +160,7 @@ export type Database = {
           abandoned_email_sent_at: string | null
           options_price: number | null
           order_number: string
+          platform: string | null
           paid_at: string | null
           partner_id: string | null
           payment_method: string | null
@@ -224,6 +225,7 @@ export type Database = {
           abandoned_email_sent_at?: string | null
           options_price?: number | null
           order_number: string
+          platform?: string | null
           paid_at?: string | null
           partner_id?: string | null
           payment_method?: string | null
@@ -288,6 +290,7 @@ export type Database = {
           abandoned_email_sent_at?: string | null
           options_price?: number | null
           order_number?: string
+          platform?: string | null
           paid_at?: string | null
           partner_id?: string | null
           payment_method?: string | null

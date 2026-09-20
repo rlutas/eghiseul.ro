@@ -71,7 +71,8 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   nota de proveniență + data citirii sub carduri.
 - [x] Poza avocatei (Tarța Ana Gabriela, avocat-tarta.ro) în `public/images/documentero/`;
   textul de pe „Despre” e factual, din site-ul ei. Rămâne: poză reală a echipei.
-- [ ] Numărul real de acte obținute (înlocuiește `[N]` în „Despre”).
+- [x] Numărul real de acte obținute (20.09: 40+, din 44 comenzi plătite în DB
+  din 07.07.2026; de actualizat manual în `despre/page.tsx`).
 - [ ] Primul ghid („certificat de naștere pierdut”) scris complet.
 
 ## Verificare înainte de a scoate `noindex`
@@ -87,7 +88,9 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   `resolveFrom` (Resend), fără card de cont pe documentero, link cookies.
   Din test rămâne doar: previzualizări KYC goale după reîncărcare (bug general).
   Comenzile de test au fost ȘTERSE din DB pe 20.09 (să nu încurce echipa).
-- [ ] Rich Results Test pe acasă și pe o pagină de serviciu.
+- [~] Rich Results Test pe acasă și pe o pagină de serviciu — JSON-LD validat
+  structural local pe 7 pagini (20.09); testul Google se rulează după
+  scoaterea `noindex`.
 - [ ] `curl -A Googlebot`: conținutul e în HTML, nu după Suspense.
 - [ ] Screaming Frog cu Crawl Analysis: inlinks ≥ 20 pe pagină, fără
   near-duplicate peste prag.

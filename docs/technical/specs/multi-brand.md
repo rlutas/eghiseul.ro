@@ -181,9 +181,8 @@ Teste: `tests/unit/lib/brand/brands.test.ts`.
 4. ~~`verification.google`~~ — 20.09 (meta tag; TXT în DNS dacă proprietatea e Domain).
 5. ~~Logo email și OG implicit~~ — 20.09 (`public/images/brand/documentero-email-logo.png`,
    `public/og/documentero-default.png`).
-6. `src/types/supabase.ts` nu cunoaște `orders.platform` (migrarea 181):
-   selecturile tipate cad pe `SelectQueryError`; se folosește clientul
-   `as any`. De regenerat tipurile la prima ocazie.
-7. Ținta hyperlinkului din `contract-prestari.docx` rămâne T&C eghiseul
-   (`word/_rels` nu se templetizează); textul vizibil urmează brandul.
-8. Pagina de dezabonare (`/api/contacts/unsubscribe`) e eghiseul-branded.
+6. ~~`src/types/supabase.ts` nu cunoaște `orders.platform`~~ — adăugat manual
+   20.09 (Row/Insert/Update); `as any`-urile rămase se pot curăța treptat.
+7. ~~Ținta hyperlinkului din `contract-prestari.docx`~~ — wrapper-ul scos 20.09;
+   `{{TC_URL}}` e text simplu pe brandul comenzii.
+8. ~~Pagina de dezabonare~~ — `getBrand()` din host, 20.09.

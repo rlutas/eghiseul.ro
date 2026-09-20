@@ -154,7 +154,7 @@ export default async function ExtrasMultilingvPage() {
             'Atenție la două lucruri. Extrasul nu spune nimic despre starea civilă actuală: pentru căsătorie ai nevoie și de dovada de celibat. Și nu e recunoscut automat în afara Uniunii: pentru Regatul Unit, Elveția, Norvegia, SUA sau Canada rămâne varianta certificat plus apostilă plus traducere.',
           ]}
           guides={[
-            { title: 'Extras multilingv sau certificat cu apostilă?', desc: 'Depinde de țară. Tabelul pe scurt.', href: '/ghiduri/' },
+            { title: 'Extras multilingv sau certificat cu apostilă?', desc: 'Depinde de țară. Tabelul pe scurt.', href: '/ghiduri/apostila-acte-stare-civila/' },
             { title: 'Transcrierea certificatului de naștere emis în străinătate', desc: 'Copil născut în Italia sau Spania.', href: '/ghiduri/' },
             { title: 'Certificat de naștere pierdut: ce faci în 2026', desc: 'Pașii, actele, termenul real.', href: '/ghiduri/certificat-de-nastere-pierdut/' },
           ]}
