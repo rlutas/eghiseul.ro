@@ -66,6 +66,14 @@ de clicuri în trei luni.
 Sectoarele din București (2.350 volum pe cluster) se tratează ca un tabel în
 ghidul de acte necesare, nu ca pagini.
 
+## Competitorii și planul de dinainte de indexare
+
+SERP-ul real la 20.09.2026, paginile competitorilor, ce lipsește pe paginile
+noastre (cuvinte, linkuri interne, `FAQPage`, dată vizibilă, pasaj citabil) și
+planul în 7 părți (cod, conținut, matricea de linkuri, ghidurile reordonate,
+GEO, ce nu facem, măsurare): [`analiza-competitori-seo.md`](analiza-competitori-seo.md).
+Ordinea ghidurilor de mai sus e înlocuită de tabelul D de acolo.
+
 ## Cum se scrie
 
 - Propoziții scurte, la persoana a doua, cu ce se întâmplă de fapt la ghișeu.

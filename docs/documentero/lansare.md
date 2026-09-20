@@ -55,6 +55,15 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   butoane și titluri repictate pe brand în `brandedEmailHtml`.
 - [x] `Organization` documentero în schema; `Service`/`Product` pe paginile de
   serviciu; `Article` pe ghid (`src/lib/seo/documentero-schema.ts`).
+- [ ] Planul A din [`analiza-competitori-seo.md`](analiza-competitori-seo.md)
+  §6 (20.09): `FAQPage` pe paginile de serviciu, bloc „Pe scurt” citabil sub
+  hero, „Actualizat la” vizibil, zero linkuri din carduri spre `/ghiduri/`
+  (index), „Ai nevoie și de” pe naștere/căsătorie/extras, recenzii filtrate pe
+  act, baza legală completă (L. 119/1996 + L. 51/1995 + H.G. 255/2024), linkuri
+  în text pe acasă/ghiduri/despre, `llms.txt`.
+- [ ] Numele actual al documentului de celibat în metodologia H.G. 255/2024
+  (Anexa 18 / „fosta Anexa 9”?) — SERP-ul e împărțit între cele două nume;
+  pagina noastră spune doar „Anexa 9”.
 - [ ] Sitemap curatoriat completat pagină cu pagină; placeholder-ul `noindex`
   scos de pe acasă abia când hub-ul e scris.
 - [x] Link declarat din eghiseul (20.09): footer (coloana Contact, text) +

@@ -12,6 +12,7 @@ tehnic, cum arată, ce conținut are și ce mai e de făcut până la lansare.
 | Cum e legat tehnic (rutare pe host, `orders.platform`, grupuri de rute, brand pe comandă) | [`../technical/specs/multi-brand.md`](../technical/specs/multi-brand.md) |
 | Design: paletă, logo, tipografie, componente, canvasul cu machetele | [`design.md`](design.md) |
 | Conținut și SEO: ce pagină pe ce cuvinte, titluri, linking, sitemap, cadență | [`continut-si-seo.md`](continut-si-seo.md) |
+| Competitorii pe naștere/căsătorie/celibat, SERP-ul real, ce lipsește pe paginile noastre, planul (cod, conținut, linkuri, ghiduri, GEO) | [`analiza-competitori-seo.md`](analiza-competitori-seo.md) |
 | Formularul de comandă: pașii, ce diferă față de eghiseul, ce rămâne comun | [`formular.md`](formular.md) |
 | Lansare: ce lipsește, în ordine, cine face | [`lansare.md`](lansare.md) |
 | Prompturile pentru pozele care lipsesc (le generează Raul) | [`prompturi-poze.md`](prompturi-poze.md) |
@@ -28,6 +29,9 @@ tehnic, cum arată, ce conținut are și ce mai e de făcut până la lansare.
 - Comanda de test `E-260919-ADXE7` a trecut wizardul și e în checkout
   (`pending`, `platform='documentero'`); plata și verificările de după plată
   sunt la Raul (vezi [`lansare.md`](lansare.md)).
+- 20.09: analiza competitorilor + planul SEO/GEO de dinainte de `noindex` în
+  [`analiza-competitori-seo.md`](analiza-competitori-seo.md). Pe naștere,
+  eghiseul a ieșit din top 20 (SERP live); pe căsătorie și celibat e pe locul 1.
 - Nu e lansat. Lista de blocaje, bifată: [`lansare.md`](lansare.md).
   Jurnal: [`../changelog/`](../changelog/README.md) (intrările din 19.09).
 
