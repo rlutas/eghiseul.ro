@@ -9,6 +9,7 @@
  * so it matches every other customer email.
  */
 import { brandedEmailHtml, ctaButton } from './branded-layout';
+import { BRANDS, type Brand } from '@/lib/brand/brands';
 
 export interface ExtraPaymentEmailInput {
   customerFirstName?: string | null;
@@ -22,6 +23,8 @@ export interface ExtraPaymentEmailInput {
    *  PaymentIntent `client_secret` via a tenant URL that the frontend
    *  resolves to a Stripe Elements page. */
   paymentUrl: string;
+  /** The ORDER's brand (documentero or eghiseul) — header, colors, signature. */
+  brand?: Brand;
 }
 
 export function buildExtraPaymentSubject(input: ExtraPaymentEmailInput): string {
@@ -33,6 +36,7 @@ export function buildExtraPaymentHtml(input: ExtraPaymentEmailInput): string {
     ? `Salut ${escapeHtml(input.customerFirstName)},`
     : 'Salut,';
   return brandedEmailHtml({
+    brand: input.brand,
     preheader: `Plată suplimentară ${input.amountRon.toFixed(2)} RON pentru comanda ${input.orderNumber}`,
     content: `
         <p style="margin:0 0 10px;font-size:13px;color:#64748b;">Comanda <span style="font-family:monospace;font-weight:700;color:#0f172a;">${escapeHtml(input.orderNumber)}</span></p>
@@ -68,6 +72,7 @@ export function buildExtraPaymentReminderHtml(input: ExtraPaymentReminderInput):
     ? `Salut ${escapeHtml(input.customerFirstName)},`
     : 'Salut,';
   return brandedEmailHtml({
+    brand: input.brand,
     preheader: `Link-ul de plată de ${input.amountRon.toFixed(2)} RON expiră în ~${input.hoursLeft} ore`,
     content: `
         <p style="margin:0 0 10px;font-size:13px;color:#64748b;">Comanda <span style="font-family:monospace;font-weight:700;color:#0f172a;">${escapeHtml(input.orderNumber)}</span></p>
@@ -85,6 +90,7 @@ export function buildExtraPaymentReminderHtml(input: ExtraPaymentReminderInput):
 
 export function buildExtraPaymentReminderText(input: ExtraPaymentReminderInput): string {
   const greeting = input.customerFirstName ? `Salut ${input.customerFirstName},` : 'Salut,';
+  const b = input.brand ?? BRANDS.eghiseul;
   return [
     `Comanda ${input.orderNumber}`,
     '',
@@ -98,7 +104,7 @@ export function buildExtraPaymentReminderText(input: ExtraPaymentReminderInput):
     '',
     'Dacă link-ul a expirat deja, răspunde la acest email și îți trimitem unul nou.',
     '',
-    '— Echipa eGhișeul.ro',
+    `— Echipa ${b.name}`,
   ].join('\n');
 }
 
@@ -106,6 +112,7 @@ export function buildExtraPaymentText(input: ExtraPaymentEmailInput): string {
   const greeting = input.customerFirstName
     ? `Salut ${input.customerFirstName},`
     : 'Salut,';
+  const b = input.brand ?? BRANDS.eghiseul;
   return [
     `Comanda ${input.orderNumber}`,
     '',
@@ -119,7 +126,7 @@ export function buildExtraPaymentText(input: ExtraPaymentEmailInput): string {
     '',
     'Link-ul rămâne valid 24h. Dacă apare orice problemă, răspunde la acest email.',
     '',
-    '— Echipa eGhișeul.ro',
+    `— Echipa ${b.name}`,
   ].join('\n');
 }
 

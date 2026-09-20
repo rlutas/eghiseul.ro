@@ -37,8 +37,23 @@ function resolveBrand(brand: Brand | BrandId | undefined): Brand {
   return typeof brand === 'string' ? brandById(brand) : brand;
 }
 
-export function brandedEmailHtml({ preheader, content, brand: brandIn }: BrandedEmailInput): string {
+/**
+ * Templates were written with eghiseul's palette inline (gold CTA `#ECB95F`,
+ * navy headings/CTA text `#0B1B33`, via `ctaButton()` called without a brand
+ * and literal heading styles). For another brand the shell repaints those
+ * two literals with the brand's CTA background and ink, so every template
+ * follows the brand without touching 20 files. eghiseul content is untouched.
+ */
+function repaintForBrand(content: string, brand: Brand): string {
+  if (brand.id === 'eghiseul') return content;
+  return content
+    .replaceAll(BRANDS.eghiseul.emailCtaBg, brand.emailCtaBg)
+    .replaceAll(BRANDS.eghiseul.emailHeaderBg, brand.emailHeaderBg);
+}
+
+export function brandedEmailHtml({ preheader, content: rawContent, brand: brandIn }: BrandedEmailInput): string {
   const brand = resolveBrand(brandIn);
+  const content = repaintForBrand(rawContent, brand);
   return `<!doctype html><html lang="ro"><body style="margin:0;background:#f8fafc;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;">
   <div style="display:none;max-height:0;overflow:hidden;">${escHtml(preheader)}</div>
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px;">

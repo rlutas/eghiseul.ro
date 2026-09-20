@@ -249,7 +249,7 @@ export async function POST(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: order } = await (admin as any)
       .from('orders')
-      .select('id, friendly_order_id, order_number, status, customer_data, standby_started_at, standby_total_seconds, estimated_completion_date')
+      .select('id, friendly_order_id, order_number, status, customer_data, platform, standby_started_at, standby_total_seconds, estimated_completion_date')
       .eq('id', req.order_id)
       .single();
     const customerData: AnyObj = (order?.customer_data as AnyObj) ?? {};

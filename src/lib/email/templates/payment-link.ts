@@ -5,6 +5,7 @@
  * vizită — deci NU expiră (spre deosebire de un URL de sesiune Stripe).
  */
 import { brandedEmailHtml, ctaButton } from './branded-layout';
+import type { Brand } from '@/lib/brand/brands';
 
 export interface PaymentLinkEmailInput {
   customerFirstName?: string | null;
@@ -12,6 +13,8 @@ export interface PaymentLinkEmailInput {
   serviceName: string;
   amountRon: number;
   paymentUrl: string;
+  /** The ORDER's brand (documentero or eghiseul) — header, colors, legal line. */
+  brand?: Brand;
 }
 
 export function buildPaymentLinkSubject(input: PaymentLinkEmailInput): string {
@@ -23,6 +26,7 @@ export function buildPaymentLinkHtml(input: PaymentLinkEmailInput): string {
     ? `Salut ${escapeHtml(input.customerFirstName)},`
     : 'Salut,';
   return brandedEmailHtml({
+    brand: input.brand,
     preheader: `Plată ${input.amountRon.toFixed(2)} RON pentru comanda ${input.orderNumber}`,
     content: `
         <p style="margin:0 0 10px;font-size:13px;color:#64748b;">Comanda <span style="font-family:monospace;font-weight:700;color:#0f172a;">${escapeHtml(input.orderNumber)}</span></p>

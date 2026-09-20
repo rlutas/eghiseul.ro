@@ -43,6 +43,7 @@ import { hasProgressBeyondContact } from '@/lib/orders/abandoned-progress';
 import { TEST_EMAILS, isSuspiciousEmail, isUndeliverable } from '@/lib/email/deliverability';
 import { buildResumeUrl } from '@/lib/orders/resume-url';
 import { withUtm } from '@/lib/email/utm';
+import { brandForOrder } from '@/lib/brand/for-order';
 
 const MIN_AGE_MS = 30 * 60 * 1000;
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
@@ -146,6 +147,8 @@ export async function POST(request: NextRequest) {
     const serviceSlug = (order.services?.slug ?? null) as string | null;
     const estimatedDaysDisplay = (order.services?.processing_config?.estimated_days_display ?? null) as string | null;
     const orderNumber = order.friendly_order_id ?? order.order_number ?? '';
+    // The ORDER's brand (orders.platform): resume link, header and sender follow it.
+    const brand = brandForOrder(order);
 
     // Cuponul se alocă DOAR la pasul 3.
     let couponCode: string | null = null;
@@ -195,9 +198,9 @@ export async function POST(request: NextRequest) {
 
     let mail: { subject: string; html: string; text: string };
     if (step === 1) {
-      mail = buildRecoveryStep1({ customerFirstName: firstName, serviceName, totalRon, resumeUrl, orderNumber, estimatedDaysDisplay });
+      mail = buildRecoveryStep1({ customerFirstName: firstName, serviceName, totalRon, resumeUrl, orderNumber, estimatedDaysDisplay, brand });
     } else if (step === 2) {
-      mail = buildRecoveryStep2({ customerFirstName: firstName, serviceName, totalRon, resumeUrl, orderNumber, estimatedDaysDisplay });
+      mail = buildRecoveryStep2({ customerFirstName: firstName, serviceName, totalRon, resumeUrl, orderNumber, estimatedDaysDisplay, brand });
     } else {
       const payload: RecoveryEmailInput = {
         customerFirstName: firstName,
@@ -207,6 +210,7 @@ export async function POST(request: NextRequest) {
         discountPercent: DISCOUNT_PERCENT,
         resumeUrl,
         orderNumber,
+        brand,
       };
       mail = { subject: buildRecoverySubject(payload), html: buildRecoveryHtml(payload), text: buildRecoveryText(payload) };
     }
@@ -214,6 +218,7 @@ export async function POST(request: NextRequest) {
     try {
       const sendRes = await sendEmail({
         to: email,
+        from: brand.emailFrom,
         subject: mail.subject,
         html: mail.html,
         text: mail.text,

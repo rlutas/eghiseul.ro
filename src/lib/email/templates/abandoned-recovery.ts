@@ -11,6 +11,7 @@
  */
 
 import { brandedEmailHtml, ctaButton } from './branded-layout';
+import { BRANDS, type Brand } from '@/lib/brand/brands';
 
 export interface RecoveryEmailInput {
   customerFirstName?: string | null;
@@ -25,6 +26,8 @@ export interface RecoveryEmailInput {
   resumeUrl: string;
   /** Order number, surfaced in the subject for tracking. */
   orderNumber: string;
+  /** The ORDER's brand (documentero or eghiseul) — header, colors, site name. */
+  brand?: Brand;
 }
 
 export function buildRecoverySubject(input: RecoveryEmailInput): string {
@@ -38,7 +41,9 @@ export function buildRecoveryHtml(input: RecoveryEmailInput): string {
   const greeting = input.customerFirstName
     ? `Salut ${escapeHtml(input.customerFirstName)},`
     : 'Salut,';
+  const b = input.brand ?? BRANDS.eghiseul;
   return brandedEmailHtml({
+    brand: input.brand,
     preheader: `Reducere ${input.discountPercent}% pe 48h la ${input.serviceName} — cod ${input.couponCode}`,
     content: `
         <p style="margin:0 0 10px;font-size:13px;color:#64748b;">Comanda <span style="font-family:monospace;font-weight:700;color:#0f172a;">${escapeHtml(input.orderNumber)}</span></p>
@@ -52,7 +57,7 @@ export function buildRecoveryHtml(input: RecoveryEmailInput): string {
         <p style="margin:0 0 6px;font-size:13px;color:#64748b;line-height:1.6;">Cuponul se aplică automat când apeși butonul. Dacă închizi mailul, îl poți introduce și manual pe pagina de plată.</p>
         ${ctaButton('Continuă comanda', input.resumeUrl)}
         <p style="margin:12px 0 0;text-align:center;font-size:12px;color:#9ca3af;">Total estimat: ${input.totalRon.toFixed(2)} RON (înainte de reducere)</p>
-        <p style="margin:14px 0 0;font-size:11px;color:#9ca3af;line-height:1.5;">Ai primit acest email pentru că ai început o comandă pe eGhișeul.ro. Dacă nu mai vrei să continui, ignoră mesajul — datele tale nu vor fi păstrate mai mult de 14 zile.</p>`,
+        <p style="margin:14px 0 0;font-size:11px;color:#9ca3af;line-height:1.5;">Ai primit acest email pentru că ai început o comandă pe ${escapeHtml(b.name)}. Dacă nu mai vrei să continui, ignoră mesajul — datele tale nu vor fi păstrate mai mult de 14 zile.</p>`,
   });
 }
 
@@ -60,6 +65,7 @@ export function buildRecoveryText(input: RecoveryEmailInput): string {
   const greeting = input.customerFirstName
     ? `Salut ${input.customerFirstName},`
     : 'Salut,';
+  const b = input.brand ?? BRANDS.eghiseul;
   return [
     `Comanda ${input.orderNumber}`,
     '',
@@ -74,7 +80,7 @@ export function buildRecoveryText(input: RecoveryEmailInput): string {
     '',
     `Total estimat: ${input.totalRon.toFixed(2)} RON (înainte de reducere)`,
     '',
-    '— Echipa eGhișeul.ro',
+    `— Echipa ${b.name}`,
   ].join('\n');
 }
 

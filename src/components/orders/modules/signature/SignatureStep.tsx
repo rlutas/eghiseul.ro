@@ -1,5 +1,7 @@
 'use client';
 
+import { useBrand } from '@/lib/brand/client';
+
 /**
  * SignatureStep Component
  *
@@ -28,6 +30,7 @@ interface SignatureStepProps {
 }
 
 export default function SignatureStep({ config, onValidChange }: SignatureStepProps) {
+  const brand = useBrand();
   const { state, updateSignature, updateConsent, validationAttempt } = useModularWizard();
 
   // Vezi nota din PropertyDataStep: casetele de eroare apar abia după prima
@@ -384,7 +387,7 @@ export default function SignatureStep({ config, onValidChange }: SignatureStepPr
                 className="mt-0.5 shrink-0"
               />
               <span className="text-sm leading-relaxed text-neutral-700 group-hover:text-neutral-900">
-                <span className="text-red-500">*</span> <strong>Declarație privind corectitudinea datelor.</strong> Declar pe propria răspundere că toate informațiile furnizate sunt reale, corecte și complete. Înțeleg că eGhișeul.ro acționează în baza datelor comunicate de mine și nu răspunde pentru eventualele erori sau omisiuni din informațiile pe care le-am furnizat. În cazul în care informațiile declarate sunt false, incomplete sau eronate, documentul solicitat nu poate fi eliberat, iar contravaloarea serviciului prestat nu se restituie. De asemenea, înțeleg că furnizarea de informații false poate atrage răspunderea mea conform legislației în vigoare.
+                <span className="text-red-500">*</span> <strong>Declarație privind corectitudinea datelor.</strong> Declar pe propria răspundere că toate informațiile furnizate sunt reale, corecte și complete. Înțeleg că {brand.name} acționează în baza datelor comunicate de mine și nu răspunde pentru eventualele erori sau omisiuni din informațiile pe care le-am furnizat. În cazul în care informațiile declarate sunt false, incomplete sau eronate, documentul solicitat nu poate fi eliberat, iar contravaloarea serviciului prestat nu se restituie. De asemenea, înțeleg că furnizarea de informații false poate atrage răspunderea mea conform legislației în vigoare.
               </span>
             </label>
           </div>

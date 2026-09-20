@@ -117,6 +117,10 @@ linia legală.
   primește șablonul `%s | eGhiseul.ro` din root).
 - `src/app/documentero/layout.tsx` are `metadataBase` și titlul implicit
   documentero; `verification.google` se completează când există proprietatea GSC.
+- Pagini legale proprii pe documentero (20.09): `/termeni-si-conditii/`,
+  `/politica-de-confidentialitate/`, `/politica-de-anulare/`,
+  `/politica-cookies/`; `Brand.legalBaseUrl` = originea brandului, fiecare
+  brand servește aceleași patru căi.
 - Rutele partajate (`(order)`: checkout, success, status, cont) iau titlul din
   `generateMetadata` al layout-ului `(order)` — pe documentero `title.absolute`
   + șablon `%s | documentero.ro`, `noindex`; pe eghiseul returnează `{}` și
@@ -166,13 +170,20 @@ Teste: `tests/unit/lib/brand/brands.test.ts`.
 
 ## Rămase (în ordinea în care dor)
 
-1. ~~Alocarea numerelor de Barou cu `platform` din comandă~~ — făcut 19.09
-   (`registryPlatform` din brandul comenzii; registrul `003` aplicat).
-2. Emailurile din fluxul de comandă care încă nu primesc `brand` (transfer
-   bancar, document gata, completare, reîncărcare poză, recovery).
-3. Texte cu „eghiseul.ro” în wizard/KYC/login (`SelfieLegalNotice`, paginile
-   de auth) — să citească `useBrand()`.
-4. `verification.google` în layout-ul documentero când există proprietatea.
-5. Logo email documentero (`/images/brand/documentero-email-logo.png`) și OG
-   implicit (`/og/documentero-default.png`) — de adăugat în `public/` după
-   alegerea direcției vizuale.
+1. ~~Alocarea numerelor de Barou cu `platform` din comandă~~ — 19.09.
+2. ~~Emailurile din fluxul de comandă care încă nu primesc `brand`~~ — 20.09:
+   13 șabloane + 17 apelanți; `brandedEmailHtml` repictează literalele
+   eghiseul (`repaintForBrand`). Rămân eghiseul-only, intenționat: emailurile
+   interne (dovadă plată, colaborator), marketing/warmup/campanii, contact,
+   avarii, remindere auto; `unsubscribeUrlFor` duce la pagina eghiseul.
+3. ~~Texte cu „eghiseul.ro” în wizard/KYC/login~~ — 20.09 (selfie, semnătură,
+   transfer, auth, register, upload/completare, specimen, contract docx).
+4. ~~`verification.google`~~ — 20.09 (meta tag; TXT în DNS dacă proprietatea e Domain).
+5. ~~Logo email și OG implicit~~ — 20.09 (`public/images/brand/documentero-email-logo.png`,
+   `public/og/documentero-default.png`).
+6. `src/types/supabase.ts` nu cunoaște `orders.platform` (migrarea 181):
+   selecturile tipate cad pe `SelectQueryError`; se folosește clientul
+   `as any`. De regenerat tipurile la prima ocazie.
+7. Ținta hyperlinkului din `contract-prestari.docx` rămâne T&C eghiseul
+   (`word/_rels` nu se templetizează); textul vizibil urmează brandul.
+8. Pagina de dezabonare (`/api/contacts/unsubscribe`) e eghiseul-branded.

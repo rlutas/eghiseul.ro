@@ -8,6 +8,7 @@
  */
 
 import { brandedEmailHtml, bulletList, ctaButton, escHtml } from './branded-layout';
+import { BRANDS, type Brand } from '@/lib/brand/brands';
 
 export interface ReuploadEmailInput {
   customerFirstName?: string | null;
@@ -21,6 +22,8 @@ export interface ReuploadEmailInput {
   reuploadUrl: string;
   /** Human-readable expiry, e.g. "16 iunie 2026". */
   expiresLabel: string;
+  /** The ORDER's brand (documentero or eghiseul) — header, colors, contact line. */
+  brand?: Brand;
 }
 
 export function buildReuploadSubject(input: ReuploadEmailInput): string {
@@ -47,6 +50,7 @@ export function buildReuploadHtml(input: ReuploadEmailInput): string {
         <p style="margin:18px 0 0;color:#94a3b8;font-size:12px;line-height:1.6;">Linkul este valabil până la <strong>${escHtml(input.expiresLabel)}</strong>. Comanda ta este în așteptare până primim documentele — durează sub un minut de pe telefon. Dacă butonul nu funcționează, copiază linkul: <a href="${escHtml(input.reuploadUrl)}" style="color:#0B1B33;word-break:break-all;">${escHtml(input.reuploadUrl)}</a></p>`;
 
   return brandedEmailHtml({
+    brand: input.brand,
     preheader: `Comanda ${input.orderNumber} este în așteptare — încarcă documentele solicitate.`,
     content,
   });
@@ -55,6 +59,7 @@ export function buildReuploadHtml(input: ReuploadEmailInput): string {
 export function buildReuploadText(input: ReuploadEmailInput): string {
   const greeting = input.customerFirstName ? `Bună, ${input.customerFirstName}!` : 'Bună ziua!';
   const reason = input.reason ? `\nMotiv: ${input.reason}\n` : '';
+  const b = input.brand ?? BRANDS.eghiseul;
   return [
     `Comanda ${input.orderNumber}`,
     '',
@@ -71,6 +76,6 @@ export function buildReuploadText(input: ReuploadEmailInput): string {
     'Comanda ta este în așteptare până primim documentele.',
     'Dacă nu ai solicitat această acțiune, ignoră acest email.',
     '',
-    'eGhișeul.ro · WhatsApp +40 757 708 181 · contact@eghiseul.ro',
+    `${b.name} · WhatsApp ${b.phoneDisplay} · ${b.contactEmail}`,
   ].join('\n');
 }

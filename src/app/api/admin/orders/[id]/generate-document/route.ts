@@ -396,6 +396,7 @@ export async function POST(
         order_number: order.order_number || '',
         friendly_order_id: order.friendly_order_id || '',
         total_price: order.total_price || 0,
+        platform: order.platform ?? null,
         service_name: order.services?.name || '',
         // Effective slug: on a secondary cerere this is the ADDITIONAL
         // service so its placeholders (TIP_ACT, INSTITUTIE...) come out right.

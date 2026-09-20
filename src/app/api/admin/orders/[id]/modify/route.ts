@@ -36,6 +36,7 @@ import {
 import { addBusinessDaysISO } from '@/lib/delivery-calculator';
 import { sendEmail } from '@/lib/email/resend';
 import { createExtraPaymentSession } from '@/lib/orders/extra-payment-link';
+import { brandForOrder } from '@/lib/brand/for-order';
 import {
   buildExtraPaymentSubject,
   buildExtraPaymentHtml,
@@ -359,6 +360,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ((order as any).customer_data?.personal?.lastName as string) ?? '',
       ].filter(Boolean).join(' ');
+      // The ORDER's brand (orders.platform): return URL, header and sender follow it.
+      const brand = brandForOrder(order as { platform?: string | null });
       const session = await createExtraPaymentSession({
         orderId: order.id,
         orderNumber: orderNum,
@@ -367,6 +370,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         clientName,
         customerEmail: cd.contact?.email ?? null,
         adminEmail,
+        platform: brand.id === 'eghiseul' ? null : brand.id,
       });
       pendingPaymentIntentId = session.sessionId;
       pendingPaymentClientSecret = session.url;
@@ -396,12 +400,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         try {
           const result = await sendEmail({
             to: customerEmail,
+            from: brand.emailFrom,
             subject: buildExtraPaymentSubject({
               orderNumber: orderNum,
               amountRon: diff.diff,
               customerFirstName: firstName,
               changesDescription: changesSummary,
               paymentUrl,
+              brand,
             }),
             html: buildExtraPaymentHtml({
               orderNumber: orderNum,
@@ -409,6 +415,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
               customerFirstName: firstName,
               changesDescription: changesSummary,
               paymentUrl,
+              brand,
             }),
             text: buildExtraPaymentText({
               orderNumber: orderNum,
@@ -416,6 +423,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
               customerFirstName: firstName,
               changesDescription: changesSummary,
               paymentUrl,
+              brand,
             }),
             idempotencyKey: `extra-payment-${session.sessionId}`,
           });

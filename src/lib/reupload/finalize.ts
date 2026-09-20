@@ -7,6 +7,7 @@ import {
 } from '@/lib/email/templates/reupload-completed';
 import { reuploadDocLabel } from '@/lib/reupload/doc-types';
 import { ORGANIZATION } from '@/lib/seo/constants';
+import { brandForOrder } from '@/lib/brand/for-order';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyObj = Record<string, any>;
@@ -90,6 +91,8 @@ export async function finalizeReuploadRequest(
         ...(req.flow === 'completion' ? ['Semnătură'] : []),
       ],
       restoredStatus,
+      // The ORDER's brand — the team sees which site the customer ordered on.
+      brand: brandForOrder(order),
     };
     await sendEmail({
       to: ORGANIZATION.contactPoint.email,

@@ -10,6 +10,7 @@
  * the first Modifică and reused on regenerate (never re-issue).
  */
 import { stripe } from '@/lib/stripe';
+import { appBaseForOrder } from '@/lib/brand/for-order';
 
 export interface ExtraPaymentSessionInput {
   orderId: string;
@@ -21,6 +22,8 @@ export interface ExtraPaymentSessionInput {
   clientName?: string | null;
   customerEmail?: string | null;
   adminEmail: string;
+  /** `orders.platform` — the Stripe return URL opens the status page on the order's brand. */
+  platform?: string | null;
 }
 
 export interface ExtraPaymentSessionResult {
@@ -33,7 +36,7 @@ export interface ExtraPaymentSessionResult {
 export async function createExtraPaymentSession(
   input: ExtraPaymentSessionInput
 ): Promise<ExtraPaymentSessionResult> {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
+  const base = appBaseForOrder({ platform: input.platform ?? null });
   const statusUrl = `${base}/comanda/status?order=${encodeURIComponent(input.orderNumber)}&email=${encodeURIComponent(input.customerEmail ?? '')}`;
 
   const session = await stripe.checkout.sessions.create({

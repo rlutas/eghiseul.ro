@@ -1,4 +1,5 @@
 import Docxtemplater from 'docxtemplater';
+import { brandForOrder } from '@/lib/brand/for-order';
 import PizZip from 'pizzip';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -146,6 +147,8 @@ export interface DocumentContext {
     total_price: number;
     service_name: string;
     service_slug?: string;
+    /** `orders.platform` — the brand the contract speaks for ({{SITE_NAME}}, {{TC_URL}}). */
+    platform?: string | null;
     service_price: number;
     created_at: string;
     estimated_days?: number | null;
@@ -1142,6 +1145,13 @@ export function buildPlaceholderData(ctx: DocumentContext) {
     CLIENT_COMPANY_NR: cap?.number || '',
     CLIENT_COMPANY_BL: cap?.building || '',
     CLIENT_COMPANY_AP: cap?.apartment || '',
+
+    // The brand the contract is issued under (orders.platform → documentero.ro
+    // or eGhișeul.ro): the site named in clause 9.6 and the T&C link. The
+    // hyperlink TARGET inside the docx stays the eghiseul T&C (relationships
+    // are not templated); the visible text follows the brand.
+    SITE_NAME: brandForOrder({ platform: ctx.order.platform }).domain,
+    TC_URL: `${brandForOrder({ platform: ctx.order.platform }).legalBaseUrl}/termeni-si-conditii/`,
 
     // Company data (prestator)
     NUMEFIRMAN: ctx.company.name,

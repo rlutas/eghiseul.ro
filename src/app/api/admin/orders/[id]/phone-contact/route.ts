@@ -27,6 +27,7 @@ import { generateCouponCode } from '@/lib/coupons/recovery-code';
 import { buildResumeUrl } from '@/lib/orders/resume-url';
 import { TEST_EMAILS, isUndeliverable } from '@/lib/email/deliverability';
 import { withUtm } from '@/lib/email/utm';
+import { brandForOrder } from '@/lib/brand/for-order';
 
 const MAX_NOTES_LENGTH = 2000;
 const DEFAULT_COUPON_VALID_DAYS = 7;
@@ -186,7 +187,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       couponWarning = 'Comanda nu are un email valid — cuponul există, dar trimite-i codul pe alt canal.';
     } else {
       try {
+        // The ORDER's brand (orders.platform): header, sender and team name follow it.
+        const brand = brandForOrder(order);
         const mail = renderPhoneFollowupEmail({
+          brand,
           customerFirstName: cd.personal?.firstName ?? cd.billing?.firstName ?? cd.contact?.firstName ?? null,
           agentName,
           serviceName: (order.services?.name ?? 'documentul') as string,
@@ -197,7 +201,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           couponValidUntil: coupon.validUntil,
           resumeUrl,
         });
-        const res = await sendEmail({ to: email, subject: mail.subject, html: mail.html, text: mail.text });
+        const res = await sendEmail({ to: email, from: brand.emailFrom, subject: mail.subject, html: mail.html, text: mail.text });
         emailStatus = res.skipped ? 'skipped' : 'sent';
         if (res.skipped) couponWarning = `Email netrimis: ${res.reason}`;
       } catch (err) {

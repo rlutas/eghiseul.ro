@@ -188,6 +188,16 @@ export function Footer() {
                 <span className="text-white/70">L-V: 08:00 - 16:00</span>
               </li>
             </ul>
+            {/* Legătura declarată cu site-ul soră pentru stare civilă (același grup,
+                aceeași echipă) — dofollow, un singur link, din text, nu din listă
+                de servicii: content-and-seo.md §5/§6, docs/documentero/. */}
+            <p className="mt-6 text-xs leading-relaxed text-white/50">
+              Acte de stare civilă prin avocat, pe site-ul nostru dedicat:{' '}
+              <a href="https://documentero.ro/" className="text-white/80 underline underline-offset-2 hover:text-primary-500">
+                documentero.ro
+              </a>
+              .
+            </p>
           </div>
         </div>
       </div>

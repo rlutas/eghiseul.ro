@@ -1,5 +1,7 @@
 'use client';
 
+import { useBrand } from '@/lib/brand/client';
+
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Info, X } from 'lucide-react';
@@ -20,6 +22,9 @@ export function SpecimenInfoButton({
   label?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const brand = useBrand();
+  // Specimen images carry the eGhișeul lettering — nothing to show on other brands yet.
+  if (brand.id !== 'eghiseul') return null;
   return (
     <>
       <button

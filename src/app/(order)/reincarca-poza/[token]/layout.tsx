@@ -6,10 +6,17 @@
 
 import { BrandFooter as Footer } from '@/components/shared/brand-footer';
 
-export const metadata = {
-  title: 'Încarcă documentele — eGhișeul.ro',
-  robots: { index: false, follow: false },
-};
+import type { Metadata } from 'next';
+import { getBrand } from '@/lib/brand/server';
+
+/** Title on the brand of the host (the page itself reads the ORDER's brand for its content). */
+export async function generateMetadata(): Promise<Metadata> {
+  const brand = await getBrand();
+  return {
+    title: { absolute: `Încarcă documentele — ${brand.name}` },
+    robots: { index: false, follow: false },
+  };
+}
 
 export default function ReuploadLayout({ children }: { children: React.ReactNode }) {
   return (

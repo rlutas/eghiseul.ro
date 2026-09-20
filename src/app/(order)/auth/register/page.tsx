@@ -1,5 +1,7 @@
 'use client';
 
+import { useBrand } from '@/lib/brand/client';
+
 import { useState } from 'react';
 import Link from 'next/link';
 import { AuthLogo } from '@/components/auth/auth-logo';
@@ -17,6 +19,7 @@ import { validatePhone } from '@/lib/format/validate-phone';
 import { PhoneInput } from '@/components/shared/PhoneInput';
 
 export default function RegisterPage() {
+  const brand = useBrand();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -117,7 +120,7 @@ export default function RegisterPage() {
             Creează-ți contul gratuit
           </h1>
           <p className="text-lg text-white/80 mb-10">
-            Alătură-te celor peste 200.000 de clienți care au ales eGhișeul.ro pentru documentele lor.
+            {brand.id === 'eghiseul' ? 'Alătură-te celor peste 200.000 de clienți care au ales eGhișeul.ro pentru documentele lor.' : `Contul pe ${brand.name}: comenzile, documentele și statusul într-un singur loc.`}
           </p>
 
           <div className="space-y-6">

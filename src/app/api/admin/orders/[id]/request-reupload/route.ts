@@ -40,6 +40,7 @@ import {
   STANDBY_ELIGIBLE_STATUSES,
 } from '@/lib/reupload/doc-types';
 import { enterStandby } from '@/lib/orders/standby';
+import { appBaseForOrder, brandForOrder } from '@/lib/brand/for-order';
 
 export const runtime = 'nodejs';
 
@@ -84,9 +85,11 @@ export async function POST(
     }
 
     const admin = createAdminClient();
-    const { data: order, error: fetchErr } = await admin
+    // `platform` is not in the generated types yet — untyped builder, as in bank-transfer.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: order, error: fetchErr } = await (admin as any)
       .from('orders')
-      .select('id, friendly_order_id, order_number, status, customer_data')
+      .select('id, friendly_order_id, order_number, status, customer_data, platform')
       .eq('id', orderId)
       .single();
     if (fetchErr || !order) {
@@ -166,7 +169,9 @@ export async function POST(
         .eq('id', orderId);
     }
 
-    const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
+    // The ORDER's brand (orders.platform): upload link, header and sender follow it.
+    const brand = brandForOrder(order);
+    const base = appBaseForOrder(order);
     const reuploadUrl = `${base}/reincarca-poza/${token}`;
     const expiresLabel = expiresAt.toLocaleDateString('ro-RO', {
       day: 'numeric',
@@ -185,9 +190,11 @@ export async function POST(
         reason,
         reuploadUrl,
         expiresLabel,
+        brand,
       };
       const res = await sendEmail({
         to: email,
+        from: brand.emailFrom,
         subject: buildReuploadSubject(emailInput),
         html: buildReuploadHtml(emailInput),
         text: buildReuploadText(emailInput),

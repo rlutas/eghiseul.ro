@@ -12,6 +12,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/resend';
 import { renderDocumentReadyEmail } from '@/lib/email/templates/document-ready';
+import { appBaseForOrder, brandForOrder } from '@/lib/brand/for-order';
 
 export async function deliverAncpiResult(
   orderId: string,
@@ -30,7 +31,7 @@ export async function deliverAncpiResult(
 
     const { data: order } = await supabase
       .from('orders')
-      .select('id, friendly_order_id, customer_data')
+      .select('id, friendly_order_id, customer_data, platform')
       .eq('id', orderId)
       .single();
     if (!order) return;
@@ -96,9 +97,11 @@ export async function deliverAncpiResult(
     // 3. Email the client.
     const email: string | undefined = order.customer_data?.contact?.email;
     if (email) {
-      const appUrl =
-        process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://eghiseul.ro';
+      // The ORDER's brand (orders.platform): status link, header and sender follow it.
+      const brand = brandForOrder(order);
+      const appUrl = appBaseForOrder(order);
       const mail = renderDocumentReadyEmail({
+        brand,
         friendlyOrderId: friendly,
         documentLabel: 'Extrasul de Carte Funciară',
         registrationNumber: registrationNumber ?? null,
@@ -106,6 +109,7 @@ export async function deliverAncpiResult(
       });
       await sendEmail({
         to: email,
+        from: brand.emailFrom,
         subject: mail.subject,
         html: mail.html,
         text: mail.text,

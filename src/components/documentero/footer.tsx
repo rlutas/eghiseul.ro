@@ -6,8 +6,6 @@ import { CookieSettingsLink } from '@/components/consent/cookie-settings-link';
 import { DocumenteroLogo } from './logo';
 
 const brand = BRANDS.documentero;
-/** Legal texts are the group's; until documentero gets its own pages they live on eghiseul.ro. */
-const LEGAL = BRANDS.eghiseul.baseUrl;
 
 function Col({ title, items }: { title: string; items: ReadonlyArray<{ label: string; href: string }> }) {
   return (
@@ -64,9 +62,11 @@ export function FooterDocumentero() {
                 {i.label}
               </Link>
             ))}
-            <a href={`${LEGAL}/termeni-si-conditii/`} className="text-d-muted hover:text-d-ink">Termeni și condiții</a>
-            <a href={`${LEGAL}/politica-de-confidentialitate/`} className="text-d-muted hover:text-d-ink">Confidențialitate</a>
-            <a href={`${LEGAL}/politica-de-anulare/`} className="text-d-muted hover:text-d-ink">Politica de anulare</a>
+            {/* documentero's own legal pages (src/app/documentero/…), 20.09.2026 */}
+            <Link href="/termeni-si-conditii/" className="text-d-muted hover:text-d-ink">Termeni și condiții</Link>
+            <Link href="/politica-de-confidentialitate/" className="text-d-muted hover:text-d-ink">Confidențialitate</Link>
+            <Link href="/politica-de-anulare/" className="text-d-muted hover:text-d-ink">Politica de anulare</Link>
+            <Link href="/politica-cookies/" className="text-d-muted hover:text-d-ink">Politica de cookie-uri</Link>
             <CookieSettingsLink className="text-left text-d-muted hover:text-d-ink" />
           </div>
         </div>

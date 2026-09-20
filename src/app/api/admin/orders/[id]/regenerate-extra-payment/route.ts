@@ -23,6 +23,7 @@ import {
   buildExtraPaymentText,
 } from '@/lib/email/templates/extra-payment';
 import { formatPersonName } from '@/lib/format/person-name';
+import { brandForOrder } from '@/lib/brand/for-order';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -94,6 +95,8 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
   const orderNum = (anyOrder.friendly_order_id ?? anyOrder.order_number ?? '') as string;
   const clientName = formatPersonName(cd.personal?.lastName, cd.personal?.firstName);
   const description = `Servicii suplimentare comanda ${orderNum}`;
+  // The ORDER's brand (orders.platform): return URL, header and sender follow it.
+  const brand = brandForOrder(anyOrder);
 
   let session;
   try {
@@ -105,6 +108,7 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
       clientName,
       customerEmail: cd.contact?.email ?? null,
       adminEmail: user.email ?? 'admin',
+      platform: brand.id === 'eghiseul' ? null : brand.id,
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Stripe session creation failed';
@@ -144,9 +148,11 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
         customerFirstName: cd.personal?.firstName ?? cd.contact?.firstName ?? null,
         changesDescription: description,
         paymentUrl: session.url,
+        brand,
       };
       const result = await sendEmail({
         to: customerEmail,
+        from: brand.emailFrom,
         subject: buildExtraPaymentSubject(emailInput),
         html: buildExtraPaymentHtml(emailInput),
         text: buildExtraPaymentText(emailInput),

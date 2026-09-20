@@ -42,7 +42,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     const { data: order } = await admin
       .from('orders')
-      .select('id, friendly_order_id, order_number, status, customer_data, total_price, service_id, standby_started_at, standby_total_seconds, estimated_completion_date')
+      .select('id, friendly_order_id, order_number, status, customer_data, total_price, service_id, platform, standby_started_at, standby_total_seconds, estimated_completion_date')
       .eq('id', req.order_id)
       .single();
     if (!order) return NextResponse.json({ success: false, error: 'Comanda nu există' }, { status: 404 });

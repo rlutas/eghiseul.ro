@@ -1,12 +1,15 @@
 // Email confirmation sent when a customer self-cancels within the 30-min
 // window. Uses the shared branded shell (same look as the order emails).
 import { brandedEmailHtml, infoRows } from './branded-layout';
+import type { Brand } from '@/lib/brand/brands';
 
 export interface CancellationRequestEmailInput {
   clientName: string;
   orderNumber: string;
   amountTotalRon: number;
   refundAmountRon: number; // 70% of total
+  /** The ORDER's brand (documentero or eghiseul) — header, colors, legal line. */
+  brand?: Brand;
 }
 
 function esc(s: string): string {
@@ -27,6 +30,7 @@ export function renderCancellationRequestEmail(input: CancellationRequestEmailIn
   const subject = `Cerere anulare comandă ${orderNumber} înregistrată`;
 
   const html = brandedEmailHtml({
+    brand: input.brand,
     preheader: `Cerere de anulare înregistrată pentru comanda ${orderNumber} — rambursare ${refundAmountRon.toFixed(2)} RON`,
     content: `
         <h1 style="margin:0 0 6px;color:#0B1B33;font-size:20px;">Cerere de anulare înregistrată</h1>

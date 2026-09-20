@@ -17,6 +17,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/resend';
+import { brandForOrder } from '@/lib/brand/for-order';
 import {
   buildExtraPaymentReminderSubject,
   buildExtraPaymentReminderHtml,
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: orders, error } = await (admin as any)
     .from('orders')
-    .select('id, order_number, friendly_order_id, customer_data, pending_extra_payment_amount, pending_extra_payment_url, pending_extra_payment_intent_id, pending_extra_payment_expires_at, pending_extra_reminder_sent_at')
+    .select('id, order_number, friendly_order_id, customer_data, platform, pending_extra_payment_amount, pending_extra_payment_url, pending_extra_payment_intent_id, pending_extra_payment_expires_at, pending_extra_reminder_sent_at')
     .not('pending_extra_payment_url', 'is', null)
     .gt('pending_extra_payment_amount', 0)
     .eq('payment_status', 'paid');
@@ -78,6 +79,8 @@ export async function POST(request: NextRequest) {
 
     const orderNum = (o.friendly_order_id ?? o.order_number ?? '') as string;
     const hoursLeft = Math.max(1, Math.round((expiresAt - now) / 3_600_000));
+    // The ORDER's brand (orders.platform): header, sender and signature follow it.
+    const brand = brandForOrder(o);
     const input = {
       orderNumber: orderNum,
       amountRon: Number(o.pending_extra_payment_amount),
@@ -85,11 +88,13 @@ export async function POST(request: NextRequest) {
       changesDescription: `Servicii suplimentare comanda ${orderNum}`,
       paymentUrl: o.pending_extra_payment_url as string,
       hoursLeft,
+      brand,
     };
 
     try {
       const result = await sendEmail({
         to: email,
+        from: brand.emailFrom,
         subject: buildExtraPaymentReminderSubject(input),
         html: buildExtraPaymentReminderHtml(input),
         text: buildExtraPaymentReminderText(input),

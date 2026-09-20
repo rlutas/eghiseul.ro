@@ -11,6 +11,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/resend';
 import { renderDocumentReadyEmail } from '@/lib/email/templates/document-ready';
+import { appBaseForOrder, brandForOrder } from '@/lib/brand/for-order';
 
 export interface DeliverResult {
   ok: boolean;
@@ -23,7 +24,7 @@ export async function deliverCollaboratorResult(orderId: string): Promise<Delive
 
   const { data: order } = await supabase
     .from('orders')
-    .select('id, friendly_order_id, customer_data, status, services:service_id(name)')
+    .select('id, friendly_order_id, customer_data, status, platform, services:service_id(name)')
     .eq('id', orderId)
     .single();
   if (!order) return { ok: false, error: 'Order not found' };
@@ -57,16 +58,19 @@ export async function deliverCollaboratorResult(orderId: string): Promise<Delive
   // Email the client.
   const email: string | undefined = order.customer_data?.contact?.email;
   if (email) {
-    const appUrl =
-      process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://eghiseul.ro';
+    // The ORDER's brand (orders.platform): status link, header and sender follow it.
+    const brand = brandForOrder(order);
+    const appUrl = appBaseForOrder(order);
     try {
       const mail = renderDocumentReadyEmail({
+        brand,
         friendlyOrderId: friendly,
         documentLabel: serviceName,
         viewUrl: `${appUrl}/comanda/status/?order=${encodeURIComponent(friendly)}&email=${encodeURIComponent(email)}`,
       });
       await sendEmail({
         to: email,
+        from: brand.emailFrom,
         subject: mail.subject,
         html: mail.html,
         text: mail.text,

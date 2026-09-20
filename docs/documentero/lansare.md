@@ -7,21 +7,21 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
 - [x] Domeniul `documentero.ro` cumpărat (19.09, DNS pe Vercel, HTTPS live);
   rămân `.eu` și `.net` defensiv;
   `faracoada.ro` ca slogan/campanie, nu ca site.
-- [x] Domeniul adăugat la proiectul Vercel `eghiseul-ro` (19.09). ⚠️ `www`
-  răspunde 200 în loc de 308 spre apex — de setat redirectul în Vercel.
-  Fără `www` pe webhookuri.
-- [ ] Resend: domeniul `documentero.ro` verificat (SPF, DKIM), ca
-  `contact@documentero.ro` să poată trimite. La 19.09 `dig` nu vede niciun
-  MX/TXT pe domeniu, deci Resend va refuza `from`-ul documentero. Zoho: alias
-  sau cutie pentru primire.
-- [ ] Search Console: proprietate de tip Domain; tokenul de verificare intră în
-  `src/app/documentero/layout.tsx` (`verification.google`).
+- [x] Domeniul adăugat la proiectul Vercel `eghiseul-ro` (19.09); `www` →
+  apex cu 308 (Raul, 20.09, verificat cu `curl`). Fără `www` pe webhookuri.
+- [x] Resend: domeniul `documentero.ro` verificat (Raul, 20.09; DKIM pe
+  `resend._domainkey`, SPF + MX pe `send.documentero.ro`); `resolveFrom`
+  acceptă implicit `eghiseul.ro,documentero.ro`. Rămâne: Zoho — alias sau cutie
+  pentru PRIMIRE pe `contact@documentero.ro`.
+- [~] Search Console: proprietatea creată (Raul, 20.09); tokenul e în
+  `src/app/documentero/layout.tsx` (`verification.google`, meta tag). Dacă
+  proprietatea e de tip Domain, aceeași valoare trebuie și ca TXT în DNS
+  (Vercel): `google-site-verification=R5wF7Ny…`; apoi „Verifică” în GSC.
 - [ ] GA4: stream nou pentru documentero.ro; `AttributionTracker` trimite
   `platform`.
 - [x] Registrul central: `003_platform_documentero.sql` aplicat pe
   `registru-barou-central` (19.09, 13:40).
-- [ ] Oblio: aceeași serie (decizie 19.09); de confirmat cu contabilul textul
-  de pe factură (numele brandului în descriere).
+- [x] Oblio: aceeași serie, facturile rămân cum sunt (Raul, 20.09).
 
 ## Cod (eu)
 
@@ -31,23 +31,36 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   ghiduri, primul ghid, despre, contact.
   Toate `noindex` până la `DOCUMENTERO_INDEXABLE = true`
   (`src/config/documentero-nav.ts`).
-- [ ] Pagini legale proprii (T&C, confidențialitate, anulare, cookies) cu
-  brandul documentero; până atunci footerul și disclosure-ul trimit la cele de
-  pe eghiseul.ro (`Brand.legalBaseUrl`).
+- [x] Pagini legale proprii (20.09): `/termeni-si-conditii/`,
+  `/politica-de-confidentialitate/`, `/politica-de-anulare/`,
+  `/politica-cookies/` — textul eghiseul restrâns la stare civilă + avocat,
+  paragraf nou pentru transfer bancar, `legalBaseUrl` = documentero.ro, în
+  sitemap. ⚠️ De citit de Raul: §4 transfer bancar, §6 două cazuri fără
+  rambursare (solicitant neîndreptățit; act netranscris în România).
 - [x] Favicon + apple-icon proprii (19.09: `src/app/documentero/icon.png`,
   `apple-icon.png`, `public/images/documentero/favicon.ico`; excepție în
   `proxy.ts`).
-- [ ] Assets rămase: logo SVG (normal, alb), OG implicit
-  `/og/documentero-default.png`, logo pentru email; cele trei fotografii
-  refăcute fără mărci și exportate WebP.
+- [x] OG implicit `public/og/documentero-default.png` (1200×630) și logo
+  email `public/images/brand/documentero-email-logo.png` (660×160), randate
+  din marca SVG + Bricolage (20.09).
+- [ ] Assets rămase: logo SVG static (normal, alb) pentru terți; cele trei
+  fotografii refăcute fără mărci de curier și exportate WebP.
 - [x] `registryPlatform` din brandul comenzii la alocarea numerelor (19.09).
-- [ ] Emailurile secundare cu `brand`; textele „eghiseul.ro” rămase în KYC,
-  auth, cont.
+- [x] Textele „eghiseul.ro” din fluxul de comandă (20.09): nota de selfie,
+  declarația de la semnătură, transferul bancar, titlurile paginilor de
+  upload/completare, logo-ul auth, register, specimenele (ascunse pe
+  documentero), contractul de prestări (`{{SITE_NAME}}`, `{{TC_URL}}` din
+  brandul comenzii; ținta hyperlinkului din docx rămâne eghiseul).
+- [x] Emailurile secundare cu `brand` (20.09): 13 șabloane + 17 apelanți,
+  butoane și titluri repictate pe brand în `brandedEmailHtml`.
 - [x] `Organization` documentero în schema; `Service`/`Product` pe paginile de
   serviciu; `Article` pe ghid (`src/lib/seo/documentero-schema.ts`).
 - [ ] Sitemap curatoriat completat pagină cu pagină; placeholder-ul `noindex`
   scos de pe acasă abia când hub-ul e scris.
-- [ ] Link declarat din eghiseul (footer + pagina de serviciu naștere).
+- [x] Link declarat din eghiseul (20.09): footer (coloana Contact, text) +
+  pagina „eliberare certificat de naștere” → `documentero.ro/certificat-de-nastere/`.
+  Propus, în alte repo-uri: ecazier.ro și cazierjudiciaronline.com (footer,
+  un link din text, dofollow) — de făcut când documentero iese din `noindex`.
 
 ## Conținut (împreună)
 
@@ -72,17 +85,15 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   anulare) și apoi verificăm factura, numărul din registru, emailul de
   confirmare. Reparate din test: emailul de transfer pe brandul comenzii,
   `resolveFrom` (Resend), fără card de cont pe documentero, link cookies.
-  Rămase din test: specimenul din wizard cu logo eGhișeul; textul de la selfie
-  cu „certificat constatator, extras de carte funciară”; contractul trimite la
-  T&C eghiseul.ro (până la paginile legale proprii); previzualizări KYC goale
-  după reîncărcare (bug general).
-- [ ] Resend verificat → `RESEND_VERIFIED_DOMAINS=eghiseul.ro,documentero.ro`
-  în Vercel (până atunci emailurile documentero pleacă de pe eghiseul).
+  Din test rămâne doar: previzualizări KYC goale după reîncărcare (bug general).
+  Comenzile de test au fost ȘTERSE din DB pe 20.09 (să nu încurce echipa).
 - [ ] Rich Results Test pe acasă și pe o pagină de serviciu.
 - [ ] `curl -A Googlebot`: conținutul e în HTML, nu după Suspense.
 - [ ] Screaming Frog cu Crawl Analysis: inlinks ≥ 20 pe pagină, fără
   near-duplicate peste prag.
-- [ ] Jaccard mascat < 0,65 față de paginile surori de pe eghiseul.
+- [x] Jaccard (20.09, shingles de 5, `<main>`): față de surorile eghiseul
+  0,001–0,003 (texte scrise de la zero); între paginile documentero maxim 0,19
+  mascat (naștere/căsătorie), restul sub 0,10 — mult sub pragurile 0,65 / 0,45.
 
 ## După lansare
 

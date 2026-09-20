@@ -4,6 +4,7 @@
  * Link-ul cere confirmarea emailului comenzii la deschidere.
  */
 import { brandedEmailHtml, ctaButton } from './branded-layout';
+import type { Brand } from '@/lib/brand/brands';
 
 export interface CompletionRequestEmailInput {
   customerFirstName?: string | null;
@@ -13,6 +14,8 @@ export interface CompletionRequestEmailInput {
   signatureRequired: boolean;
   completionUrl: string;
   expiresLabel: string;
+  /** The ORDER's brand (documentero or eghiseul) — header, colors, legal line. */
+  brand?: Brand;
 }
 
 export function buildCompletionRequestSubject(input: CompletionRequestEmailInput): string {
@@ -28,6 +31,7 @@ export function buildCompletionRequestHtml(input: CompletionRequestEmailInput): 
     ...(input.signatureRequired ? ['<li style="margin:0 0 6px;">Semnătura ta (direct pe ecran, cu degetul sau mouse-ul)</li>'] : []),
   ].join('');
   return brandedEmailHtml({
+    brand: input.brand,
     preheader: `Un ultim pas pentru comanda ${input.orderNumber}: actele și semnătura`,
     content: `
         <p style="margin:0 0 10px;font-size:13px;color:#64748b;">Comanda <span style="font-family:monospace;font-weight:700;color:#0f172a;">${escapeHtml(input.orderNumber)}</span></p>

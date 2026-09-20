@@ -64,7 +64,7 @@ export function documenteroOrderHref(orderSlug: string): string {
 /** Shared order-tracking page (code + email), served on this host with the documentero chrome. */
 export const DOCUMENTERO_TRACK_HREF = '/comanda/status/';
 
-/** Footer columns. Legal pages are the group's, hosted on eghiseul.ro until documentero gets its own. */
+/** Footer columns. The legal links are rendered directly in footer.tsx (documentero's own pages). */
 export const DOCUMENTERO_FOOTER = {
   certificate: [
     { label: 'Certificat de naștere', href: '/certificat-de-nastere/' },

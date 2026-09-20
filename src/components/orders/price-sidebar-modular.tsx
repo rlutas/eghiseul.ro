@@ -17,6 +17,7 @@ import { useCivilStatusTerms } from '@/hooks/use-civil-status-terms';
 import { resolveCivilTermTier } from '@/lib/civil-status/delivery-terms';
 import { instantPlatformProvider, platformStatusProvider } from '@/lib/services/platform-services';
 import { getServiceSpecimen } from '@/config/service-specimens';
+import { useBrand } from '@/lib/brand/client';
 import Image from 'next/image';
 
 interface PriceSidebarModularProps {
@@ -117,7 +118,9 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
         ? `${estimate.minDays} zile lucrătoare`
         : `${estimate.minDays}-${estimate.maxDays} zile lucrătoare`;
 
-  const specimen = getServiceSpecimen(service.slug);
+  // Specimen images carry the eGhișeul lettering — hidden on other brands until they get their own.
+  const brand = useBrand();
+  const specimen = brand.id === 'eghiseul' ? getServiceSpecimen(service.slug) : null;
 
   return (
     <div className="space-y-3">

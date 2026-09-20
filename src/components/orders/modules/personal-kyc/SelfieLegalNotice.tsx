@@ -1,3 +1,6 @@
+'use client';
+
+import { useBrand } from '@/lib/brand/client';
 /**
  * SelfieLegalNotice
  *
@@ -56,6 +59,7 @@ interface SelfieLegalNoticeProps {
 }
 
 export function SelfieLegalNotice({ matching, className }: SelfieLegalNoticeProps) {
+  const brand = useBrand();
   return (
     <details
       aria-label="Temeiul și durata de păstrare a fotografiei de verificare"
@@ -126,10 +130,10 @@ export function SelfieLegalNotice({ matching, className }: SelfieLegalNoticeProp
             control că am verificat identitatea persoanei pentru care am depus
             cererea. Ștergerea o poți cere oricând la{' '}
             <a
-              href="mailto:contact@eghiseul.ro"
+              href={`mailto:${brand.contactEmail}`}
               className="font-medium text-primary-600 underline underline-offset-2 hover:text-primary-700"
             >
-              contact@eghiseul.ro
+              {brand.contactEmail}
             </a>
             .
           </p>
@@ -137,9 +141,10 @@ export function SelfieLegalNotice({ matching, className }: SelfieLegalNoticeProp
           <p>
             <span className="font-medium text-secondary-900">Dacă nu vrei.</span>{' '}
             Nu ești obligat să o încarci. Fără ea nu putem verifica identitatea,
-            deci nu putem prelua serviciile care cer act de identitate. Serviciile
-            care nu cer act — certificat constatator, extras de carte funciară și
-            celelalte — rămân disponibile fără selfie.
+            deci nu putem prelua serviciile care cer act de identitate.
+            {brand.id === 'eghiseul'
+              ? ' Serviciile care nu cer act — certificat constatator, extras de carte funciară și celelalte — rămân disponibile fără selfie.'
+              : ' Toate actele de stare civilă se obțin prin împuternicire avocațială, deci cer verificarea identității.'}
           </p>
 
           <p>

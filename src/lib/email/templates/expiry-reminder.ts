@@ -9,6 +9,7 @@
 import { brandedEmailHtml, ctaButton, escHtml } from './branded-layout';
 import { greeting, unsubscribeNoteHtml, unsubscribeNoteText } from './marketing-footer';
 import { formatRoDate } from '@/lib/lifecycle/rules';
+import { BRANDS, type Brand } from '@/lib/brand/brands';
 
 export interface ExpiryReminderEmailInput {
   firstName?: string | null;
@@ -21,6 +22,8 @@ export interface ExpiryReminderEmailInput {
   validityLabel: string; // ex: „6 luni", „30 de zile"
   reorderUrl: string;
   unsubscribeUrl: string;
+  /** The ORDER's brand (documentero or eghiseul) — header, colors, signature. */
+  brand?: Brand;
 }
 
 export function renderExpiryReminderEmail(input: ExpiryReminderEmailInput): { subject: string; html: string; text: string } {
@@ -31,12 +34,14 @@ export function renderExpiryReminderEmail(input: ExpiryReminderEmailInput): { su
     ? `${svc} obținut prin noi a expirat — îl reobținem dacă mai ai nevoie`
     : `${svc} obținut prin noi expiră în jurul datei de ${date}`;
   const hello = greeting(input.firstName);
+  const b = input.brand ?? BRANDS.eghiseul;
 
   const lead = input.alreadyExpired
     ? `Documentul <strong>${escHtml(svcLower)}</strong> obținut prin comanda <strong>${escHtml(input.friendlyOrderId)}</strong> a depășit, după calculul nostru, termenul de valabilitate de ${escHtml(input.validityLabel)} (în jurul datei de ${escHtml(date)}).`
     : `Documentul <strong>${escHtml(svcLower)}</strong> obținut prin comanda <strong>${escHtml(input.friendlyOrderId)}</strong> are valabilitate ${escHtml(input.validityLabel)} de la emitere — după calculul nostru expiră în jurul datei de <strong>${escHtml(date)}</strong>.`;
 
   const html = brandedEmailHtml({
+    brand: input.brand,
     preheader: input.alreadyExpired
       ? `${svc} a expirat. Dacă mai ai nevoie de unul, îl obținem la fel de simplu ca prima dată.`
       : `${svc} expiră în jurul datei de ${date}. Dacă mai ai nevoie, îl reobținem fără drumuri.`,
@@ -46,7 +51,7 @@ export function renderExpiryReminderEmail(input: ExpiryReminderEmailInput): { su
         <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">Dacă ai nevoie de unul nou — pentru angajare, licitație, bancă, instituții din străinătate — îl obținem la fel ca prima dată: comandă online, fără drumuri, livrat prin curier sau electronic. Datele tale de la ultima comandă sunt deja în cont, deci durează câteva minute.</p>
         ${ctaButton(`Reobține ${svcLower}`, input.reorderUrl)}
         <p style="margin:16px 0 0;color:#475569;font-size:14px;line-height:1.6;">Nu mai ai nevoie? Ignoră mesajul — nu-ți mai trimitem alt reminder pentru documentul ăsta.</p>
-        ${unsubscribeNoteHtml(input.unsubscribeUrl)}`,
+        ${unsubscribeNoteHtml(input.unsubscribeUrl, `ai comandat prin ${b.name}`)}`,
   });
 
   const text = [
@@ -61,7 +66,7 @@ export function renderExpiryReminderEmail(input: ExpiryReminderEmailInput): { su
     '',
     'Nu mai ai nevoie? Ignoră mesajul — nu-ți mai trimitem alt reminder pentru documentul ăsta.',
     '',
-    '— Echipa eGhișeul.ro',
+    `— Echipa ${b.name}`,
     '',
     unsubscribeNoteText(input.unsubscribeUrl),
   ].join('\n');

@@ -342,6 +342,7 @@ export async function autoGenerateOrderDocuments(
           order_number: order.order_number || '',
           friendly_order_id: order.friendly_order_id || '',
           total_price: order.total_price || 0,
+          platform: order.platform ?? null,
           service_name: order.services?.name || '',
           service_slug: serviceSlug,
           service_price: order.services?.base_price || order.base_price || 0,

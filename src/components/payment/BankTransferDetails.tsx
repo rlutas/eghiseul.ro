@@ -1,5 +1,7 @@
 'use client';
 
+import { useBrand } from '@/lib/brand/client';
+
 import { useEffect, useState } from 'react';
 import { Copy, Check, AlertTriangle, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -34,6 +36,7 @@ export function BankTransferDetails({
   orderNumber,
   amount,
 }: BankTransferDetailsProps) {
+  const brand = useBrand();
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [details, setDetails] = useState<BankDetails | null>(null);
   const [loadError, setLoadError] = useState(false);
@@ -104,7 +107,7 @@ export function BankTransferDetails({
         <AlertTriangle className="h-4 w-4 text-red-600" />
         <AlertDescription className="text-red-800">
           Datele pentru transfer bancar nu sunt disponibile momentan. Te rugăm să plătești cu cardul
-          sau să ne scrii la <strong>contact@eghiseul.ro</strong> ca să ți le trimitem.
+          sau să ne scrii la <strong>{brand.contactEmail}</strong> ca să ți le trimitem.
         </AlertDescription>
       </Alert>
     );

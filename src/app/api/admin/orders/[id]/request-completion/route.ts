@@ -31,6 +31,7 @@ import {
   STANDBY_ELIGIBLE_STATUSES,
 } from '@/lib/reupload/doc-types';
 import { enterStandby } from '@/lib/orders/standby';
+import { appBaseForOrder, brandForOrder } from '@/lib/brand/for-order';
 
 export const runtime = 'nodejs';
 
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const admin = createAdminClient();
     const { data: order, error: fetchErr } = await admin
       .from('orders')
-      .select('id, friendly_order_id, order_number, status, payment_status, customer_data, services(name, verification_config)')
+      .select('id, friendly_order_id, order_number, status, payment_status, customer_data, platform, services(name, verification_config)')
       .eq('id', orderId)
       .single();
     if (fetchErr || !order) {
@@ -166,7 +167,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         .eq('id', orderId);
     }
 
-    const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
+    // The ORDER's brand (orders.platform): completion link, header and sender follow it.
+    const brand = brandForOrder(o);
+    const base = appBaseForOrder(o);
     const completionUrl = `${base}/completare/${token}`;
     const expiresLabel = expiresAt.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
     const documentLabels = documentTypes.map((t) => reuploadDocLabel(t));
@@ -174,14 +177,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const emailInput = {
       customerFirstName: firstName,
       orderNumber: o.friendly_order_id || o.order_number || orderId,
-      serviceName: o.services?.name || 'Serviciu eGhișeul',
+      serviceName: o.services?.name || `Serviciu ${brand.name}`,
       documentLabels,
       signatureRequired,
       completionUrl,
       expiresLabel,
+      brand,
     };
     const res = await sendEmail({
       to: email,
+      from: brand.emailFrom,
       subject: buildCompletionRequestSubject(emailInput),
       html: buildCompletionRequestHtml(emailInput),
       text: buildCompletionRequestText(emailInput),

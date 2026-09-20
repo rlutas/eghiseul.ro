@@ -6,6 +6,7 @@
  */
 
 import { brandedEmailHtml, ctaButton, escHtml } from './branded-layout';
+import { BRANDS, type Brand } from '@/lib/brand/brands';
 
 export interface PhoneFollowupEmailInput {
   customerFirstName?: string | null;
@@ -20,20 +21,24 @@ export interface PhoneFollowupEmailInput {
   couponValidUntil: Date;
   /** Link de reluare cu ?coupon= inclus. */
   resumeUrl: string;
+  /** The ORDER's brand (documentero or eghiseul) — header, colors, team name. */
+  brand?: Brand;
 }
 
 export function renderPhoneFollowupEmail(input: PhoneFollowupEmailInput): { subject: string; html: string; text: string } {
   const name = input.customerFirstName?.trim();
   const hello = name ? `Salut ${name},` : 'Salut,';
+  const b = input.brand ?? BRANDS.eghiseul;
   const subject = `Cum am stabilit la telefon: ${input.discountLabel} reducere la ${input.serviceName.toLowerCase()}`;
   const until = input.couponValidUntil.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', timeZone: 'Europe/Bucharest' });
 
   const html = brandedEmailHtml({
-    preheader: `Ai vorbit cu ${input.agentName} de la eGhișeul.ro. Cuponul ${input.couponCode} se aplică automat din link.`,
+    brand: input.brand,
+    preheader: `Ai vorbit cu ${input.agentName} de la ${b.name}. Cuponul ${input.couponCode} se aplică automat din link.`,
     content: `
         <p style="margin:0 0 10px;font-size:13px;color:#64748b;">Comanda <span style="font-family:monospace;font-weight:700;color:#0f172a;">${escHtml(input.orderNumber)}</span></p>
         <h1 style="margin:0 0 12px;color:#0B1B33;font-size:20px;">${escHtml(hello)}</h1>
-        <p style="margin:0 0 12px;color:#475569;font-size:14px;line-height:1.6;">Mulțumim pentru discuția de azi cu <strong>${escHtml(input.agentName)}</strong> din echipa eGhișeul.ro. Cum am stabilit, ai <strong>${escHtml(input.discountLabel)} reducere</strong> la <strong>${escHtml(input.serviceName)}</strong>, cu codul:</p>
+        <p style="margin:0 0 12px;color:#475569;font-size:14px;line-height:1.6;">Mulțumim pentru discuția de azi cu <strong>${escHtml(input.agentName)}</strong> din echipa ${escHtml(b.name)}. Cum am stabilit, ai <strong>${escHtml(input.discountLabel)} reducere</strong> la <strong>${escHtml(input.serviceName)}</strong>, cu codul:</p>
         <div style="background:#fef3c7;border:2px dashed #f59e0b;border-radius:10px;padding:18px;text-align:center;margin:0 0 18px;">
           <p style="margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#92400e;">Cod cupon — valabil până pe ${escHtml(until)}</p>
           <p style="margin:0;font-size:28px;font-family:'Courier New',Courier,monospace;font-weight:bold;color:#78350f;letter-spacing:2px;">${escHtml(input.couponCode)}</p>
@@ -49,7 +54,7 @@ export function renderPhoneFollowupEmail(input: PhoneFollowupEmailInput): { subj
     '',
     hello,
     '',
-    `Mulțumim pentru discuția de azi cu ${input.agentName} din echipa eGhișeul.ro. Cum am stabilit, ai ${input.discountLabel} reducere la ${input.serviceName}, cu codul: ${input.couponCode} (valabil până pe ${until}).`,
+    `Mulțumim pentru discuția de azi cu ${input.agentName} din echipa ${b.name}. Cum am stabilit, ai ${input.discountLabel} reducere la ${input.serviceName}, cu codul: ${input.couponCode} (valabil până pe ${until}).`,
     '',
     `Reia comanda cu reducerea aplicată automat: ${input.resumeUrl}`,
     '',
@@ -57,7 +62,7 @@ export function renderPhoneFollowupEmail(input: PhoneFollowupEmailInput): { subj
     '',
     'Ceva neclar? Răspunde la acest email sau scrie-ne pe WhatsApp.',
     '',
-    '— Echipa eGhișeul.ro',
+    `— Echipa ${b.name}`,
   ].join('\n');
 
   return { subject, html, text };

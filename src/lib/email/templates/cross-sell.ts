@@ -10,6 +10,7 @@
 
 import { brandedEmailHtml, ctaButton, escHtml } from './branded-layout';
 import { greeting, unsubscribeNoteHtml, unsubscribeNoteText } from './marketing-footer';
+import { BRANDS, type Brand } from '@/lib/brand/brands';
 
 /** O frază per serviciu: CÂND ai nevoie de el (nu ce e). */
 export const CROSS_SELL_BLURBS: Record<string, string> = {
@@ -46,6 +47,8 @@ export interface CrossSellEmailInput {
   suggestions: CrossSellSuggestion[]; // 1–3
   catalogUrl: string;
   unsubscribeUrl: string;
+  /** The ORDER's brand (documentero or eghiseul) — header, colors, site name. */
+  brand?: Brand;
 }
 
 export function renderCrossSellEmail(input: CrossSellEmailInput): { subject: string; html: string; text: string } {
@@ -54,6 +57,7 @@ export function renderCrossSellEmail(input: CrossSellEmailInput): { subject: str
     ? `După ${input.boughtServiceName.toLowerCase()}: ${first.name.toLowerCase()}, la fel de simplu`
     : 'Ce alte documente îți obținem, fără drumuri';
   const hello = greeting(input.firstName);
+  const b = input.brand ?? BRANDS.eghiseul;
 
   const items = input.suggestions
     .map((s) => {
@@ -66,26 +70,27 @@ export function renderCrossSellEmail(input: CrossSellEmailInput): { subject: str
     .join('');
 
   const html = brandedEmailHtml({
+    brand: input.brand,
     preheader: `Ai obținut ${input.boughtServiceName.toLowerCase()} prin noi. Iată ce alte documente îți luăm de pe cap la fel de simplu.`,
     content: `
         <h1 style="margin:0 0 12px;color:#0B1B33;font-size:20px;">${escHtml(hello)}</h1>
-        <p style="margin:0 0 14px;color:#475569;font-size:14px;line-height:1.6;">Acum ceva timp ai obținut <strong>${escHtml(input.boughtServiceName.toLowerCase())}</strong> prin eGhișeul.ro. Mulți dintre clienții noștri au nevoie, mai devreme sau mai târziu, și de:</p>
+        <p style="margin:0 0 14px;color:#475569;font-size:14px;line-height:1.6;">Acum ceva timp ai obținut <strong>${escHtml(input.boughtServiceName.toLowerCase())}</strong> prin ${escHtml(b.name)}. Mulți dintre clienții noștri au nevoie, mai devreme sau mai târziu, și de:</p>
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 18px;">${items}</table>
         <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">Același flux: comandă online, plată directă, livrare prin curier sau electronic. Datele tale sunt deja în cont.</p>
         ${ctaButton('Vezi toate serviciile', input.catalogUrl)}
-        ${unsubscribeNoteHtml(input.unsubscribeUrl)}`,
+        ${unsubscribeNoteHtml(input.unsubscribeUrl, `ai comandat prin ${b.name}`)}`,
   });
 
   const text = [
     hello,
     '',
-    `Acum ceva timp ai obținut ${input.boughtServiceName.toLowerCase()} prin eGhișeul.ro. Mulți clienți au nevoie, mai devreme sau mai târziu, și de:`,
+    `Acum ceva timp ai obținut ${input.boughtServiceName.toLowerCase()} prin ${b.name}. Mulți clienți au nevoie, mai devreme sau mai târziu, și de:`,
     '',
     ...input.suggestions.map((s) => `• ${s.name}${CROSS_SELL_BLURBS[s.slug] ? ` — ${CROSS_SELL_BLURBS[s.slug]}` : ''}\n  ${s.url}`),
     '',
     `Toate serviciile: ${input.catalogUrl}`,
     '',
-    '— Echipa eGhișeul.ro',
+    `— Echipa ${b.name}`,
     '',
     unsubscribeNoteText(input.unsubscribeUrl),
   ].join('\n');

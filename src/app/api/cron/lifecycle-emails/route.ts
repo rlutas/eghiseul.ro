@@ -32,6 +32,9 @@ import { renderExpiryReminderEmail, validityLabel } from '@/lib/email/templates/
 import { renderCrossSellEmail } from '@/lib/email/templates/cross-sell';
 import { serviceUrl } from '@/lib/seo/constants';
 import { GOOGLE_REVIEW_WRITE_URL } from '@/config/contact';
+import { appBaseForOrder, brandForOrder } from '@/lib/brand/for-order';
+import { brandSellsService, type Brand } from '@/lib/brand/brands';
+import { DOCUMENTERO_SERVICES_MENU } from '@/config/documentero-nav';
 import {
   CROSS_SELL_COOLDOWN_DAYS,
   CROSS_SELL_MAP,
@@ -48,7 +51,6 @@ import {
   wasOnTime,
 } from '@/lib/lifecycle/rules';
 import {
-  appBase,
   canReceiveMarketing,
   ensureContactForOrder,
   loadContactsByEmail,
@@ -75,6 +77,7 @@ interface OrderRow {
   email_bounced_at: string | null;
   is_test: boolean | null;
   customer_data: Record<string, unknown> | null;
+  platform: string | null;
   services: { slug: string; name: string; processing_config: Record<string, unknown> | null } | null;
 }
 
@@ -94,6 +97,15 @@ function orderFirstName(o: OrderRow, contact: MarketingContact | null): string |
 }
 function utm(url: string, campaign: string): string {
   return `${url}${url.includes('?') ? '&' : '?'}utm_source=email&utm_medium=lifecycle&utm_campaign=${campaign}`;
+}
+/**
+ * Public page of a service on the ORDER's brand. documentero has no
+ * `/servicii/` cluster — its services live at their own paths (nav config);
+ * a slug it has no page for falls back to its home page.
+ */
+function servicePathForBrand(brand: Brand, slug: string): string {
+  if (brand.id === 'eghiseul') return serviceUrl(slug);
+  return DOCUMENTERO_SERVICES_MENU.find((s) => s.orderSlug === slug)?.href ?? '/';
 }
 
 export async function POST(request: NextRequest) {
@@ -127,7 +139,7 @@ export async function POST(request: NextRequest) {
   const { data: ordersRaw, error: ordersError } = await admin
     .from('orders')
     .select(
-      'id, friendly_order_id, order_number, status, paid_at, completed_at, estimated_completion_date, email_bounced_at, is_test, customer_data, services(slug, name, processing_config)'
+      'id, friendly_order_id, order_number, status, paid_at, completed_at, estimated_completion_date, email_bounced_at, is_test, customer_data, platform, services(slug, name, processing_config)'
     )
     .eq('status', 'completed')
     .gte('completed_at', oldest)
@@ -181,6 +193,7 @@ export async function POST(request: NextRequest) {
       const mail = render();
       const res = await sendEmail({
         to: email,
+        from: brandForOrder(o).emailFrom,
         subject: mail.subject,
         html: mail.html,
         text: mail.text,
@@ -241,6 +254,10 @@ export async function POST(request: NextRequest) {
         results.push({ kind: 'review_request', orderId: o.id, status: 'skipped', reason: 'not on time' });
         continue;
       }
+      // The review link is the COMPANY's Google profile (eDigitalizare SRL): the
+      // same profile documentero.ro shows on its landing page, so every brand
+      // asks for the review there.
+      const brand = brandForOrder(o);
       const contact = await getContact(o);
       if (!canReceiveMarketing(contact)) {
         results.push({ kind: 'review_request', orderId: o.id, status: 'skipped', reason: 'unsubscribed or no contact' });
@@ -249,6 +266,7 @@ export async function POST(request: NextRequest) {
       n += 1;
       await dispatch('review_request', o, contact!, () =>
         renderReviewRequestEmail({
+          brand,
           firstName: orderFirstName(o, contact),
           serviceName: o.services!.name,
           friendlyOrderId: o.friendly_order_id ?? o.order_number ?? o.id.slice(0, 8),
@@ -299,16 +317,18 @@ export async function POST(request: NextRequest) {
       }
       const slug = o.services!.slug;
       const expiresOn = expiryDate(new Date(o.completed_at!), slug)!;
+      const brand = brandForOrder(o);
       n += 1;
       await dispatch('expiry_reminder', o, contact!, () =>
         renderExpiryReminderEmail({
+          brand,
           firstName: orderFirstName(o, contact),
           serviceName: o.services!.name,
           friendlyOrderId: o.friendly_order_id ?? o.order_number ?? o.id.slice(0, 8),
           expiresOn,
           alreadyExpired: expiresOn.getTime() < now.getTime(),
           validityLabel: validityLabel(DOCUMENT_VALIDITY_DAYS[slug]),
-          reorderUrl: utm(`${appBase()}${serviceUrl(slug)}`, 'expiry'),
+          reorderUrl: utm(`${appBaseForOrder(o)}${servicePathForBrand(brand, slug)}`, 'expiry'),
           unsubscribeUrl: unsubscribeUrlFor(contact!),
         })
       );
@@ -347,10 +367,11 @@ export async function POST(request: NextRequest) {
         continue;
       }
       const bought = new Set(contact!.services ?? []);
+      const brand = brandForOrder(o);
       const suggestions = (CROSS_SELL_MAP[o.services!.slug] ?? [])
-        .filter((slug) => activeServices.has(slug) && !bought.has(slug))
+        .filter((slug) => activeServices.has(slug) && !bought.has(slug) && brandSellsService(brand, slug))
         .slice(0, 3)
-        .map((slug) => ({ slug, name: activeServices.get(slug)!, url: utm(`${appBase()}${serviceUrl(slug)}`, 'cross_sell') }));
+        .map((slug) => ({ slug, name: activeServices.get(slug)!, url: utm(`${appBaseForOrder(o)}${servicePathForBrand(brand, slug)}`, 'cross_sell') }));
       if (suggestions.length === 0) {
         results.push({ kind: 'cross_sell', orderId: o.id, status: 'skipped', reason: 'nothing to suggest' });
         continue;
@@ -359,10 +380,12 @@ export async function POST(request: NextRequest) {
       n += 1;
       await dispatch('cross_sell', o, contact!, () =>
         renderCrossSellEmail({
+          brand,
           firstName: orderFirstName(o, contact),
           boughtServiceName: o.services!.name,
           suggestions,
-          catalogUrl: utm(`${appBase()}/servicii/`, 'cross_sell'),
+          // documentero has no /servicii/ catalog — its home page lists the services.
+          catalogUrl: utm(brand.id === 'eghiseul' ? `${appBaseForOrder(o)}/servicii/` : `${appBaseForOrder(o)}/`, 'cross_sell'),
           unsubscribeUrl: unsubscribeUrlFor(contact!),
         })
       );

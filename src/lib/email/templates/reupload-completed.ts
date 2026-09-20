@@ -6,6 +6,7 @@
  */
 
 import { brandedEmailHtml, bulletList, ctaButton, escHtml, infoRows } from './branded-layout';
+import type { Brand } from '@/lib/brand/brands';
 
 export interface ReuploadCompletedInput {
   orderNumber: string;
@@ -15,6 +16,8 @@ export interface ReuploadCompletedInput {
   documentLabels: string[];
   /** Status the order was restored to (null = order was not in standby). */
   restoredStatus: string | null;
+  /** The ORDER's brand — so the team sees which site the customer ordered on. */
+  brand?: Brand;
 }
 
 export function buildReuploadCompletedSubject(input: ReuploadCompletedInput): string {
@@ -39,6 +42,7 @@ export function buildReuploadCompletedHtml(input: ReuploadCompletedInput): strin
         ${ctaButton('Deschide comanda în admin', input.adminOrderUrl)}`;
 
   return brandedEmailHtml({
+    brand: input.brand,
     preheader: `Comanda ${input.orderNumber}: documentele solicitate au sosit.`,
     content,
   });

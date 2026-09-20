@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
 import { sendEmail } from '@/lib/email/resend';
+import { appBaseForOrder, brandForOrder } from '@/lib/brand/for-order';
 import {
   buildPaymentLinkSubject,
   buildPaymentLinkHtml,
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const adminClient = createAdminClient();
     const { data: order, error: fetchError } = await adminClient
       .from('orders')
-      .select('id, friendly_order_id, order_number, payment_status, total_price, customer_data, services(name)')
+      .select('id, friendly_order_id, order_number, payment_status, total_price, customer_data, platform, services(name)')
       .eq('id', orderId)
       .single();
 
@@ -56,18 +57,22 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ success: false, error: 'Comanda nu are email de contact.' }, { status: 400 });
     }
 
-    const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
+    // The ORDER's brand (orders.platform): checkout link, header and sender follow it.
+    const brand = brandForOrder(o);
+    const base = appBaseForOrder(o);
     const paymentUrl = `${base}/comanda/checkout/${orderId}`;
     const input = {
       customerFirstName: o.customer_data?.contact?.firstName || null,
       orderNumber: o.friendly_order_id || o.order_number,
-      serviceName: o.services?.name || 'Serviciu eGhișeul',
+      serviceName: o.services?.name || `Serviciu ${brand.name}`,
       amountRon: Number(o.total_price) || 0,
       paymentUrl,
+      brand,
     };
 
     await sendEmail({
       to: email,
+      from: brand.emailFrom,
       subject: buildPaymentLinkSubject(input),
       html: buildPaymentLinkHtml(input),
       text: buildPaymentLinkText(input),

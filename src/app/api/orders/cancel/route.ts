@@ -8,6 +8,7 @@ import {
 } from '@/lib/orders/self-cancel';
 import { sendEmail } from '@/lib/email/resend';
 import { renderCancellationRequestEmail } from '@/lib/email/templates/cancellation-request';
+import { brandForOrder } from '@/lib/brand/for-order';
 
 /**
  * POST /api/orders/cancel
@@ -80,10 +81,12 @@ export async function POST(req: NextRequest) {
     // Locate order — match on friendly_order_id (visible to client) first,
     // fall back to UUID. Email match is via JSONB customer_data.contact.email
     // since we don't denormalize email to a column.
-    const { data: orders, error: fetchError } = await supabase
+    // `platform` is not in the generated types yet — untyped builder, as in bank-transfer.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: orders, error: fetchError } = await (supabase as any)
       .from('orders')
       .select(
-        'id, friendly_order_id, order_number, status, paid_at, total_price, customer_data, stripe_payment_intent_id, service:services(processing_config)'
+        'id, friendly_order_id, order_number, status, paid_at, total_price, customer_data, stripe_payment_intent_id, platform, service:services(processing_config)'
       )
       .or(`friendly_order_id.eq.${orderNumber},order_number.eq.${orderNumber}`)
       .limit(1);
@@ -167,7 +170,10 @@ export async function POST(req: NextRequest) {
     const totalRon = order.total_price || 0;
     const refundAmountRon = computeCancelRefundAmount(totalRon);
 
+    // The ORDER's brand (orders.platform): header, sender and legal line follow it.
+    const brand = brandForOrder(order);
     const { subject, html, text } = renderCancellationRequestEmail({
+      brand,
       clientName,
       orderNumber: order.friendly_order_id || order.order_number,
       amountTotalRon: totalRon,
@@ -176,6 +182,7 @@ export async function POST(req: NextRequest) {
 
     sendEmail({
       to: email,
+      from: brand.emailFrom,
       subject,
       html,
       text,

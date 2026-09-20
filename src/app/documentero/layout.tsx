@@ -34,8 +34,11 @@ export const metadata: Metadata = {
   },
   authors: [{ name: brand.name }],
   creator: brand.name,
-  // Search Console for documentero.ro: set once the property exists.
-  verification: {},
+  // Search Console, proprietatea documentero.ro (Raul, 20.09.2026). Pentru o
+  // proprietate de tip Domain, Google cere ACEEAȘI valoare și ca TXT în DNS
+  // (Vercel): `google-site-verification=R5wF7Ny…`; meta tag-ul acoperă
+  // proprietatea de tip URL-prefix.
+  verification: { google: 'R5wF7NyinN-jw_HtDSh2i1ytJxpLSV4WIsVUOblPQyA' },
   openGraph: { siteName: brand.name, locale: 'ro_RO', type: 'website' },
   robots: DOCUMENTERO_INDEXABLE ? { index: true, follow: true } : { index: false, follow: false },
 };

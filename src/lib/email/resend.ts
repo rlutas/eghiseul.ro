@@ -16,10 +16,11 @@ const REPLY_TO_DEFAULT = process.env.RESEND_REPLY_TO ?? 'contact@eghiseul.ro';
  * is exactly what would happen to documentero.ro order emails until its
  * domain is verified (19.09.2026: no MX/TXT on the domain yet). Until then
  * the brand's `from` falls back to the default sender, with a log line, so
- * the customer still gets the email. Set
- * `RESEND_VERIFIED_DOMAINS=eghiseul.ro,documentero.ro` once verified.
+ * the customer still gets the email. documentero.ro verified 20.09.2026
+ * (DKIM + SPF on send.documentero.ro), so both are in the default; a third
+ * brand goes through `RESEND_VERIFIED_DOMAINS` once its DNS is in.
  */
-const VERIFIED_DOMAINS = (process.env.RESEND_VERIFIED_DOMAINS ?? 'eghiseul.ro')
+const VERIFIED_DOMAINS = (process.env.RESEND_VERIFIED_DOMAINS ?? 'eghiseul.ro,documentero.ro')
   .split(',')
   .map((d) => d.trim().toLowerCase())
   .filter(Boolean);

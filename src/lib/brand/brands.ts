@@ -57,8 +57,12 @@ export interface Brand {
   /** One-line disclosure used in email footers and order screens. */
   legalTagline: string;
   /**
-   * Absolute origin of the legal pages (T&C, confidențialitate, anulare).
-   * documentero points at eghiseul.ro until it has its own texts.
+   * Absolute origin of the legal pages (T&C, confidențialitate, anulare,
+   * cookies). Each brand has its own set at the same paths
+   * (`/termeni-si-conditii/`, `/politica-de-confidentialitate/`,
+   * `/politica-de-anulare/`, `/politica-cookies/`), so this is the brand's
+   * own baseUrl; kept as a separate field for the places (emails, order
+   * screens) that need an absolute link.
    */
   legalBaseUrl: string;
 }
@@ -111,7 +115,7 @@ export const BRANDS: Record<BrandId, Brand> = {
     ogDefault: '/og/documentero-default.png',
     serviceSlugs: DOCUMENTERO_SERVICE_SLUGS,
     registryPlatform: 'documentero',
-    legalBaseUrl: 'https://eghiseul.ro',
+    legalBaseUrl: 'https://documentero.ro',
     legalTagline:
       'eDigitalizare SRL · CUI RO49278701 · documentero.ro este un serviciu privat de asistență la obținerea actelor de stare civilă; nu suntem instituție de stat.',
   },

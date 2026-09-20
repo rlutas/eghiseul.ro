@@ -24,4 +24,9 @@ export const DOCUMENTERO_SITEMAP: DocumenteroSitemapEntry[] = [
   { path: '/ghiduri/certificat-de-nastere-pierdut/', lastModified: '2026-09-19', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/despre/', lastModified: '2026-09-19', changeFrequency: 'yearly', priority: 0.5 },
   { path: '/contact/', lastModified: '2026-09-19', changeFrequency: 'yearly', priority: 0.5 },
+  // Legal pages (documentero's own texts, 20.09.2026).
+  { path: '/termeni-si-conditii/', lastModified: '2026-09-20', changeFrequency: 'yearly', priority: 0.3 },
+  { path: '/politica-de-confidentialitate/', lastModified: '2026-09-20', changeFrequency: 'yearly', priority: 0.3 },
+  { path: '/politica-de-anulare/', lastModified: '2026-09-20', changeFrequency: 'yearly', priority: 0.3 },
+  { path: '/politica-cookies/', lastModified: '2026-09-20', changeFrequency: 'yearly', priority: 0.3 },
 ];

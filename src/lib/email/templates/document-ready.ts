@@ -7,6 +7,7 @@
  */
 
 import { brandedEmailHtml, ctaButton, escHtml, infoRows } from './branded-layout';
+import { BRANDS, type Brand } from '@/lib/brand/brands';
 
 export interface DocumentReadyEmailInput {
   friendlyOrderId: string;
@@ -16,6 +17,8 @@ export interface DocumentReadyEmailInput {
   registrationNumber?: string | null;
   /** Absolute link to the status page (pre-filled) or account page. */
   viewUrl: string;
+  /** The ORDER's brand (documentero or eghiseul) — header, colors, contact line. */
+  brand?: Brand;
 }
 
 export function renderDocumentReadyEmail(input: DocumentReadyEmailInput): {
@@ -24,6 +27,7 @@ export function renderDocumentReadyEmail(input: DocumentReadyEmailInput): {
   text: string;
 } {
   const { friendlyOrderId, documentLabel, registrationNumber, viewUrl } = input;
+  const b = input.brand ?? BRANDS.eghiseul;
   const subject = `${documentLabel} pentru comanda ${friendlyOrderId} este gata 🎉`;
 
   const rows = [
@@ -40,6 +44,7 @@ export function renderDocumentReadyEmail(input: DocumentReadyEmailInput): {
         ${ctaButton('Vezi și descarcă documentul', viewUrl)}`;
 
   const html = brandedEmailHtml({
+    brand: input.brand,
     preheader: `${documentLabel} pentru comanda ${friendlyOrderId} a fost emis — descarcă-l acum.`,
     content,
   });
@@ -53,7 +58,7 @@ export function renderDocumentReadyEmail(input: DocumentReadyEmailInput): {
     '',
     `Vezi și descarcă documentul: ${viewUrl}`,
     '',
-    'Întrebări? WhatsApp +40 757 708 181 · contact@eghiseul.ro',
+    `Întrebări? WhatsApp ${b.phoneDisplay} · ${b.contactEmail}`,
   ]
     .filter(Boolean)
     .join('\n');

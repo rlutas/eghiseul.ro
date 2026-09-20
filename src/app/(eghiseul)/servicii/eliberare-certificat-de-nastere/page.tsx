@@ -412,8 +412,12 @@ export default async function CertificatNasterePage() {
                 <Link href="/servicii/extras-multilingv-certificat-nastere/" className="text-primary-600 font-medium hover:underline">
                   extrasul multilingv de pe certificatul de naștere
                 </Link>
-                , recunoscut în toate statele UE fără traducere și fără apostilă.
-                Ai nevoie și de un{' '}
+                , recunoscut în toate statele UE fără traducere și fără apostilă. Pentru actele de stare
+                civilă avem și un site dedicat, cu aceeași echipă și același avocat:{' '}
+                <a href="https://documentero.ro/certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
+                  documentero.ro
+                </a>
+                . Ai nevoie și de un{' '}
                 <Link href="/servicii/eliberare-certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">
                   certificat de căsătorie
                 </Link>{' '}
