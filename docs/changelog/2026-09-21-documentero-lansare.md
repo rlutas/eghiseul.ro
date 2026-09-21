@@ -28,8 +28,12 @@ paginile.
   la `/sitemap.xml`.
 - Search Console: proprietatea `https://documentero.ro/` verificată pe
   sishuletz@gmail.com (al doilea token în layout; cel din 20.09 e al altui
-  cont). Sitemap trimis; indexare cerută manual pentru acasă, cele 4 pagini
-  de serviciu și cele 2 ghiduri.
+  cont). Sitemap trimis (`/sitemap.xml`, 14 URL-uri, 200 ca Googlebot; GSC
+  îl arată „Couldn't fetch”/„Temporary processing error” în primele minute,
+  normal). Indexare cerută manual, în ordinea asta: acasă, naștere,
+  căsătorie, celibat, extras multilingv, ghidul „pierdut”, ghidul „apostilă”.
+  Ultima accesare Googlebot a fost 20.09 cu `noindex`; următoarea vede
+  `index, follow`.
 - GA4: proprietate „documentero.ro” (cont GA „eGhiseul”, eghiseul@gmail.com),
   `G-ND6HB81QXF`, verificat pe prod după consimțământ.
 - Verificare A–Z a celor 4 pagini de serviciu + ghidul „pierdut” pe textul
