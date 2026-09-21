@@ -1,6 +1,6 @@
 # Identificare imobil: fluxul pentru „nu l-am găsit” (certificat OCPI 2.7.8 + credit)
 
-**Data:** 21.09.2026 · **Status:** 📋 design, de confirmat cu Raul și Mircea · **Preț nou decis:** 298 lei
+**Data:** 21.09.2026 · **Status:** ✅ livrat în aceeași zi (etapele 1 și 3; raportul PDF și creditul ELIMINATE, vezi §8) · **Preț nou:** 298 lei (după adresă)
 
 ## 1. Problema
 
@@ -116,3 +116,21 @@ la instituție”. Prețul: e un status nou, deci trece prin TOATE listele albe
 3. **Raul:** „identificare după proprietar” urcă tot la 298? (2.7.6 costă 125, deci marja e mai mică.)
 4. **Raul:** 2.7.8 se depune din oficiu la fiecare negăsire (implicit da) sau Mircea decide de la caz la caz (ex. adresă evident incompletă → mai întâi întrebăm clientul, `standby` rămâne pentru asta).
 5. Urgent: clientul cu opțiunea urgent plătește și 2.7.8 urgent (3 zile)? Tariful de urgență ANCPI e separat.
+
+## 8. Decizii finale (Raul, 21.09, după analiză)
+
+- **Fără credit, fără extras gratuit.** Certificatul de la OCPI (cu CF sau
+  negativ) este serviciul complet. Secțiunile despre credit/cupon de mai sus
+  rămân ca istoric al analizei, nu se implementează.
+- **Fără raport PDF generat de noi.** Documentul clientului e cel primit de
+  la OCPI, încărcat de Mircea. Modelul din `~/Downloads` rămâne doar model.
+- **Fără cerere 2.7.8 generată din platformă** (deocamdată): nu avem
+  formularul OCPI ca bază înghețată (ca la Anexa 6); Mircea o completează la
+  ghișeu, cum a făcut deja la E-260728-VWFTT.
+- **Livrat:** status `identification_pending_ocpi` pe toate listele albe
+  (migrarea 182 + 12 fișiere), ruta `POST /api/collaborator/orders/[id]/identificare-nereusita`
+  (status + `customer_data.identification_result` + termen +10 zile
+  lucrătoare + email `identification-pending-ocpi` + istoric), butonul în
+  portal, textul clientului, preț 298 pe `identificare-imobil` (DB + pagină +
+  FAQ), `ancpi_cost_ron` 125 pe identificarea după proprietar (2.7.6).
+- **Rămâne deschis:** prețul identificării după proprietar (198 → 298?).

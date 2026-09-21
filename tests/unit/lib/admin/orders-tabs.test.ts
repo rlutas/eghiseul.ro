@@ -46,6 +46,10 @@ describe('resolveStatusFilter', () => {
     expect(resolveStatusFilter('').notIn).toEqual(HIDDEN_FROM_DEFAULT);
   });
 
+  it('identification_pending_ocpi stays in „În procesare” (work still open)', () => {
+    expect(PROCESSING_GROUP).toContain('identification_pending_ocpi');
+  });
+
   it('processing tab → in PROCESSING_GROUP', () => {
     const f = resolveStatusFilter('processing');
     expect(f.in).toEqual(PROCESSING_GROUP);

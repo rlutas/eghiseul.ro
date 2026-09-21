@@ -154,6 +154,7 @@ export const STANDBY_ELIGIBLE_STATUSES = new Set([
   'processing',
   'documents_generated',
   'submitted_to_institution',
+  'identification_pending_ocpi',
   'document_received',
   'extras_in_progress',
   'pending_documents',

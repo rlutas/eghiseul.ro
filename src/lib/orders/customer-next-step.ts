@@ -88,6 +88,9 @@ const NEXT_STEP: Record<string, CustomerNextStep> = {
   // The institution's to do — the part we cannot hurry, and saying so is the
   // honest version of "în curs".
   submitted_to_institution: INSTITUTION('Dosarul e depus. Așteptăm eliberarea documentului.'),
+  identification_pending_ocpi: INSTITUTION(
+    'OCPI verifică oficial dacă imobilul e înscris. Primești certificatul cu numărul de carte funciară sau certificatul că nu figurează.'
+  ),
   on_hold_institution: INSTITUTION(
     'Instituția e temporar indisponibilă. Termenul e pe pauză și reluăm imediat ce se poate.'
   ),

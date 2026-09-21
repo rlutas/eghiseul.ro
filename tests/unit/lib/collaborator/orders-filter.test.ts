@@ -16,6 +16,8 @@ describe('etapaOf', () => {
     expect(etapaOf('standby')).toBe('blocate');
     expect(etapaOf('on_hold_institution')).toBe('blocate');
     expect(etapaOf('completed')).toBe('livrate');
+    // Certificat 2.7.8 cerut la OCPI: lucrarea e la ghișeu, deci „Depuse”.
+    expect(etapaOf('identification_pending_ocpi')).toBe('depuse');
   });
 });
 

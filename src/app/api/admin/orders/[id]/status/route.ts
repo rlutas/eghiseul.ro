@@ -54,6 +54,7 @@ const VALID_STATUSES = new Set([
   'refunded',
   'standby',
   'on_hold_institution',
+  'identification_pending_ocpi',
 ]);
 
 // Statuses that pause the SLA clock. Both use the same standby_* columns —

@@ -87,6 +87,10 @@ export default function CollaboratorOrderDetail() {
   const [identCf, setIdentCf] = useState('');
   const [identCad, setIdentCad] = useState('');
   const [savingIdent, setSavingIdent] = useState(false);
+  // „Nu am găsit imobilul": cere certificatul oficial la OCPI (2.7.8 / 2.7.6)
+  // în loc să parcheze comanda pe standby cu o notă.
+  const [notFoundNote, setNotFoundNote] = useState('');
+  const [savingNotFound, setSavingNotFound] = useState(false);
   // Statusul pe care ÎL SETEAZĂ EL (finalizat / așteptare info client / în
   // lucru) — aceleași statusuri ca în admin, ca echipa să vadă exact ce alege.
   const [newStatus, setNewStatus] = useState('');
@@ -205,6 +209,30 @@ export default function CollaboratorOrderDetail() {
       toast.error(err instanceof Error ? err.message : 'Eroare la salvare');
     } finally {
       setSavingIdent(false);
+    }
+  };
+
+  const handleNotFound = async () => {
+    setSavingNotFound(true);
+    try {
+      const res = await fetch(withPreview(`/api/collaborator/orders/${orderId}/identificare-nereusita`, previewAs), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note: notFoundNote.trim() }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Eroare');
+      toast.success(
+        json.data?.emailSent
+          ? 'Salvat — clientul a fost anunțat. Depune certificatul la OCPI și înregistrează nr. mai jos.'
+          : 'Salvat. Depune certificatul la OCPI și înregistrează nr. de depunere mai jos.'
+      );
+      setNotFoundNote('');
+      await load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Eroare la salvare');
+    } finally {
+      setSavingNotFound(false);
     }
   };
 
@@ -400,6 +428,49 @@ export default function CollaboratorOrderDetail() {
           >
             {savingIdent ? 'Se salvează...' : 'Salvează identificarea'}
           </Button>
+
+          {/* Nu l-a găsit online: cere certificatul oficial la OCPI (cod 2.7.8
+              după adresă, 2.7.6 după proprietar). Răspunsul e document în
+              ambele cazuri — cu CF (continuă cu extrasul) sau negativ (se
+              livrează certificatul, serviciu complet). Nu mai punem standby. */}
+          <div className="mt-5 border-t border-slate-200 pt-4">
+            <h3 className="text-sm font-semibold text-slate-900">Nu am găsit imobilul în e-Terra</h3>
+            {order.customer_data?.identification_result?.outcome === 'not_found_eterra' ? (
+              <p className="mt-1 rounded-md bg-violet-50 px-3 py-2 text-xs text-violet-900">
+                Raportat negăsit la{' '}
+                {new Date(order.customer_data.identification_result.reportedAt).toLocaleDateString('ro-RO')}
+                {' '}— certificat ANCPI {order.customer_data.identification_result.ancpiServiceCode}. Depune-l la
+                OCPI și salvează nr. de depunere mai jos; când vine răspunsul, încarcă-l. Dacă are CF, completează
+                și „Am identificat imobilul”.
+              </p>
+            ) : (
+              <>
+                <p className="mt-1 text-xs text-slate-500">
+                  Trece comanda pe „Certificat OCPI cerut” și anunță clientul că imobilul nu apare
+                  în e-Terra și că depui cererea de certificat (
+                  {order.services?.slug === 'identificare-imobile-proprietar' ? '2.7.6, 125 lei' : '2.7.8, 100 lei'}
+                  , ~10 zile lucrătoare). Nr. de depunere și costul le salvezi apoi la „Am depus cererea la OCPI”.
+                </p>
+                <input
+                  value={notFoundNote}
+                  onChange={(e) => setNotFoundNote(e.target.value)}
+                  disabled={readOnly}
+                  placeholder="Opțional: ce ai verificat (ex. adresă, geoportal, registrul proprietarilor)"
+                  className="mt-2 w-full rounded border border-slate-300 px-2 py-1.5 text-sm"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="mt-2"
+                  onClick={handleNotFound}
+                  disabled={readOnly || savingNotFound}
+                >
+                  {savingNotFound ? 'Se salvează...' : 'Nu am găsit — depun certificat la OCPI'}
+                </Button>
+              </>
+            )}
+          </div>
         </div>
       )}
 

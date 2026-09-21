@@ -16,6 +16,10 @@ export const STATUS_OPTIONS: StatusOption[] = [
   { value: 'processing', label: 'În procesare', group: 'normal' },
   { value: 'documents_generated', label: 'Documente generate', group: 'normal' },
   { value: 'submitted_to_institution', label: 'Trimis instituție', group: 'normal' },
+  // Identificare imobil: topograful nu l-a găsit în e-Terra și a cerut la OCPI
+  // certificatul oficial (cod 2.7.8 după adresă / 2.7.6 după proprietar).
+  // Lucrarea e la ghișeu, nu pauzată — termenul curge (~10 zile lucrătoare).
+  { value: 'identification_pending_ocpi', label: 'Identificare nereușită — certificat OCPI depus', group: 'normal' },
   { value: 'document_received', label: 'Document primit', group: 'normal' },
   { value: 'extras_in_progress', label: 'Extras în lucru', group: 'normal' },
   // Granular add-on stages (only relevant for orders with translation /

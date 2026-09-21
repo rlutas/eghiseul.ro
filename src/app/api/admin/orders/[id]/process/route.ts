@@ -9,6 +9,9 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   'processing': ['documents_generated'],
   'documents_generated': ['submitted_to_institution'],
   'submitted_to_institution': ['document_received'],
+  // Certificat 2.7.8/2.7.6 cerut la OCPI (identificare imobil): răspunsul e un
+  // document în ambele cazuri — cu CF sau negativ — deci curge ca o depunere.
+  'identification_pending_ocpi': ['document_received', 'document_ready'],
   'document_received': ['extras_in_progress', 'document_ready'],
   'extras_in_progress': ['document_ready'],
   'document_ready': ['shipped'],

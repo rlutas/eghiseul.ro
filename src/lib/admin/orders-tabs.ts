@@ -18,6 +18,7 @@ export const PROCESSING_GROUP = [
   'cancellation_requested',
   'documents_generated',
   'submitted_to_institution',
+  'identification_pending_ocpi',
   'document_received',
   'extras_in_progress',
   'la_tradus',

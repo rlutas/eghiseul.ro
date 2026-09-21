@@ -21,7 +21,7 @@ export interface CollabOrderFilters {
 
 export function etapaOf(status: string): Exclude<Etapa, 'toate'> {
   if (CERERE_DONE_STATUSES.includes(status as never)) return 'livrate';
-  if (status === 'submitted_to_institution') return 'depuse';
+  if (status === 'submitted_to_institution' || status === 'identification_pending_ocpi') return 'depuse';
   // Parcate: blocate de instituție sau în așteptarea clientului — separate de
   // „de depus" ca să nu se amestece cu lucrările efectiv lucrabile (28.08).
   if (status === 'on_hold_institution' || status === 'standby') return 'blocate';

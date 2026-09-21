@@ -24,6 +24,7 @@ export const STATUS_BADGES: Record<string, StatusBadge> = {
   processing: { label: 'În procesare', variant: 'default', className: 'bg-blue-600 text-white' },
   documents_generated: { label: 'Documente generate', variant: 'default', className: 'bg-cyan-600 text-white' },
   submitted_to_institution: { label: 'Depus la instituție', variant: 'default', className: 'bg-indigo-500 text-white' },
+  identification_pending_ocpi: { label: 'Certificat OCPI cerut', variant: 'default', className: 'bg-violet-600 text-white' },
   document_received: { label: 'Document primit', variant: 'default', className: 'bg-teal-600 text-white' },
   extras_in_progress: { label: 'Extras în lucru', variant: 'default', className: 'bg-orange-500 text-white' },
   la_tradus: { label: 'La traducere', variant: 'default', className: 'bg-sky-500 text-white' },

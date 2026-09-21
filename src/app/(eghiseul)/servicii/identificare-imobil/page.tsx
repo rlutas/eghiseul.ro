@@ -41,7 +41,7 @@ const SCHEMA_SLUG = 'identificare-imobil';
 const TITLE = 'Număr Cadastral după Adresă — Îl Aflăm Noi | Extras CF';
 const DESCRIPTION =
   'Ne dai adresa, îți aflăm numărul cadastral și de carte funciară din ANCPI ' +
-  'și primești extrasul CF pe email. 198 RON, taxe incluse, fără cont ANCPI.';
+  'și primești extrasul CF pe email. 298 RON, taxe incluse, fără cont ANCPI.';
 const DATE_PUBLISHED = '2026-06-16';
 const DATE_MODIFIED = '2026-06-16';
 
@@ -85,7 +85,7 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Identificare Imobil după Adresă', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Identificare Imobil după Adresă', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Identificare Imobil după Adresă', price: 298, url: `${BASE_URL}${PAGE_PATH}` },
   ],
 });
 
@@ -554,7 +554,7 @@ export default async function IdentificareImobilPage() {
             { q: 'Cât costă identificarea imobilului?', a: `${service.base_price} RON, cu taxele ANCPI și extrasul CF incluse. Fără costuri ascunse.` },
             { q: 'Cât durează?', a: `${formatEstimatedDays(service)}. Verificarea este făcută de un operator, pentru că presupune căutarea imobilului după adresă.` },
             { q: 'Funcționează pentru apartamente?', a: 'Da, dar apartamentele pot necesita verificări suplimentare (bloc, scară, etaj) și uneori date din actul de proprietate. Te ținem la curent.' },
-            { q: 'Ce se întâmplă dacă imobilul nu poate fi identificat?', a: 'Dacă imobilul nu este înscris în cartea funciară (neintabulat / fără cadastru), identificarea poate să nu reușească. În acest caz căutăm date utile prin alte surse oficiale și îți comunicăm rezultatul.' },
+            { q: 'Ce se întâmplă dacă imobilul nu poate fi identificat?', a: 'Dacă imobilul nu apare în e-Terra (neintabulat sau intabulat pe cartea funciară veche, pe hârtie, neconvertită încă), depunem la OCPI cererea de certificat privind înscrierea imobilului (serviciul ANCPI 2.7.8, inclus în preț). În circa 10 zile lucrătoare primești fie certificatul cu numărul de carte funciară și extrasul CF, fie certificatul oficial că imobilul nu figurează înscris, cu care poți face intabularea sau conversia cărții vechi.' },
             { q: 'Trebuie să am cont ANCPI ca să cer identificarea?', a: 'Nu. Ne ocupăm noi de tot procesul; tu trebuie doar să ne dai adresa imobilului.' },
             { q: 'Pot identifica imobilul și după proprietar?', a: 'Căutarea standard este după adresă. Dacă ai doar numele proprietarului, contactează-ne și verificăm ce opțiuni sunt disponibile pentru cazul tău.' },
           ]}

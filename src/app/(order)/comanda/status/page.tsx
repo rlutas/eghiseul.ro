@@ -69,6 +69,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
   // Paused because the issuing institution is unavailable (e.g. ANCPI outage)
   on_hold_institution: { label: 'În așteptare — instituția emitentă e momentan indisponibilă', color: 'bg-amber-100 text-amber-800', icon: Clock },
   awaiting_payment: { label: 'Plată prin transfer bancar', color: 'bg-amber-100 text-amber-800', icon: Clock },
+  identification_pending_ocpi: { label: 'Certificat oficial cerut la OCPI', color: 'bg-violet-100 text-violet-800', icon: Clock },
 
   // Final statuses
   completed: { label: 'Finalizat', color: 'bg-green-100 text-green-800', icon: CheckCircle },

@@ -226,6 +226,7 @@ The `employee` role has been replaced by specialized roles. See [Workflow Design
 | `/api/admin/orders/[id]/request-reupload` | POST | `orders.manage` | „Solicită documente" — cerere multi-document de la client, auto-standby, email cu link. Spec: `technical/specs/document-request-system.md` |
 | `/api/reupload/[token]` | GET, POST | Public (token-gated) | Upload documente de către client (link single-use, 7 zile) |
 | `/api/admin/orders/[id]/ancpi-create-job` | POST | `orders.manage` | Job ANCPI manual (operatorul pune CF-ul găsit la identificare → workerul emite extrasul). Dropdown-uri județ/UAT din nomenclator; doar comenzi plătite; 409 dacă job există. Spec: `technical/specs/ancpi-automation-plan.md` §11 |
+| `/api/collaborator/orders/[id]/identificare-nereusita` | POST | rol `collaborator` pe comandă | Topograful raportează că imobilul nu apare în e-Terra: status `identification_pending_ocpi`, `customer_data.identification_result`, termen +10 zile lucrătoare, email client, istoric. Ghid: `identificare-imobil-nereusita.md` |
 
 ### Planned (Not Yet Built)
 

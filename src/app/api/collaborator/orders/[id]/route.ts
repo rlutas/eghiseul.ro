@@ -92,6 +92,9 @@ export async function GET(
         identified_property: order.customer_data?.identified_property ?? null,
         // OCPI submission number he reported — shown back so he can correct it.
         ocpi_submission: order.customer_data?.ocpi_submission ?? null,
+        // „Nu am găsit imobilul” raportat de el — ca pagina să-i arate că a
+        // cerut deja certificatul și ce urmează.
+        identification_result: order.customer_data?.identification_result ?? null,
       },
     };
 

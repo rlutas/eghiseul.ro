@@ -45,6 +45,11 @@ export const CUSTOMER_STATUS: Record<string, CustomerStatus> = {
   processing: { label: 'În procesare', tone: PROGRESS, hint: 'Lucrăm la comanda ta.' },
   documents_generated: { label: 'Documente pregătite', tone: PROGRESS, hint: 'Am pregătit actele necesare pentru depunere.' },
   submitted_to_institution: { label: 'Depusă la instituție', tone: PROGRESS, hint: 'Dosarul este la instituție. Așteptăm eliberarea.' },
+  identification_pending_ocpi: {
+    label: 'Certificat oficial cerut la OCPI',
+    tone: PROGRESS,
+    hint: 'Imobilul nu apare în e-Terra. Am cerut OCPI certificatul oficial privind înscrierea lui; răspunsul vine în circa 10 zile lucrătoare.',
+  },
   document_received: { label: 'Document primit', tone: PROGRESS, hint: 'Am primit documentul de la instituție.' },
   extras_in_progress: { label: 'Servicii suplimentare în lucru', tone: PROGRESS },
 

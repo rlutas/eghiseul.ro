@@ -315,6 +315,7 @@ const STATUS_CONFIG: Record<string, { label: string; variant: 'default' | 'secon
   refunded: { label: 'Rambursata', variant: 'destructive' },
   standby: { label: 'In asteptare client', variant: 'default', className: 'bg-amber-500 text-white' },
   on_hold_institution: { label: 'Blocat institutie', variant: 'default', className: 'bg-red-600 text-white' },
+  identification_pending_ocpi: { label: 'Certificat OCPI cerut', variant: 'default', className: 'bg-violet-600 text-white' },
   cancellation_requested: { label: 'Anulare solicitata', variant: 'default', className: 'bg-red-500 text-white' },
   delivered: { label: 'Livrata', variant: 'default', className: 'bg-emerald-600 text-white' },
   abandoned: { label: 'Abandonata', variant: 'secondary' },
@@ -3060,7 +3061,7 @@ function UnpaidWorkWarning({ order }: { order: OrderDetail }) {
     'processing', 'documents_generated', 'submitted_to_institution', 'document_received',
     'extras_in_progress', 'la_tradus', 'la_legalizat', 'la_apostila_notari',
     'eliberat_apostila_haga', 'in_progress', 'document_ready', 'shipped', 'delivered',
-    'completed', 'standby', 'on_hold_institution',
+    'completed', 'standby', 'on_hold_institution', 'identification_pending_ocpi',
   ];
   if (order.payment_status === 'paid') return null;
   if (!WORK_STATUSES.includes(order.status || '')) return null;
