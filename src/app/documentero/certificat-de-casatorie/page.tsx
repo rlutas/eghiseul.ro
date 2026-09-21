@@ -23,7 +23,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PATH,
-  ogImage: '/images/documentero/curier-livrare-plic.webp',
+  ogImage: '/images/documentero/cuplu-certificat-casatorie.webp',
   noindex: !DOCUMENTERO_INDEXABLE,
 });
 
@@ -91,7 +91,7 @@ export default async function CasatoriePage() {
           cta="Comandă duplicatul"
           secondary={{ label: 'Cu mențiunea de divorț', href: '#divort' }}
           facts={[['≤ 30 de zile', 'termen legal de eliberare'], ['Oriunde în RO', 'se cere de la orice primărie din 2023'], ['Oricare dintre soți', 'poate semna împuternicirea']]}
-          media={<Image src="/images/documentero/curier-livrare-plic.webp" alt="Curierul aduce plicul cu certificatul" width={1264} height={848} className="h-full w-full object-cover" sizes="(min-width: 1024px) 760px, 100vw" />}
+          media={<Image src="/images/documentero/cuplu-certificat-casatorie.webp" alt="Cuplu la birou, verificând certificatul de căsătorie lângă laptop și pașaport" width={1370} height={1148} className="h-full w-full object-cover" sizes="(min-width: 1024px) 760px, 100vw" />}
           priceLabel="Duplicat certificat de căsătorie"
           price={p.basePrice}
           options={[

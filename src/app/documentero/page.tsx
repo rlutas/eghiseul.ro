@@ -41,7 +41,7 @@ export default async function DocumenteroHome() {
 
   const acte = [
     { k: 'Naștere', t: 'Certificat de naștere', d: 'Duplicat: pierdut, deteriorat, model vechi, pentru străinătate.', pr: nastere.basePrice, h: '/certificat-de-nastere/', img: '/images/documentero/clienta-usa-certificat.webp', alt: 'Clientă în ușa apartamentului, cu certificatul de naștere scos din plic' },
-    { k: 'Căsătorie', t: 'Certificat de căsătorie', d: 'Duplicat, inclusiv cu mențiunea de divorț sau pentru schimbarea numelui.', pr: casatorie.basePrice, h: '/certificat-de-casatorie/', img: '/images/documentero/curier-livrare-plic.webp', alt: 'Curierul predă plicul' },
+    { k: 'Căsătorie', t: 'Certificat de căsătorie', d: 'Duplicat, inclusiv cu mențiunea de divorț sau pentru schimbarea numelui.', pr: casatorie.basePrice, h: '/certificat-de-casatorie/', img: '/images/documentero/cuplu-certificat-casatorie.webp', alt: 'Cuplu verificând certificatul de căsătorie' },
     { k: 'Celibat', t: 'Certificat de celibat (Anexa 18)', d: 'Pentru căsătorie, ședere sau notar în străinătate. Apostilă și traducere opționale.', pr: celibat.basePrice, h: '/certificat-de-celibat/', img: '/images/documentero/avocat-ghiseu-stare-civila.webp', alt: 'Avocata la ghișeul de stare civilă' },
     { k: 'UE', t: 'Extras multilingv de naștere', d: 'Formularul standard UE: acceptat fără traducere și fără apostilă în toată Uniunea.', pr: mlN.basePrice, h: '/extras-multilingv/', img: null, alt: '' },
     { k: 'UE', t: 'Extras multilingv de căsătorie', d: 'Aceeași procedură, pentru actul de căsătorie.', pr: mlC.basePrice, h: '/extras-multilingv/#casatorie', img: null, alt: '' },
