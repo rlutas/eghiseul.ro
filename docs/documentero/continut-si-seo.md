@@ -53,6 +53,11 @@ de clicuri în trei luni.
 
 ## Ghiduri, în ordinea publicării (1–2 pe săptămână)
 
+Publicate: pierdut (19.09), apostilă (20.09), acte necesare + sectoare și
+procură din străinătate (21.09). Următoarele, în ordinea din
+`analiza-competitori-seo.md` §6.D: model vechi, valabilitate celibat,
+transcriere, divorț, căsătoria pe țări. Săptămâna 28.09: două dintre ele.
+
 1. Certificat de naștere pierdut: ce faci în 2026 (pierdut 590 + variante).
 2. Certificatul vechi, tipizat, mai e valabil? (schimbare 480; pe eghiseul e
    singurul articol de stare civilă care încă merge, poziția 1,8).

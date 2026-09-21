@@ -241,7 +241,7 @@ export default async function CelibatPage() {
           guides={[
             { title: 'Apostila pe acte de stare civilă: când e nevoie și când nu', desc: 'În UE nu; în afara UE, pe original.', href: '/ghiduri/apostila-acte-stare-civila/' },
             { title: 'Valabilitatea certificatului de celibat: 6 luni sau 90 de zile?', desc: 'Amândouă sunt corecte, în contexte diferite.' },
-            { title: 'Acte pentru căsătoria în străinătate, pe țări', desc: 'Ce cer Italia, Spania, Germania, Franța, UK.' },
+            { title: 'Procură din străinătate: notar, consulat sau avocat', desc: 'Trei căi ca să ceară cineva în locul tău.', href: '/ghiduri/procura-din-strainatate-notar-consulat-avocat/' },
           ]}
         />
 

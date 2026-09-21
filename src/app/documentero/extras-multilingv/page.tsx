@@ -189,7 +189,7 @@ export default async function ExtrasMultilingvPage() {
           ]}
           guides={[
             { title: 'Apostila pe acte de stare civilă: când e nevoie și când nu', desc: 'Depinde de țară. Tabelul pe scurt.', href: '/ghiduri/apostila-acte-stare-civila/' },
-            { title: 'Certificat de naștere pierdut: ce faci în 2026', desc: 'Pașii, actele, termenul real.', href: '/ghiduri/certificat-de-nastere-pierdut/' },
+            { title: 'Procură din străinătate: notar, consulat sau avocat', desc: 'Cum ceri extrasul fără să vii în țară.', href: '/ghiduri/procura-din-strainatate-notar-consulat-avocat/' },
             { title: 'Transcrierea certificatului de naștere emis în străinătate', desc: 'Copil născut în Italia sau Spania.' },
           ]}
         />

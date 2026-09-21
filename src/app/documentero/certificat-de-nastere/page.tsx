@@ -33,7 +33,7 @@ const SITUATIONS: Array<[string, string, string?]> = [
   ['L-am pierdut sau mi-a fost furat', 'Fără declarație la poliție, fără anunț în Monitorul Oficial. Se cere direct duplicatul.', '/ghiduri/certificat-de-nastere-pierdut/'],
   ['E deteriorat sau plastifiat', 'Un certificat plastifiat nu mai e acceptat: nu se pot pune mențiuni pe el. Cel vechi se predă la eliberare.'],
   ['Am modelul vechi, tipizat', 'Rămâne valabil în țară. Pentru pașaport, pentru străinătate sau pentru copil ți se cere tot mai des modelul nou, cu CNP.'],
-  ['Locuiesc în străinătate', 'Semnezi de acolo, livrăm oriunde. Pentru UE adaugi extrasul multilingv în aceeași comandă.', '/extras-multilingv/'],
+  ['Locuiesc în străinătate', 'Semnezi de acolo, fără procură la notar sau consulat. Livrăm oriunde; pentru UE adaugi extrasul multilingv.', '/ghiduri/procura-din-strainatate-notar-consulat-avocat/'],
   ['Pentru copilul meu', 'Părintele cere duplicatul minorului. Copilul de peste 14 ani semnează și el cererea.'],
   ['Pentru un părinte decedat', 'Pentru succesiune se cere un extras pentru uz oficial, nu un duplicat. Scrie-ne și îți spunem ce document e potrivit.', '/contact/'],
 ];
@@ -182,7 +182,7 @@ export default async function NasterePage() {
           guides={[
             { title: 'Certificat de naștere pierdut: ce faci în 2026', desc: 'Pașii, actele, termenul real.', href: '/ghiduri/certificat-de-nastere-pierdut/' },
             { title: 'Apostila pe acte de stare civilă: când e nevoie și când nu', desc: 'În UE nu; în afara UE, pe original.', href: '/ghiduri/apostila-acte-stare-civila/' },
-            { title: 'Certificatul vechi, tipizat, mai e valabil?', desc: 'Da în țară, cu limite la pașaport și în străinătate.' },
+            { title: 'Acte necesare pentru duplicatul certificatului de naștere', desc: 'Lista scurtă, pe cazuri, plus sectoarele din București.', href: '/ghiduri/acte-necesare-duplicat-certificat-de-nastere/' },
           ]}
         />
 
