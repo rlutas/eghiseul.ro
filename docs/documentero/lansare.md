@@ -1,6 +1,8 @@
 # Lansarea documentero.ro: ce lipsește, în ordine
 
-Stare la 19.09.2026. Bifează aici, nu în alt loc.
+**LANSAT 21.09.2026**: `DOCUMENTERO_INDEXABLE = true`, paginile `index,follow`,
+sitemap-ul servit și trimis în GSC. Lista de mai jos e istoricul; ce rămâne
+e la „După lansare”.
 
 ## Conturi și infrastructură (Raul)
 
@@ -77,8 +79,8 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   „adeverință privind statutul civil” (fosta Anexa 9 din H.G. 64/2011). Pe
   site: „certificat de celibat (Anexa 18, fosta Anexa 9)”; titlu, hero, FAQ,
   meniu, acasă, T&C actualizate.
-- [ ] Sitemap curatoriat completat pagină cu pagină; placeholder-ul `noindex`
-  scos de pe acasă abia când hub-ul e scris.
+- [x] Sitemap curatoriat (14 pagini) servit din 21.09; `noindex` scos peste tot
+  (`DOCUMENTERO_INDEXABLE = true`, commit `805b5fda`).
 - [x] Link declarat din eghiseul (20.09): footer (coloana Contact, text) +
   pagina „eliberare certificat de naștere” → `documentero.ro/certificat-de-nastere/`.
   21.09: încă 4 linkuri în text din eghiseul (căsătorie, celibat, extras,
@@ -94,7 +96,8 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   profilul eGhișeul.ro, cu pozele de profil, în `src/lib/documentero/reviews.ts`;
   nota de proveniență + data citirii sub carduri.
 - [x] Poza avocatei (Tarța Ana Gabriela, avocat-tarta.ro) în `public/images/documentero/`;
-  textul de pe „Despre” e factual, din site-ul ei. Rămâne: poză reală a echipei.
+  textul de pe „Despre” e factual, din site-ul ei. Poza echipei nu există
+  (21.09): placeholder-ul scos, în loc e un card cu cele 4 servicii.
 - [x] Numărul real de acte obținute (20.09: 40+, din 44 comenzi plătite în DB
   din 07.07.2026; de actualizat manual în `despre/page.tsx`).
 - [x] Primul ghid („certificat de naștere pierdut”) scris complet (21.09,
@@ -105,7 +108,7 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
 - [x] (21.09) pe producție: `/`, `/robots.txt`, `/sitemap.xml` (gol, corect
   cât e `noindex`), `/llms.txt` 200; `/calculator/`, `/documentero/`,
   `/servicii/cazier-judiciar/` 404; `/admin/` 307.
-- [~] Comandă de test pe documentero.ro. 19.09, **pe live**: `E-260919-HJ9X9`
+- [x] Comandă de test pe documentero.ro (IBAN, fără plată; Raul 21.09: suficient). 19.09, **pe live**: `E-260919-HJ9X9`
   (certificat de naștere, transfer bancar) a trecut wizardul, checkout-ul,
   succesul și statusul pe brandul documentero, `platform='documentero'`,
   contract generat; stă în „Așteptare plată”. **Raul**: „Confirmă plata” (sau
@@ -115,8 +118,8 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   Din test rămâne doar: previzualizări KYC goale după reîncărcare (bug general).
   Comenzile de test au fost ȘTERSE din DB pe 20.09 (să nu încurce echipa).
 - [~] Rich Results Test pe acasă și pe o pagină de serviciu — JSON-LD validat
-  structural local pe 7 pagini (20.09); testul Google se rulează după
-  scoaterea `noindex`.
+  structural local pe 7 pagini (20.09); testul Google de rulat acum, că
+  site-ul e indexabil.
 - [x] (21.09) `curl -A Googlebot` pe cele 14 pagini publice: conținutul e în
   HTML (naștere 2.446 cuvinte, căsătorie 2.220, celibat 2.339, extras 1.796).
 - [x] (21.09) crawl propriu în loc de Screaming Frog: fiecare pagină publică
@@ -127,6 +130,9 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   mascat (naștere/căsătorie), restul sub 0,10 — mult sub pragurile 0,65 / 0,45.
 
 ## După lansare
+
+- 21.09: sitemap trimis în GSC (sishuletz@gmail.com), indexare cerută pentru
+  acasă, cele 4 servicii și cele 2 ghiduri (vezi changelog-ul de lansare).
 
 - Expunerile pe documentero.ro, săptămânal, nu clicurile.
 - 1–2 ghiduri pe săptămână din lista din
