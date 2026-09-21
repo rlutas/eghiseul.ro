@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { BRANDS } from '@/lib/brand/brands';
+import { SUPPORT_HOURS_SHORT } from '@/config/contact';
 import { ORGANIZATION } from '@/lib/seo/constants';
 import { DOCUMENTERO_FOOTER } from '@/config/documentero-nav';
 import { CookieSettingsLink } from '@/components/consent/cookie-settings-link';
@@ -46,7 +47,7 @@ export function FooterDocumentero() {
               <a href={`mailto:${brand.contactEmail}`} className="hover:text-d-ink">
                 {brand.contactEmail}
               </a>{' '}
-              · {brand.phoneDisplay} · L–V 9–18
+              · {brand.phoneDisplay} · {SUPPORT_HOURS_SHORT}
             </p>
           </div>
           <div className="md:col-span-3">

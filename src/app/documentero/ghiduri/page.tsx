@@ -22,7 +22,6 @@ export default function GhiduriPage() {
     '@graph': [documenteroOrganizationNode(), documenteroWebsiteNode(), documenteroBreadcrumb([{ name: 'Acasă', path: '/' }, { name: 'Ghiduri', path: PATH }], PATH)],
   };
   const published = GUIDES.filter((g) => g.published);
-  const queue = GUIDES.filter((g) => !g.published);
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
@@ -49,15 +48,6 @@ export default function GhiduriPage() {
               <span className="text-[20px] font-bold leading-[1.2] tracking-[-0.02em]">{g.title}</span>
               <span className="text-[14px] leading-[1.55] text-d-muted">{g.desc}</span>
             </Link>
-          ))}
-          {queue.map((g) => (
-            <div key={g.slug} className="flex flex-col gap-2.5 rounded-2xl border border-dashed border-d-line p-6 opacity-80">
-              <div className="flex justify-between text-[12px] font-bold uppercase tracking-[0.06em] text-d-muted">
-                <span>{g.category}</span><span>în lucru</span>
-              </div>
-              <span className="text-[20px] font-bold leading-[1.2] tracking-[-0.02em]">{g.title}</span>
-              <span className="text-[14px] leading-[1.55] text-d-muted">{g.desc}</span>
-            </div>
           ))}
         </Section>
 

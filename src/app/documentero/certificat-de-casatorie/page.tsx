@@ -181,7 +181,7 @@ export default async function CasatoriePage() {
           guides={[
             { title: 'Apostila pe acte de stare civilă: când e nevoie și când nu', desc: 'În UE nu; în afara UE, pe original.', href: '/ghiduri/apostila-acte-stare-civila/' },
             { title: 'Procură din străinătate: notar, consulat sau avocat', desc: 'Cum ceri duplicatul fără să vii în țară.', href: '/ghiduri/procura-din-strainatate-notar-consulat-avocat/' },
-            { title: 'Duplicat certificat de căsătorie cu mențiunea de divorț', desc: 'Când ai nevoie de el și ce nu înlocuiește.' },
+            { title: 'Acte necesare pentru duplicat', desc: 'Lista scurtă; aceeași logică și pentru căsătorie.', href: '/ghiduri/acte-necesare-duplicat-certificat-de-nastere/' },
           ]}
         />
 

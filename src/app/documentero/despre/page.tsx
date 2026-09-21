@@ -7,6 +7,7 @@ import { documenteroBreadcrumb, documenteroOrganizationNode, documenteroWebsiteN
 import { ORGANIZATION, SOCIAL_PROOF } from '@/lib/seo/constants';
 import { SITE_AUTHOR } from '@/lib/seo/author';
 import { BRANDS } from '@/lib/brand/brands';
+import { SUPPORT_HOURS_SHORT } from '@/config/contact';
 import { DOCUMENTERO_INDEXABLE } from '@/config/documentero-nav';
 import { LAWYER } from '@/lib/documentero/content';
 
@@ -155,7 +156,7 @@ export default function DesprePage() {
           <Card className="flex flex-col gap-2.5 rounded-2xl p-7">
             <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-d-muted">Biroul</span>
             <span className="text-[20px] font-bold">{ORGANIZATION.office.locality}</span>
-            <span className="text-[15px] leading-[1.6] text-d-muted">{ORGANIZATION.office.street}, {ORGANIZATION.office.locality}<br />L–V 9–18 · {BRANDS.documentero.phoneDisplay} · <Link href="/contact/" className="underline">{BRANDS.documentero.contactEmail}</Link></span>
+            <span className="text-[15px] leading-[1.6] text-d-muted">{ORGANIZATION.office.street}, {ORGANIZATION.office.locality}<br />{SUPPORT_HOURS_SHORT} · {BRANDS.documentero.phoneDisplay} · <Link href="/contact/" className="underline">{BRANDS.documentero.contactEmail}</Link></span>
           </Card>
         </Section>
       </main>

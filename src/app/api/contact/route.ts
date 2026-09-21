@@ -4,6 +4,7 @@ import { checkRateLimit, getClientIP } from '@/lib/security/rate-limiter';
 import { sendEmail } from '@/lib/email/resend';
 import { renderContactMessageEmail } from '@/lib/email/templates/contact-message';
 import { ORGANIZATION } from '@/lib/seo/constants';
+import { getBrand } from '@/lib/brand/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -108,12 +109,14 @@ export async function POST(req: NextRequest) {
   // Notify the inbox. A failed send must not lose the message — it's already
   // persisted — so we log and still return success.
   try {
+    // Which site the message came from: the inbox is shared, the answer is not.
+    const brand = await getBrand();
     const mail = renderContactMessageEmail({
       name,
       email,
       phone: phone || undefined,
       orderNumber: orderNumber || undefined,
-      subject: subjectLabel,
+      subject: brand.id === 'documentero' ? `[documentero] ${subjectLabel}` : subjectLabel,
       message,
     });
     await sendEmail({ to: INBOX, subject: mail.subject, html: mail.html, text: mail.text, replyTo: email });
