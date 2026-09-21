@@ -38,7 +38,9 @@ export const metadata: Metadata = {
   // proprietate de tip Domain, Google cere ACEEAȘI valoare și ca TXT în DNS
   // (Vercel): `google-site-verification=R5wF7Ny…`; meta tag-ul acoperă
   // proprietatea de tip URL-prefix.
-  verification: { google: 'R5wF7NyinN-jw_HtDSh2i1ytJxpLSV4WIsVUOblPQyA' },
+  // Two owners: the token from 20.09 (contul lui Raul de atunci) and the one
+  // for sishuletz@gmail.com (21.09), so the property can be driven from both.
+  verification: { google: ['R5wF7NyinN-jw_HtDSh2i1ytJxpLSV4WIsVUOblPQyA', 'fsG8DsyWevuhGvHQVMLSqS-6bSrTjgC4UY1NsVYLb4M'] },
   openGraph: { siteName: brand.name, locale: 'ro_RO', type: 'website' },
   robots: DOCUMENTERO_INDEXABLE ? { index: true, follow: true } : { index: false, follow: false },
 };

@@ -12,6 +12,13 @@ import {
 } from '@/lib/consent';
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+// documentero.ro has its own GA4 data stream (own property, own reports).
+// Empty → the eghiseul stream also collects documentero traffic (before 21.09.2026 that was the case).
+const GA_ID_DOCUMENTERO = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID_DOCUMENTERO || GA_ID;
+type BrandKey = 'eghiseul' | 'documentero';
+function gaIdFor(brand: BrandKey): string | undefined {
+  return brand === 'documentero' ? GA_ID_DOCUMENTERO : GA_ID;
+}
 // Google Ads: eticheta de conversie a contului 677-995-5005. Se încarcă DOAR
 // cu consimțământ de marketing; conversia „Purchase" se declanșează din pagina
 // de succes a comenzii. Lipsea complet după migrarea de pe WordPress — contul
@@ -54,11 +61,12 @@ function loadGtagScript(firstId: string) {
 }
 
 let gaConfigured = false;
-function loadGa() {
-  if (!GA_ID || gaConfigured) return;
+function loadGa(brand: BrandKey) {
+  const id = gaIdFor(brand);
+  if (!id || gaConfigured) return;
   gaConfigured = true;
-  loadGtagScript(GA_ID);
-  win().gtag!('config', GA_ID);
+  loadGtagScript(id);
+  win().gtag!('config', id);
 }
 
 const OPENAI_PIXEL_ID = process.env.NEXT_PUBLIC_OPENAI_ADS_PIXEL_ID;
@@ -138,7 +146,7 @@ function loadAds() {
   win().gtag!('config', ADS_ID);
 }
 
-function applyConsent(state: ConsentState) {
+function applyConsent(state: ConsentState, brand: BrandKey) {
   ensureGtagStub();
   win().gtag!('consent', 'update', {
     analytics_storage: state.analytics ? 'granted' : 'denied',
@@ -147,7 +155,7 @@ function applyConsent(state: ConsentState) {
     ad_personalization: state.marketing ? 'granted' : 'denied',
   });
   if (state.analytics) {
-    loadGa();
+    loadGa(brand);
   } else {
     deleteAnalyticsCookies();
   }
@@ -189,7 +197,7 @@ export function CookieConsent() {
     const existing = readConsent();
     let t: ReturnType<typeof setTimeout> | undefined;
     if (existing) {
-      applyConsent(existing);
+      applyConsent(existing, brand.id);
     } else {
       // Deferred so the effect doesn't set state synchronously (react-compiler rule).
       t = setTimeout(() => setVisible(true), 0);
@@ -198,13 +206,16 @@ export function CookieConsent() {
       if (t) clearTimeout(t);
       window.removeEventListener(CONSENT_OPEN_EVENT, open);
     };
-  }, []);
+  }, [brand.id]);
 
-  const decide = useCallback((a: boolean, m: boolean) => {
-    applyConsent(writeConsent(a, m));
-    setVisible(false);
-    setCustomize(false);
-  }, []);
+  const decide = useCallback(
+    (a: boolean, m: boolean) => {
+      applyConsent(writeConsent(a, m), brand.id);
+      setVisible(false);
+      setCustomize(false);
+    },
+    [brand.id],
+  );
 
   if (!visible) return null;
 
