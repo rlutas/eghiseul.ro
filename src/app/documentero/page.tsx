@@ -6,14 +6,14 @@ import { ReviewersStack, ReviewsDocumentero } from '@/components/documentero/rev
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { documenteroHomeGraph } from '@/lib/seo/documentero-schema';
 import { getAllPricing, lei } from '@/lib/documentero/services';
-import { HOME_FAQ } from '@/lib/documentero/content';
+import { HOME_FAQ, LAWYER } from '@/lib/documentero/content';
 import { DOCUMENTERO_INDEXABLE } from '@/config/documentero-nav';
 
 export const revalidate = 3600;
 
 const TITLE = 'Acte de Stare Civilă Online, prin Avocat — documentero.ro';
 const DESCRIPTION =
-  'Certificat de naștere, de căsătorie, dovadă de celibat și extrase multilingve, obținute de un avocat de la starea civilă și livrate prin curier, în România sau în străinătate. Semnezi pe telefon, fără programare, fără notar.';
+  'Certificat de naștere, de căsătorie, certificat de celibat și extrase multilingve, obținute de un avocat de la starea civilă și livrate prin curier, în România sau în străinătate. Semnezi pe telefon, fără programare, fără notar.';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -42,7 +42,7 @@ export default async function DocumenteroHome() {
   const acte = [
     { k: 'Naștere', t: 'Certificat de naștere', d: 'Duplicat: pierdut, deteriorat, model vechi, pentru străinătate.', pr: nastere.basePrice, h: '/certificat-de-nastere/', img: '/images/documentero/client-acasa-certificat.webp', alt: 'Clientă cu certificatul de naștere primit' },
     { k: 'Căsătorie', t: 'Certificat de căsătorie', d: 'Duplicat, inclusiv cu mențiunea de divorț sau pentru schimbarea numelui.', pr: casatorie.basePrice, h: '/certificat-de-casatorie/', img: '/images/documentero/curier-livrare-plic.webp', alt: 'Curierul predă plicul' },
-    { k: 'Celibat', t: 'Dovadă de celibat (Anexa 9)', d: 'Pentru căsătorie, ședere sau notar în străinătate. Apostilă și traducere opționale.', pr: celibat.basePrice, h: '/certificat-de-celibat/', img: '/images/documentero/avocat-ghiseu-stare-civila.webp', alt: 'Avocata la ghișeul de stare civilă' },
+    { k: 'Celibat', t: 'Certificat de celibat (Anexa 18)', d: 'Pentru căsătorie, ședere sau notar în străinătate. Apostilă și traducere opționale.', pr: celibat.basePrice, h: '/certificat-de-celibat/', img: '/images/documentero/avocat-ghiseu-stare-civila.webp', alt: 'Avocata la ghișeul de stare civilă' },
     { k: 'UE', t: 'Extras multilingv de naștere', d: 'Formularul standard UE: acceptat fără traducere și fără apostilă în toată Uniunea.', pr: mlN.basePrice, h: '/extras-multilingv/', img: null, alt: '' },
     { k: 'UE', t: 'Extras multilingv de căsătorie', d: 'Aceeași procedură, pentru actul de căsătorie.', pr: mlC.basePrice, h: '/extras-multilingv/#casatorie', img: null, alt: '' },
   ];
@@ -69,7 +69,7 @@ export default async function DocumenteroHome() {
               Actele de stare civilă, obținute de un avocat și aduse la ușa ta.
             </h1>
             <p className="d-rise m-0 max-w-[560px] text-[17px] leading-[1.55] text-d-muted sm:text-[19px]" style={{ animationDelay: '160ms' }}>
-              Certificat de naștere, de căsătorie, dovadă de celibat sau extras multilingv pentru UE. Completezi în 5
+              Certificat de naștere, de căsătorie, certificat de celibat sau extras multilingv pentru UE. Completezi în 5
               minute, semnezi pe telefon, avocatul nostru depune cererea la starea civilă. Originalul vine prin curier,
               oriunde în România sau în lume.
             </p>
@@ -199,7 +199,7 @@ export default async function DocumenteroHome() {
               {[
                 ['Certificat de naștere, duplicat', nastere.basePrice, '/certificat-de-nastere/'],
                 ['Certificat de căsătorie, duplicat', casatorie.basePrice, '/certificat-de-casatorie/'],
-                ['Dovadă de celibat (Anexa 9)', celibat.basePrice, '/certificat-de-celibat/'],
+                ['Certificat de celibat (Anexa 18)', celibat.basePrice, '/certificat-de-celibat/'],
                 ['Extras multilingv de naștere', mlN.basePrice, '/extras-multilingv/'],
                 ['Extras multilingv de căsătorie', mlC.basePrice, '/extras-multilingv/#casatorie'],
               ].map(([t, pr, h]) => (
@@ -228,6 +228,28 @@ export default async function DocumenteroHome() {
               </Card>
             ))}
           </div>
+        </Section>
+
+        {/* Plain text with real links: what the site is, for people and crawlers alike */}
+        <Section className="mt-24 lg:mt-32">
+          <Card className="flex flex-col gap-4 p-7 lg:p-10">
+            <Eyebrow>Pe scurt</Eyebrow>
+            <H2 className="sm:text-[32px]">Ce facem, în trei propoziții</H2>
+            <p className="m-0 max-w-[900px] text-[17px] leading-[1.7] text-d-body">
+              Obținem de la oficiile de stare civilă din România{' '}
+              <Link href="/certificat-de-nastere/" className="font-semibold underline underline-offset-2 hover:text-d-acc">duplicatul certificatului de naștere</Link>,{' '}
+              <Link href="/certificat-de-casatorie/" className="font-semibold underline underline-offset-2 hover:text-d-acc">duplicatul certificatului de căsătorie</Link>{' '}
+              (inclusiv cu mențiunea de divorț),{' '}
+              <Link href="/certificat-de-celibat/" className="font-semibold underline underline-offset-2 hover:text-d-acc">certificatul de celibat</Link>{' '}
+              (adeverința privind statutul civil, Anexa 18) și{' '}
+              <Link href="/extras-multilingv/" className="font-semibold underline underline-offset-2 hover:text-d-acc">extrasele multilingve</Link>{' '}
+              pentru Uniunea Europeană. Cererile le depune{' '}
+              <Link href="/despre/" className="font-semibold underline underline-offset-2 hover:text-d-acc">av. {LAWYER.name}, Baroul Satu Mare</Link>, cu împuternicirea avocațială pe care o semnezi pe telefon, în temeiul Legii 119/1996 și al Legii 51/1995. Dacă ai pierdut certificatul, citește întâi{' '}
+              <Link href="/ghiduri/certificat-de-nastere-pierdut/" className="font-semibold underline underline-offset-2 hover:text-d-acc">ce faci când ai pierdut certificatul de naștere</Link>; dacă ai nevoie de el în afara UE,{' '}
+              <Link href="/ghiduri/apostila-acte-stare-civila/" className="font-semibold underline underline-offset-2 hover:text-d-acc">când e nevoie de apostilă și când nu</Link>. Toate ghidurile sunt la{' '}
+              <Link href="/ghiduri/" className="font-semibold underline underline-offset-2 hover:text-d-acc">Ghiduri</Link>.
+            </p>
+          </Card>
         </Section>
 
         <ReviewsDocumentero />

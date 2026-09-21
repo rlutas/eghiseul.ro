@@ -28,6 +28,57 @@ export const HOME_FAQ = [
   },
 ];
 
+/**
+ * The lawyer who files every documentero request. Facts from avocat-tarta.ro
+ * (19.09.2026); shown on /despre/ and, as one line, on every service page.
+ */
+export const LAWYER = {
+  name: 'Tarța Ana Gabriela',
+  title: 'avocat, Baroul Satu Mare',
+  experience: 'peste 8 ani de practică',
+  office: 'Str. Mihai Viteazu nr. 20A, biroul 3, Satu Mare',
+  areas: ['Drept civil', 'Dreptul familiei', 'Drept comercial', 'Drept imobiliar'],
+  site: 'https://www.avocat-tarta.ro/',
+  photo: '/images/documentero/avocat-tarta-ana-gabriela.webp',
+} as const;
+
+/**
+ * Legal basis, spelled the same way on every page (and in the FAQ answer
+ * about the lawyer). Hub MAI cites the same three when it says a request may
+ * be filed by "avocați împuterniciți".
+ */
+export const LEGAL_BASIS = {
+  short: 'Legea 119/1996, Legea 51/1995 și H.G. 255/2024',
+  long: 'Legea 119/1996 privind actele de stare civilă (art. 10), Legea 51/1995 privind profesia de avocat și Normele metodologice aprobate prin H.G. 255/2024',
+} as const;
+
+/**
+ * Our own delivery figures: paid civil-status orders on this platform,
+ * 07.07.2026 → 21.09.2026, days from payment to completion (courier
+ * included). Median and 80th percentile; the sample is small and says so on
+ * the page. Recompute by hand when the numbers move (query in
+ * docs/documentero/analiza-competitori-seo.md §6.B).
+ */
+export const PROCESSING_STATS = {
+  asOf: '2026-09-21',
+  since: '7 iulie 2026',
+  byService: {
+    'certificat-nastere': { done: 11, medianDays: 19, p80Days: 23 },
+    'certificat-casatorie': { done: 4, medianDays: 22, p80Days: 30 },
+    'certificat-celibat': { done: 5, medianDays: 19, p80Days: 24 },
+    'extras-multilingv-certificat-nastere': { done: 12, medianDays: 19, p80Days: 24 },
+    'extras-multilingv-certificat-casatorie': { done: 3, medianDays: 12, p80Days: 12 },
+  },
+} as const;
+
+const RO_MONTHS = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
+
+/** '2026-09-21' → '21 septembrie 2026'. */
+export function fmtDateRo(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number);
+  return `${d} ${RO_MONTHS[m - 1]} ${y}`;
+}
+
 export interface GuideMeta {
   slug: string;
   title: string;
@@ -49,6 +100,11 @@ export const GUIDES: GuideMeta[] = [
   { slug: 'duplicat-certificat-de-casatorie-divort', title: 'Duplicat certificat de căsătorie cu mențiunea de divorț', desc: 'Când ai nevoie de el și de ce nu e același lucru cu sentința.', category: 'Căsătorie', minutes: 5, published: false },
 ];
 
-export function guideHref(g: GuideMeta): string {
-  return g.published ? `/ghiduri/${g.slug}/` : '/ghiduri/';
+/** Public path of a PUBLISHED guide; null for the queue (never link a card to the index). */
+export function guideHref(g: GuideMeta): string | null {
+  return g.published ? `/ghiduri/${g.slug}/` : null;
+}
+
+export function publishedGuides(): GuideMeta[] {
+  return GUIDES.filter((g) => g.published);
 }

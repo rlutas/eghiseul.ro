@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { fmtDateRo, LAWYER } from '@/lib/documentero/content';
 
 /**
  * Small building blocks for documentero.ro pages. Same names and roles as in
@@ -239,6 +240,75 @@ export function CertificateMock() {
   );
 }
 
+/**
+ * "Pe scurt": the 40–60 word answer right under the hero, written the way a
+ * search engine or an AI summary would quote it (who issues, who may request,
+ * legal basis, term, state fee). One per service page.
+ */
+export function QuickAnswer({ children, updated }: { children: ReactNode; updated: string }) {
+  return (
+    <Section className="mt-14 lg:mt-20">
+      <Card className="flex flex-col gap-3 border-l-4 border-l-d-acc p-6 sm:p-7">
+        <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-d-muted">Pe scurt</span>
+        <p className="m-0 text-[17px] leading-[1.6] text-d-body sm:text-[18px]">{children}</p>
+        <UpdatedLine date={updated} />
+      </Card>
+    </Section>
+  );
+}
+
+/** "Actualizat la 21 septembrie 2026 · cererile le depune av. …" — the same date feeds dateModified in the schema. */
+export function UpdatedLine({ date }: { date: string }) {
+  return (
+    <p className="m-0 text-[13px] text-d-muted">
+      Actualizat la {fmtDateRo(date)} · cererile le depune{' '}
+      <Link href="/despre/" className="font-semibold text-d-ink underline underline-offset-2 hover:text-d-acc">
+        av. {LAWYER.name}, Baroul Satu Mare
+      </Link>
+    </p>
+  );
+}
+
+/** "Ai nevoie și de": three cards to the sister services and guides. */
+export function RelatedServices({ items, title = 'Ai nevoie și de' }: { items: Array<[string, string, string]>; title?: string }) {
+  return (
+    <Section className="mt-24 flex flex-col gap-5 lg:mt-32">
+      <H2 className="sm:text-[28px]">{title}</H2>
+      <div className="grid gap-5 md:grid-cols-3">
+        {items.map(([t, d, h]) => (
+          <Link key={t} href={h} className="flex flex-col gap-2 rounded-2xl border border-d-line bg-d-card p-6 hover:border-d-acc">
+            <span className="text-[17px] font-bold">{t}</span>
+            <span className="text-[14px] leading-[1.5] text-d-muted">{d}</span>
+            <span className="text-[15px] font-bold text-d-acc">Vezi →</span>
+          </Link>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+/** A plain data table (countries, sectors): header row + rows, stacked on phones. */
+export function InfoTable({ head, rows }: { head: string[]; rows: string[][] }) {
+  const cols = { gridTemplateColumns: `1.3fr repeat(${head.length - 1}, 1fr)` };
+  return (
+    <Card className="overflow-hidden">
+      <div className="hidden gap-4 px-5 py-3.5 text-[13px] font-bold uppercase tracking-[0.06em] text-d-muted sm:grid" style={cols}>
+        {head.map((h) => <span key={h}>{h}</span>)}
+      </div>
+      {rows.map((r) => (
+        <div key={r[0]} className="flex flex-col gap-1 border-t border-d-line px-5 py-3.5 text-[15px] sm:grid sm:gap-4" style={cols}>
+          {r.map((c, i) => (
+            <span key={`${r[0]}-${i}`} className={i === 0 ? 'font-semibold' : 'text-d-body'}>
+              {i > 0 && <span className="text-d-muted sm:hidden">{head[i]}: </span>}
+              {c}
+            </span>
+          ))}
+        </div>
+      ))}
+    </Card>
+  );
+}
+
 /** The long content block shared by the service pages (intro + acte + table + diaspora + guides). */
 export function SeoBlock({
   title,
@@ -255,7 +325,8 @@ export function SeoBlock({
   rows: Array<[string, string, string]>;
   diasporaTitle: string;
   diaspora: string[];
-  guides: Array<{ title: string; desc: string; href: string }>;
+  /** A guide without `href` is in the writing queue: rendered as text, never linked to the index. */
+  guides: Array<{ title: string; desc: string; href?: string }>;
 }) {
   return (
     <>
@@ -290,12 +361,19 @@ export function SeoBlock({
       <Section className="mt-20 flex flex-col gap-4 lg:mt-28">
         <H2 className="sm:text-[28px]">Ghiduri pe subiect</H2>
         <div className="grid gap-4 sm:grid-cols-3">
-          {guides.map((g) => (
-            <Link key={g.title} href={g.href} className="flex flex-col gap-1.5 rounded-2xl border border-d-line bg-d-card p-5 hover:border-d-acc">
-              <span className="text-[16px] font-bold leading-[1.3]">{g.title}</span>
-              <span className="text-[13px] text-d-muted">{g.desc}</span>
-            </Link>
-          ))}
+          {guides.map((g) =>
+            g.href ? (
+              <Link key={g.title} href={g.href} className="flex flex-col gap-1.5 rounded-2xl border border-d-line bg-d-card p-5 hover:border-d-acc">
+                <span className="text-[16px] font-bold leading-[1.3]">{g.title}</span>
+                <span className="text-[13px] text-d-muted">{g.desc}</span>
+              </Link>
+            ) : (
+              <div key={g.title} className="flex flex-col gap-1.5 rounded-2xl border border-dashed border-d-line p-5 opacity-80">
+                <span className="text-[16px] font-bold leading-[1.3]">{g.title}</span>
+                <span className="text-[13px] text-d-muted">{g.desc} · în lucru</span>
+              </div>
+            ),
+          )}
         </div>
       </Section>
     </>

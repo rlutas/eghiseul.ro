@@ -59,7 +59,7 @@ export default async function GhidApostilaPage() {
     image: '/images/documentero/curier-livrare-plic.webp',
     breadcrumb: [{ name: 'Acasă', path: '/' }, { name: 'Ghiduri', path: '/ghiduri/' }, { name: 'Apostila pe acte de stare civilă', path: PATH }],
   });
-  const related = GUIDES.filter((g) => g.slug !== SLUG).slice(0, 3);
+  const related = GUIDES.filter((g) => g.published && g.slug !== SLUG).slice(0, 3);
 
   return (
     <>
@@ -141,7 +141,7 @@ export default async function GhidApostilaPage() {
           <H2 className="sm:text-[28px]">Citește și</H2>
           <div className="grid gap-5 md:grid-cols-3">
             {related.map((g) => (
-              <Link key={g.slug} href={guideHref(g)} className="flex flex-col gap-2 rounded-2xl border border-d-line bg-d-card p-5 hover:border-d-acc">
+              <Link key={g.slug} href={guideHref(g) ?? '/ghiduri/'} className="flex flex-col gap-2 rounded-2xl border border-d-line bg-d-card p-5 hover:border-d-acc">
                 <span className="text-[12px] font-bold uppercase tracking-[0.06em] text-d-acc">{g.category}</span>
                 <span className="text-[18px] font-bold leading-[1.25]">{g.title}</span>
               </Link>

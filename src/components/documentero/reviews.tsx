@@ -85,14 +85,17 @@ export function ReviewersStack({ count = 4 }: { count?: number }) {
  * profile belongs to eDigitalizare SRL, the company behind documentero.ro
  * (named as the company, not as the sister brand — Raul, 19.09).
  */
-export function ReviewsDocumentero({ limit = 6 }: { limit?: number }) {
-  const items = DOCUMENTERO_REVIEWS.slice(0, limit);
+export function ReviewsDocumentero({ limit = 6, match, title }: { limit?: number; match?: RegExp; title?: string }) {
+  // On a service page only the reviews about THAT document; fall back to all
+  // when fewer than two match, so the section never looks empty.
+  const matched = match ? DOCUMENTERO_REVIEWS.filter((r) => match.test(r.service)) : DOCUMENTERO_REVIEWS;
+  const items = (matched.length >= 2 ? matched : DOCUMENTERO_REVIEWS).slice(0, limit);
   return (
     <Section className="mt-24 flex flex-col gap-7 lg:mt-32">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-3">
           <Eyebrow>Recenzii Google</Eyebrow>
-          <H2>Ce spun clienții despre actele de stare civilă</H2>
+          <H2>{title ?? 'Ce spun clienții despre actele de stare civilă'}</H2>
         </div>
         <a
           href={GOOGLE_REVIEWS_URL}

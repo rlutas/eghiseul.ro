@@ -365,6 +365,42 @@ Apostila (publicat 20.09) rămâne al nouălea, deja linkat din toate patru.
   documentero, se discută 301 de pe pagina eghiseul spre documentero (are
   1.714 clicuri istorice și backlinkuri → 301, nu 410).
 
+## Stare după implementare (21.09.2026)
+
+Planul A (cod) și B (conținut) sunt făcute pe `main` (vezi changelog-ul din
+21.09). Măsurat pe dev, fără JavaScript, aceleași criterii ca în §4:
+
+| Pagină | Cuvinte înainte → după | Linkuri din conținut (unice) | FAQPage | Recenzii pe act |
+|---|---|---|---|---|
+| `/` | 1.023 → 1.135 | 4 → 9 | da | 6 |
+| `/certificat-de-nastere/` | 983 → 2.446 | 6 → 9 | da | 3 |
+| `/certificat-de-casatorie/` | 908 → 2.220 | 5 → 8 | da | 2 (fallback la toate dacă < 2) |
+| `/certificat-de-celibat/` | 1.187 → 2.339 | 6 → 7 | da | 2 |
+| `/extras-multilingv/` | 924 → 1.796 | 6 → 9 | da | 2 |
+| `/ghiduri/` | 254 → 306 | 4 → 9 | | |
+| `/ghiduri/certificat-de-nastere-pierdut/` | 474 → 1.272 | 3 → 10 | | |
+| `/despre/` | 338 → 366 | 1 → 6 | | |
+
+Similaritate după rescriere: vs eghiseul 0,003–0,005 mascat; între paginile
+documentero max 0,182 (naștere vs căsătorie). Pragul e 0,65.
+
+Ce s-a adăugat pe fiecare pagină de serviciu: blocul „Pe scurt” (răspunsul
+citabil, cu temeiul legal), „Actualizat la” cu avocata, secțiunea „Cât
+durează, de fapt?” cu mediana noastră din DB (`PROCESSING_STATS` în
+`src/lib/documentero/content.ts`; naștere 19 zile pe 11 comenzi, căsătorie 22
+pe 4, celibat 19 pe 5, extras naștere 19 pe 12; de recalculat lunar cu
+interogarea din §6.B), „Ce plătești, de fapt”, tabelul „pentru ce îl cer
+instituțiile”, `FAQPage`, recenzii filtrate, „Ai nevoie și de”. Pe naștere în
+plus: „Cine poate cere”, „Când datele nu se potrivesc” (inclusiv duplicat vs
+transcriere). Pe căsătorie: divorțul în străinătate (Regulamentul 2019/1111),
+„Ce nu înlocuiește duplicatul”. Pe celibat: numele oficial (Anexa 18), tabelul
+pe 7 țări, „procură notar / consulat / avocat”. Pe extras: formularul UE vs
+extrasul CIEC (Convenția nr. 16, Viena 1976).
+
+Rămân din plan: C (linkurile din eghiseul spre căsătorie/celibat la flip), D
+(ghidurile 2–8, 1–2 pe săptămână), G (măsurarea după flip). Plus verificarea
+vizuală a paginilor de către Raul înainte de `DOCUMENTERO_INDEXABLE = true`.
+
 ## Surse
 
 - SERP: `google.ro`, 20.09.2026, `hl=ro&gl=ro&pws=0&udm=14`, pozițiile 1–20.

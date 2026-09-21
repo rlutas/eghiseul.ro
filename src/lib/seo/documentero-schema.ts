@@ -68,6 +68,8 @@ export interface DocumenteroServiceInput {
   datePublished: string;
   dateModified: string;
   breadcrumb: Array<{ name: string; path: string }>;
+  /** Questions that are visible on the page (FAQPage is emitted only then). */
+  faq?: Array<{ q: string; a: string }>;
 }
 
 export function documenteroServiceGraph(input: DocumenteroServiceInput) {
@@ -122,6 +124,15 @@ export function documenteroServiceGraph(input: DocumenteroServiceInput) {
         breadcrumb: { '@id': `${url}#breadcrumb` },
         about: { '@id': `${url}#service` },
       },
+      ...(input.faq && input.faq.length > 0
+        ? [
+            {
+              '@type': 'FAQPage',
+              '@id': `${url}#faq`,
+              mainEntity: input.faq.map(({ q, a }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+            },
+          ]
+        : []),
     ],
   };
 }

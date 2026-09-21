@@ -76,6 +76,21 @@ Ordinea ghidurilor de mai sus e înlocuită de tabelul D de acolo.
 
 ## Cum se scrie
 
+- Certificatul de celibat se numește pe site „certificat de celibat (adeverința
+  privind statutul civil, Anexa 18, fosta Anexa 9)”. Anexa 18 e din H.G.
+  255/2024; „Anexa 9” era în H.G. 64/2011. Ambele nume rămân în text fiindcă
+  SERP-ul și primăriile le folosesc pe amândouă (verificat 21.09.2026).
+- Temeiul legal se scrie o singură dată, la fel peste tot: `LEGAL_BASIS` din
+  `src/lib/documentero/content.ts` (Legea 119/1996, Legea 51/1995, H.G.
+  255/2024).
+- Fiecare pagină de serviciu are, în ordinea asta: hero, „Pe scurt”
+  (`QuickAnswer`, 40–60 de cuvinte citabile, cu „Actualizat la” și avocata),
+  secțiunile proprii, `SeoBlock`, „Cât durează, de fapt?” cu cifrele din
+  `PROCESSING_STATS` (recalculate lunar), FAQ (același array intră în
+  `FAQPage`), recenzii filtrate pe act (`ReviewsDocumentero match=`), „Ai
+  nevoie și de” (`RelatedServices`). Un ghid nescris apare în „Ghiduri pe
+  subiect” ca text „în lucru”, niciodată ca link spre `/ghiduri/`.
+
 - Propoziții scurte, la persoana a doua, cu ce se întâmplă de fapt la ghișeu.
   Fără „stă drept mărturie”, fără triade forțate, fără em-dash, fără „nu doar…
   ci și”. Ghidul e `~/.claude/skills/humanizer`.

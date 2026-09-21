@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { HeaderDocumentero } from '@/components/documentero/header';
-import { Section } from '@/components/documentero/ui';
+import { Card, Section } from '@/components/documentero/ui';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { documenteroBreadcrumb, documenteroOrganizationNode, documenteroWebsiteNode } from '@/lib/seo/documentero-schema';
 import { GUIDES, guideHref } from '@/lib/documentero/content';
@@ -42,7 +42,7 @@ export default function GhiduriPage() {
 
         <Section className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {published.map((g) => (
-            <Link key={g.slug} href={guideHref(g)} className="flex flex-col gap-2.5 rounded-2xl border border-d-line bg-d-card p-6 hover:border-d-acc">
+            <Link key={g.slug} href={guideHref(g) ?? '/ghiduri/'} className="flex flex-col gap-2.5 rounded-2xl border border-d-line bg-d-card p-6 hover:border-d-acc">
               <div className="flex justify-between text-[12px] font-bold uppercase tracking-[0.06em] text-d-acc">
                 <span>{g.category}</span><span className="text-d-muted">{g.minutes} min</span>
               </div>
@@ -62,6 +62,20 @@ export default function GhiduriPage() {
         </Section>
 
         <Section className="mt-20">
+          <Card className="flex flex-col gap-3 p-7 lg:p-10">
+            <p className="m-0 max-w-[900px] text-[17px] leading-[1.7] text-d-body">
+              Ghidurile explică procedura; actul îl obținem noi, dacă vrei. Pentru fiecare există o pagină cu prețul, actele necesare și termenul real:{' '}
+              <Link href="/certificat-de-nastere/" className="font-semibold underline underline-offset-2 hover:text-d-acc">duplicat certificat de naștere</Link>,{' '}
+              <Link href="/certificat-de-casatorie/" className="font-semibold underline underline-offset-2 hover:text-d-acc">duplicat certificat de căsătorie</Link>,{' '}
+              <Link href="/certificat-de-celibat/" className="font-semibold underline underline-offset-2 hover:text-d-acc">certificat de celibat</Link>{' '}
+              și{' '}
+              <Link href="/extras-multilingv/" className="font-semibold underline underline-offset-2 hover:text-d-acc">extras multilingv de naștere sau de căsătorie</Link>. Cine suntem și cine depune cererile:{' '}
+              <Link href="/despre/" className="font-semibold underline underline-offset-2 hover:text-d-acc">despre noi</Link>.
+            </p>
+          </Card>
+        </Section>
+
+        <Section className="mt-10">
           <div className="flex flex-wrap items-center justify-between gap-6 rounded-3xl bg-d-ink p-8 text-d-bg sm:p-10">
             <div className="flex flex-col gap-2">
               <span className="text-[26px] font-bold tracking-[-0.03em] sm:text-[28px]">Nu găsești cazul tău?</span>

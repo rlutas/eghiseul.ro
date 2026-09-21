@@ -55,15 +55,18 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   butoane și titluri repictate pe brand în `brandedEmailHtml`.
 - [x] `Organization` documentero în schema; `Service`/`Product` pe paginile de
   serviciu; `Article` pe ghid (`src/lib/seo/documentero-schema.ts`).
-- [ ] Planul A din [`analiza-competitori-seo.md`](analiza-competitori-seo.md)
-  §6 (20.09): `FAQPage` pe paginile de serviciu, bloc „Pe scurt” citabil sub
-  hero, „Actualizat la” vizibil, zero linkuri din carduri spre `/ghiduri/`
-  (index), „Ai nevoie și de” pe naștere/căsătorie/extras, recenzii filtrate pe
-  act, baza legală completă (L. 119/1996 + L. 51/1995 + H.G. 255/2024), linkuri
-  în text pe acasă/ghiduri/despre, `llms.txt`.
-- [ ] Numele actual al documentului de celibat în metodologia H.G. 255/2024
-  (Anexa 18 / „fosta Anexa 9”?) — SERP-ul e împărțit între cele două nume;
-  pagina noastră spune doar „Anexa 9”.
+- [x] Planul A din [`analiza-competitori-seo.md`](analiza-competitori-seo.md)
+  §6 (21.09): `FAQPage` pe cele patru pagini de serviciu, bloc „Pe scurt”
+  citabil sub hero, „Actualizat la” + avocata vizibile, zero linkuri din
+  carduri spre `/ghiduri/` (ghidurile nescrise apar ca text „în lucru”),
+  „Ai nevoie și de” pe toate patru, recenzii filtrate pe act, baza legală
+  completă (L. 119/1996 + L. 51/1995 + H.G. 255/2024), linkuri în text pe
+  acasă/ghiduri/despre, `llms.txt`. Planul B (conținut) făcut pe toate patru
+  paginile + ghidul „pierdut” extins (474 → 1.272 cuvinte).
+- [x] Numele documentului de celibat (21.09): H.G. 255/2024, Anexa 18 =
+  „adeverință privind statutul civil” (fosta Anexa 9 din H.G. 64/2011). Pe
+  site: „certificat de celibat (Anexa 18, fosta Anexa 9)”; titlu, hero, FAQ,
+  meniu, acasă, T&C actualizate.
 - [ ] Sitemap curatoriat completat pagină cu pagină; placeholder-ul `noindex`
   scos de pe acasă abia când hub-ul e scris.
 - [x] Link declarat din eghiseul (20.09): footer (coloana Contact, text) +
@@ -73,8 +76,9 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
 
 ## Conținut (împreună)
 
-- [ ] Textele finale pentru cele patru pagini de serviciu, trecute prin
-  humanizer și prin testul de similaritate.
+- [x] Textele finale pentru cele patru pagini de serviciu (21.09), trecute
+  prin humanizer și prin testul de similaritate (Jaccard mascat vs eghiseul
+  0,003–0,005; între ele max 0,182). De citit de Raul înainte de flip.
 - [x] Recenzii Google reale (19.09): 9 recenzii 5★ despre stare civilă din
   profilul eGhișeul.ro, cu pozele de profil, în `src/lib/documentero/reviews.ts`;
   nota de proveniență + data citirii sub carduri.
@@ -82,7 +86,8 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   textul de pe „Despre” e factual, din site-ul ei. Rămâne: poză reală a echipei.
 - [x] Numărul real de acte obținute (20.09: 40+, din 44 comenzi plătite în DB
   din 07.07.2026; de actualizat manual în `despre/page.tsx`).
-- [ ] Primul ghid („certificat de naștere pierdut”) scris complet.
+- [x] Primul ghid („certificat de naștere pierdut”) scris complet (21.09,
+  1.272 cuvinte, 9 secțiuni, tabel de cazuri particulare).
 
 ## Verificare înainte de a scoate `noindex`
 

@@ -8,6 +8,7 @@ import { ORGANIZATION, SOCIAL_PROOF } from '@/lib/seo/constants';
 import { SITE_AUTHOR } from '@/lib/seo/author';
 import { BRANDS } from '@/lib/brand/brands';
 import { DOCUMENTERO_INDEXABLE } from '@/config/documentero-nav';
+import { LAWYER } from '@/lib/documentero/content';
 
 const PATH = '/despre/';
 
@@ -18,17 +19,6 @@ export const metadata = buildPageMetadata({
   path: PATH,
   noindex: !DOCUMENTERO_INDEXABLE,
 });
-
-/** Facts from avocat-tarta.ro (19.09.2026); the personal text is hers to write. */
-const LAWYER = {
-  name: 'Tarța Ana Gabriela',
-  title: 'avocat, Baroul Satu Mare',
-  experience: 'peste 8 ani de practică',
-  office: 'Str. Mihai Viteazu nr. 20A, biroul 3, Satu Mare',
-  areas: ['Drept civil', 'Dreptul familiei', 'Drept comercial', 'Drept imobiliar'],
-  site: 'https://www.avocat-tarta.ro/',
-  photo: '/images/documentero/avocat-tarta-ana-gabriela.webp',
-};
 
 export default function DesprePage() {
   const graph = {
@@ -113,6 +103,13 @@ export default function DesprePage() {
               </Card>
             ))}
           </div>
+          <p className="m-0 max-w-[900px] text-[16px] leading-[1.7] text-d-body">
+            Ce obținem: <Link href="/certificat-de-nastere/" className="font-semibold underline underline-offset-2 hover:text-d-acc">duplicatul certificatului de naștere</Link>,{' '}
+            <Link href="/certificat-de-casatorie/" className="font-semibold underline underline-offset-2 hover:text-d-acc">duplicatul certificatului de căsătorie</Link>,{' '}
+            <Link href="/certificat-de-celibat/" className="font-semibold underline underline-offset-2 hover:text-d-acc">certificatul de celibat</Link> și{' '}
+            <Link href="/extras-multilingv/" className="font-semibold underline underline-offset-2 hover:text-d-acc">extrasele multilingve</Link> pentru UE. Procedurile, explicate pe înțeles, sunt în{' '}
+            <Link href="/ghiduri/" className="font-semibold underline underline-offset-2 hover:text-d-acc">ghiduri</Link>.
+          </p>
         </Section>
 
         <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">

@@ -38,7 +38,7 @@ export const DOCUMENTERO_INDEXABLE = false;
 export const DOCUMENTERO_SERVICES_MENU: DocumenteroServiceMenuItem[] = [
   { label: 'Certificat de naștere', hint: 'Duplicat: pierdut, deteriorat, model vechi', href: '/certificat-de-nastere/', orderSlug: 'certificat-nastere', icon: 'nastere' },
   { label: 'Certificat de căsătorie', hint: 'Duplicat, inclusiv cu mențiunea de divorț', href: '/certificat-de-casatorie/', orderSlug: 'certificat-casatorie', icon: 'casatorie' },
-  { label: 'Certificat de celibat', hint: 'Anexa 9, pentru căsătorie în străinătate', href: '/certificat-de-celibat/', orderSlug: 'certificat-celibat', icon: 'celibat' },
+  { label: 'Certificat de celibat', hint: 'Anexa 18 (fosta Anexa 9), pentru căsătorie în străinătate', href: '/certificat-de-celibat/', orderSlug: 'certificat-celibat', icon: 'celibat' },
   { label: 'Extras multilingv de naștere', hint: 'Formularul UE, fără traducere și apostilă', href: '/extras-multilingv/', orderSlug: 'extras-multilingv-certificat-nastere', icon: 'ue' },
   { label: 'Extras multilingv de căsătorie', hint: 'Aceeași procedură, pentru actul de căsătorie', href: '/extras-multilingv/#casatorie', orderSlug: 'extras-multilingv-certificat-casatorie', icon: 'ue' },
 ];
