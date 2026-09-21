@@ -11,7 +11,9 @@ lucrătoare. Mircea depune certificatul 2.7.8 la OCPI, salvează nr. de
 depunere ca până acum, iar când vine răspunsul îl încarcă: cu CF → extras;
 negativ → certificatul E livrarea. **Nu mai promitem credit sau extras
 gratuit.** „Identificare după adresă” costă acum 298 lei. Procedura completă:
-ghidul „Identificare imobil: când topograful NU găsește imobilul”.
+ghidul „Identificare imobil: când topograful NU găsește imobilul”, cu PDF de
+trimis lui Mircea și echipei (serviciul de la A la Z, pașii din portal, ce vede
+clientul, ce spuneți la telefon).
 
 ---
 

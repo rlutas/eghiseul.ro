@@ -1,5 +1,9 @@
 # Identificare imobil: ce facem când topograful NU găsește imobilul
 
+Versiunea completă de tipărit / trimis pe WhatsApp lui Mircea și echipei (serviciul
+A→Z, pașii din portal, ce vede clientul, ce spuneți la telefon):
+`docs/admin/identificare-imobil-ghid.pdf`.
+
 Procedura de echipă din 21.09.2026, cu butoanele din platformă. Se aplică la
 „Identificare Imobil după Adresă” (**298 lei** din 21.09) și „Identificare
 Imobile după Proprietar” (198 lei, de decis).
