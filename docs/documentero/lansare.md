@@ -71,8 +71,9 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   scos de pe acasă abia când hub-ul e scris.
 - [x] Link declarat din eghiseul (20.09): footer (coloana Contact, text) +
   pagina „eliberare certificat de naștere” → `documentero.ro/certificat-de-nastere/`.
-  Propus, în alte repo-uri: ecazier.ro și cazierjudiciaronline.com (footer,
-  un link din text, dofollow) — de făcut când documentero iese din `noindex`.
+  21.09: încă 4 linkuri în text din eghiseul (căsătorie, celibat, extras,
+  articolul „model vechi”), footer pe cazierjudiciaronline.com + ecazier.ro,
+  footer + 2 articole pe avocat-tarta.ro (commit-uri în repo-urile lor).
 
 ## Conținut (împreună)
 

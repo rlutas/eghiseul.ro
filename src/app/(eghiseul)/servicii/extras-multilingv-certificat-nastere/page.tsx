@@ -451,6 +451,8 @@ export default async function ExtrasMultilingvNasterePage() {
                 <Link href="/acte-necesare-certificat-de-nastere/" className="text-primary-600 font-medium hover:underline">
                   transcrierea certificatului de naștere
                 </Link>
+                . Pentru actele de stare civilă avem și un site dedicat, cu aceeași echipă și același avocat, unde explicăm și diferența dintre formularul UE și extrasul CIEC:{' '}
+                <a href="https://documentero.ro/extras-multilingv/" className="text-primary-600 font-medium hover:underline">documentero.ro</a>
                 .
               </p>
             </div>

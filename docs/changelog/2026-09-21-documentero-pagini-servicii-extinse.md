@@ -74,19 +74,36 @@ Planul complet și starea lui: [analiza competitorilor SEO](../documentero/anali
 - Meniu, T&C: „Anexa 18 (fosta Anexa 9)”.
 - `documentero-sitemap.ts`: `lastModified` 2026-09-21 pe paginile atinse.
 
+### Linkuri din site-urile surori (planul C, 21.09)
+
+- eghiseul.ro: pe lângă footer și pagina de naștere (20.09), câte un link în
+  text spre documentero pe paginile de căsătorie, celibat, extras multilingv de
+  naștere și pe articolul „schimbare certificat de naștere vechi” (singurul
+  articol de stare civilă care încă rankează). Textul e același peste tot:
+  „site dedicat, cu aceeași echipă și același avocat”, dofollow.
+- cazierjudiciaronline.com (repo separat, commit acolo): rând nou în footer,
+  „Resurse” → `https://documentero.ro/`; pe host-ul ecazier.ro (același repo,
+  layout propriu) la fel.
+- avocat-tarta.ro (repo `avocat-tarta-gabriela`, Netlify, commit acolo): link
+  în footer („Link-uri utile”) + două linkuri contextuale în articolele
+  „Divorț în România 2026” (duplicatul certificatului de căsătorie, la pasul
+  2 și la pasul 6) și „Succesiune” (duplicatele actelor de stare civilă). E
+  linkul cu cea mai mare greutate: site-ul avocatei care depune cererile.
+
 ### Verificat
 
 - `tsc --noEmit` și `eslint` curate.
 - Randare pe dev cu `Host: documentero.ro`, `User-Agent: GPTBot`: toate
   paginile 200, conținutul în HTML, `FAQPage` pe cele 4 servicii, `/llms.txt`
   servit.
+- Vizual (21.09, a doua trecere): `DOCUMENTERO_EXTRA_HOSTS=documentero.localhost:3000`
+  în `.env.local` + Playwright pe `http://documentero.localhost:3000/`; 8 pagini,
+  desktop 1280 și mobil 390, fără erori de runtime; tabelele (`InfoTable`) se
+  stivuiesc corect pe telefon, „Pe scurt” și „Ce plătești” se văd cum trebuie.
 - Similaritate (shingles 5, nume mascate): vs eghiseul 0,003–0,005; între
   paginile documentero max 0,182.
 
 ### Nu s-a făcut
 
-- Verificarea vizuală (screenshot) pe dev: rewrite-ul pe host nu se poate
-  imita din Playwright fără `DOCUMENTERO_EXTRA_HOSTS` în `.env.local`; Raul
-  se uită pe preview/prod.
 - Ghidurile 2–8 (câte 1–2 pe săptămână, după flip).
 - `DOCUMENTERO_INDEXABLE` rămâne `false`.

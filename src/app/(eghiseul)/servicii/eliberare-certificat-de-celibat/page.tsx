@@ -546,7 +546,9 @@ export default async function CertificatCelibatPage() {
                   <Link href="/servicii/eliberare-certificat-de-casatorie/" className="text-primary-600 font-semibold hover:underline">
                     certificatul de căsătorie
                   </Link>
-                  , pe care le poți obține tot online.
+                  , pe care le poți obține tot online. Pentru actele de stare civilă avem și un site dedicat, cu aceeași echipă și același avocat, cu tabelul pe țări (Italia, Spania, Germania, UK) pentru certificatul de celibat:{' '}
+                  <a href="https://documentero.ro/certificat-de-celibat/" className="text-primary-600 font-medium hover:underline">documentero.ro</a>
+                  .
                 </p>
               </div>
             </div>

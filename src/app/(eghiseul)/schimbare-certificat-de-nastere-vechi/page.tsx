@@ -138,7 +138,10 @@ export default function Page() {
         Un certificat de naștere vechi rămâne valabil, dar îl poți înlocui oricând cu un{' '}
         <strong>duplicat pe modelul actual</strong>, cu acte puține și costuri mici. Cel mai comod
         este <Link href={nastereUrl}>online, prin eGhișeul.ro</Link>, fără drum la ghișeu și fără
-        cozi.
+        cozi. Pentru actele de stare civilă avem și un site dedicat, cu aceeași echipă și același
+        avocat, unde găsești și situațiile în care duplicatul nu e ce îți trebuie (transcriere,
+        rectificare):{' '}
+        <a href="https://documentero.ro/certificat-de-nastere/">documentero.ro</a>.
       </p>
     </ArticleLayout>
   );

@@ -123,7 +123,9 @@ Ordinea ghidurilor de mai sus e înlocuită de tabelul D de acolo.
 ## Legătura cu eghiseul
 
 Declarată, nu ascunsă: „parte din grupul eghiseul.ro” în footer și în Despre,
-`sameAs`/`parentOrganization` în schema. Din eghiseul spre documentero: un link
-în footer și unul pe pagina de serviciu naștere („ghidul complet”). Paginile de
+`sameAs`/`parentOrganization` în schema. Din eghiseul spre documentero: footer +
+un link în text pe naștere, căsătorie, celibat, extras și pe articolul „model
+vechi”. Din cazierjudiciaronline.com și ecazier.ro: footer. Din
+avocat-tarta.ro: footer + articolele „Divorț” și „Succesiune” (21.09). Paginile de
 stare civilă de pe eghiseul rămân; se mută cu 301 doar când documentero le
 depășește pe aceleași interogări.

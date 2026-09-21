@@ -397,8 +397,10 @@ transcriere). Pe căsătorie: divorțul în străinătate (Regulamentul 2019/111
 pe 7 țări, „procură notar / consulat / avocat”. Pe extras: formularul UE vs
 extrasul CIEC (Convenția nr. 16, Viena 1976).
 
-Rămân din plan: C (linkurile din eghiseul spre căsătorie/celibat la flip), D
-(ghidurile 2–8, 1–2 pe săptămână), G (măsurarea după flip). Plus verificarea
+C e făcut pe 21.09: linkuri în text din eghiseul (căsătorie, celibat, extras,
+articolul „model vechi”), footer pe cazierjudiciaronline.com și ecazier.ro,
+footer + două articole pe avocat-tarta.ro (repo-uri separate). Rămân: D
+(ghidurile 2–8, 1–2 pe săptămână) și G (măsurarea după flip). Plus verificarea
 vizuală a paginilor de către Raul înainte de `DOCUMENTERO_INDEXABLE = true`.
 
 ## Surse

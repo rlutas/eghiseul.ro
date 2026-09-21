@@ -416,7 +416,9 @@ export default async function CertificatCasatoriePage() {
                 <Link href="/servicii/extras-multilingv-certificat-casatorie/" className="text-primary-600 font-medium hover:underline">
                   extrasul multilingv de pe certificatul de căsătorie
                 </Link>
-                , recunoscut în toate statele UE fără traducere și fără apostilă. Te-ai căsătorit în străinătate? Vezi ghidul de{' '}
+                , recunoscut în toate statele UE fără traducere și fără apostilă. Pentru actele de stare civilă avem și un site dedicat, cu aceeași echipă și același avocat, inclusiv pentru duplicatul cu mențiunea de divorț:{' '}
+                <a href="https://documentero.ro/certificat-de-casatorie/" className="text-primary-600 font-medium hover:underline">documentero.ro</a>
+                . Te-ai căsătorit în străinătate? Vezi ghidul de{' '}
                 <Link href="/acte-necesare-casatorie/" className="text-primary-600 font-medium hover:underline">
                   transcriere a certificatului de căsătorie
                 </Link>
