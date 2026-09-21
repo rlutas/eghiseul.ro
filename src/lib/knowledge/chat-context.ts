@@ -89,3 +89,66 @@ export function guideHref(slug: string, audience: ChatAudience): string {
   const base = audience === 'collaborator' ? '/colaborator/ghid' : '/admin/ghid';
   return `${base}/${slug}/`;
 }
+
+/**
+ * Răspunsul vine ca text simplu (ca să poată fi transmis pe măsură ce se
+ * generează) și se termină cu un subsol fix:
+ *
+ *   SURSE: slug1, slug2
+ *   DOCUMENTAT: da | nu
+ *   DE_DOCUMENTAT: ce lipsește (doar la „nu”)
+ *
+ * Parserul e tolerant: fără subsol → documentat=true, fără surse.
+ */
+export interface ParsedAnswer {
+  body: string;
+  sources: string[];
+  documented: boolean;
+  followUp: string | null;
+}
+
+export function parseAnswerFooter(text: string): ParsedAnswer {
+  const lines = text.replace(/\r\n/g, '\n').split('\n');
+  let start = -1;
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if (/^\s*SURSE\s*:/i.test(lines[i])) {
+      start = i;
+      break;
+    }
+  }
+  if (start < 0) return { body: text.trim(), sources: [], documented: true, followUp: null };
+  let body = lines.slice(0, start).join('\n').replace(/\n\s*-{3,}\s*$/, '').trim();
+  body = body.replace(/\n\s*-{3,}\s*$/, '').trim();
+  let sources: string[] = [];
+  let documented = true;
+  let followUp: string | null = null;
+  for (const raw of lines.slice(start)) {
+    const line = raw.trim();
+    const m = line.match(/^([A-ZĂÂÎȘȚ_]+)\s*:\s*(.*)$/i);
+    if (!m) continue;
+    const key = m[1].toUpperCase();
+    const val = m[2].trim();
+    if (key === 'SURSE') {
+      sources = val
+        .split(/[,;]/)
+        .map((s) => s.trim().replace(/^[`"'«„]+|[`"'»”]+$/g, '').replace(/\.md$/i, '').replace(/^\/+|\/+$/g, ''))
+        .filter((s) => s && !/^(niciuna|none|-)$/i.test(s));
+    } else if (key === 'DOCUMENTAT') {
+      documented = !/^(nu|no|false)\b/i.test(val);
+    } else if (key === 'DE_DOCUMENTAT') {
+      followUp = val || null;
+    }
+  }
+  return { body, sources, documented, followUp: documented ? null : followUp };
+}
+
+/** Câte caractere din text sunt „încă subsol în curs” (ca UI-ul să nu afișeze SURSE: pe măsură ce vine). */
+export function visibleAnswerPrefix(partial: string): string {
+  const idx = partial.search(/\n\s*(-{3,}\s*\n\s*)?SURSE\s*:/i);
+  if (idx >= 0) return partial.slice(0, idx).replace(/\n\s*-{3,}\s*$/, '').trimEnd();
+  // Ultimul rând poate fi un subsol pe jumătate scris („SUR”): îl ascundem până se decide.
+  const lastNl = partial.lastIndexOf('\n');
+  const tail = partial.slice(lastNl + 1);
+  if (/^\s*(-{1,3}|S|SU|SUR|SURS|SURSE)\s*:?\s*$/i.test(tail) && tail.length > 0) return partial.slice(0, lastNl + 1).trimEnd();
+  return partial;
+}

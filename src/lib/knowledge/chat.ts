@@ -1,47 +1,32 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
-import { z } from 'zod';
 import { loadSearchIndex } from './docs';
 import { renderMarkdown } from './render';
 import { knowledgeDb } from './reports';
 import {
   coreDocs,
   guideHref,
+  parseAnswerFooter,
   renderDocsForPrompt,
   retrievedDocs,
   type ChatAudience,
 } from './chat-context';
 
 /**
- * Chatbotul din Ghid: răspunde DOAR din documentația echipei, cu surse.
+ * Chatbotul din Ghid: răspunde DOAR din documentația echipei, cu surse,
+ * transmis pe măsură ce se generează (latența e în generare, nu în gândire:
+ * 4–9 s pentru 400 de tokeni; cu streaming primul rând apare sub o secundă).
  *
  * Model: Claude Sonnet 5 (Raul, 21.09: Opus e prea scump pentru întrebări de
- * procedură; testat, răspunde corect), thinking adaptiv (implicit), effort
- * „medium”. Nucleul (catalog A→Z,
- * statusuri, pagina comenzii) stă în system prompt cu cache de o oră;
- * documentele găsite pentru întrebare vin în mesajul utilizatorului.
+ * procedură), fără thinking, effort „low”. Nucleul (catalog A→Z, statusuri,
+ * pagina comenzii; la colaborator fișele lui) stă în system prompt cu cache
+ * de o oră; documentele găsite pentru întrebare vin în mesajul utilizatorului.
+ * Răspunsul e text cu un subsol fix (SURSE / DOCUMENTAT / DE_DOCUMENTAT),
+ * parsat de `parseAnswerFooter`.
  *
  * Fără `ANTHROPIC_API_KEY` chatbotul nu pornește; UI-ul arată mesajul de
  * configurare, iar raportarea de probleme merge oricum.
  */
 export const CHAT_MODEL = 'claude-sonnet-5';
-
-const AnswerSchema = z.object({
-  raspuns_md: z
-    .string()
-    .describe('Răspunsul pentru operator, în română, Markdown scurt (liste, bold pe butoane). Fără surse aici.'),
-  surse: z
-    .array(z.string())
-    .describe('Slug-urile documentelor pe care se bazează răspunsul, exact cum apar în atributul slug.'),
-  documentat: z
-    .boolean()
-    .describe('true dacă răspunsul reiese clar din documente; false dacă documentele nu acoperă întrebarea.'),
-  intrebare_pentru_raul: z
-    .string()
-    .nullable()
-    .describe('Când documentat=false: ce ar trebui documentat, într-o propoziție. Altfel null.'),
-});
-export type ChatAnswer = z.infer<typeof AnswerSchema>;
 
 export interface ChatTurn {
   role: 'user' | 'assistant';
@@ -57,6 +42,8 @@ export interface ChatResult {
   logId: string | null;
 }
 
+export type ChatEvent = { t: 'delta'; text: string } | { t: 'done'; result: ChatResult } | { t: 'error'; message: string };
+
 export function isChatConfigured(): boolean {
   return !!process.env.ANTHROPIC_API_KEY;
 }
@@ -64,12 +51,15 @@ export function isChatConfigured(): boolean {
 const SYSTEM_RULES = `Ești asistentul intern al echipei eGhișeul.ro / documentero.ro (servicii de obținere a actelor: caziere, acte de stare civilă, certificat constatator, extras de carte funciară, servicii imobiliare prin topograf). Răspunzi operatorilor din echipă și colaboratorilor (topograful Mircea) la întrebări despre cum funcționează platforma și ce au de făcut.
 
 Reguli:
-- Răspunzi DOAR din documentele primite (nucleul de mai jos + documentele din mesaj). Nu inventezi prețuri, termene, butoane sau proceduri. Dacă documentele nu acoperă întrebarea, spui clar că nu e documentat și pui documentat=false.
-- Român simplu, la persoana a doua plural („apăsați”, „verificați”), scurt: de regulă 3–8 rânduri sau o listă. Numele butoanelor și statusurilor exact ca în documente, cu ghilimele sau bold.
-- Când răspunsul depinde de serviciu, întrebi sau dai ramurile scurt.
+- Răspunzi DOAR din documentele primite (nucleul de mai jos + documentele din mesaj). Nu inventezi prețuri, termene, butoane sau proceduri. Dacă documentele nu acoperă întrebarea, spui într-o propoziție că nu e documentat.
+- Român simplu, la persoana a doua plural („apăsați”, „verificați”). SCURT: răspunsul are cel mult 6 rânduri sau o listă de cel mult 5 puncte; fără introducere, fără încheiere, fără repetarea întrebării. Numele butoanelor și statusurilor exact ca în documente, cu ghilimele sau bold.
+- Când răspunsul depinde de serviciu, dai ramurile în câte un rând.
 - Nu dai sfaturi juridice clientului; explici ce face echipa în platformă.
-- În „surse” pui slug-urile documentelor folosite (atributul slug al fiecărui <document>), cel mult 4.
-- Nu repeta întrebarea. Nu adăuga introduceri sau încheieri.`;
+
+Formatul răspunsului: textul (Markdown simplu), apoi o linie goală, apoi EXACT subsolul de mai jos, pe rânduri separate, nimic după el:
+SURSE: <slug-urile documentelor folosite, separate prin virgulă, exact valoarea atributului slug; cel mult 4; „niciuna” dacă nu ai folosit niciunul>
+DOCUMENTAT: <da | nu>
+DE_DOCUMENTAT: <doar când DOCUMENTAT este nu: ce ar trebui scris în ghid, într-o propoziție>`;
 
 function buildSystem(audience: ChatAudience, coreText: string): Anthropic.TextBlockParam[] {
   const who =
@@ -86,17 +76,22 @@ function buildSystem(audience: ChatAudience, coreText: string): Anthropic.TextBl
   ];
 }
 
-export async function answerQuestion(input: {
+/**
+ * Generează răspunsul ca flux de evenimente: `delta` (bucăți de text, fără
+ * subsol; UI-ul le afișează imediat), apoi `done` (rezultatul complet, cu
+ * surse, HTML randat și id-ul din log) sau `error`.
+ */
+export async function* streamAnswer(input: {
   question: string;
   audience: ChatAudience;
   history?: ChatTurn[];
   user: { id: string; role: string };
-}): Promise<ChatResult> {
+}): AsyncGenerator<ChatEvent> {
   const question = input.question.trim().slice(0, 2000);
   const index = await loadSearchIndex();
   const core = coreDocs(index, input.audience);
   const retrieved = retrievedDocs(index, question, input.audience);
-  const byPath = new Map([...core, ...retrieved].map((d) => [d.slug, d]));
+  const bySlug = new Map([...core, ...retrieved].map((d) => [d.slug, d]));
 
   const client = new Anthropic();
   const history = (input.history ?? []).slice(-6).map<Anthropic.MessageParam>((t) => ({
@@ -111,19 +106,33 @@ export async function answerQuestion(input: {
 
   const admin = knowledgeDb();
   const t0 = Date.now();
+  let full = '';
+  let sentUpTo = 0;
   try {
-    const response = await client.messages.parse({
+    const stream = client.messages.stream({
       model: CHAT_MODEL,
-      max_tokens: 4000,
-      output_config: { effort: 'medium', format: zodOutputFormat(AnswerSchema) },
+      max_tokens: 1500,
+      thinking: { type: 'disabled' },
+      output_config: { effort: 'low' },
       system: buildSystem(input.audience, renderDocsForPrompt(core)),
       messages: [...history, { role: 'user', content: userContent }],
     });
-    const parsed = response.parsed_output;
-    if (!parsed) throw new Error(`Răspuns neparsabil (stop_reason=${response.stop_reason})`);
 
-    const sources = parsed.surse
-      .map((slug) => byPath.get(slug))
+    for await (const event of stream) {
+      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+        full += event.delta.text;
+        // Trimitem doar ce e sigur răspuns (nu subsol în curs de scriere).
+        const visible = safePrefixLength(full);
+        if (visible > sentUpTo) {
+          yield { t: 'delta', text: full.slice(sentUpTo, visible) };
+          sentUpTo = visible;
+        }
+      }
+    }
+    const message = await stream.finalMessage();
+    const parsed = parseAnswerFooter(full);
+    const sources = parsed.sources
+      .map((slug) => bySlug.get(slug))
       .filter((d): d is NonNullable<typeof d> => !!d)
       .slice(0, 4)
       .map((d) => ({ slug: d.slug, title: d.title, href: guideHref(d.slug, input.audience) }));
@@ -135,42 +144,46 @@ export async function answerQuestion(input: {
         user_role: input.user.role,
         audience: input.audience,
         question,
-        answer: parsed.raspuns_md,
+        answer: parsed.body,
         sources: sources.map((s) => s.slug),
-        documented: parsed.documentat,
-        model: response.model,
-        input_tokens: response.usage.input_tokens,
-        output_tokens: response.usage.output_tokens,
-        cache_read_tokens: response.usage.cache_read_input_tokens ?? null,
+        documented: parsed.documented,
+        model: message.model,
+        input_tokens: message.usage.input_tokens,
+        output_tokens: message.usage.output_tokens,
+        cache_read_tokens: message.usage.cache_read_input_tokens ?? null,
       })
       .select('id')
       .single();
 
     // Întrebarea fără răspuns e un gol în documentație: intră singură în rapoarte.
-    if (!parsed.documentat) {
+    if (!parsed.documented) {
       await admin.from('knowledge_reports').insert({
         reporter_id: input.user.id,
         reporter_role: input.user.role,
         audience: input.audience,
         kind: 'intrebare-fara-raspuns',
-        message: parsed.intrebare_pentru_raul || question,
-        context: { question, answer: parsed.raspuns_md, chatLogId: log?.id ?? null },
+        message: parsed.followUp || question,
+        context: { question, answer: parsed.body, chatLogId: log?.id ?? null },
       });
     }
 
     console.info(
-      `[knowledge/chat] ${input.audience} ${Date.now() - t0}ms in=${response.usage.input_tokens} cached=${response.usage.cache_read_input_tokens ?? 0} out=${response.usage.output_tokens} documented=${parsed.documentat}`
+      `[knowledge/chat] ${input.audience} ${Date.now() - t0}ms in=${message.usage.input_tokens} cached=${message.usage.cache_read_input_tokens ?? 0} out=${message.usage.output_tokens} documented=${parsed.documented} stop=${message.stop_reason}`
     );
-    return {
-      answerMd: parsed.raspuns_md,
-      answerHtml: renderMarkdown(parsed.raspuns_md, 'admin/README.md', input.audience === 'collaborator' ? '/colaborator/ghid' : '/admin/ghid'),
-      sources,
-      documented: parsed.documentat,
-      followUp: parsed.intrebare_pentru_raul,
-      logId: log?.id ?? null,
+    yield {
+      t: 'done',
+      result: {
+        answerMd: parsed.body,
+        answerHtml: renderMarkdown(parsed.body, 'admin/README.md', input.audience === 'collaborator' ? '/colaborator/ghid' : '/admin/ghid'),
+        sources,
+        documented: parsed.documented,
+        followUp: parsed.followUp,
+        logId: log?.id ?? null,
+      },
     };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
+    console.error('[knowledge/chat] failed:', message);
     await admin.from('knowledge_chat_log').insert({
       user_id: input.user.id,
       user_role: input.user.role,
@@ -179,6 +192,26 @@ export async function answerQuestion(input: {
       error: message.slice(0, 1000),
       model: CHAT_MODEL,
     });
-    throw err;
+    yield { t: 'error', message: 'Chatbotul nu a putut răspunde acum. Încearcă din nou sau raportează problema.' };
   }
+}
+
+/** Câte caractere din textul parțial pot fi arătate fără să scăpăm subsolul. */
+function safePrefixLength(partial: string): number {
+  const idx = partial.search(/\n\s*(-{3,}\s*\n\s*)?SURSE\s*:/i);
+  if (idx >= 0) return idx;
+  // Ținem în buffer ultimul rând neterminat dacă poate fi începutul subsolului.
+  const lastNl = partial.lastIndexOf('\n');
+  const tail = partial.slice(lastNl + 1);
+  if (tail.length > 0 && /^\s*(-{1,3}|S|SU|SUR|SURS|SURSE)\s*:?\s*$/i.test(tail)) return lastNl + 1;
+  return partial.length;
+}
+
+/** Varianta fără streaming (teste, scripturi): consumă fluxul și întoarce rezultatul. */
+export async function answerQuestion(input: Parameters<typeof streamAnswer>[0]): Promise<ChatResult> {
+  for await (const ev of streamAnswer(input)) {
+    if (ev.t === 'done') return ev.result;
+    if (ev.t === 'error') throw new Error(ev.message);
+  }
+  throw new Error('Fluxul s-a încheiat fără rezultat');
 }

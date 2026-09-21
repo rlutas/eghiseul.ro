@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { coreDocs, guideHref, renderDocsForPrompt, retrievedDocs } from '@/lib/knowledge/chat-context';
+import { coreDocs, guideHref, parseAnswerFooter, renderDocsForPrompt, retrievedDocs, visibleAnswerPrefix } from '@/lib/knowledge/chat-context';
 import { indexDoc } from '@/lib/knowledge/search';
 
 // Contextul chatbotului: nucleul mereu prezent, documentele relevante peste,
@@ -54,5 +54,33 @@ describe('renderDocsForPrompt / guideHref', () => {
   it('linkul spre ghid depinde de audiență', () => {
     expect(guideHref('admin/servicii', 'team')).toBe('/admin/ghid/admin/servicii/');
     expect(guideHref('admin/servicii/imobiliare-topograf', 'collaborator')).toBe('/colaborator/ghid/admin/servicii/imobiliare-topograf/');
+  });
+});
+
+describe('parseAnswerFooter', () => {
+  it('desparte răspunsul de subsol și citește sursele', () => {
+    const r = parseAnswerFooter('Apăsați **„Confirmă plata”**.\n\n---\nSURSE: admin/statusuri-comenzi, admin/plata-transfer-bancar.md\nDOCUMENTAT: da\n');
+    expect(r.body).toBe('Apăsați **„Confirmă plata”**.');
+    expect(r.sources).toEqual(['admin/statusuri-comenzi', 'admin/plata-transfer-bancar']);
+    expect(r.documented).toBe(true);
+    expect(r.followUp).toBeNull();
+  });
+  it('nedocumentat + ce lipsește', () => {
+    const r = parseAnswerFooter('Nu găsesc în ghid.\nSURSE: niciuna\nDOCUMENTAT: nu\nDE_DOCUMENTAT: cine depune cazierul auto');
+    expect(r.sources).toEqual([]);
+    expect(r.documented).toBe(false);
+    expect(r.followUp).toBe('cine depune cazierul auto');
+  });
+  it('fără subsol → tot textul e răspuns, documentat', () => {
+    expect(parseAnswerFooter('Doar text.')).toEqual({ body: 'Doar text.', sources: [], documented: true, followUp: null });
+  });
+});
+
+describe('visibleAnswerPrefix', () => {
+  it('ascunde subsolul pe măsură ce vine', () => {
+    expect(visibleAnswerPrefix('Răspuns.\n\nSURSE: admin/x')).toBe('Răspuns.');
+    expect(visibleAnswerPrefix('Răspuns.\n---\nSURSE:')).toBe('Răspuns.');
+    expect(visibleAnswerPrefix('Răspuns.\nSUR')).toBe('Răspuns.');
+    expect(visibleAnswerPrefix('Răspuns normal fără subsol')).toBe('Răspuns normal fără subsol');
   });
 });

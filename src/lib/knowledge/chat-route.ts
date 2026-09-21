@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { answerQuestion, isChatConfigured, type ChatTurn } from './chat';
+import { isChatConfigured, streamAnswer, type ChatTurn } from './chat';
 import type { ChatAudience } from './chat-context';
 import { asResponse, requireKnowledgeActor } from './request-auth';
 import { createReport, isReportKind } from './reports';
 
-/** Corpul comun al rutelor de chat (admin + colaborator). */
+/**
+ * Corpul comun al rutelor de chat (admin + colaborator). Răspunsul e un flux
+ * NDJSON (`application/x-ndjson`): un rând per eveniment —
+ * `{"t":"delta","text":"…"}` pe măsură ce vine textul, apoi
+ * `{"t":"done","result":{…}}` sau `{"t":"error","message":"…"}`.
+ */
 export async function handleChat(request: NextRequest, audience: ChatAudience): Promise<Response> {
   try {
     const actor = await requireKnowledgeActor(request, audience);
@@ -27,8 +32,24 @@ export async function handleChat(request: NextRequest, audience: ChatAudience): 
           )
           .slice(-6)
       : [];
-    const result = await answerQuestion({ question, audience, history, user: { id: actor.id, role: actor.role } });
-    return NextResponse.json({ success: true, data: result });
+    const encoder = new TextEncoder();
+    const events = streamAnswer({ question, audience, history, user: { id: actor.id, role: actor.role } });
+    const stream = new ReadableStream<Uint8Array>({
+      async pull(controller) {
+        const { value, done } = await events.next();
+        if (done) {
+          controller.close();
+          return;
+        }
+        controller.enqueue(encoder.encode(JSON.stringify(value) + '\n'));
+      },
+      async cancel() {
+        await events.return(undefined);
+      },
+    });
+    return new Response(stream, {
+      headers: { 'Content-Type': 'application/x-ndjson; charset=utf-8', 'Cache-Control': 'no-store', 'X-Accel-Buffering': 'no' },
+    });
   } catch (e) {
     const r = asResponse(e);
     if (r) return r;

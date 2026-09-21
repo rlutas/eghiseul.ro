@@ -1,15 +1,19 @@
 # Chatbotul din Ghid și raportarea problemelor
 
 Din 21.09.2026, în **Ghid & noutăți** (admin) și în meniul **Ghid** din
-portalul topografului există o casetă „Întreabă ghidul” și un buton
-„Raportează o problemă”. Aici e ce fac și cum le folosiți.
+portalul topografului există o singură casetă sus, „Caută în ghid sau
+întreabă”, și linkul „Raportează o problemă” sub ea. Aici e ce fac și cum le
+folosiți.
 
-## Întreabă ghidul
+## Caută sau întreabă
 
-Scrieți întrebarea ca la un coleg: „ce fac cu o comandă în Așteptare plată?”,
+Cât scrieți, sub casetă apar **paginile din ghid** care se potrivesc (click
+și ajungeți direct). Apăsați **Enter** sau „Întreabă” și întrebarea merge la
+chatbot. Scrieți-o ca la un coleg: „ce fac cu o comandă în Așteptare plată?”,
 „cât durează certificatul de naștere la București?”, „clientul are permis din
-străinătate, ce preț are cazierul auto?”. Răspunsul vine în câteva secunde,
-cu **link la pagina din ghid** de unde a luat informația.
+străinătate, ce preț are cazierul auto?”. Răspunsul **se scrie sub ochii
+voștri** (primul rând sub o secundă), iar la final apar sursele, ca butoane
+spre pagina din ghid.
 
 Reguli de știut:
 
@@ -19,6 +23,8 @@ Reguli de știut:
 - Când ceva **nu e documentat**, spune asta, iar întrebarea ajunge singură la
   Raul în lista de rapoarte. Așa aflăm ce lipsește din ghid.
 - Puteți continua conversația (răspunsurile țin cont de ultimele întrebări).
+- Răspunsurile sunt scurte intenționat (cel mult 6 rânduri): pentru detalii,
+  deschideți pagina sursă.
 - Topograful vede doar ghidurile lui (serviciile imobiliare, extrasul CF,
   identificarea), chatbotul lui răspunde doar din ele.
 - Verificați în pagina sursă înainte să spuneți clientului un preț sau un

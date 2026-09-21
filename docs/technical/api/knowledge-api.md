@@ -9,7 +9,8 @@ Răspuns standard `{ success, data?, error? }`.
 |---|---|---|---|
 | GET | `/api/admin/knowledge/search?q=&scope=team\|all` | admin | căutare full-text; implicit pe corpusul echipei (`admin/`, `changelog/`, `registru-central/`) |
 | GET | `/api/admin/knowledge/feed` | admin | livrările recente (badge în meniu) |
-| POST | `/api/admin/knowledge/chat` `{ question, history? }` | admin | chatbot peste corpusul echipei; 503 fără `ANTHROPIC_API_KEY` |
+| GET | `/api/collaborator/knowledge/search?q=` | colaborator | căutare doar în documentele marcate `<!-- audienta: colaborator -->` |
+| POST | `/api/admin/knowledge/chat` `{ question, history? }` | admin | chatbot peste corpusul echipei, răspuns **NDJSON în streaming** (`{"t":"delta","text"}`… apoi `{"t":"done","result"}` sau `{"t":"error","message"}`); 503 fără `ANTHROPIC_API_KEY` |
 | POST | `/api/collaborator/knowledge/chat` | colaborator | idem, doar peste documentele marcate `<!-- audienta: colaborator -->` |
 | POST | `/api/admin/knowledge/reports` `{ kind, message, context? }` | admin | raport (problemă / sugestie) |
 | POST | `/api/collaborator/knowledge/reports` | colaborator | idem |
@@ -18,9 +19,13 @@ Răspuns standard `{ success, data?, error? }`.
 
 ## Chat: cum se construiește răspunsul (`src/lib/knowledge/chat.ts`)
 
-- Model `claude-sonnet-5` (decizie Raul 21.09: Opus e prea scump pentru întrebări de procedură; testat: răspunsuri corecte, ~5–9 s), `messages.parse` cu `zodOutputFormat` (JSON garantat:
-  `raspuns_md`, `surse[]`, `documentat`, `intrebare_pentru_raul`), effort
-  `medium`, thinking adaptiv implicit, `max_tokens` 4000.
+- Model `claude-sonnet-5` (decizie Raul 21.09: Opus e prea scump pentru
+  întrebări de procedură), `client.messages.stream`, `thinking: disabled`,
+  `effort: low`, `max_tokens` 1500. Răspunsul e text + subsol fix
+  (`SURSE:`, `DOCUMENTAT:`, `DE_DOCUMENTAT:`) parsat de `parseAnswerFooter`;
+  subsolul nu ajunge la client. Măsurat: 2,9–6,8 s total, primul text < 1 s.
+  Latența e în generare (300–470 tokeni), nu în thinking (testat: dezactivat,
+  aceiași timpi fără streaming).
 - System prompt = reguli + **nucleul** (`CORE_DOCS` din `chat-context.ts`:
   catalog A→Z, statusuri, pagina comenzii; pentru colaborator fișele lui) cu
   `cache_control` de 1 oră.
