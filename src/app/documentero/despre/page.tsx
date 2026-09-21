@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { HeaderDocumentero } from '@/components/documentero/header';
-import { Card, Eyebrow, H2, PhotoSlot, Section } from '@/components/documentero/ui';
+import { Card, Eyebrow, H2, Section } from '@/components/documentero/ui';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { documenteroBreadcrumb, documenteroOrganizationNode, documenteroWebsiteNode } from '@/lib/seo/documentero-schema';
 import { ORGANIZATION, SOCIAL_PROOF } from '@/lib/seo/constants';
@@ -63,7 +63,23 @@ export default function DesprePage() {
             </div>
           </div>
           <div className="lg:col-span-6">
-            <PhotoSlot label="echipa eDigitalizare, la birou, Satu Mare" className="h-[320px] rounded-3xl sm:h-[460px]" />
+            {/* No team photo yet (Raul, 21.09): the real facts instead of a placeholder. */}
+            <Card className="flex flex-col gap-4 rounded-3xl p-7 sm:p-8">
+              <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-d-muted">Ce obținem</span>
+              <ul className="m-0 flex list-none flex-col gap-3 p-0 text-[16px]">
+                {[
+                  ['Duplicat certificat de naștere', '/certificat-de-nastere/'],
+                  ['Duplicat certificat de căsătorie, inclusiv cu mențiunea de divorț', '/certificat-de-casatorie/'],
+                  ['Certificat de celibat (adeverință privind statutul civil, Anexa 18)', '/certificat-de-celibat/'],
+                  ['Extras multilingv de naștere sau de căsătorie, pentru UE', '/extras-multilingv/'],
+                ].map(([t, h]) => (
+                  <li key={h} className="border-t border-d-line pt-3 first:border-t-0 first:pt-0">
+                    <Link href={h} className="font-semibold hover:text-d-acc">{t}</Link>
+                  </li>
+                ))}
+              </ul>
+              <span className="text-[14px] leading-[1.6] text-d-muted">Toate de la oficiile de stare civilă din România, prin avocat, cu împuternicire semnată pe telefon. Nu suntem instituție publică.</span>
+            </Card>
           </div>
         </Section>
 

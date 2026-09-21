@@ -37,7 +37,7 @@ const FAQ = [
   { q: 'Pot cere extrasul pentru copilul meu?', a: 'Da, ca părinte. Pentru un alt adult, doar el semnează împuternicirea.' },
   { q: 'Ce diferență e față de „certificatul cu traducere pe verso”?', a: 'Formularul UE e recunoscut prin regulament, în toate statele; traducerea pe verso e o practică mai veche, acceptată neuniform.' },
   { q: 'E același lucru cu „certificatul de naștere internațional”?', a: 'Așa îi spun mulți. Există și extrasul multilingv după Convenția CIEC nr. 16 (Viena, 1976), acceptat în statele semnatare, inclusiv în afara UE (de exemplu Elveția, Turcia, Moldova). Pentru UE se folosește formularul din Regulamentul 2016/1191. Îți spunem care e potrivit pentru țara ta.' },
-  { q: 'Trebuie să merg la notar pentru împuternicire?', a: `Nu. Împuternicirea avocațială se semnează electronic în formular și e recunoscută de starea civilă în temeiul ${LEGAL_BASIS.short}.` },
+  { q: 'Trebuie să merg la notar pentru împuternicire?', a: `Nu. Împuternicirea avocațială se semnează electronic în formular și e recunoscută de starea civilă în temeiul ${LEGAL_BASIS.shortGen}.` },
 ];
 
 export default async function ExtrasMultilingvPage() {

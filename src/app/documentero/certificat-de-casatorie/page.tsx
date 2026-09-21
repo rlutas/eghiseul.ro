@@ -49,7 +49,7 @@ const FAQ = [
   { q: 'Ce se întâmplă cu certificatul vechi, dacă îl găsesc?', a: 'La eliberarea duplicatului, cel vechi își pierde valabilitatea. Dacă îl mai ai, se predă primăriei; dacă apare mai târziu, nu îl mai folosești.' },
   { q: 'Cât costă la primărie?', a: 'Nimic sau o taxă locală mică. La noi plătești avocatul, dosarul, urmărirea și livrarea, nu documentul.' },
   { q: 'Pot comanda și certificatul de naștere în aceeași comandă?', a: 'Sunt două acte, două cereri, deci două comenzi. Le poți face una după alta, cu aceleași date; a doua durează un minut.' },
-  { q: 'Trebuie să merg la notar pentru împuternicire?', a: `Nu. Împuternicirea avocațială se semnează electronic în formular și e recunoscută de starea civilă în temeiul ${LEGAL_BASIS.short}.` },
+  { q: 'Trebuie să merg la notar pentru împuternicire?', a: `Nu. Împuternicirea avocațială se semnează electronic în formular și e recunoscută de starea civilă în temeiul ${LEGAL_BASIS.shortGen}.` },
 ];
 
 export default async function CasatoriePage() {

@@ -41,7 +41,7 @@ const SITUATIONS: Array<[string, string, string?]> = [
 const WHO_CAN_ASK = [
   ['Titularul', 'Tu, pentru propriul certificat, cu actul de identitate valabil. De la 14 ani ai buletin și poți semna singur, cu un părinte alături.'],
   ['Părintele sau tutorele', 'Pentru copilul minor. Depune cu actul lui de identitate; nu e nevoie de acordul celuilalt părinte.'],
-  ['Avocatul cu împuternicire', `În temeiul ${LEGAL_BASIS.short}. Împuternicirea avocațială se semnează electronic, fără notar. Așa lucrăm noi.`],
+  ['Avocatul cu împuternicire', `În temeiul ${LEGAL_BASIS.shortGen}. Împuternicirea avocațială se semnează electronic, fără notar. Așa lucrăm noi.`],
   ['O persoană cu procură notarială', 'Merge și așa, dar procura se face la notar sau la consulat, costă și durează. Împuternicirea avocațială o înlocuiește.'],
 ] as const;
 
@@ -54,7 +54,7 @@ const MISMATCH = [
 
 const FAQ = [
   { q: 'Cât durează să obțin duplicatul certificatului de naștere?', a: `Termenul legal este de cel mult 30 de zile de la depunere. La comenzile noastre din vara lui 2026, jumătate au ajuns la client în cel mult ${PROCESSING_STATS.byService['certificat-nastere'].medianDays} zile de la plată, cu tot cu curier. Actele vechi, nescanate, ajung aproape de termenul maxim, fiindcă primăria de origine le caută în registrul de hârtie.` },
-  { q: 'Trebuie să merg la notar pentru împuternicire?', a: `Nu. Împuternicirea avocațială se semnează electronic în formular și este recunoscută de oficiile de stare civilă în temeiul ${LEGAL_BASIS.short}.` },
+  { q: 'Trebuie să merg la notar pentru împuternicire?', a: `Nu. Împuternicirea avocațială se semnează electronic în formular și este recunoscută de oficiile de stare civilă în temeiul ${LEGAL_BASIS.shortGen}.` },
   { q: 'Cine poate cere duplicatul certificatului de naștere?', a: 'Titularul, părintele pentru copilul minor, o persoană cu procură notarială sau un avocat cu împuternicire avocațială. Pentru un alt adult (soț, frate, prieten) nu poți cere tu, chiar dacă plătești tu comanda: el semnează împuternicirea, de pe telefonul lui.' },
   { q: 'Trebuie să știu exact primăria unde am fost înregistrat?', a: 'Ajută, dar nu e obligatoriu. Din 2023 cererea se depune la orice primărie și e trimisă electronic la cea care păstrează actul. Scrii localitatea nașterii și ne ocupăm noi.' },
   { q: 'Cât costă duplicatul la primărie?', a: 'Nimic sau o taxă locală de câțiva lei, stabilită de consiliul local. La noi plătești avocatul, împuternicirea, depunerea, urmărirea dosarului și livrarea, nu documentul.' },

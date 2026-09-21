@@ -25,10 +25,10 @@ export interface DocumenteroNavItem {
 
 /**
  * While false: every documentero page is `noindex`, the sitemap is empty.
- * Flip to true only when the placeholders are gone (team photo, order count)
- * and the launch checklist in docs/documentero/lansare.md is done.
+ * Flipped to true on 21.09.2026 (launch checklist in docs/documentero/lansare.md
+ * done; team photo replaced by a facts card until a real one exists).
  */
-export const DOCUMENTERO_INDEXABLE = false;
+export const DOCUMENTERO_INDEXABLE = true;
 
 /**
  * All five services, as listed in the "Servicii" mega menu (header, desktop

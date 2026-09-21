@@ -49,7 +49,10 @@ export const LAWYER = {
  */
 export const LEGAL_BASIS = {
   short: 'Legea 119/1996, Legea 51/1995 și H.G. 255/2024',
+  /** Genitive, for "în temeiul …". */
+  shortGen: 'Legii 119/1996, Legii 51/1995 și H.G. 255/2024',
   long: 'Legea 119/1996 privind actele de stare civilă (art. 10), Legea 51/1995 privind profesia de avocat și Normele metodologice aprobate prin H.G. 255/2024',
+  longGen: 'Legii 119/1996 privind actele de stare civilă (art. 10), al Legii 51/1995 privind profesia de avocat și al Normelor metodologice aprobate prin H.G. 255/2024',
 } as const;
 
 /**

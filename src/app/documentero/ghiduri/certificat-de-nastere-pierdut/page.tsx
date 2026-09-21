@@ -104,7 +104,7 @@ export default async function GhidPierdutPage() {
             <P>Contează totuși unde e actul. Dacă e deja scanat în sistem, duplicatul iese repede. Dacă e într-un registru de hârtie din 1958, la o primărie de comună, cineva trebuie să-l caute și să-l scaneze întâi. De aici vine toată diferența de termen de mai jos.</P>
 
             <H id="s3">Cine poate cere</H>
-            <P>Titularul, cu actul de identitate valabil. Părintele sau tutorele, pentru copilul minor. Un avocat cu împuternicire avocațială, în temeiul {LEGAL_BASIS.long}. Sau orice persoană cu procură notarială specială. Un soț, un frate sau un prieten nu pot cere „așa”, fără împuternicire, chiar dacă au certificatul vechi în mână.</P>
+            <P>Titularul, cu actul de identitate valabil. Părintele sau tutorele, pentru copilul minor. Un avocat cu împuternicire avocațială, în temeiul {LEGAL_BASIS.longGen}. Sau orice persoană cu procură notarială specială. Un soț, un frate sau un prieten nu pot cere „așa”, fără împuternicire, chiar dacă au certificatul vechi în mână.</P>
             <P>Pentru un părinte decedat, când ai nevoie de dovada nașterii lui la succesiune, nu se cere duplicat, ci un extras pentru uz oficial, pe care notarul îl solicită de regulă direct. Dacă ești în cazul ăsta, <A href="/contact/">scrie-ne</A> și îți spunem ce document e potrivit.</P>
 
             <H id="s4">Actele necesare</H>
