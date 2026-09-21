@@ -673,10 +673,14 @@ Ce rămâne de decis, ca business:
    de 40% la cazier) — și **0 din 126 de comenzi imobiliare plătite au bifat-o**.
    De stabilit dacă ținem grila lor sau punem una vandabilă.
 2. **Trei servicii sub prețul lor**: certificat urbanism informare (780 vs
-   943,80), identificare imobil și identificare imobile după proprietar (198 vs
-   302,50) — sunt servicii vechi, rămase pe grila proprie.
+   943,80) rămâne; identificare imobil și identificare imobile după proprietar
+   ✅ **298 lei din 21.09.2026** (migrările 182/183), cu certificatul OCPI
+   2.7.8/2.7.6 inclus când imobilul nu apare în e-Terra.
 3. **Identificare imobil promite 3 zile**, ei promit 10. De confirmat că îl
    susținem, mai ales cât timp e-Terra e oprit.
+   Update 21.09.2026: 2–4 zile când imobilul e în e-Terra; când nu e, termenul
+   se mută automat cu +10 zile lucrătoare (certificatul OCPI). Flux, ghid și
+   status nou: `admin/identificare-imobil-nereusita.md`.
 
 Vezi și [[collaborator-topograf-system]].
 

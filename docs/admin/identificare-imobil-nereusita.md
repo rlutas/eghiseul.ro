@@ -6,7 +6,7 @@ A→Z, pașii din portal, ce vede clientul, ce spuneți la telefon):
 
 Procedura de echipă din 21.09.2026, cu butoanele din platformă. Se aplică la
 „Identificare Imobil după Adresă” (**298 lei** din 21.09) și „Identificare
-Imobile după Proprietar” (198 lei, de decis).
+Imobile după Proprietar” (**298 lei**, la fel).
 
 ## Pe scurt
 

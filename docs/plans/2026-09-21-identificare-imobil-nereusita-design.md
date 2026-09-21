@@ -133,4 +133,4 @@ la instituție”. Prețul: e un status nou, deci trece prin TOATE listele albe
   lucrătoare + email `identification-pending-ocpi` + istoric), butonul în
   portal, textul clientului, preț 298 pe `identificare-imobil` (DB + pagină +
   FAQ), `ancpi_cost_ron` 125 pe identificarea după proprietar (2.7.6).
-- **Rămâne deschis:** prețul identificării după proprietar (198 → 298?).
+- **Închis:** identificarea după proprietar tot 298 lei (migrarea 183, 21.09).

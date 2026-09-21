@@ -50,6 +50,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Contul clientului (ce vede clientul, cupon de bun-venit, ce se leagă automat cu comanda):** [`admin/contul-clientului.md`](admin/contul-clientului.md)
 - **Plăți & facturare:** [`technical/specs/stripe-oblio-payment-invoicing.md`](technical/specs/stripe-oblio-payment-invoicing.md)
 - **Anulare în 30 min (refund 70% + factura de 30%):** [`admin/anulare-refund-70.md`](admin/anulare-refund-70.md) — procedura echipei: „Procesează refund" (Stripe + storno + factura taxei de anulare), „Am refundat manual", „Reconciliază", ce vede contabilul în Decontări
+- **Identificare imobil (după adresă / după proprietar), inclusiv „nu l-am găsit” → certificat OCPI 2.7.8:** [`admin/identificare-imobil-nereusita.md`](admin/identificare-imobil-nereusita.md) — procedura echipei + PDF pentru topograf și suport [`admin/identificare-imobil-ghid.pdf`](admin/identificare-imobil-ghid.pdf); design: [`plans/2026-09-21-identificare-imobil-nereusita-design.md`](plans/2026-09-21-identificare-imobil-nereusita-design.md)
 - **Plată prin transfer bancar (IBAN):** [`admin/plata-transfer-bancar.md`](admin/plata-transfer-bancar.md) — procedura echipei: tab „Așteptare plată", confirmarea încasării din extras, legătura cu decontările
 - **Meta Conversions API (tracking server-side):** [`technical/specs/meta-capi-tracking.md`](technical/specs/meta-capi-tracking.md)
 - **Webhook Resend (bounce → banner admin + alertă):** [`technical/specs/resend-bounce-webhook.md`](technical/specs/resend-bounce-webhook.md)

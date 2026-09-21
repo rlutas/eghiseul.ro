@@ -40,4 +40,4 @@ clientul, ce spuneți la telefon).
 - Teste: `orders-filter`, `orders-tabs`, `identification-pending-ocpi` (email),
   plus cele existente care cer text de client pentru orice status nou. 2010 verzi.
 - Nu s-a făcut: cererea 2.7.8 generată din platformă (nu avem formularul ca
-  bază), prețul pe identificarea după proprietar (rămâne 198).
+  bază). Identificarea după proprietar: 298 din 21.09 (migrarea 183).

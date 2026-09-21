@@ -41,7 +41,7 @@ const SCHEMA_SLUG = 'identificare-imobile-proprietar';
 const TITLE = 'Identificare Imobile după Proprietar — Lista Bunurilor';
 const DESCRIPTION =
   'Identificăm imobilele înscrise pe numele unei persoane (fizice sau juridice) în evidențele de ' +
-  'cadastru și carte funciară, după nume și localitate. 198 RON, taxe OCPI incluse, livrare pe email.';
+  'cadastru și carte funciară, după nume și localitate. 298 RON, taxe OCPI incluse, livrare pe email.';
 const DATE_PUBLISHED = '2026-06-25';
 const DATE_MODIFIED = '2026-06-25';
 
@@ -86,7 +86,7 @@ const jsonLdGraph = buildServicePageGraph({
     { name: 'Identificare Imobile după Proprietar', url: `${BASE_URL}${PAGE_PATH}` },
   ],
   offers: [
-    { name: 'Identificare Imobile după Proprietar', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
+    { name: 'Identificare Imobile după Proprietar', price: 298, url: `${BASE_URL}${PAGE_PATH}` },
   ],
 });
 
