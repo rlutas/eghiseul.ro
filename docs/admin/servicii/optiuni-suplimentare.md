@@ -69,5 +69,5 @@ apostilă se aleg în dialog; termenul se recalculează. Procedura:
 | Limba nu e în listă | 20 de limbi active; alta se adaugă din Setări → Furnizori după confirmarea traducătoarei. |
 | A bifat urgență la cazier auto cu permis străin | urgența dispare singură la permis străin; la comenzile vechi termenul îl bate oricum 7-10 zile. |
 | Vrea copii suplimentare după plată | „Modifică” + link de plată extra. |
-| Vede „Verificare de expert” (49 lei) pe o comandă | serviciul **nu mai există** (confirmat de Raul, 21.09); nu se prestează nimic în plus. Opțiunea încă apare în formular pe caziere și integritate până e dezactivată din Setări → Servicii → opțiuni; dacă un client a plătit-o, rambursați-o prin „Modifică”. |
+| Vede „Verificare de expert” (49 lei) pe o comandă veche | serviciul **nu mai există** (dezactivat 21.09.2026 la decizia lui Raul); nu se prestează nimic în plus. Nu mai poate fi bifat; pe o comandă veche care o are, rambursați-o prin „Modifică”. |
 | Traducerea a ieșit în pierdere | prețul e pe limbă tocmai ca să nu; dacă vedeți 178,50 pe daneză, e o comandă veche. |

@@ -43,7 +43,7 @@ identitate se cere oricum la comandă (nu se ține în cont fără comandă).
 
 - **La plată, automat**: factura, contractul de prestări, **contractul de asistență juridică** și **împuternicirea avocațială** (fiecare cu număr din registrul Baroului Satu Mare, alocat abia după plată), emailul de confirmare cu linkul de status.
 - **Din admin, la nevoie**: **cererea de eliberare** (doar cazier judiciar și cazier fiscal; se apasă „Generează” în „Procesare comandă”; se descarcă PDF sau Word ca s-o corectați înainte de depunere).
-- **Cabinetul avocatei** (Tarța Ana-Gabriela) semnează împuternicirea și contractul de asistență și **depune fizic** cazierul fiscal, cazierul judiciar (PF și PJ) și certificatul de integritate (confirmat de Raul, 21.09). Cazierul auto: de confirmat cine îl depune. Rolul „avocat” din admin vede doar comenzile cu avocat. Decontul e lunar, pe ambele site-uri, din tabul de decont.
+- **Cabinetul avocatei** (Tarța Ana-Gabriela) semnează împuternicirea și contractul de asistență și **depune fizic** toate cele patru acte: cazierul fiscal, cazierul judiciar (PF și PJ), cazierul auto și certificatul de integritate (confirmat de Raul, 21.09). Rolul „avocat” din admin vede doar comenzile cu avocat. Decontul e lunar, pe ambele site-uri, din tabul de decont.
 - **Echipa** verifică actele, apasă statusurile, trimite scanul clientului, expediază originalul dacă a ales curier, ține legătura cu clientul.
 
 ## Statusurile, în ordinea în care le apăsați

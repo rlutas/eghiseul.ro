@@ -509,8 +509,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                   Servicii adiționale disponibile
                 </h2>
                 <p className="text-neutral-600 max-w-xl mx-auto">
-                  Adaugă opțional la comandă traducere, apostilă, legalizare sau
-                  verificare de expert.
+                  Adaugă opțional la comandă traducere, apostilă sau legalizare.
                 </p>
               </div>
 
