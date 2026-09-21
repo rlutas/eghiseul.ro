@@ -12,7 +12,7 @@ Site-ul e live cu **trei** fotografii generate, refolosite în 27 de locuri
 |---|---|---|---|
 | 1 | ~~Hero acasă fără marcă de curier~~ FĂCUT 21.09 (`clienta-usa-certificat.webp`) | acasă hero + naștere hero + OG + ghid procură | §1 |
 | 2 | ~~Semnătura pe telefon~~ FĂCUT 21.09 (`semnatura-pe-telefon.webp`) | acasă „Pasul 1” | §2 |
-| 3 | Certificatul pe masă | naștere „situații” (acum `CertificateMock` desenat) + ghidul „acte necesare” | §3 |
+| 3 | ~~Certificatul pe masă~~ FĂCUT 21.09 (`certificat-pe-masa.webp`) | naștere „situații” + ghidul „acte necesare” | §3 |
 | 4 | Cuplul cu certificatul | căsătorie hero (acum poza cu curierul) | §4 |
 | 5 | Diaspora la ghișeul european | extras multilingv hero (acum n-are poză) | §5 |
 | 6 | Bărbat pe balcon, video-call | celibat hero (acum avocata la ghișeu, refolosită de 10 ori) + ghidul „procură din străinătate” | §6 |

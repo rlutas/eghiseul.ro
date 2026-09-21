@@ -24,7 +24,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PATH,
-  ogImage: '/images/documentero/avocat-ghiseu-stare-civila.webp',
+  ogImage: '/images/documentero/certificat-pe-masa.webp',
   noindex: !DOCUMENTERO_INDEXABLE,
 });
 
@@ -64,7 +64,7 @@ export default async function GhidActeNecesarePage() {
     description: DESCRIPTION,
     datePublished: DATE_PUBLISHED,
     dateModified: DATE_MODIFIED,
-    image: '/images/documentero/avocat-ghiseu-stare-civila.webp',
+    image: '/images/documentero/certificat-pe-masa.webp',
     breadcrumb: [{ name: 'Acasă', path: '/' }, { name: 'Ghiduri', path: '/ghiduri/' }, { name: 'Acte necesare pentru duplicat', path: PATH }],
   });
   const related = GUIDES.filter((g) => g.published && g.slug !== SLUG).slice(0, 3);
@@ -94,7 +94,7 @@ export default async function GhidActeNecesarePage() {
               </div>
             </div>
             <div className="h-[240px] overflow-hidden rounded-[20px] sm:h-[380px]">
-              <Image src="/images/documentero/avocat-ghiseu-stare-civila.webp" alt="Dosarul cu actele, la ghișeul de stare civilă" width={1264} height={848} className="h-full w-full object-cover" sizes="(min-width: 1024px) 860px, 100vw" priority />
+              <Image src="/images/documentero/certificat-pe-masa.webp" alt="Certificat de naștere pe masă, cu plicul, ochelarii și pixul" width={1370} height={1148} className="h-full w-full object-cover" sizes="(min-width: 1024px) 860px, 100vw" priority />
             </div>
 
             <Card className="flex flex-col gap-2 border-l-4 border-l-d-acc p-5">

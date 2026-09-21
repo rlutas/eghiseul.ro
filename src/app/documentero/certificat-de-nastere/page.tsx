@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { HeaderDocumentero } from '@/components/documentero/header';
 import { ServiceHero } from '@/components/documentero/service-hero';
 import { ReviewsDocumentero } from '@/components/documentero/reviews';
-import { Card, CertificateMock, Check, Eyebrow, FaqList, H2, InfoTable, Prose, QuickAnswer, RelatedServices, Section, SeoBlock } from '@/components/documentero/ui';
+import { Card, Check, Eyebrow, FaqList, H2, InfoTable, Prose, QuickAnswer, RelatedServices, Section, SeoBlock } from '@/components/documentero/ui';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { documenteroServiceGraph } from '@/lib/seo/documentero-schema';
 import { getServicePricing, lei, optionPrice } from '@/lib/documentero/services';
@@ -123,7 +123,9 @@ export default async function NasterePage() {
             <Eyebrow>Situații frecvente</Eyebrow>
             <H2>Oricare ar fi motivul, procedura e aceeași: un duplicat nou.</H2>
             <p className="m-0 text-[16px] leading-[1.55] text-d-muted">Din 2023, duplicatul se poate cere de la orice primărie. Noi mergem oricum acolo unde e actul.</p>
-            <CertificateMock />
+            <div className="h-[240px] overflow-hidden rounded-[20px]">
+              <Image src="/images/documentero/certificat-pe-masa.webp" alt="Certificat de naștere pe masă, lângă plicul în care a venit" width={1370} height={1148} className="h-full w-full object-cover" sizes="(min-width: 1024px) 520px, 100vw" />
+            </div>
           </div>
           <div className="grid content-start gap-4 sm:grid-cols-2 lg:col-span-7">
             {SITUATIONS.map(([t, d, h]) =>
