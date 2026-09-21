@@ -24,9 +24,11 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   Variabila `NEXT_PUBLIC_GA_MEASUREMENT_ID_DOCUMENTERO` pusă în Vercel
   (Production); `CookieConsent` o încarcă pe host-ul documentero după
   consimțământ. Contul sishuletz vede doar proprietatea demo; pentru
-  rapoarte intri pe eghiseul@gmail.com. Rămâne: legarea GSC ↔ GA4 (conturi
-  diferite: GSC pe sishuletz, GA pe eghiseul@gmail.com) și conversia
-  `purchase` de verificat pe prima comandă reală.
+  rapoarte intri pe eghiseul@gmail.com. Verificat pe prod (21.09): hit-uri pe `G-ND6HB81QXF`. Eticheta Ads
+  `AW-11464910041` trimite un hit și în eghiseul (`G-8LFRWD479Z`, destinație a
+  etichetei): în rapoartele eghiseul exclude hostname `documentero.ro`.
+  Rămâne: legarea GSC ↔ GA4 (conturi diferite) și conversia `purchase` pe
+  prima comandă reală.
 - [x] Registrul central: `003_platform_documentero.sql` aplicat pe
   `registru-barou-central` (19.09, 13:40).
 - [x] Oblio: aceeași serie, facturile rămân cum sunt (Raul, 20.09).

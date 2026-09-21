@@ -105,6 +105,12 @@ Planul complet și starea lui: [analiza competitorilor SEO](../documentero/anali
   Production); deploy-ul următor o ia.
 - Cod: `cookie-consent.tsx` alege ID-ul după `useBrand().id`; gol → cade pe
   ID-ul eghiseul (comportamentul de până acum).
+- Verificat pe producție (Playwright, după „Accept”): `gtag config
+  G-ND6HB81QXF` + `collect?tid=G-ND6HB81QXF`. Atenție: eticheta Google Ads
+  `AW-11464910041` (marketing) are ca destinație și `G-8LFRWD479Z`, deci un
+  hit ajunge și în proprietatea eghiseul. În rapoartele eghiseul, exclude
+  hostname `documentero.ro` (comparație/segment); nu scoatem destinația, ar
+  strica eghiseul.
 
 ### Verificat
 
