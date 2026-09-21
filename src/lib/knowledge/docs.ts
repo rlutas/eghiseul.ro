@@ -126,6 +126,13 @@ export interface GuideLink {
  */
 export const CURATED_GUIDES: GuideLink[] = [
   {
+    title: 'documentero.ro: al doilea site, doar acte de stare civilă',
+    slug: 'admin/documentero',
+    category: 'comenzi',
+    description:
+      'Ce vindem acolo, cum recunoașteți comenzile în admin (badge „documentero”), ce pleacă automat pe brand, cum răspundeți clientului, mesajul pentru WhatsApp.',
+  },
+  {
     title: 'Contul clientului: ce vede clientul, ce se leagă automat',
     slug: 'admin/contul-clientului',
     category: 'clienti',
