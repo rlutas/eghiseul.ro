@@ -15,15 +15,16 @@ import {
 /**
  * Chatbotul din Ghid: răspunde DOAR din documentația echipei, cu surse.
  *
- * Model: Claude Opus 5, thinking adaptiv (implicit), effort „medium” — e o
- * întrebare de procedură, nu un raționament lung. Nucleul (catalog A→Z,
+ * Model: Claude Sonnet 5 (Raul, 21.09: Opus e prea scump pentru întrebări de
+ * procedură; testat, răspunde corect), thinking adaptiv (implicit), effort
+ * „medium”. Nucleul (catalog A→Z,
  * statusuri, pagina comenzii) stă în system prompt cu cache de o oră;
  * documentele găsite pentru întrebare vin în mesajul utilizatorului.
  *
  * Fără `ANTHROPIC_API_KEY` chatbotul nu pornește; UI-ul arată mesajul de
  * configurare, iar raportarea de probleme merge oricum.
  */
-export const CHAT_MODEL = 'claude-opus-5';
+export const CHAT_MODEL = 'claude-sonnet-5';
 
 const AnswerSchema = z.object({
   raspuns_md: z

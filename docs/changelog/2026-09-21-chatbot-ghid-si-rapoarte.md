@@ -31,7 +31,7 @@ problema|sugestie|intrebare-fara-raspuns, `status` nou|in_lucru|rezolvat,
 `context` {page, question, answer, orderNumber}, rezolvare). RLS activ,
 fără politici → doar service role.
 
-**Chat (`src/lib/knowledge/chat.ts` + `chat-context.ts`):** Claude Opus 5 prin
+**Chat (`src/lib/knowledge/chat.ts` + `chat-context.ts`):** Claude Sonnet 5 (Raul: Opus prea scump) prin
 `@anthropic-ai/sdk` 0.127 (`messages.parse` + `zodOutputFormat`, effort
 `medium`, `max_tokens` 4000). Nucleu cached 1h (`CORE_DOCS`: catalog A→Z,
 statusuri, pagina comenzii; la colaborator fișele lui) + până la 6 documente
@@ -57,5 +57,7 @@ certificatele de stare civilă; „Verificare de expert” nu mai există ca
 serviciu, dar e încă opțiune activă în DB pe 6 servicii: de dezactivat).
 
 **Teste:** `chat-context.test.ts` (8); suita completă verde; `tsc` + `eslint`
-curate. **Neverificat live:** apelul către Claude (fără cheie în mediu);
-primul test real după ce cheia intră în Vercel.
+curate. **Verificat live (21.09, cheie locală):** 3 întrebări (așteptare plată,
+cazier auto cu permis străin, „nu găsesc imobilul” ca topograf) → răspunsuri
+corecte cu sursa potrivită, 5–9 s, ~3k tokeni de intrare + nucleul din cache
+(11k tokeni citiți din cache la a doua întrebare).

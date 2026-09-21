@@ -18,7 +18,7 @@ Răspuns standard `{ success, data?, error? }`.
 
 ## Chat: cum se construiește răspunsul (`src/lib/knowledge/chat.ts`)
 
-- Model `claude-opus-5`, `messages.parse` cu `zodOutputFormat` (JSON garantat:
+- Model `claude-sonnet-5` (decizie Raul 21.09: Opus e prea scump pentru întrebări de procedură; testat: răspunsuri corecte, ~5–9 s), `messages.parse` cu `zodOutputFormat` (JSON garantat:
   `raspuns_md`, `surse[]`, `documentat`, `intrebare_pentru_raul`), effort
   `medium`, thinking adaptiv implicit, `max_tokens` 4000.
 - System prompt = reguli + **nucleul** (`CORE_DOCS` din `chat-context.ts`:
