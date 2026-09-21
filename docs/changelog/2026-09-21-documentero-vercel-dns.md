@@ -7,12 +7,12 @@ Site-ul documentero.ro e în regulă tehnic (domeniu, redirecturi, deploy,
 cron-uri, emailurile pleacă de pe `contact@documentero.ro` și ajung în Inbox,
 nu în Spam).
 
-**Un lucru NU merge încă**: adresa `contact@documentero.ro` nu poate PRIMI
-email. Dacă un client dă „Reply” la un email de la documentero sau scrie la
-adresa de pe site, mesajul lui se pierde. Până se rezolvă (Raul, în Zoho),
-clienții documentero sunt de urmărit pe WhatsApp și prin formularul de contact
-de pe site (acela merge, ajunge în căsuța eghiseul cu „[documentero]” în
-subiect).
+**Adresa de contact a documentero este `contact@eghiseul.ro`** (decizie
+Raul, 21.09: nu facem cutie separată până nu crește platforma). Emailurile
+pleacă de pe `contact@documentero.ro`, dar când clientul dă „Reply” sau scrie
+la adresa de pe site, mesajul vine în căsuța eghiseul, ca până acum. Răspundeți
+cu numele documentero.ro dacă subiectul sau comanda (cod `E-…`, platformă
+documentero) arată că omul a venit de acolo.
 
 ---
 
@@ -29,12 +29,13 @@ subiect).
 - DNS (Vercel): `resend._domainkey` TXT (DKIM), `send` TXT (SPF) + MX
   (Resend), CAA ×3, ALIAS-urile Vercel. Adăugat 21.09: `_dmarc` TXT
   `v=DMARC1; p=none; rua=mailto:contact@eghiseul.ro`.
-- Lipsă: MX pe apex și TXT de verificare Zoho → `contact@documentero.ro` nu
-  primește. Pași: Zoho Mail → Domains → add `documentero.ro` ca alias de
-  domeniu (org eDigitalizare), copiază TXT-ul de verificare; Vercel DNS →
-  TXT-ul Zoho + MX `mx.zoho.eu` 10 / `mx2.zoho.eu` 20 / `mx3.zoho.eu` 50; în
-  Zoho, alias `contact@documentero.ro` pe cutia care primește deja
-  contact@eghiseul.ro.
+- Fără MX pe apex, intenționat: `BRANDS.documentero.contactEmail =
+  'contact@eghiseul.ro'` (site, emailuri, schema) și `defaultReplyToFor`
+  alege `contactEmail` al brandului după domeniul din `from` → Reply-To
+  `contact@eghiseul.ro`. Dacă vreodată se face cutia documentero: alias de
+  domeniu în Zoho + TXT + MX `mx.zoho.eu` 10 / `mx2.zoho.eu` 20 /
+  `mx3.zoho.eu` 50 în Vercel DNS, apoi `contactEmail` înapoi pe
+  `contact@documentero.ro`.
 - Emailuri: 6 teste (confirmare, transfer bancar, coș abandonat ×2, completare
   acte, act gata) primite în INBOX pe serviciiseonethut@gmail.com, sender
   `contact@documentero.ro`, Reply-To `contact@documentero.ro`

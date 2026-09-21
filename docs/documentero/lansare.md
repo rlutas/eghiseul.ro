@@ -13,15 +13,11 @@ e la „După lansare”.
   apex cu 308 (Raul, 20.09, verificat cu `curl`). Fără `www` pe webhookuri.
 - [x] Resend: domeniul `documentero.ro` verificat (Raul, 20.09; DKIM pe
   `resend._domainkey`, SPF + MX pe `send.documentero.ro`); `resolveFrom`
-  acceptă implicit `eghiseul.ro,documentero.ro`. **Rămâne (21.09, singurul
-  blocaj real): Zoho — alias de domeniu sau cutie pentru PRIMIRE pe
-  `contact@documentero.ro`.** Domeniul n-are MX pe apex, deci orice răspuns al
-  clientului la emailurile noastre (Reply-To `contact@documentero.ro`) și orice
-  email la adresa de pe site SAR ÎN GOL. Pașii: Raul adaugă `documentero.ro` în
-  Zoho Mail (alias de domeniu al organizației), Zoho dă un TXT de verificare;
-  apoi în Vercel DNS: TXT-ul Zoho + MX `mx.zoho.eu` 10, `mx2.zoho.eu` 20,
-  `mx3.zoho.eu` 50 (ca la eghiseul.ro). DMARC `p=none` cu raport la
-  contact@eghiseul.ro adăugat 21.09.
+  acceptă implicit `eghiseul.ro,documentero.ro`. **Decizie Raul, 21.09: NU se face cutie/alias Zoho pentru documentero
+  până nu crește platforma.** Trimiterea rămâne de pe `contact@documentero.ro`
+  (Resend), dar adresa la care scrie omul (site, emailuri, schema, Reply-To)
+  e `contact@eghiseul.ro` (`BRANDS.documentero.contactEmail`). Nimic nu sare în
+  gol. DMARC `p=none` cu raport la contact@eghiseul.ro adăugat 21.09.
 - [x] Search Console (21.09): proprietatea URL-prefix `https://documentero.ro/`
   VERIFICATĂ pe sishuletz@gmail.com (al doilea token în
   `src/app/documentero/layout.tsx`, `verification.google` e listă). Tokenul
@@ -142,7 +138,8 @@ e la „După lansare”.
   spre apex, HTTP→HTTPS 308, HSTS 2 ani, toate deploy-urile Ready (ultimul
   `fa7ea5d6`), 10 cron-uri din `vercel.json` active pe proiect, wizardul și
   statusul răspund 200 pe host. DNS: DKIM + SPF + MX Resend pe
-  `send.documentero.ro`, DMARC adăugat; MX pe apex LIPSEȘTE (vezi mai sus).
+  `send.documentero.ro`, DMARC adăugat; fără MX pe apex, intenționat (vezi
+  decizia de mai sus).
   Emailuri: 6 teste primite în INBOX pe serviciiseonethut@gmail.com (nu spam),
   expeditor `contact@documentero.ro`.
 

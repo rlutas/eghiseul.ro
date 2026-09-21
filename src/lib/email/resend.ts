@@ -6,6 +6,7 @@
  *
  * Resend docs: https://resend.com/docs/api-reference/emails/send-email
  */
+import { BRANDS } from '@/lib/brand/brands';
 
 const FROM_DEFAULT = process.env.RESEND_FROM ?? 'eGhișeul.ro <contact@eghiseul.ro>';
 const REPLY_TO_DEFAULT = process.env.RESEND_REPLY_TO ?? 'contact@eghiseul.ro';
@@ -40,6 +41,12 @@ function domainOf(from: string): string {
  */
 export function defaultReplyToFor(resolvedFrom: string): string {
   if (resolvedFrom === FROM_DEFAULT) return REPLY_TO_DEFAULT;
+  // The brand that sends from this domain decides where replies go: its
+  // `contactEmail` is the inbox someone actually reads (for documentero that
+  // is the eghiseul inbox — decision 21.09.2026, no separate mailbox yet).
+  const domain = domainOf(resolvedFrom);
+  const brand = Object.values(BRANDS).find((b) => b.domain === domain);
+  if (brand?.contactEmail) return brand.contactEmail;
   const m = resolvedFrom.match(/<([^>]+)>/);
   return (m ? m[1] : resolvedFrom).trim() || REPLY_TO_DEFAULT;
 }

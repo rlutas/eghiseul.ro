@@ -103,7 +103,11 @@ export const BRANDS: Record<BrandId, Brand> = {
     name: 'documentero.ro',
     domain: 'documentero.ro',
     baseUrl: 'https://documentero.ro',
-    contactEmail: 'contact@documentero.ro',
+    // Decision Raul 21.09.2026: no Zoho mailbox/alias for documentero until the
+    // platform grows. Sending stays on documentero.ro (Resend-verified), but
+    // every address a person can WRITE to (site, emails, schema, Reply-To)
+    // is the eghiseul inbox, which is read. `contact@documentero.ro` has no MX.
+    contactEmail: 'contact@eghiseul.ro',
     phoneDisplay: '+40 757 708 181',
     whatsappNumber: '40757708181',
     emailFrom: 'documentero.ro <contact@documentero.ro>',
