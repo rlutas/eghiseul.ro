@@ -29,6 +29,7 @@ Platforma digitala pentru Romania - servicii publice digitalizate (9 servicii ac
 | **Cum adaug serviciu nou** | `docs/technical/specs/modular-wizard-guide.md` |
 | **API endpoints** | `docs/technical/api/` + `docs/README.md` (summary) |
 | **Admin panel** | `docs/admin/README.md` |
+| **Chatbot Ghid + rapoarte (Claude peste corpusul echipei, `knowledge_chat_log`/`knowledge_reports`)** | `docs/admin/chatbot-si-raportare.md` (echipă) + `docs/technical/api/knowledge-api.md` (rute, prompt, tabele); cod în `src/lib/knowledge/chat*.ts`, `reports.ts` |
 | **Fișe servicii pentru echipă (A→Z, statusuri, butoane); corpusul echipei pentru căutare/chatbot** | `docs/admin/servicii/README.md`, `docs/admin/statusuri-comenzi.md`, `docs/admin/pagina-comenzii.md`; `src/lib/knowledge/corpus.ts` (`TEAM_CORPUS_PREFIXES`, marker `<!-- audienta: colaborator -->` → `/colaborator/ghid`) |
 | **Comenzi telefonice (admin A→Z, link plată, link completare)** | `docs/admin/comenzi-telefonice/README.md` |
 | **Contul clientului (ce vede, cupon de bun-venit, ce se leagă cu comanda)** | `docs/admin/contul-clientului.md` + decizii în `docs/dashboard-client/PLAN.md` §6 |

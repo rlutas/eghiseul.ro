@@ -46,6 +46,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Document generation:** [`technical/specs/admin-document-system.md`](technical/specs/admin-document-system.md)
 - **Convenția cu topograful (angajament de execuție):** [`technical/specs/conventie-topograf.md`](technical/specs/conventie-topograf.md)
 - **Solicită documente (cerere de la client + standby):** [`technical/specs/document-request-system.md`](technical/specs/document-request-system.md)
+- **Chatbotul din Ghid + rapoarte (echipă și colaborator):** [`admin/chatbot-si-raportare.md`](admin/chatbot-si-raportare.md) — „Întreabă ghidul” (Claude peste corpusul echipei), „Raportează o problemă”, pagina `/admin/ghid/rapoarte`; API: [`technical/api/knowledge-api.md`](technical/api/knowledge-api.md)
 - **Serviciile A→Z pentru echipă (catalog + fișe pe familii):** [`admin/servicii/README.md`](admin/servicii/README.md) — caziere/integritate, stare civilă, constatator, extras CF, imobiliare prin topograf, opțiuni suplimentare; transversal: [`admin/statusuri-comenzi.md`](admin/statusuri-comenzi.md) (statusuri + cozile zilnice) și [`admin/pagina-comenzii.md`](admin/pagina-comenzii.md) (butoanele). Corpusul echipei pentru căutare/chatbot: `src/lib/knowledge/corpus.ts`
 - **RBAC & permisiuni:** [`admin/rbac-permissions.md`](admin/rbac-permissions.md)
 - **Contul clientului (ce vede clientul, cupon de bun-venit, ce se leagă automat cu comanda):** [`admin/contul-clientului.md`](admin/contul-clientului.md)

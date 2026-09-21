@@ -12,6 +12,7 @@
 
 | Document | Description | Status |
 |----------|-------------|--------|
+| [Chatbotul din Ghid și raportarea problemelor](./chatbot-si-raportare.md) | „Întreabă ghidul” (răspunde din proceduri, cu sursă; ce nu e documentat ajunge la Raul), „Raportează o problemă”, pagina de rapoarte Nou / În lucru / Rezolvat | 21.09.2026 |
 | [Serviciile A→Z pentru echipă](./servicii/README.md) | Catalogul celor 31 de servicii (preț, termen, urgență, KYC, avocat, cine lucrează) + fișe pe familii: [caziere și integritate](./servicii/caziere-si-integritate.md), [stare civilă](./servicii/stare-civila.md), [constatator](./servicii/certificat-constatator.md), [extras CF](./servicii/extras-carte-funciara.md), [imobiliare prin topograf](./servicii/imobiliare-topograf.md), [opțiuni suplimentare](./servicii/optiuni-suplimentare.md) | 21.09.2026 |
 | [Statusurile comenzii](./statusuri-comenzi.md) | Fiecare status: tab, cine îl pune, ce vede clientul, ce apeși; cele trei cozi zilnice; termenul și pauzele | 21.09.2026 |
 | [Pagina comenzii](./pagina-comenzii.md) | Card cu card, ce face fiecare buton din pagina unei comenzi | 21.09.2026 |

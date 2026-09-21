@@ -1,7 +1,9 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { BookOpen, FileText } from 'lucide-react';
 import { loadCollaboratorDocs } from '@/lib/knowledge/docs';
 import { requireCollaboratorOrAdmin } from '@/lib/knowledge/collaborator-access';
+import { GhidChat } from '@/components/knowledge/ghid-chat';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +27,9 @@ export default async function ColaboratorGhidPage() {
           Aceleași pagini le citește și echipa, deci sunt mereu la zi.
         </p>
       </div>
+      <Suspense fallback={null}>
+        <GhidChat audience="collaborator" page="/colaborator/ghid" />
+      </Suspense>
       <ul className="space-y-2">
         {docs.map((d) => (
           <li key={d.slug}>

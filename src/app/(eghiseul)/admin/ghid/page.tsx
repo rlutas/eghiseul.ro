@@ -18,6 +18,8 @@ import { formatRoDate, type ChangelogKind } from '@/lib/knowledge/parse';
 import { CATEGORIES, CATEGORY_LABEL, isCategoryId, type CategoryId } from '@/lib/knowledge/categories';
 import { MarkGhidSeen } from './mark-seen';
 import { GhidSearch } from './search';
+import { GhidChat } from '@/components/knowledge/ghid-chat';
+import { countOpenReports } from '@/lib/knowledge/reports';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,11 +59,12 @@ export default async function GhidPage({
     redirect('/admin');
   }
 
-  const [allEntries, version, allDocs, folders] = await Promise.all([
+  const [allEntries, version, allDocs, folders, openReports] = await Promise.all([
     loadChangelog(),
     loadPlatformVersion(),
     loadAllTeamDocs(),
     loadTopFolders(),
+    countOpenReports().catch(() => 0),
   ]);
   const totalDocs = folders.reduce((s, f) => s + f.count, 0);
 
@@ -121,12 +124,21 @@ export default async function GhidPage({
                 deploy {new Date(version.buildTime).toLocaleString('ro-RO')}
               </p>
             )}
+            <p className="text-xs pt-1">
+              <Link href="/admin/ghid/rapoarte/" className="text-primary-700 hover:underline">
+                Rapoarte din Ghid{openReports > 0 ? ` · ${openReports} deschise` : ''}
+              </Link>
+            </p>
           </CardContent>
         </Card>
       </div>
 
       <Suspense fallback={null}>
         <GhidSearch />
+      </Suspense>
+
+      <Suspense fallback={null}>
+        <GhidChat audience="team" page="/admin/ghid" />
       </Suspense>
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">

@@ -22,6 +22,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 GOOGLE_AI_API_KEY=
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
+ANTHROPIC_API_KEY=              # chatbotul din Ghid (/admin/ghid, /colaborator/ghid); fără ea chatul dă 503 „nu e configurat”, raportarea merge
 
 # AWS S3
 AWS_REGION=eu-central-1

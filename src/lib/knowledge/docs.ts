@@ -127,6 +127,13 @@ export interface GuideLink {
  */
 export const CURATED_GUIDES: GuideLink[] = [
   {
+    title: 'Chatbotul din Ghid și raportarea problemelor',
+    slug: 'admin/chatbot-si-raportare',
+    category: 'admin',
+    description:
+      '„Întreabă ghidul” răspunde din procedurile scrise, cu link la sursă; „Raportează o problemă” ajunge la Raul în Rapoarte din Ghid; ce nu e documentat se raportează singur.',
+  },
+  {
     title: 'Serviciile noastre A→Z: catalogul pentru echipă',
     slug: 'admin/servicii',
     category: 'comenzi',
