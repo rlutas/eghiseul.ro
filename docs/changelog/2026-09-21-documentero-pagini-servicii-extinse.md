@@ -90,6 +90,22 @@ Planul complet și starea lui: [analiza competitorilor SEO](../documentero/anali
   2 și la pasul 6) și „Succesiune” (duplicatele actelor de stare civilă). E
   linkul cu cea mai mare greutate: site-ul avocatei care depune cererile.
 
+### Search Console și GA4 (21.09, seara)
+
+- GSC: proprietatea URL-prefix `https://documentero.ro/` verificată pe
+  sishuletz@gmail.com prin meta tag (al doilea token în layout, lângă cel din
+  20.09 care e al altui cont). Rapoartele pornesc în 1–2 zile; sitemap-ul se
+  trimite după flip.
+- GA4: proprietate nouă „documentero.ro” în contul „eGhiseul” (297950069,
+  eghiseul@gmail.com), stream web `15815194303`, ID `G-ND6HB81QXF`. GA a
+  detectat pe site eticheta eghiseul (`G-8LFRWD479Z`, încărcată până acum și
+  pe documentero după consimțământ) și a propus s-o refolosească; am ales
+  „instalare manuală”, fiindcă `CookieConsent` încarcă acum ID-ul pe brand.
+- Vercel: `NEXT_PUBLIC_GA_MEASUREMENT_ID_DOCUMENTERO=G-ND6HB81QXF` (Config,
+  Production); deploy-ul următor o ia.
+- Cod: `cookie-consent.tsx` alege ID-ul după `useBrand().id`; gol → cade pe
+  ID-ul eghiseul (comportamentul de până acum).
+
 ### Verificat
 
 - `tsc --noEmit` și `eslint` curate.
