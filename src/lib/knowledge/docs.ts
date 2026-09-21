@@ -126,6 +126,13 @@ export interface GuideLink {
  */
 export const CURATED_GUIDES: GuideLink[] = [
   {
+    title: 'Identificare imobil: când topograful NU găsește imobilul',
+    slug: 'admin/identificare-imobil-nereusita',
+    category: 'comenzi',
+    description:
+      'Certificatul OCPI 2.7.8 în loc de „în așteptare client”, cele două situații (neintabulat / carte veche neconvertită), pașii pentru Mircea și echipă, emailul de copiat, creditul pentru extras CF.',
+  },
+  {
     title: 'documentero.ro: al doilea site, doar acte de stare civilă',
     slug: 'admin/documentero',
     category: 'comenzi',

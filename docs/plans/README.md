@@ -4,6 +4,7 @@ Documente de design și plan, înainte de execuție. Ordine cronologică invers�
 
 | Data | Plan | Status |
 |---|---|---|
+| 2026-09-21 | [Identificare imobil: fluxul „nu l-am găsit” (certificat OCPI 2.7.8 + credit)](2026-09-21-identificare-imobil-nereusita-design.md) — status nou, cerere 2.7.8 generată, raport PDF + cupon-credit, preț 298; ce există deja în cod și ce lipsește | 📋 design, de confirmat |
 | 2026-07-20 | [Ecosistem auto: unelte, date locale, afiliere](2026-07-20-ecosistem-auto-unelte-afiliere.md) — **doc-ul principal pe zona auto**: inventar dosar-auto.ro, SIRUTA pentru „unde depui", afiliere carVertical, lanțul complet de monetizare (§5.6), decizia erovinieta vs eghiseul per produs | 📋 research complet |
 | 2026-07-20 | [Categoria „Contracte" pe eghiseul](2026-07-20-categoria-contracte-eghiseul.md) — plan de execuție: migrare categorie, template-uri Word, pricing 29/69 lei, pași de implementare | 📋 blocat de verificarea juridică |
 | 2026-07-20 | [Produse noi: auto, teren, contracte](2026-07-20-produse-noi-auto-teren-contracte.md) — research inițial: piață, competiție, procedura legală 2026, RCA prin Casier Total | 📋 research |
