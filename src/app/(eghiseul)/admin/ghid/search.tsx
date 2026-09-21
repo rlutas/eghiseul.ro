@@ -23,6 +23,9 @@ export function GhidSearch() {
   const params = useSearchParams();
   const initial = params.get('q') ?? '';
   const [q, setQ] = useState(initial);
+  // Implicit căutăm în ghidurile echipei (admin/, changelog/, registru);
+  // bifa extinde la toată documentația, inclusiv specificațiile tehnice.
+  const [allDocs, setAllDocs] = useState(params.get('scope') === 'all');
   const [results, setResults] = useState<Result[] | null>(null);
   const [loading, setLoading] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -39,7 +42,9 @@ export function GhidSearch() {
     setLoading(true);
     timer.current = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/admin/knowledge/search?q=${encodeURIComponent(query)}`);
+        const res = await fetch(
+          `/api/admin/knowledge/search?q=${encodeURIComponent(query)}${allDocs ? '&scope=all' : ''}`
+        );
         const json = await res.json();
         setResults(json.success ? (json.data.results as Result[]) : []);
       } catch {
@@ -51,16 +56,20 @@ export function GhidSearch() {
     return () => {
       if (timer.current) clearTimeout(timer.current);
     };
-  }, [q]);
+  }, [q, allDocs]);
 
-  // `?q=` în URL, fără reîncărcare — link partajabil.
+  // `?q=` (+ `scope=all`) în URL, fără reîncărcare — link partajabil.
   useEffect(() => {
     const query = q.trim();
     const current = params.get('q') ?? '';
-    if (query === current) return;
-    const url = query ? `/admin/ghid/?q=${encodeURIComponent(query)}` : '/admin/ghid/';
+    const currentAll = params.get('scope') === 'all';
+    if (query === current && allDocs === currentAll) return;
+    const qs = new URLSearchParams();
+    if (query) qs.set('q', query);
+    if (allDocs) qs.set('scope', 'all');
+    const url = qs.size ? `/admin/ghid/?${qs.toString()}` : '/admin/ghid/';
     router.replace(url, { scroll: false });
-  }, [q, params, router]);
+  }, [q, allDocs, params, router]);
 
   return (
     <div className="space-y-3">
@@ -70,7 +79,7 @@ export function GhidSearch() {
           ref={inputRef}
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Caută în toată documentația: „transfer bancar”, „AWB”, „storno”, „ONRC”…"
+          placeholder="Caută în ghidurile echipei: „transfer bancar”, „AWB”, „storno”, „cazier auto”…"
           className="pl-9 pr-9 h-11 text-base bg-white"
           autoComplete="off"
         />
@@ -91,6 +100,16 @@ export function GhidSearch() {
           <Loader2 className="absolute right-9 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-neutral-400" />
         )}
       </div>
+
+      <label className="flex items-center gap-2 text-xs text-neutral-600 select-none">
+        <input
+          type="checkbox"
+          checked={allDocs}
+          onChange={(e) => setAllDocs(e.target.checked)}
+          className="h-3.5 w-3.5 accent-slate-900"
+        />
+        Caută și în documentația tehnică (specificații, arhivă, SEO)
+      </label>
 
       {results !== null && (
         <div className="rounded-lg border bg-white divide-y">

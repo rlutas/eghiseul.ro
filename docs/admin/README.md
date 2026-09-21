@@ -12,6 +12,9 @@
 
 | Document | Description | Status |
 |----------|-------------|--------|
+| [Serviciile A→Z pentru echipă](./servicii/README.md) | Catalogul celor 31 de servicii (preț, termen, urgență, KYC, avocat, cine lucrează) + fișe pe familii: [caziere și integritate](./servicii/caziere-si-integritate.md), [stare civilă](./servicii/stare-civila.md), [constatator](./servicii/certificat-constatator.md), [extras CF](./servicii/extras-carte-funciara.md), [imobiliare prin topograf](./servicii/imobiliare-topograf.md), [opțiuni suplimentare](./servicii/optiuni-suplimentare.md) | 21.09.2026 |
+| [Statusurile comenzii](./statusuri-comenzi.md) | Fiecare status: tab, cine îl pune, ce vede clientul, ce apeși; cele trei cozi zilnice; termenul și pauzele | 21.09.2026 |
+| [Pagina comenzii](./pagina-comenzii.md) | Card cu card, ce face fiecare buton din pagina unei comenzi | 21.09.2026 |
 | [Architecture](./architecture.md) | Full technical specification: layout, pages, components, API endpoints, database schema, implementation phases | Implemented |
 | [RBAC & Permissions](./rbac-permissions.md) | Role-based access control system, granular permissions, user management, settings pages | Implemented |
 | [Security Audit](./security-audit.md) | Security audit of admin Supabase client, IDOR fixes, RLS policy recommendations | 3/4 Critical Fixed |

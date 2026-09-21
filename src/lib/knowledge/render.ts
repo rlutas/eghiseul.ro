@@ -9,7 +9,7 @@ import { rewriteDocLink } from './parse';
  * Linkurile către fișiere pe care nu le servim (png, pdf, csv) rămân text
  * simplu — mai bine decât un 404.
  */
-export function renderMarkdown(md: string, currentDoc: string): string {
+export function renderMarkdown(md: string, currentDoc: string, basePath = '/admin/ghid'): string {
   const marked = new Marked({
     gfm: true,
     breaks: false,
@@ -22,7 +22,8 @@ export function renderMarkdown(md: string, currentDoc: string): string {
           // lăsăm renderer-ul de mai jos să scoată <span>.
           t.href = '';
         } else {
-          t.href = rewritten;
+          // Portalul colaboratorului randează aceleași documente sub alt prefix.
+          t.href = basePath === '/admin/ghid' ? rewritten : rewritten.replace(/^\/admin\/ghid/, basePath);
         }
       }
     },

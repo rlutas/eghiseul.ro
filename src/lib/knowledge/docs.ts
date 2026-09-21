@@ -13,6 +13,7 @@ import {
   type QuickNavGuide,
 } from './parse';
 import { categorize, explicitCategory, type CategoryId } from './categories';
+import { filterCorpus, isCollaboratorDoc, type SearchScope } from './corpus';
 import {
   folderLabel,
   indexDoc,
@@ -126,6 +127,27 @@ export interface GuideLink {
  */
 export const CURATED_GUIDES: GuideLink[] = [
   {
+    title: 'Serviciile noastre A→Z: catalogul pentru echipă',
+    slug: 'admin/servicii',
+    category: 'comenzi',
+    description:
+      'Toate cele 31 de servicii cu preț, termen, cine le lucrează, plus o fișă pe familie: caziere și integritate, stare civilă, constatator, extras CF, imobiliare prin topograf, opțiuni suplimentare.',
+  },
+  {
+    title: 'Statusurile comenzii, de la plată la finalizare',
+    slug: 'admin/statusuri-comenzi',
+    category: 'comenzi',
+    description:
+      'Cele trei cozi zilnice (Așteptare plată / Așteptare client / Blocat instituție), fiecare status cu tabul lui, cine îl pune, ce vede clientul și ce apăsați ca să meargă mai departe.',
+  },
+  {
+    title: 'Pagina comenzii în admin: ce face fiecare buton',
+    slug: 'admin/pagina-comenzii',
+    category: 'admin',
+    description:
+      'Card cu card: Procesare comandă, documentele generate, Solicită documente, KYC verificat, plata și transferul bancar, AWB, costuri interne, note.',
+  },
+  {
     title: 'Identificare imobil: când topograful NU găsește imobilul',
     slug: 'admin/identificare-imobil-nereusita',
     category: 'comenzi',
@@ -237,7 +259,13 @@ export interface DocListing {
 
 /** Toate documentele din folderele echipei, cu titlul din H1. */
 export async function loadAllTeamDocs(): Promise<DocListing[]> {
-  const files = [...(await listMarkdown('admin')), ...(await listMarkdown('registru-central'))];
+  const files = [
+    ...(await listMarkdown('admin')),
+    // Fișele pe familii de servicii (21.09.2026); README-ul folderului vine
+    // deja din listarea lui `admin/`, îl sărim ca să nu apară de două ori.
+    ...(await listMarkdown('admin/servicii')).filter((f) => !f.endsWith('/README.md')),
+    ...(await listMarkdown('registru-central')),
+  ];
   const out: DocListing[] = [];
   for (const rel of files) {
     const content = await readIfExists(path.join(DOCS_ROOT, rel));
@@ -246,6 +274,27 @@ export async function loadAllTeamDocs(): Promise<DocListing[]> {
     out.push({ title: extractTitle(content) ?? rel, slug, relPath: rel });
   }
   return out;
+}
+
+/**
+ * Ghidurile pe care le vede și colaboratorul (topograful), în portalul lui:
+ * documentele echipei marcate `<!-- audienta: colaborator -->`.
+ */
+export async function loadCollaboratorDocs(): Promise<DocListing[]> {
+  const index = await loadSearchIndex();
+  return index
+    .filter((d) => isCollaboratorDoc(d.relPath, d.content))
+    .map((d) => ({ title: d.title, slug: d.slug, relPath: d.relPath }))
+    .sort((a, b) => a.title.localeCompare(b.title, 'ro'));
+}
+
+/** Un document servit colaboratorului DOAR dacă e marcat pentru el. */
+export async function resolveCollaboratorDoc(
+  parts: string[]
+): Promise<{ relPath: string; content: string } | null> {
+  const doc = await resolveDocFromSlugParts(parts);
+  if (!doc || !isCollaboratorDoc(doc.relPath, doc.content)) return null;
+  return doc;
 }
 
 /** Tabelul de navigare din `docs/admin/README.md` (referință secundară). */
@@ -303,9 +352,13 @@ export function loadSearchIndex(): Promise<IndexedDoc[]> {
   return searchIndexCache;
 }
 
-export async function searchDocs(query: string, limit = 30): Promise<SearchResult[]> {
+/**
+ * Căutare pe corpusul echipei (implicit), pe toată documentația (`all`) sau
+ * doar pe ghidurile colaboratorului (`collaborator`).
+ */
+export async function searchDocs(query: string, limit = 30, scope: SearchScope = 'team'): Promise<SearchResult[]> {
   const index = await loadSearchIndex();
-  return searchIndex(index, query, limit);
+  return searchIndex(filterCorpus(index, scope), query, limit);
 }
 
 export interface FolderSummary {

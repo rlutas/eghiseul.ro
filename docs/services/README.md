@@ -1,5 +1,10 @@
 # Servicii & Capabilități — ce avem, ce putem face
 
+> **Pentru echipă (21.09.2026):** fișele operaționale, cu prețurile și termenele
+> din platformă la zi, sunt în [`../admin/servicii/README.md`](../admin/servicii/README.md).
+> Folderele de mai jos sunt fișe de dezvoltare/SEO; tabelul de prețuri de aici e
+> un snapshot din 23.06.2026 (12 servicii; DB are 31 active).
+
 Inventar complet al serviciilor active + capabilitățile platformei. Pentru documentația detaliată per serviciu, vezi folderele de mai jos (fiecare cu `README.md`: SEO, flux comandă, câmpuri speciale).
 
 > **Sursă de adevăr pentru preț/termen:** tabela `services` din DB (coloanele `base_price`, `estimated_days`, `processing_config`). Editabile din `/admin/settings` → Servicii (preț, zile, termen afișat). Valorile de mai jos = snapshot 2026-06-23 (migrațiile 077-079).

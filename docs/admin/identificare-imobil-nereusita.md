@@ -1,4 +1,5 @@
 # Identificare imobil: ce facem când topograful NU găsește imobilul
+<!-- audienta: colaborator -->
 
 Versiunea completă de tipărit / trimis pe WhatsApp lui Mircea și echipei (serviciul
 A→Z, pașii din portal, ce vede clientul, ce spuneți la telefon):
