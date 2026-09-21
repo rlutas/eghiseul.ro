@@ -43,6 +43,20 @@ sub o secundă.
   documentația tehnică” doar la echipă), Enter = chat, Markdown randat
   progresiv cu `marked` pe client, HTML-ul final de pe server; raportarea
   inline. Folosit în `/admin/ghid` și `/colaborator/ghid`.
+- **Regăsirea documentelor pentru chat era prea strictă** (cerea TOATE
+  cuvintele, ca la căutarea din Ghid): „cât durează certificatul de naștere la
+  București” nu aducea fișa de stare civilă (n-are „durează”), iar „cum dau
+  refund la cazier” nu aducea procedura de refund (n-are „dau”) → chatbotul
+  răspundea greșit și raporta „nedocumentat”. Acum `retrievedDocs` folosește
+  `looseScore`: stopwords românești scoase, orice termen contează, prefix de
+  5 litere („durea” → „durează / durata”), acoperirea termenilor distincți
+  cântărește cel mai mult, `admin/` primește un mic bonus. Verificat live:
+  toate cele trei întrebări corecte, cu sursa bună.
+- Prompt: întrebările despre o comandă anume („care e situația cu
+  E-…”) primesc „nu văd comenzile, caută în admin” și NU mai intră la
+  rapoarte ca gol de documentație.
+- Procedurile din tab: categoriile ordonate după uz (comenzi, admin, plăți,
+  documente, clienți).
 - Pagina `/admin/ghid`: `?tab=proceduri|noutati|documentatie` (+ `?cat=` la
   noutăți), server-rendered, fără stare client. Cardul mare de versiune a
   devenit două rânduri în header.

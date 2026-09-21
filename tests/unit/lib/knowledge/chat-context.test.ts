@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { coreDocs, guideHref, parseAnswerFooter, renderDocsForPrompt, retrievedDocs, visibleAnswerPrefix } from '@/lib/knowledge/chat-context';
+import { coreDocs, guideHref, parseAnswerFooter, questionTerms, renderDocsForPrompt, retrievedDocs, visibleAnswerPrefix } from '@/lib/knowledge/chat-context';
 import { indexDoc } from '@/lib/knowledge/search';
 
 // Contextul chatbotului: nucleul mereu prezent, documentele relevante peste,
@@ -38,6 +38,25 @@ describe('retrievedDocs', () => {
     expect(d.truncated).toBe(true);
     expect(d.text).toContain('document tăiat aici');
     expect(d.text.length).toBeLessThan(200);
+  });
+  it('întrebare în limbaj natural: nu cere toate cuvintele, potrivește prefixe', () => {
+    // „cât durează … la București” — fișa nu conține „dureaza”, dar are „durata”, „nastere”, „bucuresti”.
+    const docs = [
+      indexDoc('admin/servicii/stare-civila.md', '# Acte de stare civilă\n\nCertificatul de naștere: durata depinde de oficiu; București 30-45 zile lucrătoare.', 'Acte de stare civilă'),
+      indexDoc('admin/chatbot.md', '# Chatbot\n\nExemplu: „cât durează certificatul de naștere la București?”', 'Chatbot'),
+      indexDoc('changelog/2026-08-05-termene.md', '# Termene stare civilă\n\nBucurești 30-45 zile.', 'Termene stare civilă'),
+    ];
+    const r = retrievedDocs(docs, 'cat dureaza certificatul de nastere la bucuresti', 'team');
+    expect(r.map((d) => d.slug)).toContain('admin/servicii/stare-civila');
+    expect(r.length).toBeGreaterThanOrEqual(2);
+  });
+  it('„cum dau refund la cazier” găsește procedura de refund', () => {
+    const docs = [
+      indexDoc('admin/anulare-refund-70.md', '# Anulare în 30 min: refund 70%\n\n„Procesează refund” face refundul Stripe.', 'Anulare: refund 70%'),
+      indexDoc('admin/altceva.md', '# Altceva\n\ncazier judiciar', 'Altceva'),
+    ];
+    expect(retrievedDocs(docs, 'cum dau refund la cazier ?', 'team')[0].slug).toBe('admin/anulare-refund-70');
+    expect(questionTerms('cum dau refund la cazier ?')).toEqual(['refund', 'cazier']);
   });
   it('respectă limita de documente', () => {
     const many = Array.from({ length: 10 }, (_, i) => indexDoc(`admin/d${i}.md`, `# D${i}\n\nfactura oblio`, `D${i}`));

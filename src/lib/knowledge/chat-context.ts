@@ -1,5 +1,5 @@
 import { filterCorpus, type SearchScope } from './corpus';
-import { searchIndex, type IndexedDoc } from './search';
+import { normalizeText, type IndexedDoc } from './search';
 
 /**
  * Ce citește chatbotul din Ghid pentru o întrebare — PUR, testabil.
@@ -53,8 +53,71 @@ export function coreDocs(index: IndexedDoc[], audience: ChatAudience, maxChars =
 }
 
 /**
+ * Cuvinte care nu spun nimic despre subiect într-o întrebare („cum dau
+ * refund la cazier” → contează „refund” și „cazier”). Fără diacritice, ca
+ * textul normalizat.
+ */
+const STOPWORDS = new Set(
+  `a al ale ai am ar are as asta astea asa aia acest aceasta aceste acesti acum ce cea cei cel cele ceva cine cu cum ca care cand cat cata cate cati da dau dat de deci din doar dupa e el ea ei ele este esti eu fac face facem faceti fi fie fost i ii il imi in intr iti la le li lui ma mai mea mi mie mult ne nici nu o ori pe pentru poate pot prin sa sau se si sunt sunteti te ti tot toti toate un una unde unei unui unor va voi vor vreau vrea vreti`
+    .split(/\s+/)
+);
+
+/** Termenii cu greutate din întrebare (fără stopwords, minimum 3 litere). */
+export function questionTerms(question: string): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of normalizeText(question).split(/[^a-z0-9]+/)) {
+    const t = raw.trim();
+    if (t.length < 3 || STOPWORDS.has(t) || seen.has(t)) continue;
+    seen.add(t);
+    out.push(t);
+  }
+  return out;
+}
+
+/**
+ * Scor „larg” pentru chat: NU cere toate cuvintele (întrebările sunt în
+ * limbaj natural: „cât durează”, „cum dau refund”). Fiecare termen contează
+ * dacă apare exact (titlu 40, conținut până la 15 pe apariții) sau doar ca
+ * prefix de 5 litere pe un cuvânt („durea” → „durează”, „durata”; jumătate
+ * din puncte). Documentele cu mai mulți termeni distincți urcă primele.
+ */
+export function looseScore(doc: IndexedDoc, terms: string[]): number {
+  let score = 0;
+  let matched = 0;
+  for (const term of terms) {
+    let s = 0;
+    if (doc.normTitle.includes(term)) s += 40;
+    const exact = countOccurrences(doc.normContent, term);
+    if (exact > 0) s += Math.min(15, exact);
+    if (s === 0 && term.length >= 6) {
+      const prefix = term.slice(0, 5);
+      const re = new RegExp(`\\b${prefix}[a-z]*`, 'g');
+      const m = doc.normContent.match(re);
+      if (m && m.length > 0) s += Math.min(7, m.length) / 2;
+      if (doc.normTitle.match(re)) s += 20;
+    }
+    if (s > 0) matched++;
+    score += s;
+  }
+  // Acoperirea (câți termeni distincți) contează mai mult decât repetiția.
+  return matched === 0 ? 0 : score + matched * 30;
+}
+
+function countOccurrences(hay: string, needle: string): number {
+  let n = 0;
+  let i = hay.indexOf(needle);
+  while (i >= 0 && n < 50) {
+    n++;
+    i = hay.indexOf(needle, i + needle.length);
+  }
+  return n;
+}
+
+/**
  * Documentele relevante pentru întrebare, din corpusul audienței, fără cele
  * din nucleu (ar fi duplicate). Cel mult `max`, fiecare tăiat la `maxChars`.
+ * Procedurile (`admin/`) au prioritate față de changelog la scor egal.
  */
 export function retrievedDocs(
   index: IndexedDoc[],
@@ -65,17 +128,17 @@ export function retrievedDocs(
   const max = opts.max ?? 6;
   const maxChars = opts.maxChars ?? 14_000;
   const core = new Set(CORE_DOCS[audience]);
-  const corpus = filterCorpus(index, audienceScope(audience));
-  const byPath = new Map(corpus.map((d) => [d.relPath, d]));
-  const hits = searchIndex(corpus, question, max * 3).filter((h) => !core.has(h.relPath));
-  const out: ContextDoc[] = [];
-  for (const h of hits) {
-    const d = byPath.get(h.relPath);
-    if (!d) continue;
-    out.push(toContextDoc(d, maxChars));
-    if (out.length >= max) break;
-  }
-  return out;
+  const terms = questionTerms(question);
+  if (terms.length === 0) return [];
+  const corpus = filterCorpus(index, audienceScope(audience)).filter((d) => !core.has(d.relPath));
+  const scored = corpus
+    .map((d) => {
+      const base = looseScore(d, terms);
+      return { d, score: base > 0 ? base + (d.relPath.startsWith('admin/') ? 10 : 0) : 0 };
+    })
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score || a.d.title.localeCompare(b.d.title, 'ro'));
+  return scored.slice(0, max).map((x) => toContextDoc(x.d, maxChars));
 }
 
 /** Textul documentelor pentru prompt, cu delimitatori pe care modelul îi citează. */

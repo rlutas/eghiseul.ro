@@ -152,7 +152,7 @@ export default async function GhidPage({
 
       {tab === 'proceduri' && (
         <section className="space-y-6">
-          {CATEGORIES.filter((c) => CURATED_GUIDES.some((g) => g.category === c.id)).map((c) => (
+          {orderedCategories().map((c) => (
             <div key={c.id} className="space-y-2">
               <h2 className="text-sm font-semibold text-neutral-700">{c.label}</h2>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -323,6 +323,17 @@ export default async function GhidPage({
       )}
     </div>
   );
+}
+
+/** Procedurile, cu ce folosește echipa zilnic sus: comenzi, apoi admin, plăți, documente, clienți. */
+const CATEGORY_PRIORITY: CategoryId[] = ['comenzi', 'admin', 'plati', 'documente', 'clienti'];
+function orderedCategories() {
+  const withGuides = CATEGORIES.filter((c) => CURATED_GUIDES.some((g) => g.category === c.id));
+  const rank = (id: CategoryId) => {
+    const i = CATEGORY_PRIORITY.indexOf(id);
+    return i < 0 ? 99 : i;
+  };
+  return [...withGuides].sort((a, b) => rank(a.id) - rank(b.id));
 }
 
 /** Titlul din rândul de changelog: textul bold de la început, fără markdown. */
