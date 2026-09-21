@@ -6,6 +6,7 @@ import { findStatusLabel } from '@/lib/admin/status-options';
 import { Download } from 'lucide-react';
 import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
 import { CERERE_DONE_STATUSES } from '@/lib/ancpi/cerere-scope';
+import { filterCollabOrders, type Etapa } from '@/lib/collaborator/orders-filter';
 import { cereriForOrderSlug, type PropertyLike } from '@/lib/ancpi/cereri-for-order';
 import { cerereDateRo } from '@/lib/ancpi/cerere-date';
 
@@ -37,22 +38,6 @@ function propertyLocation(o: CollabOrder): string {
 }
 
 /** Grupele după care filtrează: unde e lucrarea în drumul ei. */
-type Etapa = 'toate' | 'de_depus' | 'depuse' | 'blocate' | 'livrate';
-
-function etapaOf(status: string): Exclude<Etapa, 'toate'> {
-  if (CERERE_DONE_STATUSES.includes(status as never)) return 'livrate';
-  if (status === 'submitted_to_institution') return 'depuse';
-  // Parcate: blocate de instituție sau în așteptarea clientului — separate de
-  // „de depus" ca să nu se amestece cu lucrările efectiv lucrabile (28.08).
-  if (status === 'on_hold_institution' || status === 'standby') return 'blocate';
-  return 'de_depus';
-}
-
-/** Fold pentru căutare: fără diacritice, lowercase. */
-function fold(value: string): string {
-  return value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-}
-
 export default function CollaboratorOrdersPage() {
   const previewAs = usePreviewAs();
   const [orders, setOrders] = useState<CollabOrder[]>([]);
@@ -102,29 +87,12 @@ export default function CollaboratorOrdersPage() {
 
   // Filtrarea e locală: API-ul întoarce deja doar lucrările lui, iar așa
   // comutarea e instantanee. Ordinea (cea mai veche prima) vine de la API.
-  const vizibile = useMemo(() => {
-    const q = fold(cauta.trim());
-    return orders.filter((o) => {
-      if (etapa !== 'toate' && etapaOf(o.status) !== etapa) return false;
-      if (judet && o.customer_data?.property?.county !== judet) return false;
-      if (!q) return true;
-      const p = o.customer_data?.property;
-      const haystack = fold(
-        [
-          o.friendly_order_id,
-          p?.locality,
-          p?.county,
-          p?.carteFunciara,
-          p?.cadastral,
-          o.customer_data?.ocpi_submission?.registration_number,
-          o.services?.name,
-        ]
-          .filter(Boolean)
-          .join(' ')
-      );
-      return haystack.includes(q);
-    });
-  }, [orders, etapa, judet, cauta]);
+  // Căutarea trece peste tabul de etapă (vezi orders-filter.ts).
+  const searching = cauta.trim().length > 0;
+  const vizibile = useMemo(
+    () => filterCollabOrders(orders, { etapa, judet, cauta }),
+    [orders, etapa, judet, cauta]
+  );
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -207,6 +175,11 @@ export default function CollaboratorOrdersPage() {
           <span className="text-xs text-slate-500">
             {vizibile.length} din {orders.length}
           </span>
+          {searching && etapa !== 'toate' && (
+            <p className="w-full text-xs text-slate-500">
+              Căutarea se face în toate etapele, nu doar în tabul selectat.
+            </p>
+          )}
         </div>
       )}
 
