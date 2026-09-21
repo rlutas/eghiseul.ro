@@ -31,6 +31,19 @@ function domainOf(from: string): string {
   return addr.split('@')[1]?.toLowerCase() ?? '';
 }
 
+/**
+ * Reply-To when the caller gave none: the address inside the resolved `from`
+ * (contact@documentero.ro for a documentero order), never the eghiseul
+ * default on another brand's email. Found 21.09.2026: every brand-aware
+ * sender passed `from` but not `replyTo`, so a documentero customer who hit
+ * "Reply" wrote to contact@eghiseul.ro.
+ */
+export function defaultReplyToFor(resolvedFrom: string): string {
+  if (resolvedFrom === FROM_DEFAULT) return REPLY_TO_DEFAULT;
+  const m = resolvedFrom.match(/<([^>]+)>/);
+  return (m ? m[1] : resolvedFrom).trim() || REPLY_TO_DEFAULT;
+}
+
 /** The `from` Resend will accept: the requested one when its domain is verified, else the default. */
 export function resolveFrom(from: string | undefined): string {
   if (!from) return FROM_DEFAULT;
@@ -88,13 +101,14 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
     return { id: null, skipped: true, reason: 'RESEND_API_KEY not set' };
   }
 
+  const from = resolveFrom(input.from);
   const body = {
-    from: resolveFrom(input.from),
+    from,
     to: [input.to],
     subject: input.subject,
     html: input.html,
     ...(input.text ? { text: input.text } : {}),
-    reply_to: input.replyTo ?? REPLY_TO_DEFAULT,
+    reply_to: input.replyTo ?? defaultReplyToFor(from),
     ...(input.headers ? { headers: input.headers } : {}),
   };
 
