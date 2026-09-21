@@ -32,8 +32,10 @@ paginile.
   îl arată „Couldn't fetch”/„Temporary processing error” în primele minute,
   normal). Indexare cerută manual, în ordinea asta: acasă, naștere,
   căsătorie, celibat, extras multilingv, ghidul „pierdut”, ghidul „apostilă”.
-  Ultima accesare Googlebot a fost 20.09 cu `noindex`; următoarea vede
-  `index, follow`.
+  Ultima accesare Googlebot a fost 20.09 cu `noindex`. La ~20 de minute după
+  cerere, `/certificat-de-casatorie/` era deja „URL is on Google — Page is
+  indexed”, cu `Product snippets` (1 valid, „non-critical issues” = fără
+  `aggregateRating`, intenționat) și `Breadcrumbs` valide.
 - GA4: proprietate „documentero.ro” (cont GA „eGhiseul”, eghiseul@gmail.com),
   `G-ND6HB81QXF`, verificat pe prod după consimțământ.
 - Verificare A–Z a celor 4 pagini de serviciu + ghidul „pierdut” pe textul
