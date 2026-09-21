@@ -24,7 +24,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PATH,
-  ogImage: '/images/documentero/client-acasa-certificat.webp',
+  ogImage: '/images/documentero/clienta-usa-certificat.webp',
   noindex: !DOCUMENTERO_INDEXABLE,
 });
 
@@ -64,7 +64,7 @@ export default async function GhidProcuraPage() {
     description: DESCRIPTION,
     datePublished: DATE_PUBLISHED,
     dateModified: DATE_MODIFIED,
-    image: '/images/documentero/client-acasa-certificat.webp',
+    image: '/images/documentero/clienta-usa-certificat.webp',
     breadcrumb: [{ name: 'Acasă', path: '/' }, { name: 'Ghiduri', path: '/ghiduri/' }, { name: 'Procură din străinătate', path: PATH }],
   });
   const related = GUIDES.filter((g) => g.published && g.slug !== SLUG).slice(0, 3);
@@ -94,7 +94,7 @@ export default async function GhidProcuraPage() {
               </div>
             </div>
             <div className="h-[240px] overflow-hidden rounded-[20px] sm:h-[380px]">
-              <Image src="/images/documentero/client-acasa-certificat.webp" alt="Clientă în străinătate, cu certificatul primit prin curier" width={1152} height={928} className="h-full w-full object-cover" sizes="(min-width: 1024px) 860px, 100vw" priority />
+              <Image src="/images/documentero/clienta-usa-certificat.webp" alt="Clientă cu certificatul primit prin curier, scos din plic" width={1370} height={1148} className="h-full w-full object-cover" sizes="(min-width: 1024px) 860px, 100vw" priority />
             </div>
 
             <Card className="flex flex-col gap-2 border-l-4 border-l-d-acc p-5">

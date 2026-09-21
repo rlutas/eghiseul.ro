@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { HeaderDocumentero } from '@/components/documentero/header';
-import { Arrow, Btn, Card, Check, Eyebrow, FaqList, H2, PhoneSignatureMock, Section } from '@/components/documentero/ui';
+import { Arrow, Btn, Card, Check, Eyebrow, FaqList, H2, Section } from '@/components/documentero/ui';
 import { ReviewersStack, ReviewsDocumentero } from '@/components/documentero/reviews';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { documenteroHomeGraph } from '@/lib/seo/documentero-schema';
@@ -20,7 +20,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: '/',
-  ogImage: '/images/documentero/client-acasa-certificat.webp',
+  ogImage: '/images/documentero/clienta-usa-certificat.webp',
   noindex: !DOCUMENTERO_INDEXABLE,
 });
 
@@ -40,7 +40,7 @@ export default async function DocumenteroHome() {
   const mlC = p['extras-multilingv-certificat-casatorie'];
 
   const acte = [
-    { k: 'Naștere', t: 'Certificat de naștere', d: 'Duplicat: pierdut, deteriorat, model vechi, pentru străinătate.', pr: nastere.basePrice, h: '/certificat-de-nastere/', img: '/images/documentero/client-acasa-certificat.webp', alt: 'Clientă cu certificatul de naștere primit' },
+    { k: 'Naștere', t: 'Certificat de naștere', d: 'Duplicat: pierdut, deteriorat, model vechi, pentru străinătate.', pr: nastere.basePrice, h: '/certificat-de-nastere/', img: '/images/documentero/clienta-usa-certificat.webp', alt: 'Clientă în ușa apartamentului, cu certificatul de naștere scos din plic' },
     { k: 'Căsătorie', t: 'Certificat de căsătorie', d: 'Duplicat, inclusiv cu mențiunea de divorț sau pentru schimbarea numelui.', pr: casatorie.basePrice, h: '/certificat-de-casatorie/', img: '/images/documentero/curier-livrare-plic.webp', alt: 'Curierul predă plicul' },
     { k: 'Celibat', t: 'Certificat de celibat (Anexa 18)', d: 'Pentru căsătorie, ședere sau notar în străinătate. Apostilă și traducere opționale.', pr: celibat.basePrice, h: '/certificat-de-celibat/', img: '/images/documentero/avocat-ghiseu-stare-civila.webp', alt: 'Avocata la ghișeul de stare civilă' },
     { k: 'UE', t: 'Extras multilingv de naștere', d: 'Formularul standard UE: acceptat fără traducere și fără apostilă în toată Uniunea.', pr: mlN.basePrice, h: '/extras-multilingv/', img: null, alt: '' },
@@ -48,7 +48,7 @@ export default async function DocumenteroHome() {
   ];
 
   const steps = [
-    { media: <PhoneSignatureMock />, e: 'Pasul 1', t: 'Completezi și semnezi pe telefon', d: 'Date, poză a actului de identitate, semnătură. Împuternicirea avocațială se generează automat, fără notar.' },
+    { media: <Image src="/images/documentero/semnatura-pe-telefon.webp" alt="Semnătura desenată cu degetul pe telefon, la masa din bucătărie" width={1370} height={1148} className="h-[200px] w-full object-cover" sizes="(min-width: 1024px) 400px, 100vw" />, e: 'Pasul 1', t: 'Completezi și semnezi pe telefon', d: 'Date, poză a actului de identitate, semnătură. Împuternicirea avocațială se generează automat, fără notar.' },
     { media: <Image src="/images/documentero/avocat-ghiseu-stare-civila.webp" alt="Avocata predă dosarul la ghișeul de stare civilă" width={1264} height={848} className="h-[200px] w-full object-cover" sizes="(min-width: 1024px) 400px, 100vw" />, e: 'Pasul 2', t: 'Avocatul depune cererea', d: 'La starea civilă care păstrează actul tău. Urmărim dosarul și te anunțăm la fiecare schimbare.' },
     { media: <Image src="/images/documentero/curier-livrare-plic.webp" alt="Curierul predă plicul la ușa blocului" width={1264} height={848} className="h-[200px] w-full object-cover" sizes="(min-width: 1024px) 400px, 100vw" />, e: 'Pasul 3', t: 'Primești originalul acasă', d: 'Scan pe email imediat ce îl ridicăm. Originalul prin curier, în România sau în străinătate.' },
   ];
@@ -81,10 +81,10 @@ export default async function DocumenteroHome() {
           </div>
           <div className="d-rise relative lg:col-span-6" style={{ animationDelay: '200ms' }}>
             <Image
-              src="/images/documentero/client-acasa-certificat.webp"
-              alt="Clientă acasă, cu certificatul primit prin curier"
-              width={1152}
-              height={928}
+              src="/images/documentero/clienta-usa-certificat.webp"
+              alt="Clientă în ușa apartamentului, cu certificatul scos din plicul primit prin curier"
+              width={1370}
+              height={1148}
               priority
               sizes="(min-width: 1024px) 640px, 100vw"
               className="h-[360px] w-full rounded-3xl object-cover sm:h-[480px] lg:h-[560px]"

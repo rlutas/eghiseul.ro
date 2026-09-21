@@ -24,7 +24,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PATH,
-  ogImage: '/images/documentero/client-acasa-certificat.webp',
+  ogImage: '/images/documentero/clienta-usa-certificat.webp',
   noindex: !DOCUMENTERO_INDEXABLE,
 });
 
@@ -101,7 +101,7 @@ export default async function NasterePage() {
           cta="Comandă duplicatul"
           secondary={{ label: 'În ce situații', href: '#situatii' }}
           facts={[['≤ 30 de zile', 'termen legal de eliberare'], ['Orice primărie', 'din 2023, indiferent unde te-ai născut'], ['0 lei taxă de stat', 'plătești doar serviciul']]}
-          media={<Image src="/images/documentero/client-acasa-certificat.webp" alt="Clientă acasă, cu certificatul de naștere primit prin curier" width={1152} height={928} className="h-full w-full object-cover" sizes="(min-width: 1024px) 760px, 100vw" priority />}
+          media={<Image src="/images/documentero/clienta-usa-certificat.webp" alt="Clientă în ușa apartamentului, cu certificatul de naștere scos din plic" width={1370} height={1148} className="h-full w-full object-cover" sizes="(min-width: 1024px) 760px, 100vw" priority />}
           priceLabel="Duplicat certificat de naștere"
           price={p.basePrice}
           optionsTitle="Opțional, pentru străinătate"
