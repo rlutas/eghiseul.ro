@@ -132,7 +132,10 @@ e la „După lansare”.
 ## După lansare
 
 - 21.09: sitemap trimis în GSC (sishuletz@gmail.com), indexare cerută pentru
-  acasă, cele 4 servicii și cele 2 ghiduri (vezi changelog-ul de lansare).
+  acasă, cele 4 servicii și cele 2 ghiduri (vezi changelog-ul de lansare);
+  `/certificat-de-casatorie/` indexată la ~20 min. Seara: ghidurile „acte
+  necesare” și „procură din străinătate” publicate (sitemap 16), Rich Results
+  OK, indexare cerută și pentru ele.
 
 - Expunerile pe documentero.ro, săptămânal, nu clicurile.
 - 1–2 ghiduri pe săptămână din lista din
