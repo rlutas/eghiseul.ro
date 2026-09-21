@@ -1,5 +1,7 @@
 # documentero.ro: al doilea site al nostru, doar acte de stare civilă
 
+Versiunea de tipărit / trimis pe WhatsApp: `docs/admin/documentero-ghid-echipa.pdf`.
+
 Din 21.09.2026, pe lângă eghiseul.ro, avem **documentero.ro**: un site separat,
 doar pentru actele de stare civilă. Același birou, aceeași echipă, aceeași
 avocată (Tarța Ana Gabriela), același admin. Clientul vede alt site; voi vedeți
