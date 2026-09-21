@@ -59,7 +59,7 @@ depășit promisiunea veche de 7-15 zile.
 
 - **La plată, automat**: factura, contractul de prestări, contractul de asistență juridică și **împuternicirea avocațială pe modelul UNBR** (numere din registrul Baroului). Împuternicirea de căsătorie scrie singură **cu cine și când** s-a încheiat căsătoria, iar starea civilă se completează din răspunsurile clientului, acordată pe gen. Dacă rămâne liniuță la starea civilă e intenționat: răspunsurile nu au fost concludente (a fost căsătorit, dar nu a spus dacă divorț sau deces); completați de mână pe document. Detalii: [mesajul despre împuternicire](../mesaj-echipa-imputernicire-stare-civila.md).
 - **Din admin**: **cererea de eliberare** pe modelul fiecărui act (naștere / căsătorie / celibat, extras multilingv „Domnule Primar”, Anexa 4). La comenzi combinate (certificat + extras) sunt **două cereri și două împuterniciri**, una pe act; le vedeți pe rânduri separate în „Procesare comandă”.
-- **Cabinetul avocatei** depune la oficiul de stare civilă al localității care a înregistrat actul și ridică certificatul. La apostila Haga merge la prefectură.
+- **Cererea** merge la oficiul de stare civilă al localității care a înregistrat actul, pe împuternicirea avocatei; **cine depune fizic** (avocata sau echipa, prin poștă sau la ghișeu) diferă pe serviciu: lista exactă de completat de Raul (21.09). Apostila Haga se aplică la prefectură.
 - **Echipa**: verifică datele (mai ales localitatea de înregistrare și numele părinților), apasă statusurile, scanează și trimite, expediază originalul, răspunde la „unde e actul meu”.
 
 ## Statusurile

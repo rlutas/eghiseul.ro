@@ -75,7 +75,7 @@ serviciile prin topograf, plus convenția cu topograful), fără numere de Barou
 | Cine | Ce | Unde vede lucrul |
 |---|---|---|
 | Echipa (Satu Mare) | toate comenzile: verifică actele, pornește procesarea, ține legătura cu clientul, expediază, facturează | `/admin/orders` |
-| Cabinetul avocatei Tarța Ana-Gabriela | depune și ridică actele care cer avocat (caziere, integritate, stare civilă, apostila Haga la prefectură); decont lunar | rolul „avocat” în admin vede doar comenzile cu avocat |
+| Cabinetul avocatei Tarța Ana-Gabriela | semnează împuternicirile și contractele de asistență pe serviciile „cu avocat”; **depune fizic doar la o parte din servicii** (lista exactă: de completat de Raul, 21.09); decont lunar | rolul „avocat” în admin vede doar comenzile cu avocat |
 | Mircea Dumitrean (topograf autorizat) | tot ce ține de ANCPI/OCPI: extras CF, plan cadastral, cele 14 servicii imobiliare, identificările | portalul `/colaborator` (nu are acces la admin) |
 | Robotul ONRC | certificatul constatator, de la comandă la PDF, în minute | `/admin/onrc` |
 | Robotul ANCPI | extrasul CF automat; **oprit din 20.08.2026** (ANCPI a scos portalul din DNS) | `/admin/ancpi` |

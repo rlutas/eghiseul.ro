@@ -18,7 +18,6 @@ vii sunt în **Setări → Servicii → opțiuni** și, pentru traduceri, în
 | Apostilă notari (Camera Notarilor) | 83,30 | idem | Camera Notarilor, pe traducere / act notarial; cere originalul | +3 zile lucrătoare |
 | Apostilă de la Haga | 198 | idem | **prefectura** (Instituția Prefectului Satu Mare), prin cabinetul avocatei, pe împuternicire separată | +3 zile lucrătoare |
 | Copii suplimentare | 25 / bucată | caziere, integritate | echipa | |
-| Verificare de expert | 49 | caziere, integritate | echipa | |
 | Extras suplimentar | 49,99 / imobil | extras de carte funciară | Mircea | |
 | Extras multilingv | 398 | certificat de naștere / căsătorie | cabinetul avocatei (act separat, cerere separată) | |
 | Certificatul, la extrasul multilingv (pachet) | 498 | extras multilingv de naștere / căsătorie | idem | |
@@ -70,4 +69,5 @@ apostilă se aleg în dialog; termenul se recalculează. Procedura:
 | Limba nu e în listă | 20 de limbi active; alta se adaugă din Setări → Furnizori după confirmarea traducătoarei. |
 | A bifat urgență la cazier auto cu permis străin | urgența dispare singură la permis străin; la comenzile vechi termenul îl bate oricum 7-10 zile. |
 | Vrea copii suplimentare după plată | „Modifică” + link de plată extra. |
+| Vede „Verificare de expert” (49 lei) pe o comandă | serviciul **nu mai există** (confirmat de Raul, 21.09); nu se prestează nimic în plus. Opțiunea încă apare în formular pe caziere și integritate până e dezactivată din Setări → Servicii → opțiuni; dacă un client a plătit-o, rambursați-o prin „Modifică”. |
 | Traducerea a ieșit în pierdere | prețul e pe limbă tocmai ca să nu; dacă vedeți 178,50 pe daneză, e o comandă veche. |
