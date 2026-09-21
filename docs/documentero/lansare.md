@@ -18,11 +18,14 @@ e la „După lansare”.
   (Resend), dar adresa la care scrie omul (site, emailuri, schema, Reply-To)
   e `contact@eghiseul.ro` (`BRANDS.documentero.contactEmail`). Nimic nu sare în
   gol. DMARC `p=none` cu raport la contact@eghiseul.ro adăugat 21.09.
-- [x] Search Console (21.09): proprietatea URL-prefix `https://documentero.ro/`
-  VERIFICATĂ pe sishuletz@gmail.com (al doilea token în
-  `src/app/documentero/layout.tsx`, `verification.google` e listă). Tokenul
-  din 20.09 (`R5wF7Ny…`) e al altui cont; nu l-am găsit în conturile din
-  Chrome. Sitemap-ul se trimite DUPĂ flip (până atunci e gol).
+- [x] Search Console (21.09): DOUĂ proprietăți, ambele VERIFICATE.
+  URL-prefix `https://documentero.ro/` pe sishuletz@gmail.com (meta tag, token
+  `fsG8Dsy…`) și Domeniu `documentero.ro` pe serviciiseonethut@gmail.com
+  (contul cu GSC eghiseul; token `R5wF7Ny…`, verificat 21.09 după-amiază prin
+  TXT `google-site-verification=R5wF7Ny…` în zona DNS Vercel — meta tag-ul NU
+  verifică o proprietate de tip Domeniu, de-aia apărea „neverificat”). Nu
+  șterge TXT-ul. Ambele token-uri stau în `src/app/documentero/layout.tsx`
+  (`verification.google` e listă). Sitemap-ul apare pe ambele proprietăți.
 - [x] GA4 (21.09): proprietate nouă „documentero.ro” în contul GA „eGhiseul”
   (297950069, eghiseul@gmail.com), stream web 15815194303, ID de măsurare
   `G-ND6HB81QXF`, fus orar România, RON, categoria „Legi și guvernare”.
@@ -146,6 +149,12 @@ e la „După lansare”.
   Emailuri: 6 teste primite în INBOX pe serviciiseonethut@gmail.com (nu spam),
   expeditor `contact@documentero.ro`.
 
+- 21.09 după-amiază: proprietatea GSC de tip Domeniu `documentero.ro`
+  (serviciiseonethut@gmail.com) apărea „neverificată”: fusese adăugată pe 20.09,
+  dar TXT-ul cerut nu a fost pus niciodată în DNS. Adăugat prin API Vercel
+  (record `rec_94266d44a7838428ee32bc44`), „Verifică” apăsat, confirmată prin
+  „Furnizor de nume de domeniu”. Detalii: changelog
+  `2026-09-21-documentero-gsc-domeniu-verificat.md`.
 - 21.09: sitemap trimis în GSC (sishuletz@gmail.com), indexare cerută pentru
   acasă, cele 4 servicii și cele 2 ghiduri (vezi changelog-ul de lansare);
   `/certificat-de-casatorie/` indexată la ~20 min. Seara: ghidurile „acte

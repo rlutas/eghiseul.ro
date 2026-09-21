@@ -20,7 +20,8 @@ tehnic, cum arată, ce conținut are și ce mai e de făcut până la lansare.
 ## Stare (21.09.2026: LANSAT)
 
 - **21.09.2026: indexabil.** `DOCUMENTERO_INDEXABLE = true`, sitemap cu 14
-  pagini, GSC verificat (sishuletz@gmail.com), GA4 `G-ND6HB81QXF`, linkuri din
+  pagini, GSC verificat pe ambele proprietăți (URL-prefix pe sishuletz@gmail.com,
+  Domeniu pe serviciiseonethut@gmail.com prin TXT în DNS), GA4 `G-ND6HB81QXF`, linkuri din
   eghiseul, CJO/ecazier și avocat-tarta.ro. Paginile de serviciu 1.800–2.450
   cuvinte, `FAQPage`, „Pe scurt” citabil, cifre proprii de termen.
 - Fundația tehnică e pe `main` (rutare, brand, migrarea 181, emailuri, admin,
