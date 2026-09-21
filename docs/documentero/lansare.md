@@ -13,12 +13,20 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
   `resend._domainkey`, SPF + MX pe `send.documentero.ro`); `resolveFrom`
   acceptă implicit `eghiseul.ro,documentero.ro`. Rămâne: Zoho — alias sau cutie
   pentru PRIMIRE pe `contact@documentero.ro`.
-- [~] Search Console: proprietatea creată (Raul, 20.09); tokenul e în
-  `src/app/documentero/layout.tsx` (`verification.google`, meta tag). Dacă
-  proprietatea e de tip Domain, aceeași valoare trebuie și ca TXT în DNS
-  (Vercel): `google-site-verification=R5wF7Ny…`; apoi „Verifică” în GSC.
-- [ ] GA4: stream nou pentru documentero.ro; `AttributionTracker` trimite
-  `platform`.
+- [x] Search Console (21.09): proprietatea URL-prefix `https://documentero.ro/`
+  VERIFICATĂ pe sishuletz@gmail.com (al doilea token în
+  `src/app/documentero/layout.tsx`, `verification.google` e listă). Tokenul
+  din 20.09 (`R5wF7Ny…`) e al altui cont; nu l-am găsit în conturile din
+  Chrome. Sitemap-ul se trimite DUPĂ flip (până atunci e gol).
+- [x] GA4 (21.09): proprietate nouă „documentero.ro” în contul GA „eGhiseul”
+  (297950069, eghiseul@gmail.com), stream web 15815194303, ID de măsurare
+  `G-ND6HB81QXF`, fus orar România, RON, categoria „Legi și guvernare”.
+  Variabila `NEXT_PUBLIC_GA_MEASUREMENT_ID_DOCUMENTERO` pusă în Vercel
+  (Production); `CookieConsent` o încarcă pe host-ul documentero după
+  consimțământ. Contul sishuletz vede doar proprietatea demo; pentru
+  rapoarte intri pe eghiseul@gmail.com. Rămâne: legarea GSC ↔ GA4 (conturi
+  diferite: GSC pe sishuletz, GA pe eghiseul@gmail.com) și conversia
+  `purchase` de verificat pe prima comandă reală.
 - [x] Registrul central: `003_platform_documentero.sql` aplicat pe
   `registru-barou-central` (19.09, 13:40).
 - [x] Oblio: aceeași serie, facturile rămân cum sunt (Raul, 20.09).
@@ -92,8 +100,9 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
 
 ## Verificare înainte de a scoate `noindex`
 
-- [ ] `curl -H "Host: documentero.ro"` pe `/`, `/robots.txt`, `/sitemap.xml`,
-  `/calculator/` (404), `/documentero/` (404) pe producție.
+- [x] (21.09) pe producție: `/`, `/robots.txt`, `/sitemap.xml` (gol, corect
+  cât e `noindex`), `/llms.txt` 200; `/calculator/`, `/documentero/`,
+  `/servicii/cazier-judiciar/` 404; `/admin/` 307.
 - [~] Comandă de test pe documentero.ro. 19.09, **pe live**: `E-260919-HJ9X9`
   (certificat de naștere, transfer bancar) a trecut wizardul, checkout-ul,
   succesul și statusul pe brandul documentero, `platform='documentero'`,
@@ -106,9 +115,11 @@ Stare la 19.09.2026. Bifează aici, nu în alt loc.
 - [~] Rich Results Test pe acasă și pe o pagină de serviciu — JSON-LD validat
   structural local pe 7 pagini (20.09); testul Google se rulează după
   scoaterea `noindex`.
-- [ ] `curl -A Googlebot`: conținutul e în HTML, nu după Suspense.
-- [ ] Screaming Frog cu Crawl Analysis: inlinks ≥ 20 pe pagină, fără
-  near-duplicate peste prag.
+- [x] (21.09) `curl -A Googlebot` pe cele 14 pagini publice: conținutul e în
+  HTML (naștere 2.446 cuvinte, căsătorie 2.220, celibat 2.339, extras 1.796).
+- [x] (21.09) crawl propriu în loc de Screaming Frog: fiecare pagină publică
+  primește linkuri din 13 din celelalte 13 (header + footer + text); ghidul
+  „apostilă” din 7 → adăugat în footer. Near-duplicate: max 0,182 mascat.
 - [x] Jaccard (20.09, shingles de 5, `<main>`): față de surorile eghiseul
   0,001–0,003 (texte scrise de la zero); între paginile documentero maxim 0,19
   mascat (naștere/căsătorie), restul sub 0,10 — mult sub pragurile 0,65 / 0,45.

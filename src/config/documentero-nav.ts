@@ -75,6 +75,7 @@ export const DOCUMENTERO_FOOTER = {
   ],
   ghiduri: [
     { label: 'Certificat de naștere pierdut', href: '/ghiduri/certificat-de-nastere-pierdut/' },
+    { label: 'Apostila pe acte de stare civilă', href: '/ghiduri/apostila-acte-stare-civila/' },
     { label: 'Toate ghidurile', href: '/ghiduri/' },
   ],
   companie: [
