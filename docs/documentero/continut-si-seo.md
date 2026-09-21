@@ -113,6 +113,30 @@ Ordinea ghidurilor de mai sus e înlocuită de tabelul D de acolo.
   de pe eghiseul și față de celelalte pagini documentero. Scriptul e în
   `docs/seo/2026-09-recuperare-spam-update/research/data/05-scripts/`.
 
+## Măsurare săptămânală (de luni, 28.09)
+
+1. GSC `https://documentero.ro/` (sishuletz@gmail.com, `/u/2/`): Performance →
+   ultimele 7 zile, filtru interogări: `certificat de nastere`, `certificat
+   de casatorie`, `certificat de celibat`, `extras multilingv`. Se notează
+   **afișările** și poziția, nu clicurile (primul semn e expunerea).
+   Pages → câte din cele 16 URL-uri sunt „Indexed”.
+2. SERP live, nu GSC: `google.ro/search?q=<interogare>&hl=ro&gl=ro&pws=0&udm=14`
+   pentru cele 4 interogări din `analiza-competitori-seo.md` §2, pozițiile
+   1–20, notate în tabelul de mai jos cu data. eghiseul și documentero
+   separat.
+3. GA4 `G-ND6HB81QXF` (eghiseul@gmail.com): utilizatori, sursă
+   `google / organic`, evenimente `purchase`.
+4. Comenzi: `select platform, status, count(*) from orders where created_at >
+   now() - interval '7 days' group by 1,2`.
+
+| Data | Interogare | eghiseul | documentero | Note |
+|---|---|---|---|---|
+| 20.09.2026 | certificat de nastere online | absent top 20 | neindexat | AI Overview → Hub MAI |
+| 20.09.2026 | duplicat certificat de nastere online | absent top 20 | neindexat | |
+| 20.09.2026 | certificat de casatorie online | 1 | neindexat | |
+| 20.09.2026 | certificat de celibat online | 1 | neindexat | |
+| 21.09.2026 | (flip + indexare cerută) | | căsătorie indexată | baseline |
+
 ## Schema și metadate
 
 - `buildPageMetadata({ brand: 'documentero', ... })` pentru canonical, OG,

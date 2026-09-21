@@ -36,8 +36,14 @@ tehnic, cum arată, ce conținut are și ce mai e de făcut până la lansare.
 - 20.09: analiza competitorilor + planul SEO/GEO de dinainte de `noindex` în
   [`analiza-competitori-seo.md`](analiza-competitori-seo.md). Pe naștere,
   eghiseul a ieșit din top 20 (SERP live); pe căsătorie și celibat e pe locul 1.
-- Istoricul lansării, bifat: [`lansare.md`](lansare.md). Ce urmează: ghidurile
-  2–8 (1–2/săpt.), măsurarea în GSC (expuneri), Rich Results Test.
+- 21.09, seara: contact = `contact@eghiseul.ro` (fără Zoho pentru documentero
+  până crește; trimiterea rămâne de pe documentero.ro), formular de contact
+  propriu, program L–V 08:00–16:00, emailuri verificate (12 șabloane + 7 teste
+  în Inbox), Vercel/DNS verificate, 4 poze reale (ușă, semnătură, certificat pe
+  masă, cuplu) din `prompturi-poze.md`, ghidurile 3 și 4 publicate.
+- Istoricul lansării, bifat: [`lansare.md`](lansare.md). Ce urmează: pozele
+  5–11, ghidurile 1–2/săpt., măsurarea săptămânală din
+  [`continut-si-seo.md`](continut-si-seo.md) §„Măsurare”.
   Jurnal: [`../changelog/`](../changelog/README.md) (intrările din 19.09).
 
 ## Reguli scurte

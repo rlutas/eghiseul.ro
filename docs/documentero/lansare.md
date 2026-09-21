@@ -58,8 +58,11 @@ e la „După lansare”.
 - [x] OG implicit `public/og/documentero-default.png` (1200×630) și logo
   email `public/images/brand/documentero-email-logo.png` (660×160), randate
   din marca SVG + Bricolage (20.09).
-- [ ] Assets rămase: logo SVG static (normal, alb) pentru terți; cele trei
-  fotografii refăcute fără mărci de curier și exportate WebP.
+- [~] Assets: 4 poze reale generate de Raul (21.09) puse pe site —
+  `clienta-usa-certificat`, `semnatura-pe-telefon`, `certificat-pe-masa`,
+  `cuplu-certificat-casatorie` (WebP, 1370 px); poza cu marca de curier nu
+  mai apare pe acasă/naștere. Rămân: pozele 5–11 din `prompturi-poze.md`,
+  logo SVG static pentru terți.
 - [x] `registryPlatform` din brandul comenzii la alocarea numerelor (19.09).
 - [x] Textele „eghiseul.ro” din fluxul de comandă (20.09): nota de selfie,
   declarația de la semnătură, transferul bancar, titlurile paginilor de
