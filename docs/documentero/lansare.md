@@ -13,8 +13,15 @@ e la „După lansare”.
   apex cu 308 (Raul, 20.09, verificat cu `curl`). Fără `www` pe webhookuri.
 - [x] Resend: domeniul `documentero.ro` verificat (Raul, 20.09; DKIM pe
   `resend._domainkey`, SPF + MX pe `send.documentero.ro`); `resolveFrom`
-  acceptă implicit `eghiseul.ro,documentero.ro`. Rămâne: Zoho — alias sau cutie
-  pentru PRIMIRE pe `contact@documentero.ro`.
+  acceptă implicit `eghiseul.ro,documentero.ro`. **Rămâne (21.09, singurul
+  blocaj real): Zoho — alias de domeniu sau cutie pentru PRIMIRE pe
+  `contact@documentero.ro`.** Domeniul n-are MX pe apex, deci orice răspuns al
+  clientului la emailurile noastre (Reply-To `contact@documentero.ro`) și orice
+  email la adresa de pe site SAR ÎN GOL. Pașii: Raul adaugă `documentero.ro` în
+  Zoho Mail (alias de domeniu al organizației), Zoho dă un TXT de verificare;
+  apoi în Vercel DNS: TXT-ul Zoho + MX `mx.zoho.eu` 10, `mx2.zoho.eu` 20,
+  `mx3.zoho.eu` 50 (ca la eghiseul.ro). DMARC `p=none` cu raport la
+  contact@eghiseul.ro adăugat 21.09.
 - [x] Search Console (21.09): proprietatea URL-prefix `https://documentero.ro/`
   VERIFICATĂ pe sishuletz@gmail.com (al doilea token în
   `src/app/documentero/layout.tsx`, `verification.google` e listă). Tokenul
@@ -130,6 +137,14 @@ e la „După lansare”.
   mascat (naștere/căsătorie), restul sub 0,10 — mult sub pragurile 0,65 / 0,45.
 
 ## După lansare
+
+- 21.09 (seara): Vercel verificat: `documentero.ro` Production + `www` 308
+  spre apex, HTTP→HTTPS 308, HSTS 2 ani, toate deploy-urile Ready (ultimul
+  `fa7ea5d6`), 10 cron-uri din `vercel.json` active pe proiect, wizardul și
+  statusul răspund 200 pe host. DNS: DKIM + SPF + MX Resend pe
+  `send.documentero.ro`, DMARC adăugat; MX pe apex LIPSEȘTE (vezi mai sus).
+  Emailuri: 6 teste primite în INBOX pe serviciiseonethut@gmail.com (nu spam),
+  expeditor `contact@documentero.ro`.
 
 - 21.09: sitemap trimis în GSC (sishuletz@gmail.com), indexare cerută pentru
   acasă, cele 4 servicii și cele 2 ghiduri (vezi changelog-ul de lansare);
