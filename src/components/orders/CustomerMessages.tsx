@@ -103,8 +103,8 @@ export function CustomerMessages({ orderId, token }: Props) {
       if (!json.success) throw new Error(json.error || 'Mesajul nu a fost trimis.');
       setDraft('');
       setFiles([]);
-      setSent(true);
       await load();
+      setSent(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Mesajul nu a fost trimis.');
     } finally {

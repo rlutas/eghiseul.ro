@@ -1141,8 +1141,12 @@ export default function AdminOrderDetailPage() {
               {order.estimated_completion_date &&
                 !['completed', 'delivered', 'cancelled', 'refunded'].includes(order.status || '') && (
                 <span className="font-semibold text-orange-600">
-                  Termen estimat: {formatDate(order.estimated_completion_date)}
-                  {order.services?.estimated_days ? ` (${order.services.estimated_days} zile lucratoare)` : ''}
+                  {order.customer_data?.ocpi_submission?.termen_ocpi
+                    ? `Termen dat de OCPI: ${formatDate(order.estimated_completion_date)}`
+                    : `Termen estimat: ${formatDate(order.estimated_completion_date)}`}
+                  {!order.customer_data?.ocpi_submission?.termen_ocpi && order.services?.estimated_days
+                    ? ` (${order.services.estimated_days} zile lucratoare)`
+                    : ''}
                 </span>
               )}
             </div>

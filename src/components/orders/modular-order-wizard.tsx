@@ -259,6 +259,14 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
     }
 
     try {
+      // Flush the draft first. Autosave is debounced and SAVE_SUCCESS clears
+      // `isDirty` even when a field changed while the save was in flight, so
+      // the last edit (typically the billing locality, picked right after the
+      // county) could exist only on screen: /submit then read the stale draft
+      // and refused with BILLING_INCOMPLETE while the form looked complete
+      // (reproduced twice on live, 25.09.2026).
+      await saveDraftNow();
+
       // Submit the order (change status from 'draft' to 'pending_payment')
       const submitResponse = await fetch(`/api/orders/${state.orderId}/submit`, {
         method: 'POST',
@@ -294,7 +302,7 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
       toast.error('Eroare de conexiune la trimiterea comenzii. Verifică internetul și încearcă din nou.');
       setIsSubmitting(false);
     }
-  }, [state.orderId, priceBreakdown.totalPrice, state.signature?.signatureBase64, state.signature?.termsAccepted, state.consent]);
+  }, [state.orderId, priceBreakdown.totalPrice, state.signature?.signatureBase64, state.signature?.termsAccepted, state.consent, saveDraftNow]);
 
   // Handle next
   const handleNext = () => {

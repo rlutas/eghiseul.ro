@@ -53,5 +53,22 @@ Procedurile: [Identificare imobil: procesul complet](../admin/identificare-imobi
   („costuri suplimentare” scos).
 - Teste noi: `client-files`, `order-client-token`, `order-message` (10);
   suita întreagă 2045 verzi, `tsc` curat.
-- Nu s-a testat cap-coadă în browser formularul și mesajele (serverul local scrie
-  în baza de producție). De verificat pe live cu o comandă reală.
+- **Testat cap-coadă pe live (25.09, după deploy)**, cu comenzi de test marcate „plătite” direct în
+  DB (fără Stripe, cu `invoice_number` fals, ca să nu emită Oblio), apoi șterse:
+  - client fără cont (`E-260925-67DA8`): act încărcat în wizard (S3 + draft), ștergere act, submit
+    păstrează cheia; acces refuzat fără token / cu alt email / tip de fișier greșit;
+  - topograf (cont de test, `assigned_collaborator_id`): vede actul (200, jpeg), trimite mesaj cu
+    șablonul „Mai multe imobile găsite” → email în Inbox cu textul întreg; „Mesaj nou” în listă;
+    „Nu am găsit” → status + email nou (fără extras promis); depunere cu termen → „Termen dat de
+    OCPI: 9 octombrie 2026 (cererea nr. …)” la client;
+  - client din linkul de email: derulare la `#mesaje`, badge „nou”, răspuns cu text și cu poză →
+    email „Răspuns de la client” la topograf (Mircea NU, datorită atribuirii explicite);
+  - admin: fir complet, „văzut de client”, act deschis din „Date imobil”, mesaj → email la client,
+    iconița de mesaj în lista de comenzi;
+  - client cu cont (`E-260925-7ZV77`, după proprietar): upload prin sesiune, comanda legată de cont,
+    mesaj de la echipă văzut și răspuns din `/account/orders/[id]`;
+  - chatbotul din Ghid (echipă + topograf) răspunde corect la 4 întrebări, cu sursele noi.
+- Reparat în timpul testului: vezi [„Plătește” trimitea draftul nesalvat](2026-09-25-plateste-draft-nesalvat.md);
+  eticheta din admin „Termen estimat … (3 zile lucrătoare)” devine „Termen dat de OCPI: …” când
+  topograful a trecut termenul; confirmarea „Mesaj trimis” apare după reîncărcarea firului;
+  răspunsurile clientului merg doar la colaboratorul atribuit explicit, când există.
