@@ -35,6 +35,7 @@ import { normalizeJudet } from '@/lib/ancpi/judete';
 import uatNomenclator from '@/lib/ancpi/uat-nomenclator.json';
 import { checkCf, normalizeCf } from '@/lib/ancpi/cf-format';
 import { HANDOFF_STORAGE_KEY } from '@/lib/orders/wizard-handoff';
+import SupportingDocsCard from './SupportingDocsCard';
 import {
   Tooltip,
   TooltipContent,
@@ -566,8 +567,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               <Alert className="border-blue-200 bg-blue-50">
                 <AlertCircle className="h-4 w-4 text-blue-600" />
                 <AlertDescription className="text-blue-800">
-                  Pentru căutare după adresă, vom identifica imobilul în baza ANCPI.
-                  Acest serviciu poate dura mai mult și poate implica costuri suplimentare.
+                  Un topograf autorizat caută imobilul în evidențele ANCPI, de obicei în 1–3 zile
+                  lucrătoare. Dacă nu apare online, cerem noi certificatul oficial la OCPI, fără
+                  costuri în plus.
                 </AlertDescription>
               </Alert>
 
@@ -664,6 +666,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
 
         </CardContent>
       </Card>
+
+      {/* Acte care ajută topograful să găsească imobilul (identificare only). */}
+      {config.identificationService.enabled && <SupportingDocsCard />}
 
       {/* Additional imobile — "Adaugă un extras" (same county, ANCPI rule).
           Only for services with the priced extras_suplimentar option (Extras CF). */}

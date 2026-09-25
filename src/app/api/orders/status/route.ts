@@ -3,6 +3,7 @@ import { normalizeOrderOptions } from '@/lib/orders/normalize';
 import { instantPlatformProvider, getOpenOutages, PROVIDER_LABEL } from '@/lib/services/platform-services';
 import { NextRequest, NextResponse } from 'next/server';
 import { issuePaymentProofToken } from '@/lib/orders/payment-proof-token';
+import { issueOrderClientToken } from '@/lib/orders/order-client-token';
 import { reuploadDocLabel } from '@/lib/reupload/doc-types';
 import { isPJForDocumentGeneration } from '@/lib/documents/delegation-items';
 
@@ -384,6 +385,13 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    const { count: unreadMessages } = await supabase
+      .from('order_messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('order_id', order.id)
+      .neq('author_type', 'client')
+      .is('read_by_client_at', null);
+
     return NextResponse.json({
       success: true,
       data: {
@@ -472,6 +480,17 @@ export async function GET(request: NextRequest) {
         },
         timeline,
         documents: clientDocuments,
+        // Message thread with the team / the topograph. The token lets this
+        // page read and reply without a session (code + email verified above).
+        // Not on drafts or abandoned orders: nobody works those.
+        messagesToken: ['draft', 'pending', 'abandoned'].includes(order.status)
+          ? null
+          : issueOrderClientToken(order.id),
+        unreadMessages: unreadMessages ?? 0,
+        // The deadline OCPI itself gave on the registration receipt (the
+        // topograph types it when he files) — shown as „termen dat de OCPI".
+        ocpiTerm: cdAny?.ocpi_submission?.termen_ocpi ?? null,
+        ocpiRegistrationNumber: cdAny?.ocpi_submission?.registration_number ?? null,
       },
     });
   } catch (error) {

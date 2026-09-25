@@ -6,6 +6,8 @@ import { requireCollaboratorForOrder } from '@/lib/admin/permissions';
 import { resolveCollaboratorContext } from '@/lib/admin/collaborator-context';
 import { cereriForOrderSlug, type OrderForCereri } from '@/lib/ancpi/cereri-for-order';
 import { cerereDateRo } from '@/lib/ancpi/cerere-date';
+import { getDownloadUrl } from '@/lib/aws/s3';
+import { sanitizeClientFiles } from '@/lib/orders/client-files';
 
 
 /**
@@ -110,10 +112,24 @@ export async function GET(
       cerereDateRo()
     ).map(({ index, name }) => ({ index, name }));
 
+    // Actele încărcate de client în comandă (extras CF vechi, titlu de
+    // proprietate…) — cu link de descărcare de 15 minute. Cheia e verificată pe
+    // namespace-ul comenzii înainte de semnare.
+    const supportingDocuments = await Promise.all(
+      sanitizeClientFiles(orderId, order.customer_data?.property?.supportingDocuments).map(async (d) => {
+        try {
+          return { ...d, url: await getDownloadUrl(d.key, 900) };
+        } catch {
+          return d;
+        }
+      })
+    );
+
     return NextResponse.json({
       success: true,
       data: {
         ...sanitizedOrder,
+        supportingDocuments,
         deliverable,
         documents: documents ?? [],
         conventii: conventii ?? [],

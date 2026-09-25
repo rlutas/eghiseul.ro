@@ -155,11 +155,18 @@ export const CURATED_GUIDES: GuideLink[] = [
       'Card cu card: Procesare comandă, documentele generate, Solicită documente, KYC verificat, plata și transferul bancar, AWB, costuri interne, note.',
   },
   {
-    title: 'Identificare imobil: când topograful NU găsește imobilul',
+    title: 'Identificare imobil: procesul complet (topograf, apoi OCPI)',
     slug: 'admin/identificare-imobil-nereusita',
     category: 'comenzi',
     description:
-      'Certificatul OCPI 2.7.8 în loc de „în așteptare client”, cele două situații (neintabulat / carte veche neconvertită), pașii pentru Mircea și echipă, emailul de copiat, creditul pentru extras CF.',
+      'Pasul 1: topograful găsește imobilul, extras CF în 1–3 zile. Pasul 2: cerere la OCPI (~10 zile, termenul OCPI văzut de client), documentul OCPI e livrarea, extrasul după el e comandă nouă. Mai multe imobile după proprietar: clientul alege unul. Actele încărcate de client.',
+  },
+  {
+    title: 'Mesajele cu clientul pe comandă',
+    slug: 'admin/mesaje-client',
+    category: 'clienti',
+    description:
+      'Echipa și topograful scriu clientului direct pe comandă; clientul primește email, răspunde din pagina comenzii cu poze atașate, iar răspunsul vine pe email la echipă și la topograf.',
   },
   {
     title: 'documentero.ro: al doilea site, doar acte de stare civilă',

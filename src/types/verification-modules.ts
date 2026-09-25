@@ -574,6 +574,19 @@ export interface PropertyState {
   /** Free-text extra details from the client (identificare imobil). */
   additionalInfo?: string;
   propertyAddress?: string;
+  /**
+   * Identificare imobil: does the client have an act that helps us find the
+   * property (old CF extract, title deed, sale contract)? undefined = not
+   * answered. The files go straight to S3 (`orders/<id>/acte-client/`).
+   */
+  supportingDocsAnswer?: 'yes' | 'no';
+  supportingDocuments?: Array<{
+    key: string;
+    name: string;
+    mimeType: string;
+    size: number;
+    uploadedAt?: string;
+  }>;
 }
 
 /**

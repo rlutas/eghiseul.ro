@@ -11,6 +11,7 @@ import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
 import { taxaEliberare } from '@/lib/ancpi/taxe-eliberare';
 import { IDENTIFICARE_SLUGS } from '@/lib/ancpi/cerere-scope';
 import { COUNTY_NAMES } from '@/lib/ancpi/judete';
+import { OrderMessagesPanel, type MessageTemplate } from '@/components/orders/OrderMessagesPanel';
 
 interface OrderDoc {
   id: string;
@@ -35,7 +36,37 @@ interface OrderDetail {
   conventii: OrderDoc[];
   /** Cererile de depus la OCPI (Anexa 6) — una per imobil de pe comandă. */
   cereri: { index: number; name: string }[];
+  /** Acte încărcate de client (extras CF vechi, titlu de proprietate…). */
+  supportingDocuments?: { key: string; name: string; mimeType: string; size: number; url?: string }[];
 }
+
+/**
+ * Mesaje gata scrise pentru situațiile care se repetă la identificare —
+ * se completează în casetă și le editează înainte de trimitere.
+ */
+const IDENTIFICARE_TEMPLATES: MessageTemplate[] = [
+  {
+    label: 'Mai multe imobile găsite',
+    text:
+      'Bună ziua! Pe numele proprietarului am găsit mai multe imobile:\n\n1. \n2. \n\n' +
+      'Vă rog să ne spuneți pentru care dintre ele scoatem extrasul de carte funciară inclus în comandă. ' +
+      'Pentru celelalte puteți comanda separat un extras de carte funciară.',
+  },
+  {
+    label: 'Cer un act vechi',
+    text:
+      'Bună ziua! Ca să identificăm imobilul mai repede, aveți vreun act vechi pentru el: extras de carte funciară, ' +
+      'titlu de proprietate, contract de vânzare-cumpărare sau certificat de moștenitor? ' +
+      'Dacă da, vă rog să ne trimiteți aici o poză clară, cu toată pagina.',
+  },
+  {
+    label: 'Adresă incompletă',
+    text:
+      'Bună ziua! Adresa din comandă nu e suficientă ca să găsim imobilul. Vă rog să ne scrieți strada, numărul ' +
+      '(și blocul, scara, apartamentul, dacă e cazul) sau un reper: numărul vechi al casei, numele vecinilor, ' +
+      'fosta denumire a străzii.',
+  },
+];
 
 /**
  * Statusurile pe care le poate seta colaboratorul — subset din lista de admin
@@ -79,6 +110,9 @@ export default function CollaboratorOrderDetail() {
   // se precompletează după ce se încarcă comanda, ca să nu o tasteze de o sută
   // de ori; rămâne editabilă pentru cazurile în care diferă.
   const [costRon, setCostRon] = useState('');
+  // Termenul de soluționare scris de OCPI pe dovada de înregistrare — îl vede
+  // clientul în pagina comenzii.
+  const [termenOcpi, setTermenOcpi] = useState('');
   const [savingDepunere, setSavingDepunere] = useState(false);
   // Identificarea raportată de el pe comenzile de identificare imobil — din ea
   // se generează apoi cererea de extras CF pe care o depune.
@@ -113,6 +147,8 @@ export default function CollaboratorOrderDetail() {
       // Nr. de depunere deja raportat — îl vede și îl poate corecta.
       const savedReg = json.data?.customer_data?.ocpi_submission?.registration_number;
       if (savedReg) setRegNumber((current: string) => current || savedReg);
+      const savedTermen = json.data?.customer_data?.ocpi_submission?.termen_ocpi;
+      if (savedTermen) setTermenOcpi((current: string) => current || savedTermen);
       // Taxa e PE IMOBIL: o comandă cu două cărți funciare costă 2×20 la OCPI.
       const taxa = taxaEliberare(json.data?.services?.slug, json.data?.services?.processing_config);
       const imobile = Math.max(1, json.data?.cereri?.length ?? 1);
@@ -242,7 +278,7 @@ export default function CollaboratorOrderDetail() {
       const res = await fetch(withPreview(`/api/collaborator/orders/${orderId}/depunere`, previewAs), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ registrationNumber: regNumber.trim(), costRon: costRon.trim() }),
+        body: JSON.stringify({ registrationNumber: regNumber.trim(), costRon: costRon.trim(), termenOcpi }),
       });
       const json = await res.json();
       if (!json.success) throw new Error(json.error || 'Eroare');
@@ -324,6 +360,27 @@ export default function CollaboratorOrderDetail() {
           <Field label="Motivul solicitării" value={property.motiv} />
           <Field label="Alte informații de la client" value={property.additionalInfo} />
         </dl>
+        {(order.supportingDocuments?.length ?? 0) > 0 ? (
+          <div className="mt-4 border-t border-slate-100 pt-3">
+            <p className="mb-2 text-xs uppercase text-slate-400">Acte trimise de client</p>
+            <ul className="space-y-1.5">
+              {order.supportingDocuments!.map((d) => (
+                <li key={d.key} className="flex items-center gap-2 text-sm">
+                  <FileText className="h-4 w-4 text-slate-400" />
+                  {d.url ? (
+                    <a href={d.url} target="_blank" rel="noopener" className="font-medium text-primary-700 hover:underline">
+                      {d.name}
+                    </a>
+                  ) : (
+                    <span>{d.name}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : property.supportingDocsAnswer === 'no' ? (
+          <p className="mt-3 text-xs text-slate-500">Clientul a spus că nu are acte pentru imobil.</p>
+        ) : null}
       </div>
 
       {/* Angajamentul de execuție — contractul dintre client și executant,
@@ -440,8 +497,9 @@ export default function CollaboratorOrderDetail() {
                 Raportat negăsit la{' '}
                 {new Date(order.customer_data.identification_result.reportedAt).toLocaleDateString('ro-RO')}
                 {' '}— certificat ANCPI {order.customer_data.identification_result.ancpiServiceCode}. Depune-l la
-                OCPI și salvează nr. de depunere mai jos; când vine răspunsul, încarcă-l. Dacă are CF, completează
-                și „Am identificat imobilul”.
+                OCPI și salvează mai jos nr. de depunere și termenul dat de OCPI. Când vine răspunsul (cu CF
+                sau negativ), încarcă documentul OCPI: el e livrarea. Extrasul CF nu mai e inclus; dacă
+                clientul îl vrea, face o comandă nouă de extras.
               </p>
             ) : (
               <>
@@ -516,7 +574,8 @@ export default function CollaboratorOrderDetail() {
           <h2 className="mb-1 text-sm font-semibold text-slate-900">Am depus cererea la OCPI</h2>
           <p className="mb-3 text-xs text-slate-500">
             Trece comanda în &bdquo;Trimis instituție&rdquo; și înregistrează costul eliberării.
-            După numărul de depunere poți căuta comanda în listă când ridici documentul.
+            După numărul de depunere poți căuta comanda în listă când ridici documentul. Termenul
+            scris de OCPI pe dovada de înregistrare apare clientului în pagina comenzii.
           </p>
           {order.customer_data?.ocpi_submission?.registration_number && (
             <p className="mb-3 rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600">
@@ -536,6 +595,19 @@ export default function CollaboratorOrderDetail() {
                 onChange={(e) => setRegNumber(e.target.value)}
                 disabled={readOnly}
                 placeholder="ex. 84512/12.09.2026"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
+              />
+            </div>
+            <div className="w-44">
+              <label htmlFor="termen-ocpi" className="mb-1 block text-xs text-slate-500">
+                Termen dat de OCPI
+              </label>
+              <input
+                id="termen-ocpi"
+                type="date"
+                value={termenOcpi}
+                onChange={(e) => setTermenOcpi(e.target.value)}
+                disabled={readOnly}
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
               />
             </div>
@@ -562,7 +634,7 @@ export default function CollaboratorOrderDetail() {
             </div>
             <Button
               onClick={handleDepunere}
-              disabled={readOnly || savingDepunere || (!regNumber.trim() && !costRon.trim())}
+              disabled={readOnly || savingDepunere || (!regNumber.trim() && !costRon.trim() && !termenOcpi)}
               variant="outline"
               className="h-10"
             >
@@ -670,6 +742,15 @@ export default function CollaboratorOrderDetail() {
           </ul>
         )}
       </div>
+
+      {/* Mesaje direct cu clientul — întrebări, lista imobilelor găsite după
+          proprietar, cerere de act vechi. Clientul primește email și răspunde
+          din pagina comenzii. */}
+      <OrderMessagesPanel
+        endpoint={withPreview(`/api/collaborator/orders/${orderId}/messages`, previewAs)}
+        readOnly={readOnly}
+        templates={(IDENTIFICARE_SLUGS as readonly string[]).includes(order.services?.slug ?? '') ? IDENTIFICARE_TEMPLATES : undefined}
+      />
 
       {/* Note for the team */}
       <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">

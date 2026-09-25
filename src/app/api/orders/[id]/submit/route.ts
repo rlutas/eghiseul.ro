@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { sanitizeClientFiles } from '@/lib/orders/client-files';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAudit, getAuditContext } from '@/lib/security/audit-logger';
@@ -633,6 +634,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           }
         }
       }
+    }
+
+    // Acte de la client pentru identificarea imobilului: cheile vin din
+    // browser (draftul), deci păstrăm doar ce e în namespace-ul comenzii.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const propertyData = existingCustomerData.property as any;
+    if (propertyData && propertyData.supportingDocuments !== undefined) {
+      propertyData.supportingDocuments = sanitizeClientFiles(id, propertyData.supportingDocuments);
     }
 
     updateData.customer_data = {

@@ -91,3 +91,34 @@ Body: `{ paymentProofKey?, proofOnly?, proofToken? }`.
 ### `GET /api/admin/orders/list`
 Sortare: `is_closed ASC` (coloană generată, migrarea 179:
 `completed/cancelled/refunded`), apoi `paid_at DESC NULLS FIRST`, `created_at DESC`.
+
+## Mesaje pe comandă + actele clientului (25.09.2026, migrarea 186)
+
+Fir de mesaje per comandă (`order_messages`), scris de echipă, topograf și
+client. Logica: `src/lib/orders/messages.ts` (`postOrderMessage` inserează,
+scrie istoric `note_added`, trimite emailul părții opuse). Tot ce e în fir e
+vizibil clientului; notele interne rămân în `order_history`.
+
+| Rută | Metodă | Acces | Ce face |
+|---|---|---|---|
+| `/api/admin/orders/[id]/messages` | GET / POST | `orders.view` / `orders.manage` | firul complet + URL-uri semnate pe atașamente; GET marchează răspunsurile clientului citite (`read_by_staff_at`); POST `{ body }` → email „ai un mesaj nou” către client |
+| `/api/collaborator/orders/[id]/messages` | GET / POST | colaboratorul comenzii (`requireCollaboratorForOrder`); preview admin = read-only, nu marchează citit | la fel, `author_type='collaborator'` |
+| `/api/orders/[id]/messages` | GET / POST | proprietarul (sesiune) sau `token` (order-client) | vederea clientului: autor mascat („Echipa …” / „Topograful care lucrează comanda”), fără nume de angajați; POST `{ body, attachments[], token }`, max 30/zi/comandă; email către brand `contactEmail` + colaboratorii comenzii (`assigned_collaborator_id` + `collaborator_service_assignments`), `replyTo` = clientul |
+| `/api/orders/[id]/client-files` | POST | draft: `canUpdateDraft` + email existent pe draft; după: sesiune proprietar sau `token` | presigned PUT S3 sub `orders/<id>/acte-client/` (JPG/PNG/WebP/PDF ≤ 10 MB), contor `count_proof_presign` (20/oră) |
+
+- **Token client** (`src/lib/orders/order-client-token.ts`): HMAC
+  `order-client:<orderId>:<exp>`, TTL 24 h, audiență separată de
+  `payment-proof-token`. Emis de `GET /api/orders/status` ca `messagesToken`
+  (nu pe `draft/pending/abandoned`), alături de `unreadMessages`, `ocpiTerm`,
+  `ocpiRegistrationNumber`.
+- **Chei S3 din browser** (`src/lib/orders/client-files.ts`):
+  `sanitizeClientFiles` / `isClientFileKey` resping orice cheie din afara
+  `orders/<id>/acte-client/` (altă comandă, `..`, alt folder). Aplicat la
+  submit (`property.supportingDocuments`), la postarea mesajului și înainte de
+  semnarea URL-urilor în portalul colaboratorului.
+- **Wizard**: `property.supportingDocsAnswer` (`yes|no`) +
+  `property.supportingDocuments[]` pe serviciile cu `identificationService`
+  (`SupportingDocsCard`), upload direct prin `uploadClientFile`.
+- **Depunere OCPI**: `POST /api/collaborator/orders/[id]/depunere` acceptă
+  `termenOcpi` (`YYYY-MM-DD`, azi … +120 zile) → `customer_data.ocpi_submission.termen_ocpi`
+  + `estimated_completion_date`; pagina de status îl arată ca „Termen dat de OCPI”.

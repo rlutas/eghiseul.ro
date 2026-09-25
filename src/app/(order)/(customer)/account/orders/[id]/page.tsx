@@ -32,6 +32,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { customerStatus, STATUS_TONE_CLASSES, type StatusTone } from '@/lib/orders/customer-status';
 import TrackingTimeline from '@/components/orders/tracking-timeline';
+import { CustomerMessages } from '@/components/orders/CustomerMessages';
 
 interface OrderDocument {
   id: string;
@@ -653,6 +654,12 @@ export default function OrderDetailPage() {
             </div>
           )}
 
+          {/* Mesaje cu echipa / topograful — contul folosește sesiunea, nu
+              token-ul paginii publice de status. */}
+          {!['draft', 'pending', 'abandoned'].includes(order.status) && (
+            <CustomerMessages orderId={order.id} />
+          )}
+
           {/* Billing Data */}
           {order.customerData?.billing && (
             <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden">
@@ -879,7 +886,11 @@ export default function OrderDetailPage() {
                     <Calendar className="w-6 h-6 text-primary-700" />
                   </div>
                   <div>
-                    <p className="text-sm text-primary-700 font-medium">Estimare finalizare</p>
+                    <p className="text-sm text-primary-700 font-medium">
+                      {(order.customerData as { ocpi_submission?: { termen_ocpi?: string } } | null)?.ocpi_submission?.termen_ocpi
+                        ? 'Termen dat de OCPI'
+                        : 'Estimare finalizare'}
+                    </p>
                     <p className="text-lg font-bold text-primary-900">{formatDate(order.estimatedCompletion)}</p>
                   </div>
                 </div>

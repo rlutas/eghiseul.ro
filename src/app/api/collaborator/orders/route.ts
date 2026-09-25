@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { unreadClientMessageCounts } from '@/lib/orders/messages';
 import { COLLAB_HIDDEN_STATUSES } from '@/lib/collaborator/hidden-statuses';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -85,7 +86,15 @@ export async function GET(request: NextRequest) {
       },
     }));
 
-    return NextResponse.json({ success: true, data: sanitized });
+    // Răspunsuri necitite de la clienți — badge „mesaj nou” în listă.
+    const unread = await unreadClientMessageCounts(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      sanitized.map((o: any) => o.id)
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const withUnread = sanitized.map((o: any) => ({ ...o, unread_messages: unread[o.id] ?? 0 }));
+
+    return NextResponse.json({ success: true, data: withUnread });
   } catch (error) {
     console.error('[collaborator] list orders error:', error);
     return NextResponse.json({ success: false, error: 'Eroare internă' }, { status: 500 });

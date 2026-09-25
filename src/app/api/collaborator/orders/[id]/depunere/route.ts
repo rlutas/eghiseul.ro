@@ -20,6 +20,7 @@ import { SUPPLIER_ANCPI } from '@/lib/admin/supplier-costs';
 
 const MAX_REG_LENGTH = 60;
 const MAX_COST_RON = 5000;
+const MAX_TERMEN_DAYS = 120;
 
 /** Statuses from which filing at OCPI is the next step forward. */
 const BEFORE_SUBMISSION = ['paid', 'processing', 'documents_generated', 'standby'];
@@ -75,9 +76,28 @@ export async function POST(
         { status: 400 }
       );
     }
-    if (!registrationNumber && costRon === null) {
+    // Termenul de soluționare scris de OCPI pe dovada de înregistrare
+    // (YYYY-MM-DD). Clientul îl vede în pagina comenzii ca „termen dat de
+    // OCPI" și devine data estimată a comenzii — e termenul real, nu estimarea
+    // noastră de 10 zile.
+    const rawTermen = typeof body?.termenOcpi === 'string' ? body.termenOcpi.trim() : '';
+    let termenOcpi: string | null = null;
+    if (rawTermen) {
+      const valid = /^\d{4}-\d{2}-\d{2}$/.test(rawTermen) && !Number.isNaN(Date.parse(`${rawTermen}T12:00:00Z`));
+      const t = valid ? Date.parse(`${rawTermen}T12:00:00Z`) : NaN;
+      const today = Date.now() - 24 * 60 * 60 * 1000;
+      if (!valid || t < today || t > Date.now() + MAX_TERMEN_DAYS * 24 * 60 * 60 * 1000) {
+        return NextResponse.json(
+          { success: false, error: `Termenul OCPI trebuie să fie o dată din următoarele ${MAX_TERMEN_DAYS} de zile` },
+          { status: 400 }
+        );
+      }
+      termenOcpi = rawTermen;
+    }
+
+    if (!registrationNumber && costRon === null && !termenOcpi) {
       return NextResponse.json(
-        { success: false, error: 'Completează numărul de înregistrare sau costul' },
+        { success: false, error: 'Completează numărul de înregistrare, termenul sau costul' },
         { status: 400 }
       );
     }
@@ -164,7 +184,7 @@ export async function POST(
     // Numărul de depunere OCPI se salvează PE COMANDĂ, nu doar în istoric:
     // după el caută topograful comanda peste 2 zile, când OCPI îi eliberează
     // documentul și tot ce are în mână e numărul de înregistrare.
-    if (registrationNumber) {
+    if (registrationNumber || termenOcpi) {
       // Re-citim customer_data chiar înainte de scriere: de la SELECT-ul de
       // sus au trecut mai multe drumuri la DB, iar spread-ul peste o citire
       // veche ar suprascrie ce a intrat între timp (ex. identified_property).
@@ -173,17 +193,22 @@ export async function POST(
         .select('customer_data')
         .eq('id', orderId)
         .single();
+      const current = (fresh?.customer_data ?? order.customer_data) ?? {};
+      const previous = current.ocpi_submission ?? {};
       const { error: regErr } = await admin
         .from('orders')
         .update({
           customer_data: {
-            ...((fresh?.customer_data ?? order.customer_data) ?? {}),
+            ...current,
             ocpi_submission: {
-              registration_number: registrationNumber,
-              submitted_at: new Date().toISOString(),
+              ...previous,
+              registration_number: registrationNumber || previous.registration_number || null,
+              submitted_at: previous.submitted_at ?? new Date().toISOString(),
               by: who,
+              ...(termenOcpi ? { termen_ocpi: termenOcpi } : {}),
             },
           },
+          ...(termenOcpi ? { estimated_completion_date: `${termenOcpi}T15:00:00.000Z` } : {}),
           updated_at: new Date().toISOString(),
         })
         .eq('id', orderId);
@@ -203,6 +228,7 @@ export async function POST(
       registrationNumber
         ? `Cerere depusă la OCPI — nr. înregistrare ${registrationNumber}.`
         : 'Cerere depusă la OCPI.',
+      termenOcpi ? `Termen dat de OCPI: ${termenOcpi.split('-').reverse().join('.')}.` : null,
       costRon !== null ? `Cost eliberare: ${costRon.toFixed(2)} lei.` : null,
     ].filter(Boolean);
 

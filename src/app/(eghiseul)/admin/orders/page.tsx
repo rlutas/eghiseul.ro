@@ -35,6 +35,7 @@ import {
   AlertTriangle,
   Ticket,
   StickyNote,
+  MessageSquare,
   Eye,
   ExternalLink,
   FileText,
@@ -112,6 +113,8 @@ interface OrderRow {
   coupon_code: string | null;
   admin_notes: string | null;
   note_count?: number;
+  /** Răspunsuri de la client necitite de echipă (firul de mesaje). */
+  unread_messages?: number;
   services: { name: string; slug: string } | null;
 }
 
@@ -667,6 +670,22 @@ export default function AdminOrdersPage() {
                         </span>
                       </button>
                     ) : null}
+                    {(order.unread_messages ?? 0) > 0 && (
+                      <button
+                        type="button"
+                        title={`${order.unread_messages} mesaj(e) nou de la client — deschide`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/admin/orders/${order.id}#mesaje`);
+                        }}
+                        className="relative inline-flex items-center justify-center rounded p-1 text-primary-600 hover:bg-primary-50"
+                      >
+                        <MessageSquare className="h-4 w-4" />
+                        <span className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-primary-600 px-0.5 text-[9px] font-bold text-white">
+                          {order.unread_messages}
+                        </span>
+                      </button>
+                    )}
                   </TableCell>
                   <TableCell className="text-sm">
                     <ServiceBadge name={order.services?.name} slug={order.services?.slug} />

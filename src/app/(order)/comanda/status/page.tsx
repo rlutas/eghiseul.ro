@@ -30,6 +30,7 @@ import {
   Upload,
 } from 'lucide-react';
 import TrackingTimeline from '@/components/orders/tracking-timeline';
+import { CustomerMessages } from '@/components/orders/CustomerMessages';
 import { BrandFooter as Footer } from '@/components/shared/brand-footer';
 import { useBrand } from '@/lib/brand/client';
 
@@ -180,6 +181,12 @@ interface OrderData {
     createdAt: string;
   }>;
   documents?: OrderDocument[];
+  /** Lets this page read / answer the order's messages without a session. */
+  messagesToken?: string | null;
+  unreadMessages?: number;
+  /** Deadline written by OCPI on the registration receipt (YYYY-MM-DD). */
+  ocpiTerm?: string | null;
+  ocpiRegistrationNumber?: string | null;
 }
 
 function OrderStatusContent() {
@@ -203,6 +210,15 @@ function OrderStatusContent() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Emailul „ai un mesaj nou" trimite pe #mesaje; secțiunea apare abia după
+  // ce se încarcă comanda, deci derulăm noi când e gata.
+  useEffect(() => {
+    if (!orderData?.messagesToken || typeof window === 'undefined') return;
+    if (window.location.hash !== '#mesaje') return;
+    const t = window.setTimeout(() => document.getElementById('mesaje')?.scrollIntoView({ behavior: 'smooth' }), 200);
+    return () => window.clearTimeout(t);
+  }, [orderData?.messagesToken]);
 
   const [proofMessage, setProofMessage] = useState<{ ok: boolean; text: string } | null>(null);
   // The uploaded proof is attached through the same workflow as at checkout;
@@ -381,6 +397,15 @@ function OrderStatusContent() {
           {/* Help contact card — WhatsApp + phone, first touchpoint when the
               customer is confused. Always rendered above the status details
               to match sister project UX. */}
+          {(orderData.unreadMessages ?? 0) > 0 && orderData.messagesToken && (
+            <a
+              href="#mesaje"
+              className="block rounded-xl border-2 border-primary-400 bg-primary-50 px-4 py-3 text-sm font-semibold text-secondary-900 hover:bg-primary-100"
+            >
+              Ai {orderData.unreadMessages === 1 ? 'un mesaj nou' : `${orderData.unreadMessages} mesaje noi`} despre comandă. Citește și răspunde ↓
+            </a>
+          )}
+
           <HelpContactCard orderCode={orderData.orderCode} />
 
           {/* Documents requested from the customer — most urgent action, shown
@@ -558,8 +583,23 @@ function OrderStatusContent() {
                       Eliberare automată — de regulă în câteva minute
                     </p>
                   ) : null}
+                  {/* Termenul dat de OCPI la depunere — mai precis decât estimarea
+                      noastră, așa că îl arătăm pe nume. */}
+                  {orderData.ocpiTerm && !['document_ready', 'shipped', 'delivered', 'completed'].includes(orderData.status) && (
+                    <p className="text-sm font-medium text-secondary-900">
+                      Termen dat de OCPI:{' '}
+                      {new Intl.DateTimeFormat('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' }).format(
+                        new Date(`${orderData.ocpiTerm}T12:00:00`)
+                      )}
+                      {orderData.ocpiRegistrationNumber && (
+                        <span className="font-normal text-muted-foreground">
+                          {' '}(cererea nr. {orderData.ocpiRegistrationNumber})
+                        </span>
+                      )}
+                    </p>
+                  )}
                   {/* Processing time */}
-                  {!orderData.isInstantService && orderData.estimatedCompletionDate ? (
+                  {orderData.ocpiTerm ? null : !orderData.isInstantService && orderData.estimatedCompletionDate ? (
                     <p className="text-sm text-muted-foreground">
                       Estimat: {new Intl.DateTimeFormat('ro-RO', {
                         weekday: 'long',
@@ -696,6 +736,12 @@ function OrderStatusContent() {
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {/* Mesaje cu echipa / topograful — întrebări despre comandă, cu
+              răspuns și poze atașate. */}
+          {orderData.messagesToken && (
+            <CustomerMessages orderId={orderData.id} token={orderData.messagesToken} />
           )}
 
           {/* Timeline */}

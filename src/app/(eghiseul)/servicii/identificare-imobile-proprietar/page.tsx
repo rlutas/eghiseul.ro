@@ -32,6 +32,7 @@ import { ServiceSwitcher } from '@/components/services/service-switcher';
 import { SystemStatus } from '@/components/services/system-status';
 import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 import { RelatedServicesLinks } from '@/components/services/related-services-links';
+import { IdentificationProcessSection } from '@/components/services/identification-process-section';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -75,8 +76,8 @@ const jsonLdGraph = buildServicePageGraph({
   description:
     'Serviciu de identificare a imobilelor (terenuri și construcții) deținute de o persoană fizică ' +
     'sau juridică, prin căutare în evidențele de cadastru și carte funciară după numele proprietarului ' +
-    '(și, unde e cazul, CNP/CUI), la nivel de localitate și județ. Rezultatul este lista imobilelor ' +
-    'înscrise pe acel proprietar. 100% online, fără cont ANCPI, livrare pe email.',
+    '(și, unde e cazul, CNP/CUI), la nivel de localitate și județ. Rezultatul este extrasul de carte funciară ' +
+    'al imobilului găsit (la mai multe imobile, al celui ales de client). 100% online, fără cont ANCPI, livrare pe email.',
   serviceType: 'Document Processing — Real Estate',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -168,7 +169,8 @@ export default async function IdentificareImobileProprietarPage() {
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
                   Afli ce imobile deține o persoană fizică sau juridică. Căutăm în evidențele de cadastru
-                  și carte funciară după numele proprietarului și îți livrăm lista imobilelor înscrise pe el.
+                  și carte funciară după numele proprietarului și îți obținem extrasul de carte funciară al
+                  imobilului găsit. Dacă are mai multe, alegi tu pe care.
                 </p>
 
                 {/* USP */}
@@ -194,7 +196,7 @@ export default async function IdentificareImobileProprietarPage() {
                       'Ne dai numele proprietarului și județul/localitatea',
                       'Verificăm eligibilitatea cererii și interesul legitim',
                       'Plătești securizat (taxele OCPI sunt incluse)',
-                      'Primești lista imobilelor pe email',
+                      'Primești extrasul CF (la mai multe imobile, alegi unul)',
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" />
@@ -315,7 +317,7 @@ export default async function IdentificareImobileProprietarPage() {
                 construcții deține o persoană, fizică sau juridică, pornind de la{' '}
                 <strong>numele proprietarului</strong> și nu de la numărul cadastral sau de la adresă. Căutăm în
                 evidențele de <strong>cadastru și carte funciară</strong>, la nivel de localitate și județ, apoi
-                îți întocmim lista imobilelor înscrise pe numele indicat.
+                îți obținem extrasul de carte funciară al imobilului găsit.
               </p>
               <p>
                 La un extras de carte funciară obișnuit pornești de la un imobil cunoscut și afli cine este
@@ -333,16 +335,16 @@ export default async function IdentificareImobileProprietarPage() {
                   numărul de carte funciară. Câmpurile de care avem nevoie sunt:{' '}
                   <strong>numele / denumirea proprietarului</strong>, opțional <strong>CNP-ul</strong> (persoană
                   fizică) sau <strong>CUI-ul</strong> (persoană juridică), plus <strong>județul și
-                  localitatea</strong> în care vrei să căutăm. Cu cât datele sunt mai precise, cu atât lista
-                  rezultată este mai exactă.
+                  localitatea</strong> în care vrei să căutăm. Cu cât datele sunt mai precise, cu atât
+                  căutarea este mai exactă.
                 </p>
               </div>
 
               <p>
-                După verificare, primești pe email <strong>lista imobilelor</strong> înscrise pe numele
-                proprietarului în zona indicată, cu informațiile disponibile pentru fiecare poziție (localizare,
-                tip de imobil și, unde se poate, numărul cadastral sau de carte funciară). Pe baza acestei liste
-                poți comanda apoi un{' '}
+                Dacă găsim un singur imobil, primești pe email <strong>extrasul lui de carte
+                funciară</strong>. Dacă proprietarul are mai multe imobile în zona indicată, îți scriem lista în
+                pagina comenzii și alegi pentru care scoatem extrasul inclus în preț. Pentru celelalte poți comanda
+                separat un{' '}
                 <Link href={serviceUrl('extras-carte-funciara')} className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   extras de carte funciară
                 </Link>
@@ -473,7 +475,7 @@ export default async function IdentificareImobileProprietarPage() {
                 { step: 1, title: 'Ne dai datele', desc: 'Numele / denumirea proprietarului, opțional CNP/CUI, plus județul și localitatea.', icon: Users },
                 { step: 2, title: 'Verificăm eligibilitatea', desc: 'Confirmăm interesul legitim al cererii, conform regulilor de protecție a datelor.', icon: Search },
                 { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele OCPI sunt incluse în preț.', icon: Shield },
-                { step: 4, title: 'Primești lista', desc: `În ${formatEstimatedDays(service)} primești pe email lista imobilelor înscrise pe proprietar.`, icon: CheckCircle },
+                { step: 4, title: 'Primești extrasul', desc: `În ${formatEstimatedDays(service)} primești extrasul CF al imobilului găsit; la mai multe imobile, alegi tu unul.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -487,6 +489,8 @@ export default async function IdentificareImobileProprietarPage() {
             </div>
           </div>
         </section>
+
+        <IdentificationProcessSection variant="owner" />
 
         <ReviewsSection />
 
@@ -538,12 +542,14 @@ export default async function IdentificareImobileProprietarPage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Identificare Imobile după Proprietar"
           faqs={[
-            { q: 'Cum căutați imobilele după numele proprietarului?', a: 'Pornim de la numele persoanei fizice sau de la denumirea firmei și căutăm în evidențele de cadastru și carte funciară, la nivel de localitate și județ. Întocmim lista imobilelor înscrise pe numele indicat și ți-o trimitem pe email.' },
+            { q: 'Cum căutați imobilele după numele proprietarului?', a: 'Pornim de la numele persoanei fizice sau de la denumirea firmei și căutăm în evidențele de cadastru și carte funciară, la nivel de localitate și județ. Dacă găsim mai multe imobile, îți trimitem lista în pagina comenzii și alegi pentru care scoatem extrasul de carte funciară.' },
             { q: 'Ce date îmi trebuie pentru căutare?', a: 'Ai nevoie de numele / denumirea proprietarului și de zona în care căutăm (județ și localitate). Numărul cadastral nu este necesar. CNP-ul (persoană fizică) sau CUI-ul (persoană juridică) sunt opționale, dar cresc precizia rezultatului.' },
-            { q: 'Ce primesc concret?', a: 'Primești lista imobilelor înscrise pe numele proprietarului în zona indicată, cu informațiile disponibile pentru fiecare poziție (localizare, tip de imobil și, unde se poate, numărul cadastral sau de carte funciară). Apoi poți comanda separat extrasul de carte funciară pentru fiecare imobil.' },
+            { q: 'Ce primesc concret?', a: 'Extrasul de carte funciară pentru imobilul găsit pe numele proprietarului. Dacă găsim mai multe imobile în zona indicată, îți trimitem lista în pagina comenzii și alegi tu pentru care scoatem extrasul inclus în preț; pentru celelalte poți comanda separat câte un extras de carte funciară.' },
             { q: 'Căutarea acoperă tot județul sau toată țara?', a: 'Evidențele sunt organizate pe localități și județe, așa că facem căutarea pe zona pe care o indici. Dacă o persoană poate deține imobile în mai multe județe, ne spui fiecare zonă și extindem căutarea corespunzător.' },
             { q: 'Pot căuta și o firmă (persoană juridică)?', a: 'Da. Pentru persoane juridice ne dai denumirea și, ideal, CUI-ul. Procedura este aceeași: identificăm imobilele înscrise pe firma respectivă în zona indicată.' },
             { q: 'Cât durează?', a: `${formatEstimatedDays(service)}. Căutarea este făcută de un operator, pentru că presupune verificarea eligibilității și identificarea imobilelor după proprietar.` },
+            { q: 'Ce se întâmplă dacă nu găsim niciun imobil?', a: 'Dacă imobilul nu apare online (carte funciară veche, pe hârtie, nedigitalizată, sau imobil neînscris), topograful depune cerere la OCPI, inclusă în preț. OCPI caută în arhivă, de regulă în până la 10 zile lucrătoare, iar termenul dat de OCPI îl vezi în pagina comenzii. Primești documentul OCPI: fie cartea funciară găsită și digitalizată (extrasul îl poți comanda apoi separat), fie confirmarea că imobilul nu e înscris, cu care un topograf din zona ta poate face înscrierea.' },
+            { q: 'Ce acte mă ajută la căutare?', a: 'Orice act al imobilului: un extras de carte funciară vechi, titlul de proprietate, contractul de vânzare-cumpărare sau certificatul de moștenitor. Le încarci ca poză în formularul de comandă sau, mai târziu, din pagina comenzii.' },
             { q: 'Cât costă serviciul?', a: `${service.base_price} RON, cu taxele OCPI incluse. Fără costuri ascunse.` },
             { q: 'Este legal? Cum respectați protecția datelor (GDPR)?', a: 'Căutarea după proprietar prelucrează date cu caracter personal și este permisă doar pe baza unui interes legitim (de exemplu calitatea de moștenitor, creditor sau parte într-un litigiu). Înainte de procesare verificăm eligibilitatea cererii; dacă nu sunt îndeplinite condițiile, nu efectuăm căutarea.' },
             { q: 'Pot cere căutarea fără cont pe portalul ANCPI?', a: 'Nu. Ne ocupăm noi de tot procesul; tu trebuie doar să ne dai numele proprietarului și zona în care să căutăm.' },
@@ -567,7 +573,7 @@ export default async function IdentificareImobileProprietarPage() {
                 Află ce imobile deține un proprietar
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Ai nevoie doar de numele proprietarului și de localitate. Primești lista imobilelor în {formatEstimatedDays(service)}.
+                Ai nevoie doar de numele proprietarului și de localitate. Primești extrasul de carte funciară în {formatEstimatedDays(service)}.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>

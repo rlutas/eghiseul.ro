@@ -47,8 +47,8 @@ Prețurile includ TVA și taxele instituției. „Termen” = ce promitem pe pag
 | Certificat constatator cu istoric | 487 | câteva minute când robotul merge | nu | nu | nu | [constatator](certificat-constatator.md) |
 | Extras de carte funciară | 89 (+49,99 / imobil în plus) | aceeași zi, maximum 2 zile lucrătoare | nu | nu | nu | [extras CF](extras-carte-funciara.md) |
 | Extras de plan cadastral | 89 | 2 zile lucrătoare | nu | nu | nu | [extras CF](extras-carte-funciara.md) |
-| Identificare imobil după adresă | 298 | 2-4 zile lucrătoare (+10 dacă se depune certificat OCPI) | nu | nu | nu | [topograf](imobiliare-topograf.md) |
-| Identificare imobile după proprietar | 298 | 5 zile lucrătoare (+10 la certificat OCPI) | nu | nu | nu | [topograf](imobiliare-topograf.md) |
+| Identificare imobil după adresă | 298 | 1-3 zile lucrătoare (până la ~10 dacă se depune cerere la OCPI) | nu | nu | nu | [topograf](imobiliare-topograf.md) |
+| Identificare imobile după proprietar | 298 | 1-3 zile lucrătoare (până la ~10 la OCPI); la mai multe imobile, clientul alege unul | nu | nu | nu | [topograf](imobiliare-topograf.md) |
 | Copie carte funciară (in extenso) | 168,19 | 4 zile lucrătoare | +182,71 | nu | nu | [topograf](imobiliare-topograf.md) |
 | Extras de carte funciară colectivă | 168,19 | 4 zile lucrătoare | +182,71 | nu | nu | [topograf](imobiliare-topograf.md) |
 | Copie certificată din arhiva OCPI | 216,59 | 4 zile lucrătoare | +134,31 | nu | nu | [topograf](imobiliare-topograf.md) |

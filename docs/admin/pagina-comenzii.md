@@ -34,6 +34,15 @@ email) și **pasul unde s-a oprit**.
 
 Cardurile specifice serviciului: răspunsurile din pasul de stare civilă, CF /
 cadastral / adresă + UAT, numărul de depunere OCPI, datele firmei de la ANAF.
+La identificare imobil: „Are acte pentru identificare” (Da/Nu) și **Acte trimise
+de client** (extras CF vechi, titlu, contract), cu click care deschide fișierul.
+
+## Mesaje cu clientul
+
+Cardul de deasupra notelor. Ce scrieți aici ajunge la client pe email și în
+pagina comenzii; el răspunde de acolo, cu poze atașate, iar răspunsul vine pe
+email la contact@ și la topograf. Vedeți „văzut de client” sub fiecare mesaj.
+Notele interne rămân în „Note Echipă”. Detalii: [Mesajele cu clientul](mesaje-client.md).
 
 ## Documente încărcate de client
 

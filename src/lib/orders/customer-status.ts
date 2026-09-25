@@ -48,7 +48,7 @@ export const CUSTOMER_STATUS: Record<string, CustomerStatus> = {
   identification_pending_ocpi: {
     label: 'Certificat oficial cerut la OCPI',
     tone: PROGRESS,
-    hint: 'Imobilul nu apare în e-Terra. Am cerut OCPI certificatul oficial privind înscrierea lui; răspunsul vine în circa 10 zile lucrătoare.',
+    hint: 'Imobilul nu apare online, așa că am depus cerere la OCPI să-l caute în arhivă. Răspunsul vine în circa 10 zile lucrătoare; termenul exact dat de OCPI apare mai jos.',
   },
   document_received: { label: 'Document primit', tone: PROGRESS, hint: 'Am primit documentul de la instituție.' },
   extras_in_progress: { label: 'Servicii suplimentare în lucru', tone: PROGRESS },

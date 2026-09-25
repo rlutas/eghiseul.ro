@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { unreadClientMessageCounts } from '@/lib/orders/messages';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission, getUserPermissions } from '@/lib/admin/permissions';
@@ -245,6 +246,7 @@ export async function GET(request: NextRequest) {
     // (extras CF / plan cadastral / constatator) as "on hold" instead of a
     // deadline while the backing platform is down.
     const openOutages = await getOpenOutages(adminClient);
+    const unreadMessages = await unreadClientMessageCounts(orderRows.map((o) => o.id));
 
     return NextResponse.json({
       success: true,
@@ -253,6 +255,7 @@ export async function GET(request: NextRequest) {
         note_count: noteCounts[o.id] || 0,
         barou: barouByOrder[o.id] ?? null,
         onrc: onrcByOrder[o.id] ?? null,
+        unread_messages: unreadMessages[o.id] ?? 0,
       })),
       total: count || 0,
       openOutages,

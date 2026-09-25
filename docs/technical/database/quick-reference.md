@@ -766,3 +766,22 @@ digest, changed_by)` (tranzacție: `orders.payment_proof_url` + `order_history`
 `awaiting_payment`). `mark_payment_proof_notified(event)` = heads-up trimis.
 `count_proof_presign(order, max)` = bugetul de presign-uri (5/oră) în
 `orders.proof_presign_count/window_start`. Fără drepturi pentru anon/authenticated.
+
+## order_messages (migrarea 186, 25.09.2026)
+
+Firul de mesaje al unei comenzi (echipă / topograf ↔ client). RLS pornit, fără
+politici, `REVOKE ALL` de la `anon`/`authenticated`: doar prin API (service role).
+
+| Coloană | Tip | Note |
+|---|---|---|
+| `order_id` | uuid FK `orders` ON DELETE CASCADE | |
+| `author_type` | text CHECK `client\|team\|collaborator` | |
+| `author_id` | uuid null | profilul angajatului / colaboratorului; null la client |
+| `author_name` | text | nume intern; clientul NU îl vede |
+| `body` | text 1–4000 | |
+| `attachments` | jsonb `[{key,name,mimeType,size}]` | doar la client, chei sub `orders/<order_id>/acte-client/` |
+| `read_by_client_at` / `read_by_staff_at` | timestamptz | „văzut”; indexul parțial `order_messages_unread_staff_idx` pentru răspunsurile necitite |
+
+Tot în 186: `identificare-imobil` și `identificare-imobile-proprietar` →
+`estimated_days = 3`, `estimated_days_display = '1-3 zile lucrătoare'`;
+`deliverable` nou pe proprietar (un extras, pentru imobilul ales).

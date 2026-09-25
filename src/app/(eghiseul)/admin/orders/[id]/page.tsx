@@ -87,6 +87,7 @@ import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
 import { hasDeliveryAddressData, isEmailOnlyDelivery } from '@/lib/delivery/address';
 import { assessStartWorkOnProof } from '@/lib/orders/start-work-on-proof';
 import { SupplierCostsDialog } from '@/components/admin/supplier-costs-dialog';
+import { OrderMessagesPanel } from '@/components/orders/OrderMessagesPanel';
 import {
   SUPPLIER_CATEGORIES,
   SUPPLIER_CATEGORY_LABELS,
@@ -1308,6 +1309,15 @@ export default function AdminOrderDetailPage() {
         </div>
       )}
 
+
+      {/* Mesaje cu clientul — tot ce se scrie aici ajunge la client (email +
+          pagina comenzii); notele de mai jos rămân interne. */}
+      {!['draft', 'pending', 'abandoned'].includes(order.status ?? '') && (
+        <OrderMessagesPanel
+          endpoint={`/api/admin/orders/${order.id}/messages`}
+          className="rounded-lg border bg-card p-5"
+        />
+      )}
 
       {/* Note Echipă — moved to the top for parity with cazierjudiciaronline.com
           (prominent, right after the banners) so the team sees/writes notes
@@ -5776,7 +5786,27 @@ const PROPERTY_LABELS: Array<[string, string]> = [
   ['topografic', 'Nr. topografic'],
   ['motiv', 'Motivul solicitării'],
   ['additionalInfo', 'Alte informații de la client'],
+  ['supportingDocsAnswer', 'Are acte pentru identificare'],
 ];
+
+/** Act încărcat de client (identificare imobil) — link semnat la click. */
+function ClientFileLink({ file }: { file: { key: string; name: string } }) {
+  const open = async () => {
+    try {
+      const res = await fetch(`/api/upload/download?key=${encodeURIComponent(file.key)}`);
+      const json = await res.json();
+      if (!json.success) throw new Error();
+      window.open(json.data.url, '_blank');
+    } catch {
+      toast.error('Nu s-a putut deschide fișierul');
+    }
+  };
+  return (
+    <button type="button" onClick={open} className="text-left text-sm font-medium text-primary-700 hover:underline break-all">
+      {file.name}
+    </button>
+  );
+}
 
 function PropertySection({ property }: { property: AnyObj | null }) {
   if (!property || typeof property !== 'object') return null;
@@ -5791,9 +5821,14 @@ function PropertySection({ property }: { property: AnyObj | null }) {
   if (entries.length === 0 && extraImobile.length === 0) return null;
 
   const known = new Map(PROPERTY_LABELS);
+  const display = (k: string): string =>
+    k === 'supportingDocsAnswer' ? (property[k] === 'yes' ? 'Da' : 'Nu') : String(property[k]);
+  const supportingDocs = Array.isArray(property.supportingDocuments)
+    ? (property.supportingDocuments as Array<{ key: string; name: string }>)
+    : [];
   const ordered: Array<[string, string]> = [
     ...PROPERTY_LABELS.filter(([k]) => property[k] != null && String(property[k]).trim() !== '').map(
-      ([k, label]) => [label, String(property[k])] as [string, string]
+      ([k, label]) => [label, display(k)] as [string, string]
     ),
     ...entries.filter(([k]) => !known.has(k)).map(([k, v]) => [k, String(v)] as [string, string]),
   ];
@@ -5820,6 +5855,19 @@ function PropertySection({ property }: { property: AnyObj | null }) {
       {extraImobile.map((im, i) => (
         <InfoRow key={`extra-${i}`} label={`Imobil suplimentar #${i + 2}`} value={imobilSummary(im)} wrap />
       ))}
+      {supportingDocs.length > 0 && (
+        <div className="py-1.5">
+          <p className="text-sm text-muted-foreground mb-1">Acte trimise de client</p>
+          <ul className="space-y-1">
+            {supportingDocs.map((f) => (
+              <li key={f.key} className="flex items-center gap-1.5">
+                <FileText className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                <ClientFileLink file={f} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </>
   );
 }

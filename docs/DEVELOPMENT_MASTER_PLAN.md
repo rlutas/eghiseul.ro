@@ -638,6 +638,22 @@ Ghid echipă: `docs/admin/contul-clientului.md`. Changelog: `docs/changelog/2026
 Rămas: testul A→Z pe mobil de către Raul; emailul cu cuponul de bun-venit
 („eventual") nu se trimite încă — codul se vede doar în cont.
 
+### IDENTIFICARE IMOBIL + MESAJE PE COMANDĂ — livrat 25.09.2026
+
+Procesul de identificare confirmat cu topograful (pas 1 topograf 1–3 zile, pas 2
+OCPI ~10 zile, documentul OCPI = livrarea, extrasul după el = comandă nouă; după
+proprietar un singur extras, ales de client). Stare:
+- ✅ acte de la client în wizard (presigned S3, `orders/<id>/acte-client/`), văzute
+  în admin și în portal;
+- ✅ fir de mesaje pe comandă (migrarea 186), email la fiecare mesaj, răspuns cu
+  atașamente din pagina de status;
+- ✅ termenul dat de OCPI la depunere, afișat clientului;
+- ✅ landing + FAQ + email + ghiduri aliniate.
+- ✅ „mesaj nou” în listele de comenzi (admin: iconiță lângă note; portal: badge).
+Rămas: test live cu o comandă reală (formular + mesaj + răspuns); cele 11 comenzi
+vechi din „Așteptare client” de mutat de Mircea.
+Changelog: `docs/changelog/2026-09-25-identificare-acte-mesaje-client.md`.
+
 ### BACKLOG / FUTURE FEATURES
 
 Features planned but not yet scheduled for a specific sprint.

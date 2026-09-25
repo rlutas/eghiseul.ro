@@ -32,6 +32,7 @@ import { ServiceSwitcher } from '@/components/services/service-switcher';
 import { SystemStatus } from '@/components/services/system-status';
 import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 import { RelatedServicesLinks } from '@/components/services/related-services-links';
+import { IdentificationProcessSection } from '@/components/services/identification-process-section';
 
 // New service — no WP legacy URL, so the folder name matches the DB slug and
 // serviceUrl() resolves to this page with no redirect/override needed.
@@ -474,6 +475,8 @@ export default async function IdentificareImobilPage() {
           </div>
         </section>
 
+        <IdentificationProcessSection variant="address" />
+
         <ReviewsSection />
 
         {/* Related — cross-link to CF + plan cadastral */}
@@ -550,13 +553,15 @@ export default async function IdentificareImobilPage() {
             { q: 'Cum aflu numărul de carte funciară după adresă?', a: 'La fel ca pentru numărul cadastral: pornind de la adresă, identificăm imobilul în sistemul ANCPI și îți comunicăm numărul de carte funciară. Primești și extrasul CF aferent, pe email.' },
             { q: 'Pot localiza un teren după numărul cadastral?', a: 'Da. Dacă ai deja numărul cadastral, confirmăm parcela în sistemul ANCPI, îți spunem proprietarul și situația juridică și îți obținem extrasul de carte funciară. Funcționează și invers, după adresă.' },
             { q: 'Cum fac o verificare de cadastru online?', a: 'Ne trimiți adresa sau numărul cadastral, iar noi facem verificarea în sistemul oficial ANCPI și îți returnăm extrasul de carte funciară — proprietar, suprafață și eventuale sarcini. Totul 100% online, fără cont ANCPI.' },
-            { q: 'Ce primesc concret?', a: 'Numărul cadastral și/sau de carte funciară al imobilului identificat și extrasul de carte funciară aferent, livrate pe email.' },
+            { q: 'Ce primesc concret?', a: 'Când topograful găsește imobilul: numărul cadastral și de carte funciară și extrasul de carte funciară, pe email. Dacă imobilul nu apare online, primești documentul oficial de la OCPI (vezi mai jos).' },
             { q: 'Cât costă identificarea imobilului?', a: `${service.base_price} RON, cu taxele ANCPI și extrasul CF incluse. Fără costuri ascunse.` },
             { q: 'Cât durează?', a: `${formatEstimatedDays(service)}. Verificarea este făcută de un operator, pentru că presupune căutarea imobilului după adresă.` },
+            { q: 'Ce acte mă ajută la identificare?', a: 'Orice act în care apare imobilul: un extras de carte funciară vechi, titlul de proprietate, contractul de vânzare-cumpărare sau certificatul de moștenitor. Pe ele apar numărul vechi de carte funciară și numărul topografic, după care topograful găsește imobilul mult mai repede. Le încarci ca poză în formularul de comandă sau, mai târziu, din pagina comenzii.' },
+            { q: 'Cum aflu ce se întâmplă cu comanda?', a: 'În pagina comenzii vezi pasul la care a ajuns și, dacă s-a depus cerere la OCPI, termenul dat de OCPI. Dacă topograful are o întrebare, primești un email și îi răspunzi direct din pagina comenzii.' },
             { q: 'Funcționează pentru apartamente?', a: 'Da, dar apartamentele pot necesita verificări suplimentare (bloc, scară, etaj) și uneori date din actul de proprietate. Te ținem la curent.' },
-            { q: 'Ce se întâmplă dacă imobilul nu poate fi identificat?', a: 'Dacă imobilul nu apare în e-Terra (neintabulat sau intabulat pe cartea funciară veche, pe hârtie, neconvertită încă), depunem la OCPI cererea de certificat privind înscrierea imobilului (serviciul ANCPI 2.7.8, inclus în preț). În circa 10 zile lucrătoare primești fie certificatul cu numărul de carte funciară și extrasul CF, fie certificatul oficial că imobilul nu figurează înscris, cu care poți face intabularea sau conversia cărții vechi.' },
+            { q: 'Ce se întâmplă dacă imobilul nu poate fi identificat?', a: 'Dacă imobilul nu apare online (are cartea funciară veche, pe hârtie, nedigitalizată, sau nu a fost înscris niciodată), topograful depune cerere la OCPI, inclusă în preț. OCPI caută în arhivă, de regulă în până la 10 zile lucrătoare; termenul dat de OCPI îl vezi în pagina comenzii. Dacă găsește cartea funciară, o digitalizează și primești documentul care o confirmă, iar extrasul îl poți comanda apoi separat. Dacă nu o găsește, primești documentul oficial care confirmă asta, cu care un topograf din zona ta poate face înscrierea în cartea funciară.' },
             { q: 'Trebuie să am cont ANCPI ca să cer identificarea?', a: 'Nu. Ne ocupăm noi de tot procesul; tu trebuie doar să ne dai adresa imobilului.' },
-            { q: 'Pot identifica imobilul și după proprietar?', a: 'Căutarea standard este după adresă. Dacă ai doar numele proprietarului, contactează-ne și verificăm ce opțiuni sunt disponibile pentru cazul tău.' },
+            { q: 'Pot identifica imobilul și după proprietar?', a: 'Da, prin serviciul separat de identificare a imobilelor după proprietar: ne dai numele proprietarului și localitatea, iar dacă găsim mai multe imobile, alegi tu pentru care scoatem extrasul.' },
           ]}
         />
 

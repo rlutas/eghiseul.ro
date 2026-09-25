@@ -17,8 +17,8 @@ sunt provizorii. „Prioritar” = opțiunea de urgență, cu prețul ei.
 
 | Serviciu | Preț | Prioritar | Termen | Taxa ANCPI | Ce primește clientul |
 |---|--:|--:|---|--:|---|
-| Identificare imobil după adresă | 298 | | 2-4 zile lucrătoare (+10 dacă se depune certificat la OCPI) | 100 (cod 2.7.8) | numărul de CF + extrasul, sau certificatul oficial OCPI dacă imobilul nu e înscris |
-| Identificare imobile după proprietar | 298 | | 5 zile lucrătoare (+10 la certificat) | 125 (cod 2.7.6) | raport cu imobilele deținute + extrasele |
+| Identificare imobil după adresă | 298 | | 1-3 zile lucrătoare (până la ~10 dacă se depune cerere la OCPI) | 100 (cod 2.7.8) | extrasul CF; dacă nu apare online, documentul OCPI (CF găsită și digitalizată, sau confirmarea că nu e înscris) |
+| Identificare imobile după proprietar | 298 | | 1-3 zile lucrătoare (până la ~10 la OCPI) | 125 (cod 2.7.6) | extrasul CF al imobilului găsit; la mai multe, al celui ales de client (celelalte = comenzi separate); la OCPI, ca mai sus |
 | Copie carte funciară (in extenso) | 168,19 | 182,71 | 4 zile lucrătoare | 25 | copia întregii cărți funciare |
 | Extras de carte funciară colectivă | 168,19 | 182,71 | 4 zile lucrătoare | 20 | extrasul CF al blocului / condominiului |
 | Copie certificată din arhiva OCPI | 216,59 | 134,31 | 4 zile lucrătoare | 25 | copie după un act din arhivă |
@@ -67,7 +67,9 @@ imobilului, numele și telefonul solicitantului, motivul, notele.
 - **Pagina comenzii**: datele imobilului, cererea generată de descărcat (la extras CF / plan cadastral), notă pentru echipă, și butoanele:
   - **„Am identificat imobilul”** (la identificări): salvează CF-ul, generează cererea de extras.
   - **„Nu am găsit — depun certificat la OCPI”**: statusul devine „Identificare nereușită — certificat OCPI depus”, clientul primește emailul, termenul +10 zile lucrătoare.
-  - **„Am depus cererea la OCPI”**: numărul de înregistrare + costul (precompletat cu taxa serviciului). La CF obținut direct online nu se cere depunere: costul se înregistrează singur la încărcare.
+  - **„Am depus cererea la OCPI”**: numărul de înregistrare, **termenul dat de OCPI** (clientul îl vede în pagina comenzii) + costul (precompletat cu taxa serviciului). La CF obținut direct online nu se cere depunere: costul se înregistrează singur la încărcare.
+  - **„Mesaje cu clientul”**: îi scrie direct clientului (întrebări, lista imobilelor găsite după proprietar, cerere de act vechi); clientul primește email și răspunde din pagina comenzii. Vezi [Mesajele cu clientul](../mesaje-client.md).
+  - **„Acte trimise de client”** (în „Date pentru lucrare”): pozele/PDF-urile încărcate de client la comandă (extras CF vechi, titlu, contract).
   - **Statusul**: În lucru · Depusă la OCPI · Blocată — instituția indisponibilă (termenul pe pauză) · Problemă — necesare informații de la client (obligatoriu ce lipsește; comanda intră în „Așteptare client”, echipa îl contactează) · Documentul este eliberat · Finalizată · Livrată, încarcă document suplimentar.
   - **„Încarcă PDF și trimite clientului”**: documentul pleacă pe email, statusul se schimbă singur.
 - **Decont** și **Tarife**: ce i se datorează și grila ANCPI.
@@ -87,7 +89,8 @@ date) și „Blocat instituție” (OCPI / ANCPI indisponibil). Detalii:
 |---|---|
 | Comanda stă în „Plătită” după o zi lucrătoare | Mircea nu a preluat-o: verificați în istoric că emailul „comandă nouă” a plecat, scrieți-i pe WhatsApp. |
 | Mircea a pus „Problemă — informații de la client” | nota lui spune ce lipsește; sunați clientul, corectați datele imobilului în admin, spuneți-i lui Mircea. Comanda e în tabul „Așteptare client”. |
-| Imobilul nu se găsește în e-Terra | **nu** rămâne în „Așteptare client” cu „are credit”: Mircea apasă „Nu am găsit — depun certificat la OCPI”. Certificatul negativ **este livrarea**; nu dăm credit și nu dăm extras gratuit. Procedura completă și emailul de rezervă: [Identificare imobil nereușită](../identificare-imobil-nereusita.md). |
+| Imobilul nu se găsește în e-Terra | **nu** rămâne în „Așteptare client” cu „are credit”: Mircea apasă „Nu am găsit — depun certificat la OCPI”. Documentul OCPI (pozitiv sau negativ) **este livrarea**; extrasul după el e comandă nouă; nu dăm credit. Procesul complet: [Identificare imobil](../identificare-imobil-nereusita.md). |
+| Mircea are o întrebare pentru client | o scrie el direct în „Mesaje cu clientul”, nu pe WhatsApp la echipă. Răspunsul clientului vine pe email la el și la contact@. |
 | Clientul a comandat identificare, dar avea de fapt CF-ul | modificați comanda pe extras CF (diferența se rambursează automat). |
 | Clientul întreabă de ce „doar 4 zile” la copie și „30” la urbanism | termenele sunt ale instituției: OCPI eliberează copiile în câteva zile; certificatul de urbanism e al primăriei, cu termen legal de 30 de zile. |
 | Cost lipsă pe o comandă finalizată | costul intră singur la „Încarcă PDF” dacă serviciul are taxă cunoscută; altfel din pop-up-ul de la finalizare sau din **Costuri furnizori**. |
@@ -98,5 +101,5 @@ date) și „Blocat instituție” (OCPI / ANCPI indisponibil). Detalii:
 
 - Lucrarea o face un **topograf autorizat**; documentul vine de la OCPI, semnat de instituție.
 - Termenul e pe zile lucrătoare de la plată; „prioritar” îl scurtează unde există opțiunea.
-- La identificare: primește **orice ar ieși** un document oficial (CF-ul și extrasul, sau certificatul OCPI că imobilul nu e înscris, cu care merge la intabulare / conversie).
+- La identificare: dacă topograful găsește imobilul, primește extrasul CF (1–3 zile). Dacă nu, cerem la OCPI (~10 zile) și primește documentul OCPI: CF găsită și digitalizată (extrasul se comandă separat) sau confirmarea că nu e înscris (merge la un topograf din zona lui pentru înscriere).
 - Nu suntem OCPI / ANCPI.

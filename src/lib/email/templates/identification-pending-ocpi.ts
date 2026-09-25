@@ -4,10 +4,11 @@
  * Sent when the topograph reports that an identificare-imobil order could not
  * be resolved online and files the ANCPI service 2.7.8 (by address) / 2.7.6
  * (by owner) at OCPI. The client learns three things: what we searched, what
- * we filed instead, and that the answer is a document either way — the CF
- * number (then the extract) or the official negative certificate. No credit
- * and no free extract are promised: the certificate IS the complete service
- * (decizie Raul, 21.09.2026).
+ * we filed instead, and that the answer is a document either way — OCPI's
+ * document confirming the (digitised) CF, or the official negative one. That
+ * document IS the complete service: the extract after it is a new order,
+ * because the fee already went to OCPI (process confirmed with the
+ * topograph, 25.09.2026). No credit, no free extract.
  */
 
 import { brandedEmailHtml, bulletList, ctaButton, escHtml, infoRows } from './branded-layout';
@@ -44,8 +45,8 @@ export function renderIdentificationPendingOcpiEmail(input: IdentificationPendin
   ];
 
   const outcomes = [
-    'Certificatul conține numărul de carte funciară: obținem extrasul de carte funciară și ți-l trimitem imediat.',
-    'Certificatul confirmă că imobilul nu figurează înscris: primești certificatul oficial de la OCPI, documentul cu care poți merge la notar sau la OCPI pentru înscrierea imobilului.',
+    'OCPI găsește cartea funciară în arhivă: o digitalizează și ne trimite documentul care o confirmă, cu numărul ei. Îl descarci din pagina comenzii. Dacă vrei apoi extrasul de carte funciară, îl comanzi separat la noi.',
+    'OCPI nu găsește imobilul: primești documentul oficial de la OCPI care confirmă asta. Cu el, un topograf din zona ta poate face demersurile pentru înscrierea imobilului în cartea funciară.',
   ];
   const reasons = [
     'imobilul nu este intabulat: nu a fost niciodată înscris în cartea funciară, deci nu există extras;',
@@ -59,7 +60,7 @@ export function renderIdentificationPendingOcpiEmail(input: IdentificationPendin
         ${bulletList(outcomes)}
         <p style="margin:0 0 8px;color:#0f172a;font-size:14px;font-weight:600;">De ce poate lipsi un imobil din e-Terra</p>
         ${bulletList(reasons)}
-        <p style="margin:0 0 18px;color:#475569;font-size:14px;line-height:1.6;">Nu trebuie să faci nimic acum. Te anunțăm pe email imediat ce vine răspunsul; documentul apare în pagina comenzii.</p>
+        <p style="margin:0 0 18px;color:#475569;font-size:14px;line-height:1.6;">Nu trebuie să faci nimic acum. Termenul dat de OCPI apare în pagina comenzii imediat ce depunem cererea. Te anunțăm pe email când vine răspunsul; documentul îl descarci tot din pagina comenzii.</p>
         ${ctaButton('Vezi stadiul comenzii', viewUrl)}`;
 
   const html = brandedEmailHtml({

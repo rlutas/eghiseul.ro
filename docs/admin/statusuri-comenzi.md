@@ -10,7 +10,7 @@ departe. Scris pe 21.09.2026 din platformă. Butoanele în detaliu:
 | Tabul | Ce e acolo | Ce faceți |
 |---|---|---|
 | **Așteptare plată** | comenzi pe transfer bancar, banii neconfirmați (chiar dacă lucrul a pornit pe dovadă) | comparați extrasul; **„Confirmă plata”** cu referința tranzacției. Pe dovadă: **„Dovadă verificată — pornește lucrul”**. Dacă banii nu vin: „Banii nu au venit — abandonează”. [Procedura](plata-transfer-bancar.md) |
-| **Așteptare client** | comenzi oprite pentru că lipsește ceva de la client (acte cerute, date imobil) | sunați / scrieți; când a încărcat ce s-a cerut, comanda iese singură. Termenul e pe pauză cât stă aici |
+| **Așteptare client** | comenzi oprite pentru că lipsește ceva de la client (acte cerute, date imobil) | sunați sau scrieți-i din cardul „Mesaje cu clientul” de pe comandă (primește email, răspunde din pagina comenzii); când a încărcat ce s-a cerut, comanda iese singură. Termenul e pe pauză cât stă aici |
 | **Blocat instituție** | instituția e indisponibilă (ANCPI picat, registru închis); termen pe pauză, nu e vina clientului | nimic de apăsat; când revine instituția, cine lucrează comanda o scoate de aici |
 
 Plus **„Plătite”** = comenzi la care nimeni nu a apăsat încă „Începe
@@ -29,7 +29,7 @@ zi lucrătoare e o comandă uitată.
 | **În procesare** | În procesare | voi / Mircea „În lucru” / „Dovadă verificată” | „Lucrăm la comanda ta.” | verificați actele; **„Marchează documente generate”** |
 | **Documente generate** | În procesare | voi | „Am pregătit actele necesare pentru depunere.” | **„Marchează depusă la IPJ”** (numele butonului e generic pentru orice instituție) |
 | **Trimis instituție** | În procesare | voi / Mircea „Depusă la OCPI” | „Dosarul este la instituție. Așteptăm eliberarea.” | așteptați actul; **„Marchează document primit”** (încărcați scanul) |
-| **Identificare nereușită — certificat OCPI depus** | În procesare (badge mov) | Mircea, „Nu am găsit” | „Certificat oficial cerut la OCPI”, ~10 zile lucrătoare | răspunsul OCPI; Mircea continuă |
+| **Identificare nereușită — certificat OCPI depus** | În procesare (badge mov) | Mircea, „Nu am găsit” | „Certificat oficial cerut la OCPI”, ~10 zile lucrătoare, plus „Termen dat de OCPI” după depunere | răspunsul OCPI; Mircea încarcă documentul OCPI (= livrarea; extrasul după el e comandă nouă) |
 | **Document primit** | În procesare | voi | „Am primit documentul de la instituție.” | **„Marchează gata de expediere”** sau statusurile de opțiuni |
 | **Extras în lucru** | În procesare | voi | „Servicii suplimentare în lucru” | **„Marchează gata de expediere”** |
 | **La traducere / La legalizare / Apostilă Notari / Apostilă Haga** | În procesare | voi, din dropdown | „La traducere”, „Apostilă Haga obținută” | următorul pas din lanț, apoi „Documentul este eliberat” |

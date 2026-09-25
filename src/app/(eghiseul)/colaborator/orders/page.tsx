@@ -18,6 +18,8 @@ interface CollabOrder {
   /** >0 = urcată în capul listei de echipă (client nemulțumit, termen ratat). */
   priority: number | null;
   service_id: string;
+  /** Răspunsuri de la client necitite încă (firul de mesaje). */
+  unread_messages?: number;
   // API-ul returnează DOAR datele de lucrare (property) — fără date de client.
   customer_data: {
     property?: PropertyLike | null;
@@ -222,6 +224,14 @@ export default function CollaboratorOrdersPage() {
                       <span className="ml-2 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                         Urgent
                       </span>
+                    )}
+                    {(o.unread_messages ?? 0) > 0 && (
+                      <Link
+                        href={withPreview(`/colaborator/orders/${o.id}#mesaje`, previewAs)}
+                        className="ml-2 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white"
+                      >
+                        Mesaj nou
+                      </Link>
                     )}
                     {o.customer_data?.ocpi_submission?.registration_number && (
                       <div className="mt-0.5 text-xs text-slate-400">
