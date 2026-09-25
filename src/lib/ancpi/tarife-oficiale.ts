@@ -1,6 +1,8 @@
 /**
  * Official ANCPI tariffs — Ordin ANCPI nr. 16/2019 (în vigoare de la 04.02.2019),
- * consolidat 26 iulie 2024 (ultimul amendament: Ordin 1498/2024). Sursa: Anexa,
+ * consolidat 26 iulie 2024 (Ordin 1498/2024) + Ordinul 441/2025 (M. Of. 281/31.03.2025,
+ * în vigoare din 7.04.2025), care a rescris art. 8 lit. a) și a scutit necondiționat
+ * de tarif prima înregistrare (codurile 2.1.1–2.1.4). Sursa: Anexa,
  * cap. 2 „Servicii de cadastru și publicitate imobiliară" + Art. 4 (urgența).
  *
  * Urgency rule (Art. 4): la cerere, serviciul se prestează în max 1/3 din
@@ -153,33 +155,34 @@ export const TARIFE_ANCPI: GrupaTarife[] = [
       {
         cod: '2.1.1',
         serviciu: 'Recepție cadastrală și înființare carte funciară',
-        tarif: '120 lei',
+        tarif: '0 lei (scutit din 7.04.2025)',
         um: 'imobil / u.i.',
-        urgent: '600 lei',
-        nota: 'Scutit la prima înregistrare a terenurilor agricole/forestiere din titluri de proprietate (urgența costă atunci 480 lei).',
+        urgent: '0 lei',
+        nota: 'Scutire necondiționată prin Ordinul 441/2025 (art. 8 lit. a) din Ordinul 16/2019), pentru orice tip de imobil. Până la 7.04.2025: 120 lei. Clientul plătește doar onorariul topografului.',
       },
       {
         cod: '2.1.2',
         serviciu: 'Recepție cu alocare număr cadastral',
-        tarif: '60 lei',
+        tarif: '0 lei (scutit din 7.04.2025)',
         um: 'imobil / u.i.',
-        urgent: '300 lei',
-        nota: 'Include eliberarea gratuită a extrasului de plan cadastral. Scutire titluri de proprietate: urgența costă 240 lei.',
+        urgent: '0 lei',
+        nota: 'Scutit prin Ordinul 441/2025. Până la 7.04.2025: 60 lei. Include eliberarea gratuită a extrasului de plan cadastral.',
       },
       {
         cod: '2.1.3',
         serviciu: 'Înființare carte funciară',
-        tarif: '60 lei',
+        tarif: '0 lei (scutit din 7.04.2025)',
         um: 'imobil / u.i.',
-        urgent: '300 lei',
+        urgent: '0 lei',
+        nota: 'Scutit prin Ordinul 441/2025. Până la 7.04.2025: 60 lei.',
       },
       {
         cod: '2.1.4',
         serviciu: 'Recepție cadastrală + înființare CF — imobile în regiunile de CF veche (Decretul-lege 115/1938: Transilvania, Banat, Bucovina)',
-        tarif: '120 lei',
+        tarif: '0 lei (scutit din 7.04.2025)',
         um: 'imobil / u.i.',
-        urgent: '600 lei',
-        nota: 'Exact cazul conversiei cărților funciare vechi (cu jugări/stânjeni/nr. topografic) în sistemul electronic.',
+        urgent: '0 lei',
+        nota: 'Scutit prin Ordinul 441/2025 (până la 7.04.2025: 120 lei). Exact cazul conversiei cărților funciare vechi (cu jugări/stânjeni/nr. topografic) în sistemul electronic.',
       },
     ],
   },

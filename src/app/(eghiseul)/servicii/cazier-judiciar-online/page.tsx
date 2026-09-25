@@ -1113,7 +1113,7 @@ export default function CazierJudiciarHubPage() {
                   href: '/servicii/cazier-fiscal-online/',
                   icon: FileText,
                   title: 'Cazier Fiscal',
-                  desc: 'Atestă lipsa datoriilor fiscale la ANAF. 198 RON. Necesar pentru licitații, contracte cu statul, fonduri europene.',
+                  desc: 'Arată dacă ai fapte fiscale sancționate înscrise la ANAF. 198 RON. Necesar pentru licitații, contracte cu statul, fonduri europene.',
                 },
                 {
                   href: '/servicii/certificat-de-integritate-comportamentala/',

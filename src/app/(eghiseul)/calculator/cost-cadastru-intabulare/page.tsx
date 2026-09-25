@@ -46,7 +46,7 @@ export default function Page() {
         },
         {
           q: 'Cât costă regimul de urgență la ANCPI?',
-          a: 'Suplimentul de urgență e de 4 ori tariful normal (deci plătești în total 5× taxa), dar suplimentul e plafonat la 5.000 lei. Prima înregistrare urgentă costă 600 lei (120 + 480). O intabulare de 7.500 lei în regim de urgență costă 12.500 lei, nu 37.500 — plafonul limitează suplimentul. Termenul scade la 1/3 din cel normal.',
+          a: 'Suplimentul de urgență e de 4 ori tariful normal (deci plătești în total 5× taxa), dar suplimentul e plafonat la 5.000 lei. La prima înregistrare urgența nu costă nimic, pentru că tariful normal e 0 lei din 7 aprilie 2025. O intabulare de 7.500 lei în regim de urgență costă 12.500 lei, nu 37.500 — plafonul limitează suplimentul. Termenul scade la 1/3 din cel normal.',
         },
         {
           q: 'De ce onorariile topografilor diferă atât de mult?',
@@ -58,7 +58,7 @@ export default function Page() {
         },
         {
           q: 'Cât durează cadastrul și intabularea?',
-          a: 'Măsurătorile și documentația topografului: 1–3 săptămâni, în funcție de complexitate. Soluționarea la OCPI: în jur de 18 zile lucrătoare la prima înregistrare în regim normal, 6 zile la urgență. Intabularea simplă (după cumpărare) se soluționează de regulă în câteva zile lucrătoare.',
+          a: 'Măsurătorile și documentația topografului: 1–3 săptămâni, în funcție de complexitate. Soluționarea la OCPI, după Ordinul ANCPI 1622/2025: 15 zile lucrătoare la prima înregistrare (recepție și înființare carte funciară), 7 zile lucrătoare la intabularea după cumpărare (2 în regim de urgență).',
         },
         {
           q: 'E obligatoriu să fac cadastrul?',
@@ -150,9 +150,9 @@ export default function Page() {
       <h2>Cum funcționează taxa de urgență</h2>
       <p>
         Regula e simplă: suplimentul de urgență e <strong>de 4 ori tariful normal</strong>, deci în
-        total plătești de 5 ori taxa. La prima înregistrare: 120 + 480 = 600 lei. În schimb, termenul
-        de soluționare scade la <strong>1/3 din termenul normal</strong> — din 18 zile lucrătoare ajungi
-        la 6.
+        total plătești de 5 ori taxa. La intabularea după cumpărare, termenul scade de la 7 la 2
+        zile lucrătoare (Ordinul ANCPI 1622/2025). La prima înregistrare urgența nu are sens: tariful
+        e 0 lei din 7 aprilie 2025, iar termenul rămâne 15 zile lucrătoare.
       </p>
       <p>
         La taxele procentuale există o plasă de siguranță: <strong>suplimentul e plafonat la 5.000

@@ -43,9 +43,9 @@ const SCHEMA_SLUG = 'cazier-fiscal-online';
 const TITLE = 'Cazier Fiscal Online persoană fizică — ANAF, fără SPV';
 const DESCRIPTION =
   'Cazier fiscal online de la ANAF pentru persoană fizică, fără cont SPV și fără drum la ' +
-  'ghișeu. Atestă lipsa datoriilor fiscale, valabil 30 de zile. 198 RON.';
+  'ghișeu. Arată dacă ai fapte fiscale sancționate înscrise, valabil 30 de zile. 198 RON.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-06-14';
+const DATE_MODIFIED = '2026-09-25';
 
 export const revalidate = 3600;
 
@@ -83,7 +83,7 @@ const jsonLdGraph = buildServicePageGraph({
   name: 'Cazier Fiscal Online',
   description:
     'Serviciu de obținere a Cazierului Fiscal (certificat de cazier fiscal) de la ANAF pentru ' +
-    'persoană fizică. Documentul care atestă lipsa datoriilor fiscale la bugetul de stat. ' +
+    'persoană fizică. Documentul care arată dacă titularul are fapte sancționate de legile fiscale înscrise. ' +
     'Procesare 100% online, fără cont SPV, livrare email.',
   serviceType: 'Document Processing — Fiscal',
   datePublished: DATE_PUBLISHED,
@@ -171,8 +171,8 @@ export default async function CazierFiscalOnlinePage() {
 
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
                   <p className="text-white/90 leading-relaxed text-sm sm:text-base">
-                    <strong className="text-primary-500">Cazierul Fiscal</strong> atestă că nu ai datorii
-                    fiscale la bugetul de stat. Îl obții rapid de la noi, iar avocatul nostru colaborator,
+                    <strong className="text-primary-500">Cazierul Fiscal</strong> arată dacă ai fapte
+                    sancționate de legile fiscale înscrise la ANAF. Îl obții rapid de la noi, iar avocatul nostru colaborator,
                     înscris în Barou, se ocupă de procedura legală la ANAF în numele tău:
                   </p>
                   <ul className="mt-3 space-y-1.5 text-white/85 text-sm">
@@ -307,7 +307,7 @@ export default async function CazierFiscalOnlinePage() {
               </p>
               <p>
                 Prin eGhișeul obții <strong>cazierul fiscal online</strong>, fără drum la ghișeul ANAF. Ai nevoie
-                doar de CNP și un act de identitate. Noi depunem cererea, plătim taxa și îți trimitem
+                doar de CNP și un act de identitate. Noi depunem cererea și îți trimitem
                 <strong> certificatul de cazier fiscal</strong> pe email, semnat electronic — o alternativă rapidă la
                 procedura clasică de tip <strong>anaf cazier fiscal online</strong>.
               </p>
@@ -331,7 +331,7 @@ export default async function CazierFiscalOnlinePage() {
                 <p>
                   Mulți contribuabili caută o <strong>verificare a cazierului fiscal</strong> înainte de un dosar la
                   ONRC, la notar sau la bancă. În realitate nu există o „verificare” separată: singurul mod oficial de
-                  a afla dacă figurezi cu datorii sau fapte înscrise este să <strong>soliciți certificatul de cazier
+                  a afla dacă figurezi cu fapte înscrise este să <strong>soliciți certificatul de cazier
                   fiscal de la ANAF</strong>.
                 </p>
                 <p>
@@ -349,7 +349,7 @@ export default async function CazierFiscalOnlinePage() {
                 <p className="text-sm text-neutral-700">
                   Sunt două documente diferite, ambele emise de <strong>ANAF</strong>.{' '}
                   <strong>Cazierul fiscal</strong> (numit și „certificat de cazier fiscal”) atestă că persoana nu
-                  figurează cu fapte sancționate de legile fiscale și nu are obligații înscrise în cazier — cel cerut,
+                  figurează cu fapte sancționate de legile fiscale — cel cerut,
                   de regulă, la <Link href="/servicii/certificat-constatator-online/" className="text-primary-600 underline underline-offset-2 hover:text-primary-700">înființarea unei firme</Link> sau la
                   numirea ca asociat/administrator. <strong>Certificatul de atestare fiscală</strong> este alt document,
                   care prezintă situația obligațiilor de plată la un moment dat. Această pagină se referă la{' '}
@@ -414,7 +414,7 @@ export default async function CazierFiscalOnlinePage() {
               {[
                 { step: 1, title: 'Completezi Formularul', desc: 'Introduci datele tale personale, inclusiv CNP-ul, iar avocatul colaborator depune cererea la ANAF în numele tău.', icon: FileText },
                 { step: 2, title: 'Verificare Identitate', desc: 'Încarci actul de identitate și un selfie pentru validarea KYC, conform cerințelor.', icon: ScanFace },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxa ANAF este inclusă în preț.', icon: CreditCard },
+                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay. ANAF nu percepe taxă pentru certificat; plătești doar serviciul nostru.', icon: CreditCard },
                 { step: 4, title: 'Primești Documentul', desc: `În ${formatEstimatedDays(service)} primești cazierul fiscal pe email, opțional și prin curier.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
@@ -479,7 +479,7 @@ export default async function CazierFiscalOnlinePage() {
                   {[
                     { icon: Landmark, title: 'Antet oficial ANAF', desc: 'Emis de Agenția Națională de Administrare Fiscală, cu numărul și data înregistrării.' },
                     { icon: Shield, title: 'Semnătură electronică', desc: 'Are aceeași valoare legală ca varianta cu ștampilă — îl folosești la ONRC, notar sau bancă.' },
-                    { icon: Receipt, title: 'Atestă situația ta fiscală', desc: 'Confirmă lipsa datoriilor și a faptelor sancționate de legile fiscale la data emiterii.' },
+                    { icon: Receipt, title: 'Arată ce e înscris pe numele tău', desc: 'Confirmă că nu ai fapte sancționate de legile fiscale înscrise sau le enumeră, la data emiterii.' },
                     { icon: Mail, title: 'Livrat pe email, în PDF', desc: 'Gata de printat sau trimis mai departe, fără deplasare la ghișeu.' },
                   ].map((f) => (
                     <li key={f.title} className="flex items-start gap-3.5">
@@ -517,9 +517,9 @@ export default async function CazierFiscalOnlinePage() {
                 <h2 className="text-xl font-bold text-secondary-900 mb-4">Ce atestă cazierul fiscal</h2>
                 <ul className="space-y-2.5 text-sm text-neutral-700">
                   {[
-                    'Lipsa datoriilor fiscale la bugetul de stat',
-                    'Absența faptelor sancționate de legile fiscale și contabile',
-                    'Inexistența unor infracțiuni de evaziune fiscală sau spălare de bani',
+                    'Dacă ai fapte sancționate contravențional sau penal de legile fiscale, contabile, vamale sau de disciplină financiară',
+                    'Pentru fiecare faptă înscrisă: sancțiunea, temeiul legal și data rămânerii definitive',
+                    'Nu arată datoriile la stat: pentru ele există certificatul de atestare fiscală',
                   ].map((row) => (
                     <li key={row} className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
@@ -534,7 +534,8 @@ export default async function CazierFiscalOnlinePage() {
                 </div>
                 <h2 className="text-xl font-bold text-secondary-900 mb-4">Valabilitate 30 de zile</h2>
                 <p className="text-sm text-neutral-700 leading-relaxed">
-                  <strong>Cazierul fiscal este valabil 30 de zile</strong> de la data emiterii. După acest termen,
+                  <strong>Cazierul fiscal este valabil 30 de zile</strong> de la data emiterii și numai în scopul pentru
+                  care a fost eliberat (OG 39/2015 art. 9 alin. (7)). După acest termen,
                   instituțiile (notari, ONRC, bănci, autorități contractante) nu îl mai acceptă, fiindcă situația
                   fiscală a unei persoane se poate schimba rapid. De aceea îți recomandăm să soliciți
                   <strong> certificatul de cazier fiscal</strong> cât mai aproape de momentul în care îl depui.
@@ -548,16 +549,16 @@ export default async function CazierFiscalOnlinePage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Cazier Fiscal Online"
           faqs={[
-            { q: 'Ce este cazierul fiscal?', a: 'Este documentul eliberat de ANAF care atestă că o persoană nu are datorii fiscale la bugetul de stat și nu a săvârșit fapte sancționate de legile fiscale, contabile sau de evaziune fiscală.' },
-            { q: 'Care este diferența dintre cazier fiscal și cazier judiciar?', a: 'Cazierul fiscal este emis de ANAF și se referă strict la situația fiscală (datorii, fapte economice). Cazierul judiciar este emis de Poliție/IGPR și conține eventualele condamnări penale. Sunt două documente diferite, cu instituții și scopuri diferite.' },
-            { q: 'Cât este valabil cazierul fiscal?', a: 'Cazierul fiscal este valabil 30 de zile de la data emiterii. După expirare trebuie solicitat unul nou, deoarece situația fiscală a persoanei se poate modifica.' },
+            { q: 'Ce este cazierul fiscal?', a: 'Este certificatul eliberat de ANAF din evidența în care se înscriu faptele sancționate contravențional sau penal de legile fiscale, contabile, vamale și de disciplină financiară (OG 39/2015). Arată dacă titularul are sau nu fapte înscrise. Datoriile la stat nu apar în el.' },
+            { q: 'Care este diferența dintre cazier fiscal și cazier judiciar?', a: 'Cazierul fiscal este emis de ANAF și se referă la faptele sancționate de legile fiscale, contabile și vamale. Cazierul judiciar este emis de Poliție/IGPR și conține eventualele condamnări penale. Sunt două documente diferite, cu instituții și scopuri diferite.' },
+            { q: 'Cât este valabil cazierul fiscal?', a: 'Cazierul fiscal este valabil 30 de zile de la data emiterii și numai în scopul pentru care a fost eliberat (OG 39/2015 art. 9 alin. (7)). Pentru două dosare diferite se cer două certificate.' },
             { q: 'În cât timp primesc cazierul fiscal?', a: `${formatEstimatedDays(service)} în mod standard. Există și opțiunea Urgent pentru livrare mai rapidă.` },
             { q: 'De ce aveți nevoie de datele mele personale?', a: 'CNP-ul și actul de identitate sunt necesare pentru a depune cererea de cazier fiscal în numele tău la ANAF și pentru validarea identității (KYC). Datele sunt prelucrate securizat și folosite exclusiv pentru emiterea documentului.' },
             { q: 'Pot cere cazier fiscal pentru o firmă?', a: 'Această pagină acoperă cazierul fiscal pentru persoană fizică. Pentru persoane juridice (firme) procedura și actele diferă — contactează-ne și te ajutăm cu varianta potrivită.' },
             { q: 'Cazierul fiscal este gratuit?', a: 'Îl poți obține gratuit prin Spațiul Privat Virtual (SPV) al ANAF dacă ai cont SPV și semnătură electronică. Prin noi plătești un tarif pentru serviciul complet 100% online, fără cont SPV și fără deplasare la ghișeu.' },
             { q: 'Cazierul fiscal vine ca PDF semnat de ANAF?', a: 'Pe email, ca PDF semnat electronic de ANAF. Opțional, îl poți primi și fizic prin curier, dacă alegi această opțiune la comandă.' },
             { q: 'Cum verific cazierul fiscal?', a: 'Nu există o verificare separată de eliberare: singurul mod oficial de a verifica situația ta în cazierul fiscal este să soliciți certificatul de cazier fiscal de la ANAF. Îl poți obține prin SPV (cu cont și semnătură electronică) sau prin eGhișeul, complet online și fără cont SPV.' },
-            { q: 'Care e diferența dintre cazierul fiscal și certificatul de atestare fiscală?', a: 'Cazierul fiscal atestă că nu figurezi cu fapte sancționate de legile fiscale și fără datorii înscrise; certificatul de atestare fiscală arată situația obligațiilor tale de plată la un moment dat. Sunt documente ANAF diferite. Această pagină se referă la cazierul fiscal.' },
+            { q: 'Care e diferența dintre cazierul fiscal și certificatul de atestare fiscală?', a: 'Cazierul fiscal arată dacă figurezi cu fapte sancționate de legile fiscale; datoriile nu apar în el. Certificatul de atestare fiscală arată situația obligațiilor tale de plată la un moment dat. Sunt documente ANAF diferite. Această pagină se referă la cazierul fiscal.' },
             { q: 'Pot obține cazierul fiscal fără cont SPV?', a: 'Da. Prin eGhișeul depui cererea fără cont în Spațiul Privat Virtual și fără semnătură electronică proprie — ai nevoie doar de CNP și un act de identitate, iar noi ne ocupăm de relația cu ANAF.' },
           ]}
         />

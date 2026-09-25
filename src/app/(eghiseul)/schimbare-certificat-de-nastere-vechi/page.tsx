@@ -7,7 +7,7 @@ const TITLE = 'Schimbare Certificat de Naștere Vechi cu Unul Nou: Ghid Complet'
 const DESCRIPTION =
   "Schimbă certificatul de naștere vechi sau deteriorat cu modelul actual: ce acte îți trebuie, cât durează și cum obții duplicatul online.";
 const DATE_PUBLISHED = '2026-06-19';
-const DATE_MODIFIED = '2026-09-09';
+const DATE_MODIFIED = '2026-09-25';
 
 export const revalidate = 86400;
 
@@ -46,7 +46,7 @@ export default function Page() {
         },
         {
           q: 'Cum schimb un certificat de naștere vechi cu unul nou?',
-          a: 'Soliciți un duplicat la Serviciul de Stare Civilă din localitatea unde a fost înregistrată nașterea. Duplicatul este emis pe modelul actual, în baza actului de naștere existent în registre. Prin eGhișeul.ro depunem cererea în numele tău și primești noul certificat prin curier.',
+          a: 'Soliciți un duplicat la oricare serviciu de stare civilă sau primărie din țară, nu doar la cea care are registrul nașterii (HG 255/2024 art. 158). Duplicatul este emis pe modelul actual, în baza actului de naștere existent în registre. Prin eGhișeul.ro depunem cererea în numele tău și primești noul certificat prin curier.',
         },
         {
           q: 'Trebuie să predau certificatul vechi?',

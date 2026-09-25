@@ -177,7 +177,7 @@ export const HOMEPAGE_FAQ_ITEMS: HomepageFaqItem[] = [
     question: 'Ce este cazierul fiscal și cine are nevoie de el?',
     answer: (
       <>
-        <p><strong><Link href="/servicii/cazier-fiscal-online/" className={A}>Cazierul fiscal</Link></strong> este emis de ANAF și atestă că nu ai datorii la stat. Este necesar pentru:</p>
+        <p><strong><Link href="/servicii/cazier-fiscal-online/" className={A}>Cazierul fiscal</Link></strong> este emis de ANAF și arată dacă ai fapte sancționate de legile fiscale, contabile sau vamale înscrise pe numele tău. Datoriile la stat nu apar în el (pentru ele există certificatul de atestare fiscală). Este cerut pentru:</p>
         <ul>
           <li>Participare la licitații publice</li>
           <li>Obținere licențe și autorizații</li>
@@ -188,7 +188,7 @@ export const HOMEPAGE_FAQ_ITEMS: HomepageFaqItem[] = [
         <p>Poate fi solicitat atât de persoane fizice, cât și de persoane juridice (firme).</p>
       </>
     ),
-    plain: 'Cazierul fiscal este emis de ANAF și atestă că nu ai datorii la stat. Este necesar pentru licitații publice, obținere licențe și autorizații, înființare firmă, accesare fonduri europene sau contracte cu instituții publice.',
+    plain: 'Cazierul fiscal este emis de ANAF și arată dacă ai fapte sancționate de legile fiscale, contabile sau vamale înscrise pe numele tău; datoriile la stat nu apar în el. Este cerut pentru licitații publice, obținere licențe și autorizații, înființare firmă, accesare fonduri europene sau contracte cu instituții publice.',
   },
   {
     question: 'Pentru ce am nevoie de certificat de celibat?',

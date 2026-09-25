@@ -44,7 +44,7 @@ const DESCRIPTION =
   'Duplicat certificat de căsătorie online de la Starea Civilă, 998 RON, fără deplasare. ' +
   'Pentru act pierdut, din altă localitate sau diaspora. Email + curier.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-08-31';
+const DATE_MODIFIED = '2026-09-25';
 
 export const revalidate = 3600;
 
@@ -377,7 +377,7 @@ export default async function CertificatCasatoriePage() {
                   {
                     icon: Landmark,
                     title: 'Din altă localitate, fără deplasare',
-                    desc: 'Duplicatul se eliberează de primăria din localitatea unde a fost înregistrată căsătoria, dar nu trebuie să mergi acolo. Depunem cererea prin împuternicire la primăria competentă și îți trimitem certificatul prin curier — fără programare.',
+                    desc: 'Din 2024, duplicatul se poate cere de la oricare serviciu de stare civilă sau primărie din țară, nu doar de la cea care are registrul (HG 255/2024 art. 158). Depunem cererea prin împuternicire și îți trimitem certificatul prin curier — fără programare.',
                   },
                   {
                     icon: Users,
@@ -586,9 +586,9 @@ export default async function CertificatCasatoriePage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Certificat de Căsătorie"
           faqs={[
-            { q: 'Ce este certificatul de căsătorie?', a: 'Este actul de stare civilă care atestă încheierea căsătoriei dintre doi soți. Se eliberează de Starea Civilă (Direcția de Evidență a Persoanelor) din localitatea unde a fost înregistrată căsătoria.' },
+            { q: 'Ce este certificatul de căsătorie?', a: 'Este actul de stare civilă care atestă încheierea căsătoriei dintre doi soți. Primul certificat se eliberează la încheierea căsătoriei; un exemplar nou se poate cere de la oricare serviciu de stare civilă sau primărie din țară (HG 255/2024 art. 158).' },
             { q: 'Care e diferența dintre duplicat și copie legalizată?', a: 'Duplicatul este un nou exemplar oficial al certificatului, eliberat de Starea Civilă, care înlocuiește originalul pierdut sau deteriorat. Copia legalizată este o fotocopie a certificatului existent, certificată conform cu originalul de un notar — folosită când trebuie să depui mai multe exemplare.' },
-            { q: 'Am pierdut certificatul de căsătorie. Ce fac?', a: 'Soliciți un duplicat la Starea Civilă din localitatea unde s-a înregistrat căsătoria. Prin eGhișeul faci asta online, fără să te deplasezi — depunem cererea pe bază de împuternicire și primești noul certificat.' },
+            { q: 'Am pierdut certificatul de căsătorie. Ce fac?', a: 'Soliciți un duplicat la oricare serviciu de stare civilă sau primărie din țară (HG 255/2024 art. 158). Prin eGhișeul faci asta online, fără să te deplasezi — depunem cererea pe bază de împuternicire și primești noul certificat.' },
             { q: 'Pot obține certificatul dintr-o altă localitate sau din străinătate?', a: 'Da. Nu trebuie să fii prezent. Pe baza unei împuterniciri (pe care o pregătim noi), depunem cererea la Starea Civilă din localitatea de înregistrare. Serviciul este util mai ales pentru românii din diaspora.' },
             { q: 'În cât timp ajunge duplicatul certificatului de căsătorie?', a: `${formatEstimatedDays(service)} în mod standard, în funcție de Starea Civilă a localității. Pentru căsătorii mai vechi sau din altă localitate poate dura puțin mai mult. Există și opțiunea Urgent.` },
             { q: 'Cât este valabil certificatul de căsătorie?', a: 'Certificatul de căsătorie nu expiră — atestă un eveniment de stare civilă. Totuși, unele instituții (în special pentru proceduri de cetățenie) pot cere un duplicat recent, emis în ultimele luni.' },
