@@ -216,9 +216,12 @@ async function notify(admin: Admin, order: any, message: OrderMessage): Promise<
   const recipients: Array<{ to: string; url: string }> = [
     { to: brand.contactEmail, url: `${base}/admin/orders/${order.id}` },
   ];
+  // An explicit assignment from admin wins: the order was sent to THAT
+  // collaborator, so only they hear back. Otherwise everyone on the service.
   const collaboratorIds = new Set<string>();
-  if (order.assigned_collaborator_id) collaboratorIds.add(order.assigned_collaborator_id);
-  if (order.service_id) {
+  if (order.assigned_collaborator_id) {
+    collaboratorIds.add(order.assigned_collaborator_id);
+  } else if (order.service_id) {
     const { data: assignments } = await admin
       .from('collaborator_service_assignments')
       .select('collaborator_id')
