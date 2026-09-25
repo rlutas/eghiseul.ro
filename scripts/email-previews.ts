@@ -44,7 +44,13 @@ async function main() {
 
   const previews: Record<string, () => { subject: string; html: string; text: string }> = {
     warmup: () => {
-      const p = { firstName, serviceHint: 'cazier judiciar', unsubscribeUrl };
+      const p = {
+        firstName,
+        serviceSlugs: ['certificat-constatator', 'extras-carte-funciara'],
+        isCustomer: true,
+        coupon: { code: 'FIDEL-ABCD2345', discountPercent: 10, validUntil: new Date(Date.now() + 30 * day).toISOString() },
+        unsubscribeUrl,
+      };
       return { subject: buildWarmupSubject(p), html: buildWarmupHtml(p), text: buildWarmupText(p) };
     },
     review: () =>

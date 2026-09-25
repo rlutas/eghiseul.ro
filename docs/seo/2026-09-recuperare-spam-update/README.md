@@ -12,6 +12,10 @@ Dosarul complet al analizei și al planului. Start: **[`PLAN-RECUPERARE.md`](PLA
 
 - [`10-verificare-post-executie.md`](10-verificare-post-executie.md) — audit independent, adversarial, cu build și server real: fiecare redirect chemat cu curl, tot JSON-LD-ul parsat. Verdict: se poate face deploy. Cele 5 probleme găsite sunt reparate.
 
+## Urmărire
+
+- [`2026-09-25-ce-spun-expertii-recuperare.md`](2026-09-25-ce-spun-expertii-recuperare.md) — ce spun Google și practicienii despre cât durează recuperarea; September 2026 Spam Update (pornit 24.09) = prima fereastră de reevaluare; ce urmărim și ce nu facem.
+
 ## Analize (8 agenți, 09.09.2026)
 
 | Doc | Ce conține |

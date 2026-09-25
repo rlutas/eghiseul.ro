@@ -73,7 +73,7 @@ interface Coupon {
   created_by: string | null;
   created_at: string;
   updated_at: string;
-  system_kind: 'recovery' | 'phone_recovery' | 'welcome' | null;
+  system_kind: 'recovery' | 'phone_recovery' | 'welcome' | 'loyalty' | null;
 }
 
 interface Pagination {
@@ -361,6 +361,11 @@ export default function AdminCouponsPage() {
                           {c.system_kind === 'welcome' && (
                             <span className="rounded bg-green-50 px-1.5 py-0.5 text-[10px] font-medium text-green-700">
                               Bun-venit
+                            </span>
+                          )}
+                          {c.system_kind === 'loyalty' && (
+                            <span className="rounded bg-purple-50 px-1.5 py-0.5 text-[10px] font-medium text-purple-700">
+                              Client fidel
                             </span>
                           )}
                           {c.system_kind === 'recovery' && (

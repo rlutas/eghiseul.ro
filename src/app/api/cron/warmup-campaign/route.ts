@@ -30,6 +30,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail, ResendError } from '@/lib/email/resend';
 import { buildWarmupSubject, buildWarmupHtml, buildWarmupText } from '@/lib/email/templates/warmup-reengagement';
 import { TEST_EMAILS, isUndeliverable } from '@/lib/email/deliverability';
+import { isLoyalContact, mintLoyaltyCoupon } from '@/lib/coupons/loyalty';
 
 // Resend: 2 req/s pe cont. Pauza asta ține cronul sub limită indiferent de
 // mărimea batch-ului; la 300 s de rulare încap ~400 trimiteri, restul se
@@ -38,35 +39,6 @@ export const maxDuration = 300;
 const SEND_SPACING_MS = 600;
 
 const DEFAULT_SETTINGS = { enabled: false, dailyBatchSize: 25 };
-
-// Slug-uri reale din `contacts.services` (interogat 2026-09-14). Ce lipsește
-// cade pe slug-ul cu cratime înlocuite — acceptabil, dar fără diacritice.
-const SERVICE_LABELS: Record<string, string> = {
-  'cazier-judiciar': 'cazier judiciar',
-  'cazier-judiciar-persoana-fizica': 'cazier judiciar',
-  'cazier-judiciar-persoana-juridica': 'cazier judiciar (firmă)',
-  'extras-carte-funciara': 'extras de carte funciară',
-  'certificat-nastere': 'certificat de naștere',
-  'certificat-casatorie': 'certificat de căsătorie',
-  'certificat-celibat': 'certificat de celibat',
-  'extras-multilingv-certificat-nastere': 'extras multilingv de naștere',
-  'extras-multilingv-certificat-casatorie': 'extras multilingv de căsătorie',
-  'certificat-constatator': 'certificat constatator',
-  'certificat-integritate': 'certificat de integritate comportamentală',
-  'cazier-fiscal': 'cazier fiscal',
-  'cazier-auto': 'cazier auto',
-  'identificare-imobil': 'identificare imobil',
-  'identificare-imobile-proprietar': 'identificare imobile după proprietar',
-  'extras-plan-cadastral': 'extras de plan cadastral',
-  'plan-amplasament-delimitare': 'plan de amplasament și delimitare',
-  'copie-carte-funciara': 'copie de carte funciară',
-  'copie-inventar-coordonate': 'inventar de coordonate',
-};
-
-function serviceHint(slug: string | null): string | null {
-  if (!slug) return null;
-  return SERVICE_LABELS[slug] ?? slug.replace(/-/g, ' ');
-}
 
 function appBase(): string {
   return process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
@@ -104,15 +76,16 @@ export async function POST(request: NextRequest) {
 
   const batchSize = Math.min(2000, Math.max(1, Number(settings.dailyBatchSize) || DEFAULT_SETTINGS.dailyBatchSize));
 
-  // Ordine FIFO după `first_seen_at`; 99% din import nu are valoarea (NULL),
-  // deci `created_at` face ordinea deterministă între rulări.
+  // Clienții fideli întâi (decizie 2026-09-25): `warmup_priority` = comenzi
+  // pe platformă ×10 + câte servicii a cerut pe site-ul vechi (coloană
+  // generată, migrarea 187). La egalitate, FIFO după `created_at`.
   const { data: candidates, error: fetchError } = await admin
     .from('contacts')
-    .select('id, email, first_name, services, unsubscribe_token')
+    .select('id, email, first_name, services, is_customer, orders_count, unsubscribe_token')
     .is('warmup_email_sent_at', null)
     .is('warmup_skipped_at', null)
     .not('marketing_status', 'in', '(unsubscribed,suppressed)')
-    .order('first_seen_at', { ascending: true, nullsFirst: false })
+    .order('warmup_priority', { ascending: false })
     .order('created_at', { ascending: true })
     .limit(batchSize);
 
@@ -163,9 +136,15 @@ export async function POST(request: NextRequest) {
     }
 
     const unsubscribeUrl = `${appBase()}/api/contacts/unsubscribe?token=${contact.unsubscribe_token}`;
+    // Clienții fideli primesc cupon (decizie 2026-09-25). Dacă inserarea
+    // eșuează, emailul pleacă fără el; la un retry mâine se emite altul, iar
+    // cel vechi rămâne nefolosit și expiră singur.
+    const coupon = isLoyalContact(contact) ? await mintLoyaltyCoupon(admin, contact.id) : null;
     const payload = {
       firstName: contact.first_name ?? null,
-      serviceHint: serviceHint((contact.services ?? [])[0] ?? null),
+      serviceSlugs: contact.services ?? [],
+      isCustomer: !!contact.is_customer,
+      coupon,
       unsubscribeUrl,
     };
 
@@ -201,7 +180,7 @@ export async function POST(request: NextRequest) {
     }
 
     await markSent(contact.id);
-    results.push({ contactId: contact.id, status: 'sent' });
+    results.push({ contactId: contact.id, status: 'sent', ...(coupon ? { reason: `coupon ${coupon.code}` } : {}) });
     await sleep(SEND_SPACING_MS);
   }
 

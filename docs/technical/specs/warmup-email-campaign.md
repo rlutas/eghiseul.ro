@@ -1,6 +1,6 @@
 # Warm-up email — registrul de 72k contacte
 
-**Status:** ✅ LIVRAT 2026-09-14 · migrațiile 157 + 158 · implicit oprit la deploy, **PORNIT în aceeași seară la 25/zi** (Raul a văzut preview-urile; prag de oprire: dezabonări >0,5% din trimiși, vizibil în cardul „KPI marketing")
+**Status:** ✅ LIVRAT 2026-09-14 · migrațiile 157 + 158 · implicit oprit la deploy, **PORNIT în aceeași seară la 25/zi** (50/zi din 18.09, 75/zi din 23.09, **înapoi la 50/zi pe 25.09** după 10 dezabonări la 550 trimise = 1,8%) (Raul a văzut preview-urile; prag de oprire: dezabonări >0,5% din trimiși, vizibil în cardul „KPI marketing")
 **Context:** decizie de business (Raul) — contactele din `contacts` (72.278, majoritatea import WPForms de pe eghiseul.ro vechi) sunt foști clienți/lead-uri cu consimțământ acordat pe platforma veche. Se trimite email de reactivare la toți, dar treptat. Detalii complete + cercetare în `docs/marketing/email-marketing-plan-2026-09.md`.
 
 ## De ce implicit oprit (la deploy)
@@ -39,9 +39,12 @@ următoare.
 - Citește `admin_settings.warmup_campaign` (`{ enabled, dailyBatchSize }`,
   implicit `{ enabled: false, dailyBatchSize: 25 }` dacă rândul nu există).
 - Iese imediat dacă `enabled=false`.
-- Selectează batch-ul: netrimiși și nesăriți, eligibili, ordonați FIFO după
-  `first_seen_at` apoi `created_at` (99% din import are `first_seen_at` NULL,
-  deci `created_at` face ordinea deterministă).
+- Selectează batch-ul: netrimiși și nesăriți, eligibili, ordonați după
+  `warmup_priority DESC` apoi `created_at` (din 2026-09-25, migrarea 187).
+  `warmup_priority` = coloană generată `orders_count × 10 + cardinality(services)`:
+  clienții cu mai multe comenzi pe platformă, apoi contactele care au cerut mai
+  multe servicii pe site-ul vechi, apoi restul FIFO. Înainte de 25.09 ordinea
+  era FIFO pur (`first_seen_at`, `created_at`).
 - Trimite `src/lib/email/templates/warmup-reengagement.ts` prin Resend
   (`idempotencyKey: warmup-<contact.id>` — protecție împotriva dublei trimiteri
   la rulări suprapuse, nu există claim atomic separat), cu header-ele
@@ -103,3 +106,11 @@ Card nou deasupra listei de abonați newsletter:
 - Nu are claim atomic pe rândul de contact înainte de trimitere — se bazează
   pe idempotency key la Resend (risc scăzut, batch mic, o singură trimitere
   per contact oricum).
+
+
+## Conținut personalizat și cupon pentru clienții fideli (2026-09-25)
+
+- Emailul numește serviciile din `contacts.services`, fără dubluri. Scrie „Ai obținut prin noi …” pentru `is_customer` și „Ai apelat la noi pentru …” pentru lead-urile de pe site-ul vechi, ca să nu afirme o cumpărare nedovedită.
+- Butonul duce la `/comanda/<primul slug cunoscut>/`. `?coupon=` se aplică singur la pasul de plată (`review-step.tsx`).
+- Contact fidel = `orders_count >= 2` sau `cardinality(services) >= 2`. Primește un cupon `FIDEL-XXXXXXXX` (10%, 30 de zile, `max_uses 1`, `system_kind='loyalty'`, migrarea 188), creat chiar înainte de trimitere în `src/lib/coupons/loyalty.ts`.
+- UTM: `utm_campaign=warmup-fidel` pentru emailurile cu cupon și `warmup` pentru restul.
