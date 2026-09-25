@@ -32,7 +32,6 @@ import {
 import TrackingTimeline from '@/components/orders/tracking-timeline';
 import { CustomerMessages } from '@/components/orders/CustomerMessages';
 import { BrandFooter as Footer } from '@/components/shared/brand-footer';
-import { useBrand } from '@/lib/brand/client';
 
 // Order status mapping - complete workflow
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Clock }> = {
@@ -97,6 +96,9 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
   submitted: { label: 'Trimis la autorități', color: 'bg-indigo-100 text-indigo-800', icon: Truck },
   status_changed: { label: 'Status actualizat', color: 'bg-gray-100 text-gray-800', icon: Clock },
 };
+
+/** Contracts the client signed at order time — not „the document” they wait for. */
+const CONTRACT_DOC_TYPES = ['contract_prestari', 'contract-prestari', 'contract_asistenta', 'contract-asistenta', 'conventie'];
 
 interface OrderDocument {
   id: string;
@@ -190,7 +192,6 @@ interface OrderData {
 }
 
 function OrderStatusContent() {
-  const brand = useBrand();
   const searchParams = useSearchParams();
   const [orderCode, setOrderCode] = useState(searchParams.get('order') || '');
   const [email, setEmail] = useState(searchParams.get('email') || '');
@@ -380,23 +381,9 @@ function OrderStatusContent() {
       {/* Order Details */}
       {orderData && (
         <div className="space-y-6">
-          {/* Self-cancel card — only for services with the 30-min self-cancel
-              enabled (processing_config.allow_self_cancel), when status='paid'
-              and within the window. Hidden after cancellation or window expiry. */}
-          {orderData.selfCancelAllowed !== false && (
-            <SelfCancelCard
-              orderCode={orderData.orderCode}
-              email={email}
-              status={orderData.status}
-              paidAt={orderData.paidAt}
-              totalRon={orderData.pricing?.totalPrice ?? 0}
-              onCancelled={() => handleSearch(orderCode, email)}
-            />
-          )}
-
-          {/* Help contact card — WhatsApp + phone, first touchpoint when the
-              customer is confused. Always rendered above the status details
-              to match sister project UX. */}
+          {/* Top of the page = only what needs the client now: an unread
+              message, documents we asked for, then the status itself. Help,
+              messages and self-cancel sit lower (Raul, 25.09.2026). */}
           {(orderData.unreadMessages ?? 0) > 0 && orderData.messagesToken && (
             <a
               href="#mesaje"
@@ -405,8 +392,6 @@ function OrderStatusContent() {
               Ai {orderData.unreadMessages === 1 ? 'un mesaj nou' : `${orderData.unreadMessages} mesaje noi`} despre comandă. Citește și răspunde ↓
             </a>
           )}
-
-          <HelpContactCard orderCode={orderData.orderCode} />
 
           {/* Documents requested from the customer — most urgent action, shown
               above everything else with a direct link to the upload page. */}
@@ -465,8 +450,10 @@ function OrderStatusContent() {
                   </CardTitle>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 sm:flex-col sm:items-end">
-                  {/* Payment Status Badge */}
-                  {orderData.paymentStatus === 'paid' ? (
+                  {/* Payment Status Badge — skipped when the status badge
+                      itself already says „Plătită” (two green pills saying
+                      the same thing, Raul 25.09.2026). */}
+                  {orderData.paymentStatus === 'paid' && orderData.status === 'paid' ? null : orderData.paymentStatus === 'paid' ? (
                     <div className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 flex items-center gap-1">
                       <CheckCircle className="h-3 w-3" />
                       Plată confirmată
@@ -492,7 +479,7 @@ function OrderStatusContent() {
                   </div>
                   {/* Quick jump: document(e) gata -> scroll direct la sectiunea
                       Documente (clientul nu mai cauta pe pagina). */}
-                  {orderData.documents && orderData.documents.length > 0 && (
+                  {orderData.documents?.some((d) => !CONTRACT_DOC_TYPES.includes(d.type)) && (
                     <button
                       type="button"
                       onClick={() =>
@@ -508,6 +495,23 @@ function OrderStatusContent() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Identificare, pasul 2: cererea e la OCPI. Spus pe față, cu
+                  termenul dat de OCPI de îndată ce topograful l-a trecut. */}
+              {orderData.status === 'identification_pending_ocpi' && (
+                <div className="rounded-lg border border-violet-200 bg-violet-50 p-4 text-sm text-violet-950">
+                  <p className="font-semibold">Pasul 2: cererea este la OCPI</p>
+                  <p className="mt-1 text-violet-900">
+                    Imobilul nu apare online, așa că topograful a cerut OCPI să îl caute în arhivă.
+                    Primești documentul OCPI: cartea funciară găsită și digitalizată sau confirmarea
+                    că imobilul nu e înscris.
+                  </p>
+                  <p className="mt-2 font-semibold">
+                    {orderData.ocpiTerm
+                      ? `Termen dat de OCPI: ${new Intl.DateTimeFormat('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(`${orderData.ocpiTerm}T12:00:00`))}${orderData.ocpiRegistrationNumber ? ` (cererea nr. ${orderData.ocpiRegistrationNumber})` : ''}`
+                      : 'Termenul exact apare aici imediat ce depunem cererea (de regulă până la 10 zile lucrătoare).'}
+                  </p>
+                </div>
+              )}
               {/* Service Info */}
               <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                 <Package className="h-5 w-5 text-muted-foreground" />
@@ -585,7 +589,7 @@ function OrderStatusContent() {
                   ) : null}
                   {/* Termenul dat de OCPI la depunere — mai precis decât estimarea
                       noastră, așa că îl arătăm pe nume. */}
-                  {orderData.ocpiTerm && !['document_ready', 'shipped', 'delivered', 'completed'].includes(orderData.status) && (
+                  {orderData.ocpiTerm && !['identification_pending_ocpi', 'document_ready', 'shipped', 'delivered', 'completed'].includes(orderData.status) && (
                     <p className="text-sm font-medium text-secondary-900">
                       Termen dat de OCPI:{' '}
                       {new Intl.DateTimeFormat('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' }).format(
@@ -738,11 +742,6 @@ function OrderStatusContent() {
             </Card>
           )}
 
-          {/* Mesaje cu echipa / topograful — întrebări despre comandă, cu
-              răspuns și poze atașate. */}
-          {orderData.messagesToken && (
-            <CustomerMessages orderId={orderData.id} token={orderData.messagesToken} />
-          )}
 
           {/* Timeline */}
           {orderData.timeline.length > 0 && (
@@ -785,6 +784,12 @@ function OrderStatusContent() {
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {/* Mesaje cu echipa / topograful — întrebări despre comandă, cu
+              răspuns și poze atașate. */}
+          {orderData.messagesToken && (
+            <CustomerMessages orderId={orderData.id} token={orderData.messagesToken} />
           )}
 
           {/* Courier Tracking */}
@@ -925,25 +930,25 @@ function OrderStatusContent() {
             </Card>
           )}
 
-          {/* Help Section */}
-          <Card className="bg-blue-50 border-blue-100">
-            <CardContent className="pt-6">
-              <p className="text-sm text-blue-800">
-                <strong>Ai nevoie de ajutor?</strong> Contactează-ne la{' '}
-                <a
-                  href={`mailto:${brand.contactEmail}`}
-                  className="underline hover:no-underline"
-                >
-                  {brand.contactEmail}
-                </a>{' '}
-                sau la telefon{' '}
-                <a href="tel:+40757708181" className="underline hover:no-underline">
-                  +40 757 708 181
-                </a>{' '}
-                menționând codul comenzii tale.
-              </p>
-            </CardContent>
-          </Card>
+          {/* WhatsApp / telefon — jos, după ce clientul a văzut statusul (Raul,
+              25.09.2026); butonul plutitor de WhatsApp rămâne în dreapta jos. */}
+          <HelpContactCard orderCode={orderData.orderCode} />
+
+
+          {/* Anularea în primele minute — la final de pagină: e o excepție, nu
+              primul lucru pe care îl vede un client care tocmai a plătit.
+              Doar pe serviciile cu allow_self_cancel, cât timp e „Plătită”
+              și în fereastra de 30 de minute. */}
+          {orderData.selfCancelAllowed !== false && (
+            <SelfCancelCard
+              orderCode={orderData.orderCode}
+              email={email}
+              status={orderData.status}
+              paidAt={orderData.paidAt}
+              totalRon={orderData.pricing?.totalPrice ?? 0}
+              onCancelled={() => handleSearch(orderCode, email)}
+            />
+          )}
         </div>
       )}
 
