@@ -8,8 +8,8 @@ clientul răspunde echipei → echipa îi spune lui Mircea”.
 
 ## Unde îl găsiți
 
-- **Admin**: pe pagina comenzii, bara **„Mesaje cu clientul”** de jos (deasupra
-  istoricului), butonul „Scrie clientului” deschide firul într-o fereastră. Până
+- **Admin**: pe pagina comenzii, bara **„Mesaje cu clientul”** de sub „Note
+  Echipă”; butonul „Scrie clientului” deschide firul într-o fereastră. Până
   pe 29.09 cardul stătea deschis deasupra notelor și era confundat cu ele.
 - **Portalul topografului**: pe pagina comenzii, **„Mesaje cu clientul”**, deasupra
   notei pentru echipă. La identificări are 3 texte gata scrise: „Mai multe imobile

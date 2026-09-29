@@ -665,7 +665,7 @@ Două rapoarte ale echipei din `/admin/ghid/rapoarte`, închise în aceeași zi:
   max 5 capturi în S3 `knowledge-reports/<reporterId>/`, plus bife pe site
   (eghiseul, CJO, ecazier, documentero).
   [changelog](changelog/2026-09-29-raport-cu-poze-si-site.md)
-- ✅ Colateral: „Mesaje cu clientul” din admin mutat jos, buton + pop-up (era
+- ✅ Colateral: „Mesaje cu clientul” din admin = bară sub „Note Echipă”, buton + pop-up (era
   confundat cu notele interne). [changelog](changelog/2026-09-29-mesaje-client-popup.md)
 
 Rămase deschise în Rapoarte: termene pe oficii de stare civilă, „cum dau refund la

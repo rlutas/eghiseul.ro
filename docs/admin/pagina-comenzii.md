@@ -39,11 +39,10 @@ de client** (extras CF vechi, titlu, contract), cu click care deschide fișierul
 
 ## Mesaje cu clientul
 
-Din 29.09 e o **bară jos în pagină**, deasupra istoricului comenzii, cu
-butonul **„Scrie clientului”** (sau „Vezi / scrie clientului” dacă există
-mesaje). Butonul deschide o fereastră separată, cu avertismentul că mesajul
-pleacă la client. Nu mai stă deschis lângă „Note Echipă”, ca să nu fie
-confundat cu notele. Dacă clientul a răspuns și nimeni nu a citit, bara e
+Din 29.09 e o **bară sub „Note Echipă”**, cu butonul **„Scrie clientului”**
+(sau „Vezi / scrie clientului” dacă există mesaje). Butonul deschide o
+fereastră separată, cu avertismentul că mesajul pleacă la client. Nu mai e o
+casetă de scris deschisă lângă note, ca să nu fie confundată cu ele. Dacă clientul a răspuns și nimeni nu a citit, bara e
 galbenă și scrie „răspuns nou”; din lista de comenzi, linkul spre mesaje
 deschide fereastra direct.
 

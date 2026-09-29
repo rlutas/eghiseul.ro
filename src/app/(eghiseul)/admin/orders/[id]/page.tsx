@@ -1320,7 +1320,16 @@ export default function AdminOrderDetailPage() {
           that sat next to it was replaced by the QuickStatusSelect dropdown
           in the header (team request 2026-07-08). */}
       <div className="grid gap-4 lg:grid-cols-2 items-start">
-        <NoteEchipaCard orderId={order.id} timeline={timeline} onAdded={refreshSilent} />
+        <div className="flex flex-col gap-4">
+          <NoteEchipaCard orderId={order.id} timeline={timeline} onAdded={refreshSilent} />
+          {/* Mesaje cu clientul — bară + buton + pop-up, sub note (cerere 29.09).
+              Deschis ca textarea, câmpul era confundat cu notele interne și
+              observațiile ajungeau la client pe email. Tot ce se scrie în
+              pop-up ajunge la client. */}
+          {!['draft', 'pending', 'abandoned'].includes(order.status ?? '') && (
+            <OrderMessagesLauncher endpoint={`/api/admin/orders/${order.id}/messages`} />
+          )}
+        </div>
         {/* Service & Options — grouped to match what the customer saw in
             the order summary (main service + nested add-ons + each
             "Serviciu secundar" like Certificat Integritate with its own
@@ -2799,13 +2808,6 @@ export default function AdminOrderDetailPage() {
         optionStatuses={optionStatuses}
         onStatusChange={refreshSilent}
       />
-
-      {/* Mesaje cu clientul — buton + pop-up, jos (cerere 29.09): deschis sus,
-          câmpul era confundat cu notele interne și observațiile ajungeau la
-          client pe email. Tot ce se scrie aici ajunge la client. */}
-      {!['draft', 'pending', 'abandoned'].includes(order.status ?? '') && (
-        <OrderMessagesLauncher endpoint={`/api/admin/orders/${order.id}/messages`} />
-      )}
 
       {/* Order Timeline — ultimul, cerere user */}
       <Card>
