@@ -44,7 +44,7 @@ const DESCRIPTION =
   'Obții cazierul auto (fișa de evidență a conducătorului auto) online: sancțiuni rutiere, ' +
   'puncte de penalizare, suspendări. Necesar pentru atestat profesional și angajare ca șofer.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-07-15';
+const DATE_MODIFIED = '2026-09-29';
 
 export const revalidate = 3600;
 
@@ -94,8 +94,8 @@ const jsonLdGraph = buildServicePageGraph({
   ],
   offers: [
     { name: 'Cazier Auto — Fișa Conducătorului Auto (Standard)', price: 198, url: `${BASE_URL}${PAGE_PATH}` },
-    // Permis emis în străinătate: fișa se cere autorității emitente, deci alt
-    // tarif și alt termen (7-10 zile lucrătoare). Paritate cu
+    // Permis emis în străinătate: verificare în evidența permiselor străine,
+    // răspuns prin adresă IPJ (nu fișă), alt tarif și alt termen (7-10 zile lucrătoare). Paritate cu
     // cazierjudiciaronline.com; config în vehicleVerification.foreignLicense.
     { name: 'Cazier Auto — permis emis în străinătate', price: 350, url: `${BASE_URL}${PAGE_PATH}` },
   ],
@@ -521,6 +521,51 @@ export default async function CazierAutoOnlinePage() {
                 </div>
               </div>
             </div>
+
+            {/* Foreign licence — the answer is a letter, not the "Istoric sancțiuni" sheet */}
+            <div id="permis-strain" className="mt-14 lg:mt-20 scroll-mt-24 grid lg:grid-cols-[6fr_5fr] gap-8 lg:gap-14 items-center">
+              <div className="lg:order-2 relative">
+                <div className="relative bg-white rounded-2xl p-3 ring-1 ring-neutral-200 shadow-[0_20px_50px_rgba(6,16,31,0.16)]">
+                  <Image
+                    src="/images/specimens/cazier-auto-permis-strain.webp"
+                    alt="Specimen răspuns al Serviciului Rutier pentru un permis de conducere emis în străinătate, date anonimizate"
+                    width={1000}
+                    height={1431}
+                    className="w-full h-auto rounded-lg"
+                    loading="lazy"
+                    sizes="(max-width: 1024px) 100vw, 460px"
+                  />
+                  <p className="text-xs text-neutral-400 mt-2 text-center italic">
+                    Exemplu real, permis străin — date anonimizate.
+                  </p>
+                </div>
+              </div>
+              <div className="lg:order-1">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-secondary-900 text-white text-xs font-semibold rounded-full mb-4">
+                  <Globe className="h-3.5 w-3.5" aria-hidden="true" />
+                  Permis emis în străinătate
+                </span>
+                <h3 className="text-xl lg:text-2xl font-bold text-secondary-900 mb-3">
+                  Cu permis străin primești o adresă de la Poliție, nu fișa de mai sus
+                </h3>
+                <div className="space-y-3 text-neutral-600 leading-relaxed">
+                  <p>
+                    Pentru un permis emis în altă țară, Serviciul Rutier nu eliberează „Istoricul sancțiunilor”.
+                    Verifică <strong>evidența permiselor de conducere străine</strong> și a sancțiunilor aplicate
+                    în România, apoi răspunde printr-o <strong>adresă semnată și ștampilată</strong>, ca în exemplul
+                    alăturat.
+                  </p>
+                  <p>
+                    Adresa spune dacă ai abateri care să atragă <strong>suspendarea dreptului de a conduce</strong> pe
+                    drumurile publice din România. Nu conține lista amenzilor și nici punctele de penalizare, ca fișa
+                    unui permis românesc.
+                  </p>
+                  <p className="text-sm">
+                    Dacă instituția care ți-o cere are nevoie de alt format, scrie-ne înainte să comanzi și verificăm.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -578,8 +623,12 @@ export default async function CazierAutoOnlinePage() {
                   de la distanță — inclusiv pentru <strong>permise emise în străinătate</strong>, caz în care
                   documentul atestă faptele comise pe teritoriul României. Pentru un permis emis în
                   străinătate tariful este <strong>350 RON</strong> și termenul{' '}
-                  <strong>7-10 zile lucrătoare</strong>, pentru că fișa se solicită autorității care a
-                  emis permisul.
+                  <strong>7-10 zile lucrătoare</strong>: cererea se verifică în evidența separată a
+                  permiselor de conducere străine, iar răspunsul vine ca adresă a Serviciului Rutier,{' '}
+                  <a href="#permis-strain" className="text-primary-600 font-semibold hover:underline">
+                    ca în exemplul de mai sus
+                  </a>
+                  .
                 </p>
               </div>
             </div>
@@ -623,7 +672,7 @@ export default async function CazierAutoOnlinePage() {
             { q: 'Ce este cazierul auto?', a: 'Este fișa de evidență a conducătorului auto, un document eliberat de Poliția Rutieră despre șofer: istoricul sancțiunilor rutiere (amenzi, contravenții), punctele de penalizare active și suspendările permisului de conducere. Se obține pe baza permisului, nu pe numărul mașinii.' },
             { q: 'Ce acte îmi trebuie pentru a comanda?', a: 'Ai nevoie de actul de identitate, o poză cu fața permisului de conducere și un selfie cu actul în mână, pentru verificarea identității. Datele permisului le citim din poză, nu trebuie să le tastezi. Totul se încarcă direct în formular, de pe telefon sau calculator.' },
             { q: 'Cât durează să primesc cazierul auto?', a: `${formatEstimatedDays(service)} în mod standard. Dacă te grăbește un termen, există și procesare urgentă, cu livrare în ${formatUrgentDays(service) ?? 'regim prioritar'}.` },
-            { q: 'Am permis emis în străinătate. Pot obține cazierul auto din România?', a: 'Da. Documentul atestă faptele comise pe teritoriul României, indiferent de statul care a emis permisul. Pentru permisele emise în străinătate tariful este 350 RON și termenul 7-10 zile lucrătoare (în loc de 198 RON și termenul standard), pentru că fișa se solicită autorității care a emis permisul. Alegi varianta direct în formular, la pasul „Permis de Conducere", iar prețul se actualizează pe loc. Procesarea urgentă nu se aplică în acest caz.' },
+            { q: 'Am permis emis în străinătate. Pot obține cazierul auto din România?', a: 'Da. Documentul atestă faptele comise pe teritoriul României, indiferent de statul care a emis permisul. Pentru permisele emise în străinătate tariful este 350 RON și termenul 7-10 zile lucrătoare (în loc de 198 RON și termenul standard), pentru că cererea se verifică în evidența separată a permiselor de conducere străine. Nu primești fișa „Istoric sancțiuni”, ci o adresă de la Serviciul Rutier care confirmă dacă ai abateri ce atrag suspendarea dreptului de a conduce în România. Alegi varianta direct în formular, la pasul „Permis de Conducere", iar prețul se actualizează pe loc. Procesarea urgentă nu se aplică în acest caz.' },
             { q: 'Care e diferența dintre cazierul auto și cazierul judiciar?', a: 'Cazierul auto (fișa conducătorului auto) arată sancțiunile rutiere: amenzi, puncte de penalizare, suspendări ale permisului. Cazierul judiciar arată infracțiunile și condamnările penale și se eliberează de poliție pe alt circuit. Sunt documente diferite, cerute în situații diferite — pe eGhișeul le poți comanda pe amândouă.' },
             { q: 'Care e diferența dintre cazierul auto și istoricul vehiculului?', a: 'Cazierul auto este despre șofer: sancțiunile și punctele de pe permisul tău. Istoricul vehiculului este despre o mașină (accidente, daune, rulaj), verificat după numărul de înmatriculare sau seria de șasiu — un alt tip de raport, pe care nu îl oferim.' },
             { q: 'Cât este valabil cazierul auto?', a: 'Legea nu fixează un termen, dar în practică instituțiile cer un document emis în ultimele 30 de zile, pentru că punctele de penalizare și sancțiunile se schimbă în timp. Comandă-l cu puțin timp înainte de depunerea dosarului.' },

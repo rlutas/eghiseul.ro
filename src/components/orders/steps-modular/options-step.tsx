@@ -527,7 +527,7 @@ export function OptionsStepModular({ onValidChange }: OptionsStepProps) {
               Procesarea urgentă nu e disponibilă pentru permisele emise în străinătate. <span className="text-xs font-normal text-amber-700">De ce?</span>
             </summary>
             <p className="mt-2 text-xs text-amber-800">
-              Fișa conducătorului auto se solicită autorității care a emis permisul, iar termenul depinde de ea — nu poate fi scurtat.
+              Cererea se verifică în evidența separată a permiselor de conducere străine, iar termenul nu poate fi scurtat.
             </p>
           </details>
         </section>

@@ -8,8 +8,15 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { FileText, ImageIcon, MessageSquare, Send } from 'lucide-react';
+import { AlertTriangle, FileText, ImageIcon, MessageSquare, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface Attachment {
   key: string;
@@ -40,6 +47,9 @@ interface Props {
   readOnly?: boolean;
   templates?: MessageTemplate[];
   className?: string;
+  /** Hide the card heading — the pop-up brings its own title. */
+  bare?: boolean;
+  onSent?: () => void;
 }
 
 const AUTHOR_LABEL: Record<StaffMessage['author_type'], string> = {
@@ -57,7 +67,7 @@ function when(iso: string): string {
   });
 }
 
-export function OrderMessagesPanel({ endpoint, readOnly, templates, className }: Props) {
+export function OrderMessagesPanel({ endpoint, readOnly, templates, className, bare, onSent }: Props) {
   const [messages, setMessages] = useState<StaffMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState('');
@@ -95,6 +105,7 @@ export function OrderMessagesPanel({ endpoint, readOnly, templates, className }:
       );
       setDraft('');
       await load();
+      onSent?.();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Mesajul nu a fost trimis');
     } finally {
@@ -104,14 +115,18 @@ export function OrderMessagesPanel({ endpoint, readOnly, templates, className }:
 
   return (
     <div id="mesaje" className={className ?? 'mb-6 rounded-lg border border-slate-200 bg-white p-5'}>
-      <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold text-slate-900">
-        <MessageSquare className="h-4 w-4" />
-        Mesaje cu clientul
-      </h2>
-      <p className="mb-3 text-xs text-slate-500">
-        Ce scrieți aici ajunge la client pe email și în pagina comenzii; el poate răspunde, cu
-        poze atașate. Pentru observații interne folosiți notele.
-      </p>
+      {!bare && (
+        <>
+          <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold text-slate-900">
+            <MessageSquare className="h-4 w-4" />
+            Mesaje cu clientul
+          </h2>
+          <p className="mb-3 text-xs text-slate-500">
+            Ce scrieți aici ajunge la client pe email și în pagina comenzii; el poate răspunde, cu
+            poze atașate. Pentru observații interne folosiți notele.
+          </p>
+        </>
+      )}
 
       {loading ? (
         <p className="text-sm text-slate-500">Se încarcă...</p>
@@ -197,5 +212,116 @@ export function OrderMessagesPanel({ endpoint, readOnly, templates, className }:
         </Button>
       </div>
     </div>
+  );
+}
+
+interface PeekCounts {
+  total: number;
+  unreadFromClient: number;
+  lastAt: string | null;
+}
+
+/**
+ * Admin order page: the thread sits closed behind a button, low on the page.
+ * Open on the page, the textarea was mistaken for the internal notes and
+ * internal remarks reached clients by email. The pop-up says loudly that the
+ * client receives what is written; the bar still flags unread client replies.
+ */
+export function OrderMessagesLauncher({ endpoint, templates }: { endpoint: string; templates?: MessageTemplate[] }) {
+  // The orders list links unread replies to `#mesaje`: open the thread directly.
+  // The admin order page renders client-side only, so reading the hash here is safe.
+  const [open, setOpen] = useState(() => typeof window !== 'undefined' && window.location.hash === '#mesaje');
+  const [counts, setCounts] = useState<PeekCounts | null>(null);
+
+  const peek = useCallback(async () => {
+    try {
+      const res = await fetch(`${endpoint}?peek=1`);
+      const json = await res.json();
+      if (json.success) setCounts(json.data);
+    } catch {
+      // The bar still works without counts.
+    }
+  }, [endpoint]);
+
+  useEffect(() => {
+    fetch(`${endpoint}?peek=1`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success) setCounts(json.data);
+      })
+      .catch(() => {});
+  }, [endpoint]);
+
+  const unread = counts?.unreadFromClient ?? 0;
+
+  return (
+    <>
+      <div
+        id="mesaje"
+        className={`flex flex-wrap items-center justify-between gap-3 rounded-lg border p-4 ${
+          unread > 0 ? 'border-amber-300 bg-amber-50' : 'bg-card'
+        }`}
+      >
+        <div className="flex items-start gap-2.5">
+          <MessageSquare className="mt-0.5 h-4 w-4 text-slate-500" />
+          <div>
+            <p className="text-sm font-semibold text-slate-900">
+              Mesaje cu clientul
+              {counts && counts.total > 0 && (
+                <span className="ml-1.5 font-normal text-slate-500">({counts.total})</span>
+              )}
+              {unread > 0 && (
+                <span className="ml-2 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-semibold text-white">
+                  {unread} {unread === 1 ? 'răspuns nou' : 'răspunsuri noi'}
+                </span>
+              )}
+            </p>
+            <p className="text-xs text-slate-500">
+              Se trimit clientului pe email. Nu sunt note interne.
+              {counts?.lastAt && ` Ultimul: ${when(counts.lastAt)}.`}
+            </p>
+          </div>
+        </div>
+        <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
+          <Send className="mr-1.5 h-4 w-4" />
+          {counts && counts.total > 0 ? 'Vezi / scrie clientului' : 'Scrie clientului'}
+        </Button>
+      </div>
+
+      <Dialog
+        open={open}
+        onOpenChange={(next) => {
+          setOpen(next);
+          if (!next) peek();
+        }}
+      >
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Mesaj către client
+            </DialogTitle>
+            <DialogDescription asChild>
+              <div className="flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-2.5 text-xs text-amber-900">
+                <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
+                <span>
+                  Clientul primește mesajul pe email și îl vede în pagina comenzii. Observațiile
+                  interne se scriu în „Note echipă”, nu aici.
+                </span>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          {open && (
+            <OrderMessagesPanel
+              endpoint={endpoint}
+              templates={templates}
+              bare
+              className=""
+              onSent={peek}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

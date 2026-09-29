@@ -87,7 +87,7 @@ import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
 import { hasDeliveryAddressData, isEmailOnlyDelivery } from '@/lib/delivery/address';
 import { assessStartWorkOnProof } from '@/lib/orders/start-work-on-proof';
 import { SupplierCostsDialog } from '@/components/admin/supplier-costs-dialog';
-import { OrderMessagesPanel } from '@/components/orders/OrderMessagesPanel';
+import { OrderMessagesLauncher } from '@/components/orders/OrderMessagesPanel';
 import {
   SUPPLIER_CATEGORIES,
   SUPPLIER_CATEGORY_LABELS,
@@ -1313,15 +1313,6 @@ export default function AdminOrderDetailPage() {
         </div>
       )}
 
-
-      {/* Mesaje cu clientul — tot ce se scrie aici ajunge la client (email +
-          pagina comenzii); notele de mai jos rămân interne. */}
-      {!['draft', 'pending', 'abandoned'].includes(order.status ?? '') && (
-        <OrderMessagesPanel
-          endpoint={`/api/admin/orders/${order.id}/messages`}
-          className="rounded-lg border bg-card p-5"
-        />
-      )}
 
       {/* Note Echipă — moved to the top for parity with cazierjudiciaronline.com
           (prominent, right after the banners) so the team sees/writes notes
@@ -2808,6 +2799,13 @@ export default function AdminOrderDetailPage() {
         optionStatuses={optionStatuses}
         onStatusChange={refreshSilent}
       />
+
+      {/* Mesaje cu clientul — buton + pop-up, jos (cerere 29.09): deschis sus,
+          câmpul era confundat cu notele interne și observațiile ajungeau la
+          client pe email. Tot ce se scrie aici ajunge la client. */}
+      {!['draft', 'pending', 'abandoned'].includes(order.status ?? '') && (
+        <OrderMessagesLauncher endpoint={`/api/admin/orders/${order.id}/messages`} />
+      )}
 
       {/* Order Timeline — ultimul, cerere user */}
       <Card>

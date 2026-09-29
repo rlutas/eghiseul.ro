@@ -14,7 +14,7 @@ prețul și termenul vii sunt în **Setări → Servicii**.
 | Cazier judiciar pentru cetățean străin | IPJ + verificări IGI | 298 (198 + 100) | 7-15 zile lucrătoare | nu se poate | idem, pentru cetățeni străini | 6 luni |
 | Cazier fiscal persoană fizică | ANAF | 198 | 1-3 zile lucrătoare | nu | lipsa datoriilor / faptelor fiscale | 30 zile |
 | Cazier auto (fișa conducătorului auto) | Poliția Rutieră | 198 | 3-5 zile lucrătoare | +80 → 1-2 zile | sancțiuni rutiere, puncte, suspendări ale **șoferului** (nu ale mașinii) | uzual 30 zile |
-| Cazier auto cu permis emis în străinătate | autoritatea străină | 350 | 7-10 zile lucrătoare | nu se poate | idem; fișa se cere autorității care a emis permisul | |
+| Cazier auto cu permis emis în străinătate | Poliția Rutieră (evidența permiselor străine) | 350 | 7-10 zile lucrătoare | nu se poate | **adresă** a Serviciului Rutier, nu fișa „Istoric sancțiuni”: spune doar dacă are abateri care atrag suspendarea dreptului de a conduce în România | |
 | Certificat de integritate comportamentală | IGPR | 198 | 3-5 zile lucrătoare | +80 → 1-2 zile | că persoana nu are fapte împotriva minorilor / persoanelor vulnerabile (Legea 118/2019); cerut la lucrul cu copii | uzual 6 luni |
 
 Combinații în aceeași comandă (o singură plată, o singură livrare):
@@ -84,6 +84,7 @@ Detalii pe fiecare status (inclusiv „Așteptare client”, „Anulare solicita
 - **Ce primește**: scanul pe email imediat ce îl avem; originalul prin curier doar dacă a ales curier.
 - **Valabilitate**: cazier judiciar și integritate 6 luni, cazier fiscal 30 de zile. Clientul primește un email de reamintire înainte de expirare.
 - **Cazier auto**: e fișa **șoferului** (permisul), nu istoricul mașinii. Nu cerem VIN sau număr de înmatriculare.
+- **Cazier auto cu permis străin**: clientul **nu** primește fișa „Istoric sancțiuni”, ci o adresă de o pagină de la Serviciul Rutier, semnată și ștampilată. Adresa confirmă dacă are abateri care atrag suspendarea dreptului de a conduce în România. Nu are lista amenzilor și nici punctele. Exemplul real (anonimizat) e pe pagina serviciului, la secțiunea „Permis emis în străinătate”: trimiteți linkul `eghiseul.ro/servicii/cazier-auto-online/#permis-strain` înainte de plată, dacă întreabă cum arată. Dacă instituția lui cere alt format, lămuriți înainte de plată. Vezi [Cazier auto cu permis străin: ce primește clientul](../../changelog/2026-09-29-cazier-auto-permis-strain-specimen.md).
 - **Nu suntem instituția**: obținem actul prin avocat, pe împuternicire; instituția îl eliberează. Clientul poate să-l ia și singur, gratuit, de la ghișeu sau din ghiseul.ro; noi vindem timpul și drumul.
 - **Renunțare / refund**: în 30 de minute singur (70%); după, doar cu echipa, caz cu caz.
 
@@ -91,5 +92,6 @@ Detalii pe fiecare status (inclusiv „Așteptare client”, „Anulare solicita
 
 - 14.08.2026: cazierul auto și integritatea nu mai au buton de cerere (produceau formularul greșit). Urgența la integritate a devenit 80 lei (era 100).
 - 28.07.2026: cazier auto cu permis din străinătate (350 lei / 7-10 zile), numărul permisului nu se mai tastează.
+- 29.09.2026: cazier auto cu permis străin: pe site și în formular scrie ce document primește clientul (adresa Serviciului Rutier, cu exemplu real). Textul vechi, „se cere autorității care a emis permisul”, era greșit și a fost scos.
 - 12.08.2026: doar serviciile din lista „cu avocat” primesc contract de asistență și numere de Barou; anulările eliberează numerele înapoi.
 - 20.08.2026: CNP-urile reale cu coduri de județ noi nu mai sunt respinse.

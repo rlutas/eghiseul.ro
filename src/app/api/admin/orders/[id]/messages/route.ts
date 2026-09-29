@@ -1,6 +1,8 @@
 /**
  * GET  /api/admin/orders/[id]/messages — the order's message thread
- *      (`orders.view`); marks the client's replies as read.
+ *      (`orders.view`); marks the client's replies as read. `?peek=1`
+ *      returns only counts `{ total, unreadFromClient, lastAt }` and marks
+ *      nothing.
  * POST /api/admin/orders/[id]/messages — the team writes to the client
  *      (`orders.manage`); the client gets an email with the message.
  *
@@ -39,13 +41,25 @@ async function staffUser(permission: 'orders.view' | 'orders.manage') {
   return { user };
 }
 
-export async function GET(_request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
   const auth = await staffUser('orders.view');
   if ('error' in auth) return auth.error;
 
   const admin = createAdminClient();
   const messages = await listOrderMessages(id, admin);
+  // `?peek=1` = the collapsed launcher on the order page only counts the
+  // thread; the client's replies stay unread until someone opens the pop-up.
+  if (request.nextUrl.searchParams.get('peek') === '1') {
+    return NextResponse.json({
+      success: true,
+      data: {
+        total: messages.length,
+        unreadFromClient: messages.filter((m) => m.author_type === 'client' && !m.read_by_staff_at).length,
+        lastAt: messages.at(-1)?.created_at ?? null,
+      },
+    });
+  }
   await markOrderMessagesRead(id, 'staff', admin);
   return NextResponse.json({ success: true, data: { messages: await withAttachmentUrls(messages) } });
 }

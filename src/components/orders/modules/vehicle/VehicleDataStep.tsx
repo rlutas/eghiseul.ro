@@ -270,11 +270,20 @@ export default function VehicleDataStep({ config, onValidChange }: VehicleDataSt
                 <Alert className="border-amber-200 bg-amber-50">
                   <AlertCircle className="h-4 w-4 text-amber-600" />
                   <AlertDescription className="text-amber-800">
-                    Pentru permisele emise în străinătate fișa se solicită autorității
-                    care a emis permisul: tariful este{' '}
+                    Pentru permisele emise în străinătate tariful este{' '}
                     <strong>{Number(foreign?.price ?? 0).toFixed(2)} RON</strong> și termenul{' '}
                     <strong>{foreign?.daysDisplay || `${foreign?.minDays}-${foreign?.maxDays} zile lucrătoare`}</strong>.
-                    Prețul din dreapta s-a actualizat deja.
+                    Prețul din dreapta s-a actualizat deja. Vei primi o adresă de la Serviciul Rutier
+                    (nu fișa „Istoric sancțiuni”), care confirmă dacă ai abateri ce atrag suspendarea
+                    dreptului de a conduce în România.{' '}
+                    <a
+                      href="/servicii/cazier-auto-online/#permis-strain"
+                      target="_blank"
+                      rel="noopener"
+                      className="font-semibold underline"
+                    >
+                      Vezi cum arată
+                    </a>
                   </AlertDescription>
                 </Alert>
               )}
