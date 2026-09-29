@@ -3,7 +3,7 @@
 > **⚡ Header stale (2026-06-10).** Pentru starea reală vezi [`STATUS_CURRENT.md`](STATUS_CURRENT.md) + [`changelog/`](changelog/). De atunci: ONRC + ANCPI live, 36 calculatoare, expansiune SEO (CF/cazier/ONRC/stare civilă), rovinietă, /tools/.
 
 **Version:** 4.8
-**Last Updated:** 2026-09-18
+**Last Updated:** 2026-09-29
 **Status:** Sprint 4 In Progress (98%) | Sprint 5 In Progress (98%) | Admin Workflow ✅ | Document Generation ✅ | Multi-Signature ✅ | Contract Preview ✅ | Contract Legal Validity ✅ | Client Downloads ✅ | Extended RBAC ✅ | Number Registry ✅ | Gemini 2.5 Flash ✅ | KYC S3 Upload ✅ | Admin UI Polish ✅ | Review Step Pricing ✅ | Registry Own Page ✅ | User Invite ✅ | Template Placeholders ✅ | CLIENT_DETAILS_BLOCK Legal Format ✅ | KYC Confidence Tracking ✅
 
 ---
@@ -653,6 +653,23 @@ proprietar un singur extras, ales de client). Stare:
 Rămas: test live cu o comandă reală (formular + mesaj + răspuns); cele 11 comenzi
 vechi din „Așteptare client” de mutat de Mircea.
 Changelog: `docs/changelog/2026-09-25-identificare-acte-mesaje-client.md`.
+
+### RAPOARTE DIN GHID REZOLVATE — 29.09.2026
+
+Două rapoarte ale echipei din `/admin/ghid/rapoarte`, închise în aceeași zi:
+- ✅ **Cazier auto cu permis străin** (raport 6f9bf9c6): exemplu real anonimizat
+  (adresa IPJ, nu „Istoric sancțiuni”) pe eghiseul, CJO și ecazier + în formular;
+  scos textul fals „se cere autorității care a emis permisul”.
+  [changelog](changelog/2026-09-29-cazier-auto-permis-strain-specimen.md)
+- ✅ **Poze la „Raportează o problemă”** (raport 703599d3): Ctrl+V / drag / buton,
+  max 5 capturi în S3 `knowledge-reports/<reporterId>/`, plus bife pe site
+  (eghiseul, CJO, ecazier, documentero).
+  [changelog](changelog/2026-09-29-raport-cu-poze-si-site.md)
+- ✅ Colateral: „Mesaje cu clientul” din admin mutat jos, buton + pop-up (era
+  confundat cu notele interne). [changelog](changelog/2026-09-29-mesaje-client-popup.md)
+
+Rămase deschise în Rapoarte: termene pe oficii de stare civilă, „cum dau refund la
+cazier” (21.09).
 
 ### BACKLOG / FUTURE FEATURES
 
