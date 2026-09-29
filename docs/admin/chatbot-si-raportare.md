@@ -40,6 +40,22 @@ deschide un formular scurt: problemă sau sugestie, descrierea, opțional
 numărul comenzii. Ajunge la Raul, care o vede în **Rapoarte din Ghid**,
 grupată pe „Nou / În lucru / Rezolvat”, cu cine a trimis-o și când.
 
+Din 29.09 formularul are încă două lucruri:
+
+- **Pe ce site?** Bifați unul sau mai multe: eghiseul.ro,
+  cazierjudiciaronline.com, ecazier.ro, documentero.ro. Nu e obligatoriu, dar
+  ajută: aceeași problemă poate exista doar pe unul dintre site-uri.
+  Topograful nu vede alegerea, el lucrează doar pe eghiseul.ro.
+- **Poze (capturi de ecran)**, cel mult 5, fiecare de cel mult 8 MB, PNG, JPG
+  sau WEBP. Se pun în trei feluri:
+  - faceți captura (Windows: `Win+Shift+S`, Mac: `Cmd+Shift+4`, apoi
+    `Ctrl`/`Cmd` pe tastă ca s-o copiați) și dați **Ctrl+V / Cmd+V** în
+    caseta de text;
+  - trageți poza din dosar peste formular;
+  - butonul **„Adaugă poză”**.
+  Poza apare mică sub text; cu „×” o scoateți. „Trimite lui Raul” așteaptă
+  până se termină de urcat pozele.
+
 Ce ajută la o raportare bună: ce ați apăsat, ce vă așteptați să se întâmple,
 ce s-a întâmplat, numărul comenzii. „Nu merge AWB-ul” nu spune nimic;
 „la E-260921-ABCDE, Generează AWB dă eroare roșie după 5 secunde, easybox
@@ -50,6 +66,7 @@ Satu Mare” spune tot.
 `/admin/ghid/rapoarte`: trei liste (Nou, În lucru, Rezolvat), fiecare raport
 cu tipul (problemă / sugestie / întrebare fără răspuns), cine, de unde
 (echipă sau colaborator), comanda, întrebarea și răspunsul chatbotului
-(pliate). Butoane: „În lucru”, „Rezolvat” (cu notă opțională: ce ai făcut),
+(pliate), site-urile bifate și pozele (click pe o poză o deschide mare; linkul
+expiră după o oră, reîncărcați pagina). Butoane: „În lucru”, „Rezolvat” (cu notă opțională: ce ai făcut),
 „Redeschide”. Întrebările fără răspuns se închid completând ghidul, nu
 răspunzând în chat.

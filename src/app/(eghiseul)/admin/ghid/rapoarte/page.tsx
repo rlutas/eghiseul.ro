@@ -4,7 +4,14 @@ import { ArrowLeft, MessageSquareWarning } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/admin/permissions';
 import { formatRoDate } from '@/lib/knowledge/parse';
-import { listReports, REPORT_KIND_LABEL, REPORT_STATUS_LABEL, type KnowledgeReport } from '@/lib/knowledge/reports';
+import { getDownloadUrl } from '@/lib/aws/s3';
+import {
+  listReports,
+  REPORT_KIND_LABEL,
+  REPORT_SITE_LABEL,
+  REPORT_STATUS_LABEL,
+  type KnowledgeReport,
+} from '@/lib/knowledge/reports';
 import { ReportActions } from './report-actions';
 
 export const dynamic = 'force-dynamic';
@@ -39,6 +46,19 @@ export default async function GhidRapoartePage() {
   }
 
   const reports = await listReports();
+  // Capturile de ecran: link semnat pe o oră, doar pentru cine deschide pagina.
+  const shotUrls = new Map<string, string>();
+  await Promise.all(
+    reports.flatMap((r) =>
+      (r.context?.attachments ?? []).map(async (a) => {
+        try {
+          shotUrls.set(a.key, await getDownloadUrl(a.key, 3600));
+        } catch (e) {
+          console.error('[ghid/rapoarte] signed url failed:', a.key, e);
+        }
+      })
+    )
+  );
   const byStatus = new Map<KnowledgeReport['status'], KnowledgeReport[]>();
   for (const s of STATUS_ORDER) byStatus.set(s, []);
   for (const r of reports) byStatus.get(r.status)?.push(r);
@@ -82,7 +102,31 @@ export default async function GhidRapoartePage() {
                   {r.context?.orderNumber && <span className="font-mono">· {r.context.orderNumber}</span>}
                   {r.context?.page && <span className="truncate max-w-[40ch]">· {r.context.page}</span>}
                 </div>
+                {!!r.context?.sites?.length && (
+                  <div className="flex flex-wrap gap-1">
+                    {r.context.sites.map((s) => (
+                      <span key={s} className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-700">
+                        {REPORT_SITE_LABEL[s] ?? s}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <p className="text-sm whitespace-pre-wrap">{r.message}</p>
+                {!!r.context?.attachments?.length && (
+                  <div className="flex flex-wrap gap-2">
+                    {r.context.attachments.map((a) => {
+                      const url = shotUrls.get(a.key);
+                      return url ? (
+                        <a key={a.key} href={url} target="_blank" rel="noopener" className="block h-24 w-32 overflow-hidden rounded border hover:ring-2 hover:ring-amber-400" title={a.name}>
+                          {/* eslint-disable-next-line @next/next/no-img-element -- presigned S3 URL */}
+                          <img src={url} alt={a.name} className="h-full w-full object-cover" loading="lazy" />
+                        </a>
+                      ) : (
+                        <span key={a.key} className="rounded border px-2 py-1 text-xs text-neutral-500">{a.name} (indisponibilă)</span>
+                      );
+                    })}
+                  </div>
+                )}
                 {(r.context?.question || r.context?.answer) && (
                   <details className="text-xs text-neutral-700">
                     <summary className="cursor-pointer select-none">Întrebarea și răspunsul chatbotului</summary>

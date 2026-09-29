@@ -1,6 +1,9 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { ChatAudience } from './chat-context';
+import type { ReportAttachment, ReportSite } from './report-meta';
+
+export * from './report-meta';
 
 /** Tabelele din migrarea 184 nu sunt în tipul `Database` generat; convenția proiectului. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -39,7 +42,15 @@ export interface KnowledgeReport {
   audience: ChatAudience;
   kind: ReportKind;
   message: string;
-  context: { page?: string; question?: string; answer?: string; orderNumber?: string; chatLogId?: string | null };
+  context: {
+    page?: string;
+    question?: string;
+    answer?: string;
+    orderNumber?: string;
+    chatLogId?: string | null;
+    sites?: ReportSite[];
+    attachments?: ReportAttachment[];
+  };
   status: ReportStatus;
   resolution_note: string | null;
   resolved_at: string | null;

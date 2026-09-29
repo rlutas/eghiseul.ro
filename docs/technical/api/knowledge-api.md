@@ -14,6 +14,8 @@ Răspuns standard `{ success, data?, error? }`.
 | POST | `/api/collaborator/knowledge/chat` | colaborator | idem, doar peste documentele marcate `<!-- audienta: colaborator -->` |
 | POST | `/api/admin/knowledge/reports` `{ kind, message, context? }` | admin | raport (problemă / sugestie) |
 | POST | `/api/collaborator/knowledge/reports` | colaborator | idem |
+| POST | `/api/admin/knowledge/reports/upload` `{ contentType, size, name }` | admin | URL S3 semnat (PUT, 10 min) pentru o captură; cheie `knowledge-reports/<reporterId>/<uuid>.<ext>`, PNG/JPG/WEBP ≤ 8 MB |
+| POST | `/api/collaborator/knowledge/reports/upload` | colaborator | idem |
 | GET | `/api/admin/knowledge/reports` | admin | lista rapoartelor |
 | PATCH | `/api/admin/knowledge/reports/[id]` `{ status, note? }` | `settings.manage` | nou → in_lucru → rezolvat |
 
@@ -43,3 +45,12 @@ Răspuns standard `{ success, data?, error? }`.
 `knowledge_chat_log`, `knowledge_reports`: RLS activ, **fără politici** → doar
 service role (rutele de mai sus). Statusuri raport: `nou`, `in_lucru`,
 `rezolvat`; tipuri: `problema`, `sugestie`, `intrebare-fara-raspuns`.
+
+## Context raport: site-uri și capturi (29.09.2026)
+
+`context` din `POST …/reports` acceptă, pe lângă `page`, `question`, `answer`, `orderNumber`:
+
+- `sites`: listă din `eghiseul`, `cazierjudiciaronline`, `ecazier`, `documentero` (`REPORT_SITES` în `src/lib/knowledge/report-meta.ts`); valorile necunoscute se ignoră.
+- `attachments`: `[{ key, name, mimeType, size }]`, cel mult 5. Serverul păstrează doar cheile din `knowledge-reports/<id-ul celui care raportează>/`, ca nimeni să nu poată atașa un fișier străin și să primească apoi link semnat la el. Totul stă în coloana JSONB `context`, fără migrare.
+
+`/admin/ghid/rapoarte` semnează capturile pe o oră (`getDownloadUrl`) la randare.

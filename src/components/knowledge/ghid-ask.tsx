@@ -4,12 +4,30 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { marked } from 'marked';
-import { AlertTriangle, ArrowRight, FileText, Loader2, MessageSquareWarning, Search, X } from 'lucide-react';
+import { AlertTriangle, ArrowRight, FileText, ImagePlus, Loader2, MessageSquareWarning, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  REPORT_SHOT_MAX,
+  REPORT_SHOT_MAX_BYTES,
+  REPORT_SHOT_TYPES,
+  REPORT_SITE_LABEL,
+  REPORT_SITES,
+  type ReportSite,
+} from '@/lib/knowledge/report-meta';
 
 type Audience = 'team' | 'collaborator';
+
+interface Shot {
+  id: string;
+  name: string;
+  preview: string;
+  key?: string;
+  mimeType: string;
+  size: number;
+  error?: string;
+}
 
 interface SearchHit {
   slug: string;
@@ -63,7 +81,11 @@ export function GhidAsk({ audience, page }: { audience: Audience; page: string }
   const [report, setReport] = useState<{ open: boolean; kind: 'problema' | 'sugestie'; question?: string; answer?: string }>({ open: false, kind: 'problema' });
   const [reportMsg, setReportMsg] = useState('');
   const [reportOrder, setReportOrder] = useState('');
+  const [reportSites, setReportSites] = useState<ReportSite[]>([]);
+  const [shots, setShots] = useState<Shot[]>([]);
+  const [dragOver, setDragOver] = useState(false);
   const [sending, setSending] = useState(false);
+  const shotInputRef = useRef<HTMLInputElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -157,15 +179,86 @@ export function GhidAsk({ audience, page }: { audience: Audience; page: string }
     setReportMsg(ctx ? `Răspunsul la „${ctx.question}” nu m-a ajutat: ` : '');
   }
 
+  function resetReport() {
+    setReport({ open: false, kind: 'problema' });
+    setReportMsg('');
+    setReportOrder('');
+    setReportSites([]);
+    shots.forEach((s) => URL.revokeObjectURL(s.preview));
+    setShots([]);
+  }
+
+  function toggleSite(site: ReportSite) {
+    setReportSites((cur) => (cur.includes(site) ? cur.filter((s) => s !== site) : [...cur, site]));
+  }
+
+  /** Urcă o captură direct în S3 (URL semnat), ca raportul să poarte doar cheia. */
+  async function addShots(files: File[]) {
+    const images = files.filter((f) => f.type.startsWith('image/'));
+    if (!images.length) return;
+    const room = REPORT_SHOT_MAX - shots.length;
+    if (room <= 0) {
+      toast.error(`Cel mult ${REPORT_SHOT_MAX} poze la un raport.`);
+      return;
+    }
+    for (const file of images.slice(0, room)) {
+      const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const shot: Shot = { id, name: file.name || 'captura.png', preview: URL.createObjectURL(file), mimeType: file.type, size: file.size };
+      if (!REPORT_SHOT_TYPES.includes(file.type)) shot.error = 'Doar PNG, JPG sau WEBP';
+      else if (file.size === 0) shot.error = 'Fișier gol';
+      else if (file.size > REPORT_SHOT_MAX_BYTES) shot.error = 'Peste 8 MB';
+      setShots((cur) => [...cur, shot]);
+      if (shot.error) continue;
+      try {
+        const res = await fetch(`${apiBase}/reports/upload${qs}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contentType: file.type, size: file.size, name: shot.name }),
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error || 'Poza nu s-a putut încărca.');
+        const put = await fetch(json.data.uploadUrl, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file });
+        if (!put.ok) throw new Error('Poza nu s-a putut încărca.');
+        setShots((cur) => cur.map((s) => (s.id === id ? { ...s, key: json.data.key } : s)));
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : 'Poza nu s-a putut încărca.';
+        setShots((cur) => cur.map((s) => (s.id === id ? { ...s, error: msg } : s)));
+      }
+    }
+  }
+
+  function removeShot(id: string) {
+    setShots((cur) => {
+      const s = cur.find((x) => x.id === id);
+      if (s) URL.revokeObjectURL(s.preview);
+      return cur.filter((x) => x.id !== id);
+    });
+  }
+
+  const shotsUploading = shots.some((s) => !s.key && !s.error);
+
   async function sendReport() {
     const message = reportMsg.trim();
-    if (message.length < 5 || sending) return;
+    if (message.length < 5 || sending || shotsUploading) return;
     setSending(true);
     try {
       const res = await fetch(`${apiBase}/reports${qs}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kind: report.kind, message, context: { page, question: report.question, answer: report.answer, orderNumber: reportOrder || undefined } }),
+        body: JSON.stringify({
+          kind: report.kind,
+          message,
+          context: {
+            page,
+            question: report.question,
+            answer: report.answer,
+            orderNumber: reportOrder || undefined,
+            sites: reportSites.length ? reportSites : undefined,
+            attachments: shots
+              .filter((s) => s.key)
+              .map((s) => ({ key: s.key, name: s.name, mimeType: s.mimeType, size: s.size })),
+          },
+        }),
       });
       const json = await res.json();
       if (!json.success) {
@@ -173,9 +266,7 @@ export function GhidAsk({ audience, page }: { audience: Audience; page: string }
         return;
       }
       toast.success('Trimis. Raul îl vede în Rapoarte din Ghid.');
-      setReport({ open: false, kind: 'problema' });
-      setReportMsg('');
-      setReportOrder('');
+      resetReport();
     } catch {
       toast.error('Raportul nu s-a putut trimite.');
     } finally {
@@ -328,7 +419,21 @@ export function GhidAsk({ audience, page }: { audience: Audience; page: string }
       )}
 
       {report.open && (
-        <div className="rounded-xl border border-amber-300 bg-amber-50/60 px-4 py-3 space-y-2">
+        <div
+          className={`rounded-xl border px-4 py-3 space-y-2 ${dragOver ? 'border-amber-500 bg-amber-100/70' : 'border-amber-300 bg-amber-50/60'}`}
+          onDragOver={(e) => {
+            if (!e.dataTransfer.types.includes('Files')) return;
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            if (!e.dataTransfer.files.length) return;
+            e.preventDefault();
+            setDragOver(false);
+            void addShots(Array.from(e.dataTransfer.files));
+          }}
+        >
           <div className="flex items-center gap-2">
             <MessageSquareWarning className="h-4 w-4 text-amber-700" />
             <p className="text-sm font-semibold">Raportează</p>
@@ -340,18 +445,91 @@ export function GhidAsk({ audience, page }: { audience: Audience; page: string }
               <option value="problema">o problemă</option>
               <option value="sugestie">o sugestie</option>
             </select>
-            <button type="button" className="ml-auto text-neutral-500 hover:text-neutral-900" onClick={() => setReport({ open: false, kind: 'problema' })} aria-label="Închide">
+            <button type="button" className="ml-auto text-neutral-500 hover:text-neutral-900" onClick={resetReport} aria-label="Închide">
               <X className="h-4 w-4" />
             </button>
           </div>
           <Textarea
             value={reportMsg}
             onChange={(e) => setReportMsg(e.target.value)}
-            placeholder="Ce nu merge sau ce lipsește? Ce ai apăsat, ce te așteptai, ce s-a întâmplat…"
+            onPaste={(e) => {
+              const files = Array.from(e.clipboardData.files);
+              if (files.some((f) => f.type.startsWith('image/'))) {
+                e.preventDefault();
+                void addShots(files);
+              }
+            }}
+            placeholder="Ce nu merge sau ce lipsește? Ce ai apăsat, ce te așteptai, ce s-a întâmplat… Poți lipi aici o captură de ecran (Ctrl+V / Cmd+V)."
             rows={3}
             className="bg-white"
             autoFocus
           />
+          {/* Topograful lucrează doar pe eghiseul.ro, deci alegerea site-ului e doar pentru echipă. */}
+          {audience === 'team' && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-xs text-neutral-600">Pe ce site?</span>
+            {REPORT_SITES.map((site) => {
+              const on = reportSites.includes(site);
+              return (
+                <button
+                  key={site}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => toggleSite(site)}
+                  className={`rounded-full border px-2.5 py-0.5 text-xs ${on ? 'border-amber-600 bg-amber-600 text-white' : 'border-neutral-300 bg-white text-neutral-700 hover:border-amber-500'}`}
+                >
+                  {REPORT_SITE_LABEL[site]}
+                </button>
+              );
+            })}
+          </div>
+          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {shots.map((s) => (
+              <div key={s.id} className="relative h-16 w-16 overflow-hidden rounded border bg-white" title={s.error || s.name}>
+                {/* eslint-disable-next-line @next/next/no-img-element -- local blob preview */}
+                <img src={s.preview} alt={s.name} className={`h-full w-full object-cover ${s.error ? 'opacity-40' : ''}`} />
+                {!s.key && !s.error && (
+                  <span className="absolute inset-0 flex items-center justify-center bg-white/60">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  </span>
+                )}
+                {s.error && (
+                  <span className="absolute inset-x-0 bottom-0 bg-red-600 px-0.5 text-center text-[9px] leading-tight text-white">{s.error}</span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => removeShot(s.id)}
+                  className="absolute right-0.5 top-0.5 rounded-full bg-white/90 p-0.5 text-neutral-700 hover:text-neutral-900"
+                  aria-label="Scoate poza"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+            {shots.length < REPORT_SHOT_MAX && (
+              <button
+                type="button"
+                onClick={() => shotInputRef.current?.click()}
+                className="inline-flex h-8 items-center gap-1 rounded border border-dashed border-neutral-400 bg-white px-2 text-xs text-neutral-700 hover:border-amber-500"
+              >
+                <ImagePlus className="h-3.5 w-3.5" />
+                Adaugă poză
+              </button>
+            )}
+            <span className="text-[11px] text-neutral-500">sau lipește (Ctrl+V) / trage poza aici</span>
+            <input
+              ref={shotInputRef}
+              type="file"
+              accept={REPORT_SHOT_TYPES.join(',')}
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                void addShots(Array.from(e.target.files ?? []));
+                e.target.value = '';
+              }}
+            />
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             <input
               value={reportOrder}
@@ -359,7 +537,7 @@ export function GhidAsk({ audience, page }: { audience: Audience; page: string }
               placeholder="Nr. comandă (opțional), ex. E-260921-ABCDE"
               className="h-8 w-72 rounded border bg-white px-2 text-xs"
             />
-            <Button size="sm" className="ml-auto h-8 text-xs" onClick={() => void sendReport()} disabled={sending || reportMsg.trim().length < 5}>
+            <Button size="sm" className="ml-auto h-8 text-xs" onClick={() => void sendReport()} disabled={sending || shotsUploading || reportMsg.trim().length < 5}>
               {sending ? <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" /> : null}
               Trimite lui Raul
             </Button>
