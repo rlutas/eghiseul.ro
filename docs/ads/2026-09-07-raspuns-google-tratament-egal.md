@@ -1,7 +1,9 @@
 # 07.09.2026 — Răspunsul nostru către Google (caz 1-6533000041865)
 
-> **STARE: TRIMIS pe 07.09.2026 (luni), pe threadul tichetului 1-6533000041865.**
-> Așteptăm răspuns. Termenul cerut de noi: **10 zile lucrătoare → 21.09.2026**.
+> **STARE (30.09.2026): Google a menținut respingerea pe 30.09 (tichet nou
+> 6-4960000040774); al doilea răspuns al nostru TRIMIS pe 30.09 — vezi secțiunea
+> de la final. Așteptăm: răspunsul Google + răspunsul scris MAI (IGPR, DEPABD).**
+> Istoric: prima scrisoare TRIMISĂ pe 07.09.2026, termen cerut 21.09.2026.
 > Dacă nu vine răspuns pe fond până atunci, urmează pașii de la secțiunea 7
 > (Consiliul Concurenței, DSA art. 21, P2B art. 4).
 > Textul exact trimis, în format simplu pentru copiere:
@@ -180,3 +182,31 @@ Cont Google Ads: 677-995-5005 · Tichet: 1-6533000041865
 | **21.09.2026** (10 zile lucrătoare de la trimitere) | Răspuns pe fond / număr de înregistrare P2B art. 11. Fără el → Consiliul Concurenței + DSA art. 21 |
 | Imediat | Verdictul RSA-ului de test din Search-6 (ecazier, identitate „Cabinet De Avocat Tarta Ana Gabriela") |
 | Paralel | Statutul de distribuitor CNAIR pentru rovinietă (singura cale reală de certificare) |
+
+## 30.09.2026 — Răspunsul Google (Prakhar, tichet nou 6-4960000040774)
+
+Decizia rămâne: anunțurile rămân respinse pe GoDOS. Criteriul confirmat ca
+„cerință tehnică obligatorie și globală": domeniul trebuie legat direct de pe
+un site guvernamental care spune explicit că suntem autorizați. Google
+recunoaște că statul român nu dă astfel de linkuri, dar „nu acordăm excepții
+regionale".
+
+**Ce NU a adresat:** punctul 1 (linkul guvernamental pentru oricare competitor
+care rulează), aplicarea uniformă, numărul de înregistrare P2B art. 11.
+
+**Răspunsul nostru — TRIMIS pe 30.09.2026** (text exact:
+[`2026-09-30-email-google-raspuns-2.txt`](2026-09-30-email-google-raspuns-2.txt)):
+acceptăm regula, cerem din nou linkurile guvernamentale ale competitorilor
+(publice, nu confidențiale), spunem că am cerut deja confirmarea scrisă a MAI
+(IGPR, DEPABD), că situația durează de peste un an, cerem din nou numărul P2B
+art. 11. Anunțăm că, **după răspunsul scris al MAI**, sesizăm Consiliul
+Concurenței (art. 102 TFUE, Legea 21/1996), Comisia Europeană (DMA), ANCOM +
+organism ADR (DSA art. 21), în subsidiar P2B art. 4.
+
+### De urmărit după 30.09
+
+| Când | Ce |
+|---|---|
+| La primire | Răspunsul Google pe tichetele 1-6533000041865 / 6-4960000040774 — dacă dă linkuri pentru competitori, le verificăm; dacă nu, intră la dosar |
+| La primire | Răspunsul scris MAI (IGPR, DEPABD; termen legal 30 zile, Legea 544/2001) — îl trimitem și lui Google |
+| După răspunsul MAI | Depunem sesizările anunțate (Consiliul Concurenței, Comisia Europeană DMA, ANCOM/DSA). Textele de verificat cu avocata înainte |
