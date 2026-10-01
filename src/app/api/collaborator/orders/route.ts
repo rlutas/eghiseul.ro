@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { unreadClientMessageCounts } from '@/lib/orders/messages';
 import { COLLAB_HIDDEN_STATUSES } from '@/lib/collaborator/hidden-statuses';
+import { CERERE_DONE_STATUSES } from '@/lib/ancpi/cerere-scope';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getCollaboratorServices } from '@/lib/admin/permissions';
@@ -44,31 +45,44 @@ export async function GET(request: NextRequest) {
       : `assigned_collaborator_id.eq.${collaboratorId}`;
 
     const admin = createAdminClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (admin as any)
-      .from('orders')
-      .select('id, friendly_order_id, status, created_at, priority, service_id, customer_data, services:service_id(name, slug)')
-      .or(scopeFilter)
-      // Doar comenzi plătite: draft/pending/abandoned = coșuri neplătite, nu lucrări.
-      .eq('payment_status', 'paid')
-      // Anulările nu sunt lucrări: E-260915-M4A4V a apărut la topograf DUPĂ ce
-      // clientul ceruse anularea (payment_status rămâne 'paid' până la refund),
-      // iar el a lucrat-o degeaba. Scoase din listă și din pagina de detaliu.
-      .not('status', 'in', `(${COLLAB_HIDDEN_STATUSES.join(',')})`)
-      // Marcate urgent întâi (client nemulțumit), apoi cea mai veche: clientul
-      // care așteaptă de o lună are prioritate, iar colaboratorul lucrează de
-      // sus în jos fără să caute prin listă.
-      .order('priority', { ascending: false })
-      .order('created_at', { ascending: true })
-      .limit(200);
+    // One builder per query (reusing a builder stacks filters).
+    const base = () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let q = (admin as any)
+        .from('orders')
+        .select('id, friendly_order_id, status, created_at, priority, service_id, customer_data, services:service_id(name, slug)')
+        .or(scopeFilter)
+        // Doar comenzi plătite: draft/pending/abandoned = coșuri neplătite, nu lucrări.
+        .eq('payment_status', 'paid')
+        // Anulările nu sunt lucrări: E-260915-M4A4V a apărut la topograf DUPĂ ce
+        // clientul ceruse anularea (payment_status rămâne 'paid' până la refund),
+        // iar el a lucrat-o degeaba. Scoase din listă și din pagina de detaliu.
+        .not('status', 'in', `(${COLLAB_HIDDEN_STATUSES.join(',')})`);
+      if (status) q = q.eq('status', status);
+      return q;
+    };
+    const doneList = `(${CERERE_DONE_STATUSES.join(',')})`;
 
-    if (status) query = query.eq('status', status);
-
-    const { data, error } = await query;
+    // Lucrările deschise vin TOATE; cele livrate doar cele mai recente.
+    // Înainte era un singur `.limit(200)` sortat de la cea mai veche: la 201
+    // de comenzi (181 finalizate) comanda nouă E-261001-6JVWA cădea din listă —
+    // topograful primea emailul, dar în portal nu o vedea (01.10.2026).
+    const [open, done] = await Promise.all([
+      base().not('status', 'in', doneList).limit(1000),
+      base().in('status', [...CERERE_DONE_STATUSES]).order('created_at', { ascending: false }).limit(300),
+    ]);
+    const error = open.error || done.error;
     if (error) {
       console.error('[collaborator] list orders error:', error.message);
       return NextResponse.json({ success: false, error: 'Eroare la încărcarea comenzilor' }, { status: 500 });
     }
+    // Marcate urgent întâi (client nemulțumit), apoi cea mai veche: clientul
+    // care așteaptă de o lună are prioritate, iar colaboratorul lucrează de
+    // sus în jos fără să caute prin listă.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = [...(open.data ?? []), ...(done.data ?? [])].sort((a: any, b: any) =>
+      (b.priority ?? 0) - (a.priority ?? 0) || a.created_at.localeCompare(b.created_at)
+    );
 
     // Privacy: the collaborator gets ONLY the work data (property). Client
     // contact/billing/personal never leave the server on this endpoint.
