@@ -3,7 +3,7 @@
 > **⚡ Header stale (2026-06-10).** Pentru starea reală vezi [`STATUS_CURRENT.md`](STATUS_CURRENT.md) + [`changelog/`](changelog/). De atunci: ONRC + ANCPI live, 36 calculatoare, expansiune SEO (CF/cazier/ONRC/stare civilă), rovinietă, /tools/.
 
 **Version:** 4.8
-**Last Updated:** 2026-09-29
+**Last Updated:** 2026-10-01
 **Status:** Sprint 4 In Progress (98%) | Sprint 5 In Progress (98%) | Admin Workflow ✅ | Document Generation ✅ | Multi-Signature ✅ | Contract Preview ✅ | Contract Legal Validity ✅ | Client Downloads ✅ | Extended RBAC ✅ | Number Registry ✅ | Gemini 2.5 Flash ✅ | KYC S3 Upload ✅ | Admin UI Polish ✅ | Review Step Pricing ✅ | Registry Own Page ✅ | User Invite ✅ | Template Placeholders ✅ | CLIENT_DETAILS_BLOCK Legal Format ✅ | KYC Confidence Tracking ✅
 
 ---
@@ -653,6 +653,14 @@ proprietar un singur extras, ales de client). Stare:
 Rămas: test live cu o comandă reală (formular + mesaj + răspuns); cele 11 comenzi
 vechi din „Așteptare client” de mutat de Mircea.
 Changelog: `docs/changelog/2026-09-25-identificare-acte-mesaje-client.md`.
+
+### PORTAL TOPOGRAF: COMANDA NOUĂ LIPSEA DIN LISTĂ — 01.10.2026
+
+- ✅ E-261001-6JVWA: email primit, comanda invizibilă în portal. `GET
+  /api/collaborator/orders` tăia la 200 comenzi sortate de la cea mai veche
+  (201 în scop, 181 finalizate). Acum: deschise toate, finalizate ultimele 300.
+  [changelog](changelog/2026-10-01-portal-colaborator-limita-200.md)
+- Backlog: paginare pe „Livrate” când trec de 300.
 
 ### RAPOARTE DIN GHID REZOLVATE — 29.09.2026
 
