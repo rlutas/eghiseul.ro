@@ -75,6 +75,10 @@ export const DOCUMENTERO_SERVICE_SLUGS = [
   'certificat-celibat',
   'extras-multilingv-certificat-nastere',
   'extras-multilingv-certificat-casatorie',
+  // Ads landings only (05.10.2026): noindex pages, no organic overlap with
+  // the eghiseul/CJO cazier pages.
+  'cazier-judiciar-persoana-fizica',
+  'cazier-fiscal',
 ] as const;
 
 export const BRANDS: Record<BrandId, Brand> = {

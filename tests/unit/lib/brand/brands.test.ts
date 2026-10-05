@@ -60,9 +60,11 @@ describe('parseHostOverrides', () => {
 });
 
 describe('brandSellsService', () => {
-  it('eghiseul sells every slug, documentero only civil status', () => {
+  it('eghiseul sells every slug, documentero civil status + the two cazier ads landings', () => {
     expect(brandSellsService(BRANDS.eghiseul, 'cazier-judiciar')).toBe(true);
     expect(brandSellsService(BRANDS.documentero, 'cazier-judiciar')).toBe(false);
+    expect(brandSellsService(BRANDS.documentero, 'cazier-judiciar-persoana-fizica')).toBe(true);
+    expect(brandSellsService(BRANDS.documentero, 'cazier-auto')).toBe(false);
     expect(brandSellsService(BRANDS.documentero, 'certificat-nastere')).toBe(true);
     expect(brandSellsService(BRANDS.documentero, null)).toBe(false);
   });

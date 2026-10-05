@@ -24,6 +24,8 @@ const FALLBACK: Record<DocumenteroSlug, ServicePricing> = {
   'certificat-celibat': { slug: 'certificat-celibat', name: 'Certificat de Celibat', basePrice: 698, estimatedDays: 30, options: [] },
   'extras-multilingv-certificat-nastere': { slug: 'extras-multilingv-certificat-nastere', name: 'Extras Multilingv Certificat de Naștere', basePrice: 798, estimatedDays: 30, options: [] },
   'extras-multilingv-certificat-casatorie': { slug: 'extras-multilingv-certificat-casatorie', name: 'Extras Multilingv Certificat de Căsătorie', basePrice: 798, estimatedDays: 30, options: [] },
+  'cazier-judiciar-persoana-fizica': { slug: 'cazier-judiciar-persoana-fizica', name: 'Cazier Judiciar Persoană Fizică', basePrice: 198, estimatedDays: 5, options: [] },
+  'cazier-fiscal': { slug: 'cazier-fiscal', name: 'Cazier Fiscal', basePrice: 198, estimatedDays: 3, options: [] },
 };
 
 export async function getServicePricing(slug: DocumenteroSlug): Promise<ServicePricing> {
