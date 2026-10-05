@@ -56,7 +56,7 @@ Planul complet: `ads/2026-10-05-documentero-lansare-ads.md`, `ads/2026-10-05-doc
 | C3 | Cifre neverificabile rămase pe alte pagini („100.000+ clienți”, „150.000+ documente”, „4.9/5”): `TrustSignals`, `/cazier-judiciar-diaspora`, `/ppc/*`, `TestimonialsSection` | 05.10 | ✅ (rămâne de decis ratingul „4.9 · 441”) |
 | C4 | Măsurare: clicuri și poziție pe `/cazier-judiciar-online/` față de 04.09–01.10, plus comenzi pe săptămână (baza: ~25) | 12.10, 19.10 | ⬜ |
 | C6 | Pagina de cazier fiscal: snippet „fără SPV” (eghiseul avea 4,1% CTR pe poz. 6,3; CJO 1,1% pe poz. 5,9) + corectat în 6 locuri că cazierul fiscal arată datorii (arată sancțiuni) | 05.10 | ✅ |
-| C7 | Cazier fiscal pe CJO: valabilitatea corectată la 30 de zile pentru toți (pe site scria fals „90 PF”), conținutul doar pentru persoane fizice; `/cazier-fiscal-persoana-juridica` devine ghid „pe numele asociatului” | 05.10 | 🔄 |
+| C7 | Cazier fiscal pe CJO: valabilitatea corectată la 30 de zile pentru toți (pe site scria fals „90 PF”), conținutul doar pentru persoane fizice; `/cazier-fiscal-persoana-juridica` devine ghid „pe numele asociatului” | 05.10 | ✅ |
 | C5 | Dacă expunerile scad în continuare după 3 săptămâni: consolidăm paginile de oraș sub 200 de expuneri pe lună | 26.10 | ⏸ |
 
 ## D. eghiseul.ro (demotat, recuperare lentă)
@@ -98,3 +98,13 @@ Regulă: maximum 1–2 pagini rescrise pe săptămână (`.claude/rules/content-
 | G1 | CI roșu de la commitul de warm-up (testul nu știa de interogarea de numărare) | ✅ 05.10 |
 | G2 | Tokenul local Vercel CLI expirat: variabilele s-au pus din dashboard | ⬜ Raul: `! npx vercel login` |
 | G3 | Blocantul de reclame din Chrome strică salvările în Google Ads: excepție pentru ads.google.com | ⬜ Raul |
+
+## Jurnal: cereri de indexare în Search Console
+
+Cota e de circa 10 cereri pe zi pentru fiecare proprietate.
+
+| Data | Proprietate | Adrese | Rezultat |
+|---|---|---|---|
+| 05.10 | documentero.ro | `/ghiduri/valabilitate-certificat-de-celibat/`, `/ghiduri/certificat-de-nastere-vechi-tipizat/`, `/certificat-de-celibat/` | solicitată |
+| 05.10 | cazierjudiciaronline.com | `/`, `/cazier-fiscal-online`, `/valabilitate-cazier-fiscal`, `/cazier-fiscal-persoana-juridica`, `/cazier-judiciar-online/constanta`, `/iasi`, `/brasov` | solicitată; la `/craiova` am atins cota zilnică |
+| 06.10 (de făcut) | cazierjudiciaronline.com | `/cazier-judiciar-online/craiova`, `/targu-mures`, `/sibiu`, `/timisoara`, `/oradea`, `/cluj`, `/buzau`, `/galati`, `/ploiesti`, `/verificare-cazier-fiscal-online` | ⬜ |
