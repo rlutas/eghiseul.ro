@@ -55,6 +55,7 @@ Planul complet: `ads/2026-10-05-documentero-lansare-ads.md`, `ads/2026-10-05-doc
 | C2 | Prima pagină: 70.000 de expuneri cu CTR 0,7% → titlu și descriere noi (memoria `cjo-ctr-nu-autoritate`) | 05.10 | ✅ |
 | C3 | Cifre neverificabile rămase pe alte pagini („100.000+ clienți”, „150.000+ documente”, „4.9/5”): `TrustSignals`, `/cazier-judiciar-diaspora`, `/ppc/*`, `TestimonialsSection` | 05.10 | ✅ (rămâne de decis ratingul „4.9 · 441”) |
 | C4 | Măsurare: clicuri și poziție pe `/cazier-judiciar-online/` față de 04.09–01.10, plus comenzi pe săptămână (baza: ~25) | 12.10, 19.10 | ⬜ |
+| C6 | Pagina de cazier fiscal: snippet „fără SPV” (eghiseul avea 4,1% CTR pe poz. 6,3; CJO 1,1% pe poz. 5,9) + corectat în 6 locuri că cazierul fiscal arată datorii (arată sancțiuni) | 05.10 | ✅ |
 | C5 | Dacă expunerile scad în continuare după 3 săptămâni: consolidăm paginile de oraș sub 200 de expuneri pe lună | 26.10 | ⏸ |
 
 ## D. eghiseul.ro (demotat, recuperare lentă)
@@ -63,7 +64,7 @@ Regulă: maximum 1–2 pagini rescrise pe săptămână (`.claude/rules/content-
 
 | # | Pagină | Motiv | Stare |
 |---|---|---|---|
-| D1 | `/servicii/cazier-fiscal-online` | a căzut de pe poziția 8,5 pe 48; fiscalul convertește 64% | ⬜ săpt. 41 |
+| D1 | `/servicii/cazier-fiscal-online` | pagina e indexată, dar invizibilă din 21.08 (de la ~2.000 la ~20 de expuneri pe săptămână): retrogradare la nivel de domeniu. Cererea s-a mutat pe CJO (C6). Rescrierea se amână până apar semne de revenire | ⏸ săpt. 42 |
 | D2 | `/servicii/cazier-judiciar-online` | cel mai prost scor AI (21,3), pagina comercială nr. 1 | ⬜ săpt. 41 |
 | D3 | `/` (homepage) | poziția a scăzut de la 9,3 la 23,9 | ⬜ săpt. 42 |
 | D4 | `/servicii/extras-de-carte-funciara` | poziția 7,8 → 22,3; are backlink de la money.ro | ⬜ săpt. 42 |
