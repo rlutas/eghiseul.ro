@@ -87,8 +87,9 @@ Paginile `/cazier-judiciar-online/` și `/cazier-fiscal-online/` de pe documente
 | Etichetare automată (gclid) | **Da** | — |
 | Persoane de contact pentru protecția datelor | ⚠️ niciuna | Admin → Setări cont: un contact GDPR (cerut pentru UE) |
 | Verificarea advertiserului | nu apare încă în meniu | Google o cere de obicei după primele anunțuri; o faci cu actele EDIGITALIZARE când apare |
-| Conversii | ⚠️ **niciuna** | Conversia „Achiziție” cu enhanced conversions (§2.5–2.6), apoi ID + etichetă în Vercel (§4) |
-| Campanii | niciuna | după verificarea din §5 |
+| Conversii | **„Achizitie documentero”** (05.10): Google tag manual `AW-18495270055`, eticheta `AW-18495270055/bf4HCM2j3ZEdEKfZnfNE`, valoare din comandă, numărare „Fiecare” (dedup pe `transaction_id`), fereastră clic 30 de zile, atribuire bazată pe date, acțiune principală. Enhanced conversions **activate** pe cont (condiții acceptate). Sursa GA4 `555162763` legată, dar fără conversie importată (ca să nu numărăm de două ori). | Starea „Configurată greșit” până vede Google eticheta pe site (după deploy + prima vizită cu consimțământ) |
+| Variabile Vercel | `NEXT_PUBLIC_GOOGLE_ADS_ID_DOCUMENTERO`, `NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL_DOCUMENTERO` puse pe Production (05.10) | — |
+| Campanii | niciuna | după verificarea din §5, din pachetul `2026-10-05-documentero-campanii.md` |
 | Aplicare automată a recomandărilor | dezactivată | lăsăm așa |
 
 ## 8. Reguli de oprire și KPI

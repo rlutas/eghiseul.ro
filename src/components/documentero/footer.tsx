@@ -102,8 +102,8 @@ export function FooterDocumentero() {
           </div>
           <p className="m-0 mt-5 text-[12px] leading-relaxed text-d-muted">
             documentero.ro este un serviciu privat de asistență și intermediere al {ORGANIZATION.legalName}. Nu suntem
-            instituție de stat și nu suntem afiliați autorităților. Documentele sunt emise exclusiv de oficiile de stare
-            civilă și pot fi solicitate și direct, la ghișeu; tarifele noastre acoperă asistența, reprezentarea prin
+            instituție de stat și nu suntem afiliați autorităților. Documentele sunt emise exclusiv de instituțiile
+            competente (oficiile de stare civilă, Poliția Română, ANAF) și pot fi solicitate și direct, la ghișeu; tarifele noastre acoperă asistența, reprezentarea prin
             avocat înscris în Barou și livrarea.
           </p>
         </div>

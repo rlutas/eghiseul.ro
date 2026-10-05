@@ -35,7 +35,7 @@ const WHO = [
 ] as const;
 
 const NAMES = [
-  ['Adeverință privind statutul civil', 'Numele oficial, din H.G. 255/2024: Anexa 18 la Normele metodologice. Așa scrie pe hârtia pe care o primești.'],
+  ['Adeverință privind statutul civil', 'Numele din lege, din H.G. 255/2024: Anexa 18 la Normele metodologice. Așa scrie pe hârtia pe care o primești.'],
   ['Anexa 9', 'Numele vechi, din metodologia de dinainte de 2024. Multe primării și multe ghiduri încă îl folosesc; e același document.'],
   ['Dovadă de celibat', 'Cum îi spun oamenii și cum apare pe unele site-uri de primărie. Tot el.'],
   ['Certificate of no impediment, nulla osta, certificado de soltería', 'Cum îl cer autoritățile străine. Îi dai adeverința, cu apostilă și traducere dacă statul le cere.'],
@@ -91,7 +91,7 @@ export default async function CelibatPage() {
           crumb="Certificat de celibat"
           eyebrow="Adeverință privind statutul civil · Anexa 18 (fosta Anexa 9)"
           title="Certificat de celibat pentru căsătoria în străinătate, fără să vii în țară."
-          intro="Documentul se numește oficial „adeverință privind statutul civil” (Anexa 18, până în 2024 Anexa 9) și confirmă că nu ești căsătorit în România. Îl cere primăria, notarul sau consulatul din țara unde te căsătorești. Avocatul nostru îl obține de la starea civilă și ți-l trimite oriunde ești."
+          intro="În lege, documentul se numește „adeverință privind statutul civil” (Anexa 18, până în 2024 Anexa 9) și confirmă că nu ești căsătorit în România. Îl cere primăria, notarul sau consulatul din țara unde te căsătorești. Avocatul nostru îl obține de la starea civilă și ți-l trimite oriunde ești."
           orderSlug="certificat-celibat"
           cta="Comandă certificatul"
           secondary={{ label: 'Cât e valabil', href: '#valabilitate' }}
