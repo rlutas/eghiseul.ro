@@ -7,6 +7,8 @@
 > - **Email:** warm-up din oră în oră, cu plafon zilnic (300/zi, până la 5.000).
 > - **Indexare:** CJO are 71/71 pagini din sitemap indexate, fără acțiuni manuale; vechiul `sitemap_index.xml` a fost scos. ecazier are 14/15 indexate, iar documentero e normal pentru un domeniu nou: [`seo/2026-10-05-ecazier-documentero-stare-organic.md`](seo/2026-10-05-ecazier-documentero-stare-organic.md).
 > - **CI** era roșu de la warm-up; testul e reparat.
+> - **ecazier rămâne pe toate cele trei servicii** (decizia lui Raul). Linkuri interne refăcute (`/` de la 1 la 6 inlinkuri, `/ghiduri` de la 1 la 9, blocuri „Citește și”); linkuri spre ecazier din CJO (4 în text), eghiseul (footer + 3 articole) și avocat-tarta (footer + 1 articol). documentero are 18/18 pagini indexate (API).
+> - **Deploy:** `ignoreCommand` compară acum cu `VERCEL_GIT_PREVIOUS_SHA`; un vârf de push doar cu docs nu mai anulează codul de dedesubt.
 
 > **🔴 Update 2026-10-01 — portalul topografului ascundea comenzile noi.** E-261001-6JVWA (extras CF, plătită 11:08) a ajuns la Mircea pe email, dar nu apărea în portal. Cauza: `GET /api/collaborator/orders` avea `.limit(200)` sortat de la cea mai veche, iar Mircea ajunsese la 201 comenzi în scop (181 `completed`) — cea mai nouă era tăiată. Riscul era notat aici din 21.09 („taie la 200 comenzi, 193 azi”). Fix `02b387c7`: lucrările deschise vin toate, cele finalizate ultimele 300; sortarea neschimbată. Verificat în DB: 19 deschise + 182 finalizate, toate în listă. [changelog](changelog/2026-10-01-portal-colaborator-limita-200.md)
 
