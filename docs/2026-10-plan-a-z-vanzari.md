@@ -80,15 +80,16 @@ Regulă: maximum 1–2 pagini rescrise pe săptămână (`.claude/rules/content-
 | E3 | Ghidul de apostilă extins de la 830 la 1.400+ cuvinte (acum pe poziția 51) | ⬜ săpt. 42 |
 | E4 | Linkuri în text spre documentero din articolele eghiseul despre stare civilă | ⬜ săpt. 42 |
 | E6 | Tabelul pe țări de pe pagina de celibat zice „apostilă: da” în UE (Regulamentul 2016/1191 o scutește) — lăsat așa, decizie Raul 05.10 | ⏸ |
-| E7 | Contul de serviciu `claude-seo@caziere.iam.gserviceaccount.com` adăugat ca utilizator în GSC documentero (pentru inspecții prin API) | ⬜ Raul |
+| E7 | Contul de serviciu `claude-seo@caziere.iam.gserviceaccount.com` adăugat ca utilizator în GSC documentero (pentru inspecții prin API) | ✅ 05.10 (18/18 indexate) |
 | E5 | Tabelul de măsurare săptămânală (`documentero/continut-si-seo.md`) | ⬜ în fiecare luni |
 
-## F. ecazier.ro (doar cazier auto; termen de decizie 19.10)
+## F. ecazier.ro (toate cele trei servicii; măsurăm pe 19.10)
 
-Stare și explicație: `seo/2026-10-05-ecazier-documentero-stare-organic.md`. 14 din 15 pagini sunt indexate. Pe auto, ecazier e pe pozițiile 4–8; pe fiscal, pe 28, pentru că CJO câștigă aceeași căutare.
+Stare și explicație: `seo/2026-10-05-ecazier-documentero-stare-organic.md`. 14 din 15 pagini sunt indexate. Pe auto, ecazier e pe pozițiile 4–8; pe fiscal, pe 28, pentru că CJO câștigă aceeași căutare. Raul (05.10): ecazier NU rămâne doar pe auto, îl ajutăm pe toate cele trei servicii.
 
 | # | Ce | Stare |
 |---|---|---|
+| F0 | Legături interne pe ecazier (ghiduri ↔ servicii, `/ghid-alegere-tip-cazier` ≥3 inlinkuri) | 🔄 05.10 |
 | F1 | Link în text din `/cazier-auto-online` (CJO) spre ghidurile ecazier Uber/Bolt și puncte | ⬜ |
 | F2 | Linkuri în text din cazierul auto de pe eghiseul spre ecazier | ⬜ |
 | F3 | Import în Bing Webmaster Tools + cerere de indexare pentru `/`, `/ghiduri`, cele două ghiduri | ⬜ (Raul, din browser) |
