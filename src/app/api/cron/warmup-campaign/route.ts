@@ -12,7 +12,7 @@
  * Volumul zilnic e controlat din `admin_settings.warmup_campaign`
  * (`{ enabled: boolean, dailyBatchSize: number }`, editabil din
  * `/admin/marketing`). **Implicit `enabled: false`** — pornește doar după
- * ce echipa a revizuit conținutul emailului. Cronul rulează oricum zilnic
+ * ce echipa a revizuit conținutul emailului. Cronul rulează oricum din oră în oră
  * (vezi `vercel.json`) dar iese imediat dacă e dezactivat.
  *
  * Fiecare contact iese din coadă într-un singur fel: `warmup_email_sent_at`
@@ -33,10 +33,13 @@ import { TEST_EMAILS, isUndeliverable } from '@/lib/email/deliverability';
 import { isLoyalContact, mintLoyaltyCoupon } from '@/lib/coupons/loyalty';
 
 // Resend: 2 req/s pe cont. Pauza asta ține cronul sub limită indiferent de
-// mărimea batch-ului; la 300 s de rulare încap ~400 trimiteri, restul se
-// reia mâine (fiecare contact e marcat imediat după trimitere).
+// mărimea batch-ului; la 300 s de rulare încap ~400 trimiteri. De aceea
+// cronul rulează din oră în oră (vezi `vercel.json`) și fiecare rulare
+// trimite cel mult `PER_RUN_CAP`, până se atinge `dailyBatchSize` pe ziua
+// curentă (decizie 2026-10-05: volum mai mare, întins pe toată ziua).
 export const maxDuration = 300;
 const SEND_SPACING_MS = 600;
+const PER_RUN_CAP = 250;
 
 const DEFAULT_SETTINGS = { enabled: false, dailyBatchSize: 25 };
 
@@ -74,7 +77,27 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const batchSize = Math.min(2000, Math.max(1, Number(settings.dailyBatchSize) || DEFAULT_SETTINGS.dailyBatchSize));
+  const dailyLimit = Math.min(5000, Math.max(1, Number(settings.dailyBatchSize) || DEFAULT_SETTINGS.dailyBatchSize));
+
+  // Câte au plecat deja azi (UTC) — rulările din oră în oră împart plafonul zilnic.
+  const dayStart = new Date();
+  dayStart.setUTCHours(0, 0, 0, 0);
+  const { count: sentToday, error: countError } = await admin
+    .from('contacts')
+    .select('id', { count: 'exact', head: true })
+    .gte('warmup_email_sent_at', dayStart.toISOString());
+  if (countError) {
+    console.error('[warmup-campaign] sent-today count failed:', countError);
+    return NextResponse.json({ success: false, error: countError.message }, { status: 500 });
+  }
+
+  const batchSize = Math.min(PER_RUN_CAP, dailyLimit - (sentToday ?? 0));
+  if (batchSize <= 0) {
+    return NextResponse.json({
+      success: true,
+      data: { sentCount: 0, skippedCount: 0, reason: 'daily limit reached', processedAt: new Date().toISOString() },
+    });
+  }
 
   // Clienții fideli întâi (decizie 2026-09-25): `warmup_priority` = comenzi
   // pe platformă ×10 + câte servicii a cerut pe site-ul vechi (coloană

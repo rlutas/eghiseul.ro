@@ -152,10 +152,10 @@ export async function PATCH(request: NextRequest) {
         typeof v.dailyBatchSize !== 'number' ||
         !Number.isInteger(v.dailyBatchSize) ||
         v.dailyBatchSize < 1 ||
-        v.dailyBatchSize > 2000
+        v.dailyBatchSize > 5000
       ) {
         return NextResponse.json(
-          { success: false, error: 'Setare invalidă: { enabled: boolean, dailyBatchSize: 1-2000 }' },
+          { success: false, error: 'Setare invalidă: { enabled: boolean, dailyBatchSize: 1-5000 }' },
           { status: 400 }
         );
       }

@@ -151,7 +151,7 @@ function WarmupCampaignCard() {
               disabled={saving}
             />
             <span className="text-sm font-medium">
-              {settings.enabled ? 'Activă — cronul trimite zilnic' : 'Oprită — implicit, nimic nu se trimite'}
+              {settings.enabled ? 'Activă — cronul trimite din oră în oră, până la plafonul zilnic' : 'Oprită — implicit, nimic nu se trimite'}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -160,12 +160,12 @@ function WarmupCampaignCard() {
               id="warmup-batch"
               type="number"
               min={1}
-              max={2000}
+              max={5000}
               value={batchInput}
               onChange={(e) => setBatchInput(e.target.value)}
               onBlur={() => {
                 const n = parseInt(batchInput, 10);
-                if (Number.isInteger(n) && n >= 1 && n <= 2000 && n !== settings.dailyBatchSize) {
+                if (Number.isInteger(n) && n >= 1 && n <= 5000 && n !== settings.dailyBatchSize) {
                   save({ ...settings, dailyBatchSize: n });
                 } else {
                   setBatchInput(String(settings.dailyBatchSize));

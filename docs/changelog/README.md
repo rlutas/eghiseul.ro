@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-10-05 | ✅ **Warm-up email: din oră în oră, plafon zilnic până la 5.000** — cron `0 6-16 * * *`, `dailyBatchSize` = plafon pe zi (UTC) împărțit între rulări, `PER_RUN_CAP=250`; limita din setări 2000 → 5000 | [2026-10-05-warmup-volum-mare.md](2026-10-05-warmup-volum-mare.md) |
 | 2026-10-01 | 🔴 **Portalul topografului ascundea comenzile noi (limită 200, sortare de la cea mai veche)** — `GET /api/collaborator/orders` desparte lucrările deschise (toate) de cele finalizate (ultimele 300); E-261001-6JVWA era a 201-a | [2026-10-01-portal-colaborator-limita-200.md](2026-10-01-portal-colaborator-limita-200.md) |
 | 2026-09-29 | 🟣 **„Raportează o problemă”: capturi de ecran (Ctrl+V / drag / buton) + bife pe site (eghiseul, CJO, ecazier, documentero)** — `report-meta.ts`, `POST …/knowledge/reports/upload` (S3 presigned, `knowledge-reports/<reporterId>/`), `context.sites` + `context.attachments` (chei validate pe namespace), miniaturi semnate în `/admin/ghid/rapoarte` | [2026-09-29-raport-cu-poze-si-site.md](2026-09-29-raport-cu-poze-si-site.md) |
 | 2026-09-29 | ✅ **Admin: „Mesaje cu clientul” = bară sub „Note Echipă”, buton + pop-up** — era confundat cu notele interne; `OrderMessagesLauncher` (bară cu număr mesaje + „răspuns nou”, `Dialog` cu avertisment), `GET …/messages?peek=1` numără fără să marcheze citit, `#mesaje` deschide pop-up-ul | [2026-09-29-mesaje-client-popup.md](2026-09-29-mesaje-client-popup.md) |
