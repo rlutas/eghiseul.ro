@@ -89,7 +89,7 @@ Paginile `/cazier-judiciar-online/` și `/cazier-fiscal-online/` de pe documente
 | Verificarea advertiserului | nu apare încă în meniu | Google o cere de obicei după primele anunțuri; o faci cu actele EDIGITALIZARE când apare |
 | Conversii | **„Achizitie documentero”** (05.10): Google tag manual `AW-18495270055`, eticheta `AW-18495270055/bf4HCM2j3ZEdEKfZnfNE`, valoare din comandă, numărare „Fiecare” (dedup pe `transaction_id`), fereastră clic 30 de zile, atribuire bazată pe date, acțiune principală. Enhanced conversions **activate** pe cont (condiții acceptate). Sursa GA4 `555162763` legată, dar fără conversie importată (ca să nu numărăm de două ori). | Starea „Configurată greșit” până vede Google eticheta pe site (după deploy + prima vizită cu consimțământ) |
 | Variabile Vercel | `NEXT_PUBLIC_GOOGLE_ADS_ID_DOCUMENTERO`, `NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL_DOCUMENTERO` puse pe Production (05.10) | — |
-| Campanii | niciuna | după verificarea din §5, din pachetul `2026-10-05-documentero-campanii.md` |
+| Campanii | **C1 Certificat de celibat** (ID 24326169589) publicată 05.10, pornește **06.10**: Search, fără parteneri/Display, AI Max oprit; 12 țări cu „Prezență” (RO, IT, ES, DE, UK, FR, AT, BE, NL, IE, CH, CY), 7 limbi; Maximize clicks cu CPC max 3,50 lei; 45 lei/zi; grupul CB1 cu 15 cuvinte cheie (frază/exact) + RSA A; lista comună „Negative - stare civila” (~95 termeni, inclusiv cei din `2026-10-05-lectii-cont-vechi-pentru-documentero.md`) + negative pe campanie (multilingv, cazier, cutuma, "nulla osta"). | De făcut: grupul CB2, RSA B, sitelinkuri; campaniile C2–C5 |
 | Aplicare automată a recomandărilor | dezactivată | lăsăm așa |
 
 ## 8. Reguli de oprire și KPI
