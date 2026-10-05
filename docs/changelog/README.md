@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-10-05 | 🟣 **Google Ads per brand + enhanced conversions** — `NEXT_PUBLIC_GOOGLE_ADS_ID_DOCUMENTERO` / `…_PURCHASE_LABEL_DOCUMENTERO` fără fallback, `allow_enhanced_conversions`, `user_data` (email, telefon E.164) înainte de conversie; plan de lansare documentero | [2026-10-05-google-ads-documentero-tracking.md](2026-10-05-google-ads-documentero-tracking.md) |
 | 2026-10-05 | 🟣 **documentero.ro: landing-uri pentru reclame, cazier judiciar PF + cazier fiscal** — slugurile adăugate în `DOCUMENTERO_SERVICE_SLUGS`, pagini `noindex` fix în afara sitemap-ului, prețuri din `service_options` | [2026-10-05-documentero-pagini-reclame-cazier.md](2026-10-05-documentero-pagini-reclame-cazier.md) |
 | 2026-10-05 | ✅ **Warm-up email: din oră în oră, plafon zilnic până la 5.000** — cron `0 6-16 * * *`, `dailyBatchSize` = plafon pe zi (UTC) împărțit între rulări, `PER_RUN_CAP=250`; limita din setări 2000 → 5000 | [2026-10-05-warmup-volum-mare.md](2026-10-05-warmup-volum-mare.md) |
 | 2026-10-01 | 🔴 **Portalul topografului ascundea comenzile noi (limită 200, sortare de la cea mai veche)** — `GET /api/collaborator/orders` desparte lucrările deschise (toate) de cele finalizate (ultimele 300); E-261001-6JVWA era a 201-a | [2026-10-01-portal-colaborator-limita-200.md](2026-10-01-portal-colaborator-limita-200.md) |

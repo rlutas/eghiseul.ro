@@ -24,6 +24,12 @@ function gaIdFor(brand: BrandKey): string | undefined {
 // de succes a comenzii. Lipsea complet după migrarea de pe WordPress — contul
 // nu mai primea nicio conversie din iulie 2026.
 const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
+// documentero.ro has its own Google Ads account (05.10.2026). No fallback to
+// the eghiseul account: documentero conversions must never land there.
+const ADS_ID_DOCUMENTERO = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID_DOCUMENTERO;
+function adsIdFor(brand: BrandKey): string | undefined {
+  return brand === 'documentero' ? ADS_ID_DOCUMENTERO : ADS_ID;
+}
 
 // The success page already declares a narrower Window.gtag type — use a
 // local view instead of a conflicting global declaration.
@@ -139,11 +145,15 @@ function loadMetaPixel() {
 }
 
 let adsConfigured = false;
-function loadAds() {
-  if (!ADS_ID || adsConfigured) return;
+function loadAds(brand: BrandKey) {
+  const id = adsIdFor(brand);
+  if (!id || adsConfigured) return;
   adsConfigured = true;
-  loadGtagScript(ADS_ID);
-  win().gtag!('config', ADS_ID);
+  loadGtagScript(id);
+  // Enhanced conversions: the success page sets `user_data` (email, phone)
+  // before the purchase conversion; gtag hashes it and sends it only when
+  // `ad_user_data` is granted.
+  win().gtag!('config', id, { allow_enhanced_conversions: true });
 }
 
 function applyConsent(state: ConsentState, brand: BrandKey) {
@@ -161,7 +171,7 @@ function applyConsent(state: ConsentState, brand: BrandKey) {
   }
   // Eticheta Google Ads și pixelul OpenAI Ads țin de marketing, nu de analytics.
   if (state.marketing) {
-    loadAds();
+    loadAds(brand);
     loadOpenAiPixel();
     loadMetaPixel();
   }

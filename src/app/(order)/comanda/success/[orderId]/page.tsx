@@ -94,6 +94,7 @@ interface OrderData {
   customer_data?: {
     contact?: {
       email?: string;
+      phone?: string;
     };
     personal?: {
       cnp?: string;
@@ -108,7 +109,7 @@ interface OrderData {
 declare global {
   interface Window {
     gtag?: (
-      command: 'event' | 'config' | 'js',
+      command: 'event' | 'config' | 'js' | 'set',
       action: string,
       params?: Record<string, unknown>
     ) => void;
@@ -306,8 +307,24 @@ export default function SuccessPage() {
       // Conversia Google Ads (cont 677-995-5005). Separată de evenimentul GA4:
       // `send_to` cu eticheta de conversie, valoarea reală a comenzii și
       // `transaction_id` ca să nu se numere de două ori la refresh.
-      const adsLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL;
+      // Each brand has its own Ads account; documentero has no fallback to
+      // the eghiseul label so its sales never count in the wrong account.
+      const adsLabel =
+        brand.id === 'documentero'
+          ? process.env.NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL_DOCUMENTERO
+          : process.env.NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL;
       if (adsLabel) {
+        // Enhanced conversions (hashed by gtag; sent only with ad_user_data granted).
+        const ecEmail = order.customer_data?.contact?.email?.trim().toLowerCase();
+        // E.164 only: the wizard stores +40…; a bare 07… number gets +4.
+        const rawPhone = order.customer_data?.contact?.phone?.replace(/[^\d+]/g, '') ?? '';
+        const ecPhone = rawPhone.startsWith('+') ? rawPhone : /^07\d{8}$/.test(rawPhone) ? `+4${rawPhone}` : '';
+        if (ecEmail || ecPhone) {
+          window.gtag('set', 'user_data', {
+            ...(ecEmail ? { email: ecEmail } : {}),
+            ...(ecPhone ? { phone_number: ecPhone } : {}),
+          });
+        }
         window.gtag('event', 'conversion', {
           send_to: adsLabel,
           value: order.total_price,
@@ -319,7 +336,7 @@ export default function SuccessPage() {
       setPurchaseTracked(true);
       console.log('GA4 Purchase tracked:', order.friendly_order_id);
     }
-  }, [order, isPaid, purchaseTracked]);
+  }, [order, isPaid, purchaseTracked, brand.id]);
 
   // OpenAI Ads (ChatGPT Ads) — `order_created` prin pixel. Independent de gtag:
   // pixelul există doar cu consimțământ de marketing. `event_id` = numărul

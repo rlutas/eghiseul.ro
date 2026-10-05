@@ -52,6 +52,8 @@ SMSLINK_API_KEY=
 CLOUDCONVERT_API_KEY=        # DOCX→PDF preview in admin (optional; dev uses local LibreOffice)
 NEXT_PUBLIC_GA_MEASUREMENT_ID=    # GA4 eghiseul.ro (public); gtag se încarcă DOAR după consimțământ (cookie-consent.tsx)
 NEXT_PUBLIC_GA_MEASUREMENT_ID_DOCUMENTERO=  # GA4 documentero.ro (proprietate separată, 21.09.2026); gol → traficul documentero intră în stream-ul eghiseul
+NEXT_PUBLIC_GOOGLE_ADS_ID_DOCUMENTERO=     # Google Ads documentero (cont propriu, 05.10.2026); FĂRĂ fallback la contul eghiseul — gol = fără etichetă Ads pe documentero
+NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL_DOCUMENTERO=  # AW-…/eticheta conversiei Purchase documentero; vezi docs/ads/2026-10-05-documentero-lansare-ads.md
 NEXT_PUBLIC_OPENAI_ADS_PIXEL_ID=  # ChatGPT Ads pixel (public); docs/ads/chatgpt/06
 OPENAI_ADS_API_KEY=          # ChatGPT Ads Conversions API (secret; fără ea serverul nu trimite conversii)
 NEXT_PUBLIC_META_PIXEL_ID=   # Meta Pixel (public); docs/ads/meta/05
