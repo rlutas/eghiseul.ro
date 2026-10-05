@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-10-05 | 🟣 **documentero.ro: ghidurile „certificat de naștere vechi” și „valabilitatea certificatului de celibat”** — 2 pagini noi în `/ghiduri/` cu `FAQPage` (`faq` opțional în `documenteroArticleGraph`), surse primare (H.G. 255/2024 + Norme, §1309 BGB, service-public, GOV.UK), sitemap + `GUIDES`, linkuri din naștere/celibat/procură; „celibat valabil 6 luni în România” scos (Anexa 18 nu are termen) | [2026-10-05-documentero-ghiduri-nastere-vechi-celibat.md](2026-10-05-documentero-ghiduri-nastere-vechi-celibat.md) |
 | 2026-10-05 | 🟣 **Google Ads per brand + enhanced conversions** — `NEXT_PUBLIC_GOOGLE_ADS_ID_DOCUMENTERO` / `…_PURCHASE_LABEL_DOCUMENTERO` fără fallback, `allow_enhanced_conversions`, `user_data` (email, telefon E.164) înainte de conversie; plan de lansare documentero | [2026-10-05-google-ads-documentero-tracking.md](2026-10-05-google-ads-documentero-tracking.md) |
 | 2026-10-05 | 🟣 **documentero.ro: landing-uri pentru reclame, cazier judiciar PF + cazier fiscal** — slugurile adăugate în `DOCUMENTERO_SERVICE_SLUGS`, pagini `noindex` fix în afara sitemap-ului, prețuri din `service_options` | [2026-10-05-documentero-pagini-reclame-cazier.md](2026-10-05-documentero-pagini-reclame-cazier.md) |
 | 2026-10-05 | ✅ **Warm-up email: din oră în oră, plafon zilnic până la 5.000** — cron `0 6-16 * * *`, `dailyBatchSize` = plafon pe zi (UTC) împărțit între rulări, `PER_RUN_CAP=250`; limita din setări 2000 → 5000 | [2026-10-05-warmup-volum-mare.md](2026-10-05-warmup-volum-mare.md) |

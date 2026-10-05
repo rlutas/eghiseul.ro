@@ -54,7 +54,9 @@ de clicuri în trei luni.
 ## Ghiduri, în ordinea publicării (1–2 pe săptămână)
 
 Publicate: pierdut (19.09), apostilă (20.09), acte necesare + sectoare și
-procură din străinătate (21.09). Următoarele, în ordinea din
+procură din străinătate (21.09). Model vechi (`/ghiduri/certificat-de-nastere-vechi-tipizat/`) și
+valabilitate celibat (05.10). Celibatul NU are termen pe formular (Anexa 18):
+nu mai scriem „valabil 6 luni în România”. Următoarele, în ordinea din
 `analiza-competitori-seo.md` §6.D: model vechi, valabilitate celibat,
 transcriere, divorț, căsătoria pe țări. Săptămâna 28.09: două dintre ele.
 
