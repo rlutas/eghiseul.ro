@@ -7,6 +7,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 ## 📌 Citește primul
 | Document | Rol |
 |---|---|
+| [`2026-10-plan-a-z-vanzari.md`](2026-10-plan-a-z-vanzari.md) | **Planul curent (octombrie 2026)**: reclame documentero, email, CJO, eghiseul, documentero, ecazier — bifat punct cu punct |
 | [`STATUS_CURRENT.md`](STATUS_CURRENT.md) | Ce merge acum, probleme cunoscute, testare — **citește primul dacă revii** |
 | [`DEVELOPMENT_MASTER_PLAN.md`](DEVELOPMENT_MASTER_PLAN.md) | Plan master sprinturi + backlog + features viitoare |
 | [`changelog/`](changelog/) | Ce s-a livrat, pe sesiuni (cronologic invers) |

@@ -8,6 +8,8 @@
 
 ---
 
+> **Octombrie 2026 — prioritatea e repornirea vânzărilor.** Planul de lucru zilnic: [`2026-10-plan-a-z-vanzari.md`](2026-10-plan-a-z-vanzari.md).
+
 ## PROGRESS SUMMARY
 
 | Phase | Sprint | Status | Completion Date |
