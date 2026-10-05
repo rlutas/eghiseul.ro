@@ -76,7 +76,22 @@ Sunt `NEXT_PUBLIC_`, deci intră în bundle la build: după ce le setezi, faci r
 
 Paginile `/cazier-judiciar-online/` și `/cazier-fiscal-online/` de pe documentero sunt `noindex` permanent și lipsesc din sitemap, ca să nu concureze cu eghiseul și CJO în organic (changelog 05.10).
 
-## 7. Reguli de oprire și KPI
+## 7. Starea contului 809-020-5311 (verificat 05.10)
+
+| Ce | Stare | Ce mai e de făcut |
+|---|---|---|
+| Cont | **Documentero**, activ, creat 05.10 | — |
+| Login | serviciiseonethut@gmail.com, **același login** ca ecazier.ro (885-622-8494, blocat pe politică) și „Cont Google Ads (Anulat)” 624-163-9688 | Google poate lega conturile prin utilizatorul comun. Nu se mai poate schimba; doar notăm. |
+| Plătitor | **EDIGITALIZARE SRL**, profil de plăți nou 7925-6963-2887-1113 („Documentero”), Visa ••0827, plăți automate | Card de rezervă: recomandat, nu obligatoriu |
+| Monedă / fus orar | RON / (GMT+03:00) Ora Europei de Est | — |
+| Etichetare automată (gclid) | **Da** | — |
+| Persoane de contact pentru protecția datelor | ⚠️ niciuna | Admin → Setări cont: un contact GDPR (cerut pentru UE) |
+| Verificarea advertiserului | nu apare încă în meniu | Google o cere de obicei după primele anunțuri; o faci cu actele EDIGITALIZARE când apare |
+| Conversii | ⚠️ **niciuna** | Conversia „Achiziție” cu enhanced conversions (§2.5–2.6), apoi ID + etichetă în Vercel (§4) |
+| Campanii | niciuna | după verificarea din §5 |
+| Aplicare automată a recomandărilor | dezactivată | lăsăm așa |
+
+## 8. Reguli de oprire și KPI
 
 - Prima săptămână: **plafon de 150 lei/zi** pe tot contul. CPC plafonat după `2026-08-18-strategie-licitare-decizie.md`.
 - Oprim un grup dacă cheltuiește de **2× CPA-ul maxim** fără nicio comandă. CPA maxim: stare civilă 200 lei, cazier fiscal 70 lei (analiza din 18.08).
