@@ -80,9 +80,12 @@ Regulă: maximum 1–2 pagini rescrise pe săptămână (`.claude/rules/content-
 | E3 | Ghidul de apostilă extins de la 830 la 1.400+ cuvinte (acum pe poziția 51) | ⬜ săpt. 42 |
 | E4 | Linkuri în text spre documentero din articolele eghiseul despre stare civilă | ⬜ săpt. 42 |
 | E6 | Tabelul pe țări de pe pagina de celibat zice „apostilă: da” în UE (Regulamentul 2016/1191 o scutește) — lăsat așa, decizie Raul 05.10 | ⏸ |
+| E7 | Contul de serviciu `claude-seo@caziere.iam.gserviceaccount.com` adăugat ca utilizator în GSC documentero (pentru inspecții prin API) | ⬜ Raul |
 | E5 | Tabelul de măsurare săptămânală (`documentero/continut-si-seo.md`) | ⬜ în fiecare luni |
 
-## F. ecazier.ro (doar auto + fiscal; termen de decizie 19.10)
+## F. ecazier.ro (doar cazier auto; termen de decizie 19.10)
+
+Stare și explicație: `seo/2026-10-05-ecazier-documentero-stare-organic.md`. 14 din 15 pagini sunt indexate. Pe auto, ecazier e pe pozițiile 4–8; pe fiscal, pe 28, pentru că CJO câștigă aceeași căutare.
 
 | # | Ce | Stare |
 |---|---|---|
@@ -107,4 +110,5 @@ Cota e de circa 10 cereri pe zi pentru fiecare proprietate.
 |---|---|---|---|
 | 05.10 | documentero.ro | `/ghiduri/valabilitate-certificat-de-celibat/`, `/ghiduri/certificat-de-nastere-vechi-tipizat/`, `/certificat-de-celibat/` | solicitată |
 | 05.10 | cazierjudiciaronline.com | `/`, `/cazier-fiscal-online`, `/valabilitate-cazier-fiscal`, `/cazier-fiscal-persoana-juridica`, `/cazier-judiciar-online/constanta`, `/iasi`, `/brasov` | solicitată; la `/craiova` am atins cota zilnică |
+| 06.10 (de făcut) | ecazier.ro | `/ghid-alegere-tip-cazier` (05.10: cota depășită) | ⬜ |
 | 06.10 (de făcut) | cazierjudiciaronline.com | `/cazier-judiciar-online/craiova`, `/targu-mures`, `/sibiu`, `/timisoara`, `/oradea`, `/cluj`, `/buzau`, `/galati`, `/ploiesti`, `/verificare-cazier-fiscal-online` | ⬜ |
