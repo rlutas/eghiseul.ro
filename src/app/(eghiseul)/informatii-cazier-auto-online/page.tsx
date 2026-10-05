@@ -137,6 +137,11 @@ export default function Page() {
         alin. (5) că o suspendare a dreptului de a conduce șterge toate punctele acumulate până
         atunci. De aici vine impresia că „totul se curăță în șase luni”. Nu se curăță: doar
         contorul de puncte se resetează, iar sancțiunea rămâne consemnată ani buni după aceea.
+        Un exemplu pas cu pas, cu datele la care expiră fiecare punct, e în{' '}
+        <a href="https://ecazier.ro/puncte-penalizare-cazier-auto">
+          ghidul despre verificarea punctelor de penalizare
+        </a>{' '}
+        de pe ecazier.ro.
       </p>
       <p>
         Unele mențiuni nu se șterg niciodată. Ordinul le enumeră: infracțiunile soldate cu decesul
@@ -180,7 +185,10 @@ export default function Page() {
       </p>
       <p>
         În rest, documentul se cere prin practica angajatorului, nu prin obligație legală: firme de
-        transport, companii care dau mașină de serviciu, flote care își asigură parcul. Pagina
+        transport, companii care dau mașină de serviciu, flote care își asigură parcul. Tot aici
+        intră platformele de ridesharing; ce document cer concret la înscriere găsești în{' '}
+        <a href="https://ecazier.ro/cazier-auto-uber-bolt">ghidul pentru șoferii parteneri Uber și Bolt</a>.
+        Pagina
         oficială a ARR pentru atestatele profesionale nu îl listează printre actele necesare, deci
         dacă cineva îți spune că „e obligatoriu pentru atestat”, cere-i să-ți arate unde scrie.
       </p>

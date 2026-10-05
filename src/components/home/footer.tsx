@@ -198,6 +198,15 @@ export function Footer() {
               </a>
               .
             </p>
+            {/* Al doilea site soră (caziere judiciare, fiscale, auto) — același
+                tipar: un link din text, nu din lista de servicii. */}
+            <p className="mt-2 text-xs leading-relaxed text-white/50">
+              Ghiduri și comenzi pentru cazier judiciar, fiscal sau auto:{' '}
+              <a href="https://ecazier.ro/" className="text-white/80 underline underline-offset-2 hover:text-primary-500">
+                ecazier.ro
+              </a>
+              .
+            </p>
           </div>
         </div>
       </div>

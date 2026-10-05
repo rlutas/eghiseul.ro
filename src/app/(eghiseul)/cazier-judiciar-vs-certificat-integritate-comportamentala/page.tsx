@@ -333,6 +333,12 @@ export default function Page() {
         Cele două documente <strong>nu se exclud reciproc</strong>. În multe situații, este necesară prezentarea
         ambelor pentru a demonstra un profil juridic complet.
       </p>
+      <p>
+        Uneori lista angajatorului cuprinde și un cazier fiscal sau unul auto, emise de alte instituții. Dacă nu
+        ești sigur ce document ți se cere, pornește de la{' '}
+        <a href="https://ecazier.ro/ghid-alegere-tip-cazier">ghidul despre alegerea între cazierul judiciar, fiscal și auto</a>
+        , organizat pe situații concrete.
+      </p>
     </ArticleLayout>
   );
 }
