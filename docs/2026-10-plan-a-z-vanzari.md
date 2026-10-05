@@ -56,6 +56,7 @@ Planul complet: `ads/2026-10-05-documentero-lansare-ads.md`, `ads/2026-10-05-doc
 | C3 | Cifre neverificabile rămase pe alte pagini („100.000+ clienți”, „150.000+ documente”, „4.9/5”): `TrustSignals`, `/cazier-judiciar-diaspora`, `/ppc/*`, `TestimonialsSection` | 05.10 | ✅ (rămâne de decis ratingul „4.9 · 441”) |
 | C4 | Măsurare: clicuri și poziție pe `/cazier-judiciar-online/` față de 04.09–01.10, plus comenzi pe săptămână (baza: ~25) | 12.10, 19.10 | ⬜ |
 | C6 | Pagina de cazier fiscal: snippet „fără SPV” (eghiseul avea 4,1% CTR pe poz. 6,3; CJO 1,1% pe poz. 5,9) + corectat în 6 locuri că cazierul fiscal arată datorii (arată sancțiuni) | 05.10 | ✅ |
+| C7 | Cazier fiscal pe CJO: valabilitatea corectată la 30 de zile pentru toți (pe site scria fals „90 PF”), conținutul doar pentru persoane fizice; `/cazier-fiscal-persoana-juridica` devine ghid „pe numele asociatului” | 05.10 | 🔄 |
 | C5 | Dacă expunerile scad în continuare după 3 săptămâni: consolidăm paginile de oraș sub 200 de expuneri pe lună | 26.10 | ⏸ |
 
 ## D. eghiseul.ro (demotat, recuperare lentă)
@@ -74,8 +75,8 @@ Regulă: maximum 1–2 pagini rescrise pe săptămână (`.claude/rules/content-
 
 | # | Ce | Stare |
 |---|---|---|
-| E1 | Ghid „Certificat de naștere vechi / tipizat: mai e valabil?” | ⬜ săpt. 41 |
-| E2 | Ghid „Valabilitatea certificatului de celibat (6 luni / 90 de zile)” | ⬜ săpt. 41 |
+| E1 | Ghid „Certificat de naștere vechi / tipizat: mai e valabil?” | 🔄 săpt. 41 |
+| E2 | Ghid „Valabilitatea certificatului de celibat (6 luni / 90 de zile)” | 🔄 săpt. 41 |
 | E3 | Ghidul de apostilă extins de la 830 la 1.400+ cuvinte (acum pe poziția 51) | ⬜ săpt. 42 |
 | E4 | Linkuri în text spre documentero din articolele eghiseul despre stare civilă | ⬜ săpt. 42 |
 | E5 | Tabelul de măsurare săptămânală (`documentero/continut-si-seo.md`) | ⬜ în fiecare luni |
