@@ -89,9 +89,9 @@ Stare și explicație: `seo/2026-10-05-ecazier-documentero-stare-organic.md`. 14
 
 | # | Ce | Stare |
 |---|---|---|
-| F0 | Legături interne pe ecazier (ghiduri ↔ servicii, `/ghid-alegere-tip-cazier` ≥3 inlinkuri) | 🔄 05.10 |
-| F1 | Link în text din `/cazier-auto-online` (CJO) spre ghidurile ecazier Uber/Bolt și puncte | ⬜ |
-| F2 | Linkuri în text din cazierul auto de pe eghiseul spre ecazier | ⬜ |
+| F0 | Legături interne pe ecazier: blocuri „Citește și” pe ghiduri, linkuri în text spre `/` (înainte mergeau spre `/comanda`, care e noindex), `/ghiduri` de la 1 la 9 linkuri, `/` de la 1 la 6 | ✅ 05.10 (gata local, de publicat) |
+| F1 | Linkuri din CJO spre ecazier, în text (4): `/cazier-auto-online` → Uber/Bolt și puncte de penalizare; `/comparatie-servicii` → auto vs judiciar; `/impact-cazier-angajare` → fișa de evidență. Spre `/cazier-fiscal` nu punem, pentru că ar concura cu pagina de fiscal a CJO | ✅ 05.10 (gata local, de publicat) |
+| F2 | Linkuri din eghiseul (footer + 3 în articole, niciunul din `/servicii/`) și din avocat-tarta (footer + articolul de apărare penală) | ✅ 05.10 (gata local, de publicat; avocat-tarta se publică prin Netlify) |
 | F3 | Import în Bing Webmaster Tools + cerere de indexare pentru `/`, `/ghiduri`, cele două ghiduri | ⬜ (Raul, din browser) |
 | F4 | 19.10: dacă `/cazier-auto` nu e indexată și nu avem backlinkuri, oprim investiția | ⏸ |
 
