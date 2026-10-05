@@ -145,6 +145,8 @@ export function documenteroArticleGraph(input: {
   dateModified: string;
   image?: string;
   breadcrumb: Array<{ name: string; path: string }>;
+  /** Only when the same questions are rendered on the page (FaqList). */
+  faq?: Array<{ q: string; a: string }>;
 }) {
   const url = `${BASE}${input.path}`;
   const author = { name: SITE_AUTHOR.name, url: SITE_AUTHOR.url };
@@ -169,6 +171,15 @@ export function documenteroArticleGraph(input: {
         inLanguage: 'ro-RO',
       },
       authorNode(author),
+      ...(input.faq && input.faq.length > 0
+        ? [
+            {
+              '@type': 'FAQPage',
+              '@id': `${url}#faq`,
+              mainEntity: input.faq.map(({ q, a }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+            },
+          ]
+        : []),
     ],
   };
 }

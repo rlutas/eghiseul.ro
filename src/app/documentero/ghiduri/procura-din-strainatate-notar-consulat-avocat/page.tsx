@@ -17,7 +17,7 @@ const TITLE = 'Procură din străinătate pentru acte de stare civilă: notar, c
 const DESCRIPTION =
   'Ești plecat și ai nevoie de certificatul de naștere, de căsătorie sau de celibat din România. Trei căi ca să ceară cineva în locul tău: procura la notarul de acolo, procura la consulat, împuternicirea avocațială. Ce costă, cât durează, ce poate merge prost.';
 const DATE_PUBLISHED = '2026-09-21';
-const DATE_MODIFIED = '2026-09-21';
+const DATE_MODIFIED = '2026-10-05';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -154,7 +154,7 @@ export default async function GhidProcuraPage() {
             ]} />
 
             <H id="s7">Ce faci cu documentul după ce ajunge la tine</H>
-            <P>Dacă îl folosești într-un stat UE, cere de la început <A href="/extras-multilingv/">extrasul multilingv</A>: instituțiile din Uniune îl acceptă fără traducere și fără apostilă. În afara UE, duplicatul are nevoie de <A href="/ghiduri/apostila-acte-stare-civila/">apostilă</A> pe original și de traducere; le facem noi, în ordinea corectă, înainte să plece curierul. Pentru căsătoria în străinătate, lângă certificatul de naștere ți se cere și <A href="/certificat-de-celibat/">certificatul de celibat</A>, valabil 6 luni în România și de regulă 90 de zile pentru instituțiile străine, deci comandă-l când știi data depunerii dosarului.</P>
+            <P>Dacă îl folosești într-un stat UE, cere de la început <A href="/extras-multilingv/">extrasul multilingv</A>: instituțiile din Uniune îl acceptă fără traducere și fără apostilă. În afara UE, duplicatul are nevoie de <A href="/ghiduri/apostila-acte-stare-civila/">apostilă</A> pe original și de traducere; le facem noi, în ordinea corectă, înainte să plece curierul. Pentru căsătoria în străinătate, lângă certificatul de naștere ți se cere și <A href="/certificat-de-celibat/">certificatul de celibat</A>. Formularul lui nu are termen de valabilitate, dar instituțiile străine îl vor de regulă eliberat în ultimele 3–6 luni (vezi <A href="/ghiduri/valabilitate-certificat-de-celibat/">cât e valabil certificatul de celibat</A>), deci comandă-l când știi data depunerii dosarului.</P>
           </article>
 
           <aside className="flex flex-col gap-5 self-start lg:sticky lg:top-24 lg:col-span-3 lg:col-start-10">

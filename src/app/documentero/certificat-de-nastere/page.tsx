@@ -17,7 +17,7 @@ const TITLE = 'Certificat de Naștere Online: Duplicat prin Avocat, Livrat Acas�
 const DESCRIPTION =
   'Duplicat certificat de naștere obținut de un avocat de la starea civilă: pierdut, deteriorat, model vechi sau pentru străinătate. Semnezi pe telefon, fără programare, fără notar. Originalul vine prin curier.';
 const DATE_PUBLISHED = '2026-09-19';
-const DATE_MODIFIED = '2026-09-21';
+const DATE_MODIFIED = '2026-10-05';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -32,7 +32,7 @@ export const metadata = buildPageMetadata({
 const SITUATIONS: Array<[string, string, string?]> = [
   ['L-am pierdut sau mi-a fost furat', 'Fără declarație la poliție, fără anunț în Monitorul Oficial. Se cere direct duplicatul.', '/ghiduri/certificat-de-nastere-pierdut/'],
   ['E deteriorat sau plastifiat', 'Un certificat plastifiat nu mai e acceptat: nu se pot pune mențiuni pe el. Cel vechi se predă la eliberare.'],
-  ['Am modelul vechi, tipizat', 'Rămâne valabil în țară. Pentru pașaport, pentru străinătate sau pentru copil ți se cere tot mai des modelul nou, cu CNP.'],
+  ['Am modelul vechi, tipizat', 'Rămâne valabil: H.G. 255/2024 o spune expres. Îl schimbi dacă e deteriorat sau dacă instituția vrea un exemplar eliberat recent.', '/ghiduri/certificat-de-nastere-vechi-tipizat/'],
   ['Locuiesc în străinătate', 'Semnezi de acolo, fără procură la notar sau consulat. Livrăm oriunde; pentru UE adaugi extrasul multilingv.', '/ghiduri/procura-din-strainatate-notar-consulat-avocat/'],
   ['Pentru copilul meu', 'Părintele cere duplicatul minorului. Copilul de peste 14 ani semnează și el cererea.'],
   ['Pentru un părinte decedat', 'Pentru succesiune se cere un extras pentru uz oficial, nu un duplicat. Scrie-ne și îți spunem ce document e potrivit.', '/contact/'],

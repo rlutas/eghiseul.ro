@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { HeaderDocumentero } from '@/components/documentero/header';
 import { ServiceHero } from '@/components/documentero/service-hero';
 import { ReviewsDocumentero } from '@/components/documentero/reviews';
@@ -16,7 +17,7 @@ const TITLE = 'Certificat de Celibat Online (Anexa 18), Obținut prin Avocat';
 const DESCRIPTION =
   'Certificat de celibat (adeverința privind statutul civil, Anexa 18, fosta Anexa 9) obținut de un avocat de la starea civilă, fără să vii în țară. Pentru căsătorie, ședere sau notar în străinătate. Apostilă și traducere opționale.';
 const DATE_PUBLISHED = '2026-09-19';
-const DATE_MODIFIED = '2026-09-21';
+const DATE_MODIFIED = '2026-10-05';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -51,7 +52,7 @@ const FAQ = [
   { q: 'Certificat de celibat, Anexa 9 sau adeverință privind statutul civil?', a: 'Același document. Numele legal actual este „adeverință privind statutul civil”, Anexa 18 la Normele metodologice aprobate prin H.G. 255/2024; înainte de 2024 era Anexa 9. Instituțiile străine îi spun „certificat de celibat”, „certificate of no impediment” sau „nulla osta”.' },
   { q: 'Îl pot cere de la consulat?', a: 'Da, dar consulatul îl solicită tot de la primăria din România, cu termene de 30–60 de zile. Noi mergem direct la primărie.' },
   { q: 'Am fost căsătorit și am divorțat. Îl pot obține?', a: 'Da. Documentul arată starea civilă actuală, cu mențiunea divorțului. Pentru unele state ai nevoie și de certificatul de căsătorie cu mențiunea de divorț.' },
-  { q: 'Cât e valabil certificatul de celibat?', a: 'În România, 6 luni de la eliberare. Cele mai multe state UE aplică însă propria regulă și cer un document mai nou de 90 de zile la data depunerii dosarului. Comandă-l când știi data depunerii, nu „ca să-l ai”.' },
+  { q: 'Cât e valabil certificatul de celibat?', a: 'Formularul din Anexa 18 nu are termen de valabilitate: arată starea civilă la data eliberării. Termenul îl pune instituția care îl primește, de obicei 3 sau 6 luni de la data eliberării (Germania, de exemplu, 6 luni). Comandă-l când știi data depunerii, nu „ca să-l ai”. Detalii pe țări în ghidul despre valabilitatea certificatului de celibat.' },
   { q: 'Cum știu ce cere statul unde mă căsătoresc?', a: 'Spune-ne țara în formular. Îți spunem dacă e nevoie de apostilă, de traducere sau de extras multilingv în locul certificatului de naștere.' },
   { q: 'Cât costă certificatul de celibat la primărie?', a: 'Nimic, sau o taxă locală de câțiva lei. La noi costă mai mult fiindcă plătești avocatul, dosarul, urmărirea și livrarea, nu documentul.' },
   { q: 'Pot cere certificatul de celibat pentru logodnicul meu?', a: 'Nu. Împuternicirea o semnează doar titularul, chiar dacă plata o faci tu. Îi trimitem linkul comenzii și semnează de pe telefonul lui.' },
@@ -95,7 +96,7 @@ export default async function CelibatPage() {
           orderSlug="certificat-celibat"
           cta="Comandă certificatul"
           secondary={{ label: 'Cât e valabil', href: '#valabilitate' }}
-          facts={[['6 luni', 'valabil în România'], ['90 de zile', 'cerut de majoritatea statelor UE'], ['≤ 30 de zile', 'termen legal de eliberare']]}
+          facts={[['fără termen', 'pe formularul românesc'], ['3–6 luni', 'cât de nou îl cer de obicei statele străine'], ['≤ 30 de zile', 'termen legal de eliberare']]}
           media={<Image src="/images/documentero/avocat-ghiseu-stare-civila.webp" alt="Avocata depune cererea la ghișeul de stare civilă" width={1264} height={848} className="h-full w-full object-cover" sizes="(min-width: 1024px) 760px, 100vw" />}
           priceLabel="Certificat de celibat (Anexa 18)"
           price={p.basePrice}
@@ -110,7 +111,7 @@ export default async function CelibatPage() {
         />
 
         <QuickAnswer updated={DATE_MODIFIED}>
-          Certificatul de celibat este, în legea română, adeverința privind statutul civil (Anexa 18 la H.G. 255/2024, fosta Anexa 9). O eliberează oficiul de stare civilă care păstrează actul tău de naștere și confirmă că în registrele din România nu figurezi căsătorit. Cererea o poate depune titularul sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}); nu e nevoie să vii în țară. Valabilă 6 luni în România; majoritatea statelor UE o cer mai nouă de 90 de zile. Termen legal: cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală.
+          Certificatul de celibat este, în legea română, adeverința privind statutul civil (Anexa 18 la H.G. 255/2024, fosta Anexa 9). O eliberează oficiul de stare civilă care păstrează actul tău de naștere și confirmă că în registrele din România nu figurezi căsătorit. Cererea o poate depune titularul sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}); nu e nevoie să vii în țară. Formularul nu are termen de valabilitate; statul care îl primește îl vrea, de regulă, eliberat în ultimele 3 sau 6 luni. Termen legal: cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală.
         </QuickAnswer>
 
         <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
@@ -147,13 +148,17 @@ export default async function CelibatPage() {
         <Section id="valabilitate" className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-5 lg:col-span-7">
             <Eyebrow>Valabilitate</Eyebrow>
-            <H2 className="sm:text-[36px]">6 luni în România, 90 de zile în afară. Amândouă sunt adevărate.</H2>
+            <H2 className="sm:text-[36px]">Fără termen pe hârtie. Termenul îl pune țara care îl primește.</H2>
             <Prose
               paras={[
-                'Legea română dă adeverinței o valabilitate de 6 luni de la eliberare. Autoritățile străine însă aplică propria regulă: cele mai multe state UE acceptă documente de stare civilă mai noi de 90 de zile la data depunerii dosarului. Comandă-l când ai deja data depunerii, nu „ca să-l ai”.',
+                'Formularul românesc (Anexa 18) nu are rubrică de valabilitate: atestă starea civilă la data eliberării. Instituțiile străine își aplică propria regulă, de obicei 3 sau 6 luni de la eliberare, socotite la data depunerii dosarului. Comandă-l când ai deja data depunerii, nu „ca să-l ai”.',
                 'Dacă statul cere apostilă, ea se aplică de Instituția Prefectului pe originalul adeverinței. Traducerea se face după apostilare, de un traducător autorizat. Le poți alege pe amândouă în comandă, ca să primești documentul gata de folosit.',
               ]}
             />
+            <p className="m-0 text-[17px] leading-[1.7] text-d-body">
+              Ce termen aplică fiecare țară, de unde vin „6 luni” și „90 de zile” și cu cât timp înainte de dosar să comanzi:{' '}
+              <Link href="/ghiduri/valabilitate-certificat-de-celibat/" className="font-semibold text-d-ink underline underline-offset-2 hover:text-d-acc">cât e valabil certificatul de celibat</Link>.
+            </p>
           </div>
           <div className="flex flex-col gap-3.5 self-start rounded-[20px] bg-d-ink p-7 text-d-bg lg:col-span-4 lg:col-start-9">
             <span className="text-[13px] font-bold uppercase tracking-[0.08em] text-d-acc">Ce conține documentul</span>
@@ -240,7 +245,7 @@ export default async function CelibatPage() {
           ]}
           guides={[
             { title: 'Apostila pe acte de stare civilă: când e nevoie și când nu', desc: 'În UE nu; în afara UE, pe original.', href: '/ghiduri/apostila-acte-stare-civila/' },
-            { title: 'Certificat de naștere pierdut: ce faci în 2026', desc: 'Îl cer împreună cu celibatul aproape toate statele.', href: '/ghiduri/certificat-de-nastere-pierdut/' },
+            { title: 'Cât e valabil certificatul de celibat', desc: 'Ce cer Germania, Franța, Spania, Italia, Regatul Unit și când să-l comanzi.', href: '/ghiduri/valabilitate-certificat-de-celibat/' },
             { title: 'Procură din străinătate: notar, consulat sau avocat', desc: 'Trei căi ca să ceară cineva în locul tău.', href: '/ghiduri/procura-din-strainatate-notar-consulat-avocat/' },
           ]}
         />
