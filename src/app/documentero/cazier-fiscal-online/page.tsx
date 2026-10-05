@@ -16,7 +16,7 @@ export const revalidate = 3600;
 const PATH = '/cazier-fiscal-online/';
 const TITLE = 'Cazier fiscal online, fără SPV și fără drum la ANAF';
 const DESCRIPTION =
-  'Cazier fiscal pentru persoane fizice și firme, obținut de avocat cu împuternicire, fără cont SPV și fără drum la ANAF. PDF pe email. Serviciu privat, nu ANAF.';
+  'Cazier fiscal pentru persoane fizice, obținut de avocat cu împuternicire, fără cont SPV și fără drum la ANAF. PDF pe email. Serviciu privat, nu ANAF.';
 const UPDATED = '2026-10-05';
 
 export const metadata = buildPageMetadata({
@@ -39,7 +39,7 @@ const FAQ = [
   { q: 'Pot să-l obțin gratuit?', a: 'Da, la ghișeul ANAF sau din SPV, dacă ai cont activ. La noi plătești avocatul și procesarea, nu documentul.' },
   { q: 'Cazierul fiscal arată datoriile la stat?', a: 'Nu. Arată faptele fiscale sancționate înscrise pe numele tău sau al firmei. Datoriile apar în certificatul de atestare fiscală, care e alt document.' },
   { q: 'Cât e valabil?', a: '30 de zile de la emitere și doar pentru scopul pentru care a fost cerut. Pentru două dosare diferite îți trebuie două certificate.' },
-  { q: 'Merge și pentru firmă?', a: 'Da. În formular alegi persoană juridică și completezi datele firmei; reprezentantul legal semnează împuternicirea.' },
+  { q: 'Merge și pentru firmă?', a: 'Nu. Obținem cazierul fiscal doar pentru persoane fizice. Dacă îți trebuie pentru o firmă (de exemplu la înființare sau la o licitație), îl comanzi pe numele asociatului sau al administratorului, ca persoană fizică.' },
   { q: 'Ce trebuie să trimit?', a: 'Actul de identitate, scopul pentru care îl ceri și semnătura în formular. Durează câteva minute de pe telefon.' },
 ];
 
@@ -71,13 +71,13 @@ export default async function CazierFiscalAdsPage() {
       <main id="main-content">
         <ServiceHero
           crumb="Cazier fiscal"
-          eyebrow="Persoane fizice și firme · serviciu privat, nu ANAF"
+          eyebrow="Persoane fizice · serviciu privat, nu ANAF"
           title="Cazier fiscal fără SPV și fără drum la ANAF."
           intro="Semnezi împuternicirea pe telefon, avocatul depune cererea, iar ANAF eliberează cazierul fiscal. Îl primești în PDF pe email, gata de pus la dosar."
           orderSlug="cazier-fiscal"
           cta="Comandă cazierul fiscal"
           secondary={{ label: 'Variantele gratuite', href: '#variante' }}
-          facts={[[`${p.estimatedDays ?? 3} zile`, 'lucrătoare, standard'], ['30 de zile', 'valabilitate'], ['PF și PJ', 'persoane și firme']]}
+          facts={[[`${p.estimatedDays ?? 3} zile`, 'lucrătoare, standard'], ['Fără SPV', 'nu-ți trebuie cont ANAF'], ['PDF', 'pe email']]}
           media={<Image src="/images/documentero/avocat-ghiseu-stare-civila.webp" alt="Avocata depune o cerere la ghișeu" width={1264} height={848} className="h-full w-full object-cover" sizes="(min-width: 1024px) 760px, 100vw" />}
           priceLabel="Cazier fiscal"
           price={p.basePrice}
@@ -114,7 +114,7 @@ export default async function CazierFiscalAdsPage() {
             <H2 className="sm:text-[32px]">Cum îl obținem</H2>
             <div className="grid gap-5 sm:grid-cols-2">
               {[
-                ['Completezi formularul', 'Datele tale sau ale firmei, actul de identitate și semnătura.'],
+                ['Completezi formularul', 'Datele tale, actul de identitate și semnătura.'],
                 ['Plătești online', 'Cu cardul, prin Stripe. Primești factură pe email.'],
                 ['Avocatul depune cererea', 'Cu împuternicire avocațială, la ANAF.'],
                 ['Primești cazierul fiscal', 'PDF pe email, gata de pus la dosar.'],
