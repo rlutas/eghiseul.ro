@@ -1,5 +1,5 @@
 {
-  "ignoreCommand": "if [ \"$VERCEL_ENV\" != \"production\" ]; then exit 0; fi; git diff --quiet HEAD^ HEAD -- ':!docs' ':!*.md' ':!supabase/migrations' ':!.claude'",
+  "ignoreCommand": "if [ \"$VERCEL_ENV\" != \"production\" ]; then exit 0; fi; git diff --quiet ${VERCEL_GIT_PREVIOUS_SHA:-HEAD^} HEAD -- ':!docs' ':!*.md' ':!supabase/migrations' ':!.claude'",
   "crons": [
     {
       "path": "/api/cron/update-tracking/",
