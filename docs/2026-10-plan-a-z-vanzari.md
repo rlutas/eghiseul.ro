@@ -75,10 +75,11 @@ Regulă: maximum 1–2 pagini rescrise pe săptămână (`.claude/rules/content-
 
 | # | Ce | Stare |
 |---|---|---|
-| E1 | Ghid „Certificat de naștere vechi / tipizat: mai e valabil?” | 🔄 săpt. 41 |
-| E2 | Ghid „Valabilitatea certificatului de celibat (6 luni / 90 de zile)” | 🔄 săpt. 41 |
+| E1 | Ghid „Certificat de naștere vechi / tipizat: mai e valabil?” | ✅ 05.10 |
+| E2 | Ghid „Valabilitatea certificatului de celibat” (+ corectat „6 luni în România” pe pagina de celibat: Anexa 18 nu are termen) | ✅ 05.10 |
 | E3 | Ghidul de apostilă extins de la 830 la 1.400+ cuvinte (acum pe poziția 51) | ⬜ săpt. 42 |
 | E4 | Linkuri în text spre documentero din articolele eghiseul despre stare civilă | ⬜ săpt. 42 |
+| E6 | Tabelul pe țări de pe pagina de celibat zice „apostilă: da” în UE (Regulamentul 2016/1191 o scutește) — lăsat așa, decizie Raul 05.10 | ⏸ |
 | E5 | Tabelul de măsurare săptămânală (`documentero/continut-si-seo.md`) | ⬜ în fiecare luni |
 
 ## F. ecazier.ro (doar auto + fiscal; termen de decizie 19.10)
