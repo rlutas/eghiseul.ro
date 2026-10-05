@@ -13,7 +13,7 @@ export const revalidate = 3600;
 
 const SLUG = 'valabilitate-certificat-de-celibat';
 const PATH = `/ghiduri/${SLUG}/`;
-const TITLE = 'Cât e valabil certificatul de celibat: 6 luni în România, 90 de zile în străinătate?';
+const TITLE = 'Cât e valabil certificatul de celibat? Termenele cerute în Germania, Italia, Spania, Franța și UK';
 const DESCRIPTION =
   'Formularul românesc nu are termen de valabilitate. Termenul îl pune instituția care îl primește. Ce cer Germania, Franța, Spania, Italia și Regatul Unit, în ce ordine faci apostila și traducerea și când să-l comanzi.';
 const DATE_PUBLISHED = '2026-10-05';
