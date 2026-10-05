@@ -17,6 +17,7 @@ const state = {
   selects: [] as { fromCall: number; table: string; filters: string[] }[],
   candidates: [] as Row[],
   settings: null as Row | null,
+  sentToday: 0,
 };
 
 function chain(table: string, fromCall: number) {
@@ -42,6 +43,10 @@ function chain(table: string, fromCall: number) {
       return Promise.resolve({ data: null, error: null }).then(onOk, onErr);
     }
     state.selects.push({ fromCall, table, filters: local.filters });
+    // The "sent today" head-count query is the one filtered with gte.
+    if (local.filters.some((f) => f.startsWith('gte:warmup_email_sent_at'))) {
+      return Promise.resolve({ data: null, count: state.sentToday, error: null }).then(onOk, onErr);
+    }
     return Promise.resolve({ data: state.candidates, error: null }).then(onOk, onErr);
   };
   return c;
@@ -90,6 +95,7 @@ beforeEach(() => {
   state.selects = [];
   state.candidates = [];
   state.settings = null;
+  state.sentToday = 0;
   persistentFrom.mockClear();
   sendEmail.mockReset();
   sendEmail.mockResolvedValue({ id: 're_1', skipped: false });
@@ -122,11 +128,33 @@ describe('POST /api/cron/warmup-campaign — batch', () => {
   it('selects only unsent, unskipped, eligible contacts, limited to dailyBatchSize', async () => {
     state.settings = { enabled: true, dailyBatchSize: 7 };
     await POST(makeReq());
-    const sel = state.selects.find((s) => s.table === 'contacts')!;
+    const sel = state.selects.find((s) => s.table === 'contacts' && s.filters.some((f) => f.startsWith('limit:')))!;
     expect(sel.filters).toContain('is:warmup_email_sent_at,null');
     expect(sel.filters).toContain('is:warmup_skipped_at,null');
     expect(sel.filters).toContain('not:marketing_status,in,(unsubscribed,suppressed)');
     expect(sel.filters).toContain('limit:7');
+  });
+
+  it('caps one run at 250 and subtracts what already went out today', async () => {
+    state.settings = { enabled: true, dailyBatchSize: 1000 };
+    state.sentToday = 0;
+    await POST(makeReq());
+    let sel = state.selects.filter((s) => s.filters.some((f) => f.startsWith('limit:'))).at(-1)!;
+    expect(sel.filters).toContain('limit:250');
+
+    state.sentToday = 900;
+    await POST(makeReq());
+    sel = state.selects.filter((s) => s.filters.some((f) => f.startsWith('limit:'))).at(-1)!;
+    expect(sel.filters).toContain('limit:100');
+  });
+
+  it('sends nothing once the daily cap is reached', async () => {
+    state.settings = { enabled: true, dailyBatchSize: 300 };
+    state.sentToday = 300;
+    state.candidates = [contact('c1', 'a@gmail.com')];
+    const body = await (await POST(makeReq())).json();
+    expect(body.data.reason).toBe('daily limit reached');
+    expect(sendEmail).not.toHaveBeenCalled();
   });
 
   it('marks each sent contact with a FRESH from() (no builder reuse)', async () => {
@@ -141,7 +169,7 @@ describe('POST /api/cron/warmup-campaign — batch', () => {
 
     const sent = state.updates.filter((u) => 'warmup_email_sent_at' in u.values);
     expect(sent.map((u) => u.filters)).toEqual([['eq:id,c1'], ['eq:id,c2'], ['eq:id,c3']]);
-    const selectCall = state.selects.find((s) => s.table === 'contacts')!.fromCall;
+    const selectCall = state.selects.find((s) => s.table === 'contacts' && s.filters.some((f) => f.startsWith('limit:')))!.fromCall;
     for (const u of sent) expect(u.fromCall).not.toBe(selectCall);
     expect(new Set(sent.map((u) => u.fromCall)).size).toBe(3);
   });
