@@ -163,6 +163,36 @@ Costul de voce: ~1.300 de caractere ElevenLabs pe minut de clip nou. Reels-urile
 5. **Textul postării** pornește de la fraza-hook a bucății, iar linkul primește `utm_content=<tăietura>`.
 6. **Nu postăm în aceeași săptămână** două Reels din același clip; le întindem pe 2–3 săptămâni, ca să umple zilele dintre clipurile noi.
 
+## Boost pe Facebook (test, din 08.10)
+
+Scopul testului: aflăm dacă un Reel plătit aduce **comenzi**, nu doar vizualizări. Raul face boost-ul din Meta Business Suite.
+
+**Ce boost-uim:** doar cele două Reels programate. Le boost-uim după ce apar pe pagină, nu înainte.
+
+| Reel | Apare | Boost |
+|---|---|---|
+| Cât e valabil cazierul judiciar | Jo 08.10 19:00 | de vineri 09.10 |
+| Cazierul judiciar din străinătate | Du 11.10 18:00 | de luni 12.10 |
+
+**Setări:**
+- **Obiectiv:** vizite pe site sau clicuri pe link („Website visits” / „Learn more”). NU interacțiuni și NU vizualizări: aduc like-uri, nu comenzi.
+- **Linkul butonului**, cu UTM de reclamă (în admin cade pe canalul „Meta Ads”, separat de postările neplătite):
+  - valabilitate: `https://eghiseul.ro/servicii/cazier-judiciar-online/?utm_source=facebook&utm_medium=paid&utm_campaign=boost-cazier-valabilitate`
+  - străinătate: `https://eghiseul.ro/servicii/cazier-judiciar-online/?utm_source=facebook&utm_medium=paid&utm_campaign=boost-cazier-strainatate`
+  - Pe Reels, linkul din descriere nu se poate apăsa; clicul vine doar din butonul reclamei.
+- **Public:**
+  - valabilitate: România, 22–55 ani;
+  - străinătate: românii din Italia, Spania, Germania, Marea Britanie, Franța, Belgia, Austria, după limba română sau după interesul „România”.
+- **Buget:** 25–30 lei/zi, 5 zile pe fiecare Reel, adică ~250–300 lei în total.
+- **Plasări:** Facebook Reels și Feed. Instagram NU, cât timp pagina e legată de contul personal `iamraul92`.
+
+**Cum citim rezultatul** (la 5 zile după ce pornește fiecare boost):
+- Comenzile vin din admin, canalul „Meta Ads”, campania `boost-cazier-…`. Rezultatele trecute de Meta nu contează.
+- Costul pe clic și pe vizita pe site, din Meta.
+- **Merge** dacă bugetul de ~150 lei al unui Reel aduce cel puțin o comandă plătită (cazierul = 198 lei). Atunci continuăm pe clipul care a mers și boost-uim și următoarele Reels.
+- **Nu merge** dacă vin clicuri, dar zero comenzi. Atunci oprim și păstrăm doar postările neplătite.
+- Dacă Meta respinge reclama pentru politica de documente de stat, notăm aici motivul și nu insistăm cu alt text. Același risc l-a avut Google.
+
 ## Cum măsurăm
 
 **În fiecare luni**, o tabelă scurtă cu săptămâna trecută:

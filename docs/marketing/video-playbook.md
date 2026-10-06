@@ -85,7 +85,10 @@ Pentru urcarea din browser (limită 10 MB pe fișier), fișierele se comprimă l
 11. Certificatul de naștere pierdut
 12. Apostila de la Haga: unde și pentru ce acte
 
-## Ce rămâne de făcut (06.10, seara)
+## Stare (06.10, seara)
 
-- Urcarea pe YouTube a celor 3 clipuri și a trailerului, refăcute cu vocea standard (o ciornă privată veche e deja în Studio și trebuie înlocuită), după calendarul din [plan-postari-video-2026-10.md](plan-postari-video-2026-10.md).
-- Facebook/Instagram după login în Meta Business Suite.
+- YouTube: trailer, cele 2 clipuri lungi (valabilitate, străinătate) și cele 2 Shorts sunt programate 07–11.10. Linkurile sunt în [plan-postari-video-2026-10.md](plan-postari-video-2026-10.md).
+- Facebook: 2 Reels programate (08.10 și 11.10), doar pe pagina EGhiseul. Testul de boost e descris în plan.
+- Instagram: oprit. Pagina e legată de contul personal `iamraul92`; e nevoie de un cont Instagram eGhiseul.
+- Cazierul fiscal: refăcut fără „PDF semnat electronic” (scanul pe email + originalul prin curier). Așteaptă aprobarea lui Raul, apoi se programează pe 13.10, la 12:30.
+- Urcarea în Business Suite: butonul „Add video” deschide fereastra de fișiere a sistemului. Ca să meargă, înainte de clic interceptăm `HTMLInputElement.prototype.click` pentru `type=file`, apoi urcăm fișierul în inputul prins.
