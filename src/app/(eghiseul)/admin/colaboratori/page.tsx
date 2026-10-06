@@ -46,6 +46,11 @@ interface Breakdown {
   collaboratorShare: number;
   alreadyDistributed: number;
   toSettle: number;
+  projectedSharePerSide: number;
+  collaboratorReceived: number;
+  collaboratorToReceive: number;
+  commissionToInvoice: number;
+  collaboratorCashToReceive: number;
 }
 interface Summary { count: number; revenue: number; fees: number; breakdown: Breakdown | null }
 
@@ -1038,7 +1043,7 @@ export default function CollaboratorsAdminPage() {
                   ['− Comisioane Stripe', -summary.breakdown.stripeFees],
                   ['− Reclamă și alte cheltuieli', -summary.breakdown.otherCosts],
                   ['Profit brut', summary.breakdown.grossProfit],
-                  ['Taxe estimate pe comenzi nelucrate (informativ)', summary.breakdown.pendingOcpi],
+                  ['Taxe OCPI care urmează, fără taxă trecută (informativ)', summary.breakdown.pendingOcpi],
                   ['− Impozit profit 16%', -summary.breakdown.profitTax],
                   ['− Impozit dividende 16%', -summary.breakdown.dividendTax],
                   ['Net de distribuit', summary.breakdown.distributable],
@@ -1048,6 +1053,11 @@ export default function CollaboratorsAdminPage() {
                   ['Partea eGhiseul', summary.breakdown.sharePerSide],
                   ['Distribuit deja (fiecare)', -summary.breakdown.alreadyDistributed],
                   ['De reglat (fiecare)', summary.breakdown.toSettle],
+                  ['Partea fiecăruia după taxele care urmează', summary.breakdown.projectedSharePerSide],
+                  ['Colaborator: primit deja (transfer + facturi)', -summary.breakdown.collaboratorReceived],
+                  ['Colaborator: mai are de primit', summary.breakdown.collaboratorToReceive],
+                  ['  din care factură comision (TVA incl.)', summary.breakdown.commissionToInvoice],
+                  ['  din care transfer', summary.breakdown.collaboratorCashToReceive],
                 ] as [string, number][]).map(([label, value]) => (
                   <div key={label} className="flex items-center justify-between border-b border-slate-100 py-1">
                     <span className="text-slate-500">{label}</span>

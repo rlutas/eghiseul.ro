@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-10-06 | 🟣 **Decont topograf: taxele OCPI care urmează + plățile către colaborator, în portal** — `pendingOcpiSummary` pe toate comenzile fără taxă (identificare 20/100 lei), `ocpiEstimate` per comandă, card „Plăți către tine” (transfer + factură comision, rest de primit); reclamă septembrie 570 lei | [2026-10-06-decont-mircea-taxe-si-plati.md](2026-10-06-decont-mircea-taxe-si-plati.md) |
 | 2026-10-06 | 🔴 **Decontări: plăți ecazier (EJC-/EFC-) legate de factură + valori implicite decont avocată** — prefixele ecazier caută în DB-ul CJO; decont: factură cabinet 1.250, contabilitate 1.500, reclamă 0 | [2026-10-06-decontari-ecazier-si-valori-decont.md](2026-10-06-decontari-ecazier-si-valori-decont.md) |
 | 2026-10-06 | 🔴 **Decont avocat: factura lunară a cabinetului înainte de dividende** — `facturaCabinet` se scade împreună cu onorariile înainte de impozitul pe dividende (pe septembrie: +200 lei pentru avocată); export septembrie verificat cu registrul central și Stripe | [2026-10-06-decont-avocat-factura-lunara.md](2026-10-06-decont-avocat-factura-lunara.md) |
 | 2026-10-05 | 🔴 **Deploy anulat când vârful push-ului e docs-only** — `ignoreCommand` compară cu `VERCEL_GIT_PREVIOUS_SHA` (ultimul deploy reușit), nu cu `HEAD^` | [2026-10-05-vercel-ignore-command.md](2026-10-05-vercel-ignore-command.md) |

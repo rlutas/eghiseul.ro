@@ -9,9 +9,13 @@ import {
   computeSettlementBreakdown,
   sumAncpiCosts,
   platformCostForRange,
-  estimatePendingOcpi,
+  pendingOcpiSummary,
+  averageOcpiBySlug,
+  estimateOrderOcpi,
   SETTLEMENT_PERIOD_START,
   LAST_SETTLEMENT,
+  DISTRIBUTIONS,
+  IDENTIFICATION_OCPI,
 } from '@/lib/collaborator/settlement';
 
 /**
@@ -172,11 +176,16 @@ export async function GET(request: NextRequest) {
     const otherCosts = ((periodCostRows ?? []) as Array<{ amount_ron: number; period_start: string }>)
       .filter((c) => (month === 'all' ? true : c.period_start.startsWith(month)))
       .reduce((s, c) => s + (Number(c.amount_ron) || 0), 0);
-    // Taxele care abia urmează pe comenzile încasate dar nelucrate.
-    const pendingOcpi = estimatePendingOcpi(
+    // Taxele care abia urmează: orice comandă încasată fără taxă înregistrată.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const taxInputs = billable.map((o: any) => ({ serviceSlug: o.serviceSlug, status: o.status, ocpiCost: o.ocpiCost }));
+    const pending = pendingOcpiSummary(taxInputs);
+    const pendingOcpi = pending.total;
+    const avgBySlug = averageOcpiBySlug(taxInputs);
+    for (const o of orders) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      billable.map((o: any) => ({ serviceSlug: o.serviceSlug, status: o.status, ocpiCost: o.ocpiCost }))
-    );
+      (o as any).ocpiEstimate = o.isTest ? 0 : estimateOrderOcpi(o, avgBySlug);
+    }
 
     const breakdown = computeSettlementBreakdown(collected, ocpiTotal, {
       stripeFees: stripeTotal,
@@ -196,6 +205,14 @@ export async function GET(request: NextRequest) {
           totalCollected: breakdown.collectedWithVat,
         },
         breakdown,
+        pendingOcpi: pending,
+        identificationOcpi: IDENTIFICATION_OCPI,
+        distributions: DISTRIBUTIONS.map((d) => ({
+          on: d.on,
+          perSideRon: d.perSideRon,
+          collaboratorCashRon: d.collaboratorCashRon,
+          collaboratorInvoicedRon: d.collaboratorInvoicedRon,
+        })),
         lastSettlement: LAST_SETTLEMENT,
       },
     });

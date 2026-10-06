@@ -65,9 +65,24 @@ export const DISTRIBUTIONS = [
     /** Colaboratorul a primit partea minus comisionul, pe care îl facturează. */
     collaboratorCashRon: 3791.61,
     collaboratorCommissionRon: 525,
+    /**
+     * What his commission invoice for this distribution actually paid out:
+     * Mirandsof SM 153, 635,25 = 525 + VAT, paid 07.09.2026. The rule since
+     * then is 15 lei WITH VAT included, so 110,25 of it counts as an advance.
+     */
+    collaboratorInvoicedRon: 635.25,
     reference: 'docs/operations/decont-mircea-2026-08-26.md',
   },
 ] as const;
+
+/** Total primit de colaborator până acum: transferuri + facturi de comision plătite. */
+export const COLLABORATOR_RECEIVED = round2(
+  DISTRIBUTIONS.reduce((sum, d) => sum + d.collaboratorCashRon + d.collaboratorInvoicedRon, 0)
+);
+/** Cât a facturat deja ca și comision (TVA inclus). */
+export const COLLABORATOR_INVOICED = round2(
+  DISTRIBUTIONS.reduce((sum, d) => sum + d.collaboratorInvoicedRon, 0)
+);
 
 /** Total distribuit fiecărei părți până acum. */
 export const DISTRIBUTED_PER_SIDE = round2(
@@ -148,6 +163,16 @@ export interface SettlementBreakdown {
   alreadyDistributed: number;
   /** Pozitiv = mai are de primit; negativ = s-a distribuit în plus. */
   toSettle: number;
+  /** Partea fiecăruia dacă se plătesc și taxele estimate care urmează. */
+  projectedSharePerSide: number;
+  /** Colaboratorul: total primit (transferuri + facturi de comision plătite). */
+  collaboratorReceived: number;
+  /** Colaboratorul: cât mai are de primit în total (parte − primit). */
+  collaboratorToReceive: number;
+  /** Din care: comision încă de facturat (TVA inclus). */
+  commissionToInvoice: number;
+  /** Din care: transfer în cont. */
+  collaboratorCashToReceive: number;
 }
 
 /**
@@ -179,6 +204,16 @@ export function computeSettlementBreakdown(
   const dividendTax = netProfit > 0 ? netProfit * DIVIDEND_TAX_RATE : 0;
   const distributable = netProfit - dividendTax;
 
+  // Same waterfall with the taxes still to pay (informative, not deducted).
+  const projectedGross = grossProfit - pendingOcpi;
+  const projectedNet = projectedGross > 0 ? projectedGross * (1 - PROFIT_TAX_RATE) : projectedGross;
+  const projectedDistributable = projectedNet > 0 ? projectedNet * (1 - DIVIDEND_TAX_RATE) : projectedNet;
+
+  // His share is paid as commission invoices (15 lei/order, VAT included)
+  // plus a transfer for the rest.
+  const collaboratorToReceive = distributable * PROFIT_SPLIT - COLLABORATOR_RECEIVED;
+  const commissionToInvoice = Math.max(0, commission - COLLABORATOR_INVOICED);
+
   return {
     collectedWithVat: round2(collected),
     netOfVat: round2(netOfVat),
@@ -199,6 +234,11 @@ export function computeSettlementBreakdown(
     collaboratorShare: round2(distributable * PROFIT_SPLIT - commission),
     alreadyDistributed: DISTRIBUTED_PER_SIDE,
     toSettle: round2(distributable * PROFIT_SPLIT - DISTRIBUTED_PER_SIDE),
+    projectedSharePerSide: round2(projectedDistributable * PROFIT_SPLIT),
+    collaboratorReceived: COLLABORATOR_RECEIVED,
+    collaboratorToReceive: round2(collaboratorToReceive),
+    commissionToInvoice: round2(commissionToInvoice),
+    collaboratorCashToReceive: round2(collaboratorToReceive - commissionToInvoice),
   };
 }
 
@@ -230,33 +270,75 @@ export function platformCostForRange(startIso: string, endIso: string): number {
   return round2((days / 30.44) * PLATFORM_COST_PER_MONTH);
 }
 
+/** Serviciile de identificare: taxa OCPI depinde de cât de departe merge cererea. */
+export const IDENTIFICATION_SLUGS = new Set(['identificare-imobil', 'identificare-imobile-proprietar']);
 /**
- * Provizion pentru taxele OCPI care ABIA URMEAZĂ: comenzile încasate dar
- * nelucrate încă nu au taxă înregistrată, așa că profitul perioadei apare mai
- * mare decât e (lecția decontului din 26.08 — 53 de comenzi nelucrate au adus
- * +1.020 lei de taxe după închiderea decontului).
- *
- * Estimarea folosește taxa medie deja plătită pe același serviciu; comenzile
- * finalizate fără taxă rămân la 0 (serviciul chiar nu are taxă la OCPI).
+ * Regula lui Raul (06.10.2026), din momentul în care prețul identificării a
+ * crescut cu 100 lei: dacă imobilul se identifică intern și Mircea scoate
+ * direct extrasul CF, taxa e 20 lei; dacă trebuie depusă cerere la OCPI,
+ * taxa e 100 lei.
+ */
+export const IDENTIFICATION_OCPI = { extrasCf: 20, cerere: 100 } as const;
+/** Statusuri în care cererea de identificare e deja depusă la OCPI. */
+const IDENTIFICATION_FILED = new Set(['identification_pending_ocpi', 'on_hold_institution']);
+const NO_TAX_DUE = new Set(['refunded', 'cancelled']);
+
+/**
+ * Taxa OCPI estimată pentru o comandă care încă n-are taxa înregistrată.
+ * Orice comandă plătită ajunge să plătească taxă la OCPI (instituția nu
+ * eliberează gratuit), inclusiv cele finalizate la care taxa n-a fost trecută.
+ * `null` = nu există o bază de estimare (serviciu fără nicio taxă înregistrată).
+ */
+export function estimateOrderOcpi(
+  order: { serviceSlug: string; status: string; ocpiCost: number },
+  avgBySlug: Map<string, number>
+): number | null {
+  if (order.ocpiCost > 0 || NO_TAX_DUE.has(order.status)) return 0;
+  if (IDENTIFICATION_SLUGS.has(order.serviceSlug)) {
+    return IDENTIFICATION_FILED.has(order.status) ? IDENTIFICATION_OCPI.cerere : IDENTIFICATION_OCPI.extrasCf;
+  }
+  return avgBySlug.get(order.serviceSlug) ?? null;
+}
+
+/** Taxa medie deja plătită, per serviciu (doar rândurile cu taxă > 0). */
+export function averageOcpiBySlug(
+  orders: { serviceSlug: string; ocpiCost: number }[]
+): Map<string, number> {
+  const acc = new Map<string, { sum: number; n: number }>();
+  for (const o of orders) {
+    if (!(o.ocpiCost > 0)) continue;
+    const a = acc.get(o.serviceSlug) ?? { sum: 0, n: 0 };
+    a.sum += o.ocpiCost;
+    a.n += 1;
+    acc.set(o.serviceSlug, a);
+  }
+  return new Map([...acc].map(([k, a]) => [k, a.sum / a.n]));
+}
+
+/**
+ * Taxele OCPI care ABIA URMEAZĂ să fie plătite: toate comenzile încasate fără
+ * taxă înregistrată. Informativ — nu se scad din profit (decontul e cumulativ,
+ * taxa intră când e plătită), dar se arată ca să se știe că urmează.
  */
 export function estimatePendingOcpi(
   orders: { serviceSlug: string; status: string; ocpiCost: number }[]
 ): number {
-  const avg = new Map<string, { sum: number; n: number }>();
-  for (const o of orders) {
-    if (!(o.ocpiCost > 0)) continue;
-    const a = avg.get(o.serviceSlug) ?? { sum: 0, n: 0 };
-    a.sum += o.ocpiCost;
-    a.n += 1;
-    avg.set(o.serviceSlug, a);
-  }
-  const SETTLED = new Set(['completed', 'delivered', 'refunded', 'cancelled']);
+  return pendingOcpiSummary(orders).total;
+}
+
+export function pendingOcpiSummary(
+  orders: { serviceSlug: string; status: string; ocpiCost: number }[]
+): { total: number; count: number; unknownCount: number } {
+  const avg = averageOcpiBySlug(orders);
   let total = 0;
+  let count = 0;
+  let unknownCount = 0;
   for (const o of orders) {
-    if (o.ocpiCost > 0 || SETTLED.has(o.status)) continue;
-    const a = avg.get(o.serviceSlug);
-    if (!a) continue;
-    total += a.sum / a.n;
+    if (o.ocpiCost > 0 || NO_TAX_DUE.has(o.status)) continue;
+    count += 1;
+    const est = estimateOrderOcpi(o, avg);
+    if (est === null) unknownCount += 1;
+    else total += est;
   }
-  return round2(total);
+  return { total: round2(total), count, unknownCount };
 }

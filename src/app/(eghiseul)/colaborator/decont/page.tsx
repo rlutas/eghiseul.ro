@@ -16,6 +16,8 @@ interface EarningOrder {
   paidAt: string | null;
   clientTotal: number;
   ocpiCost: number;
+  /** Taxa estimată când nu e încă înregistrată; null = de completat. */
+  ocpiEstimate?: number | null;
   isTest: boolean;
 }
 
@@ -39,6 +41,11 @@ interface Breakdown {
   collaboratorShare: number;
   alreadyDistributed: number;
   toSettle: number;
+  projectedSharePerSide: number;
+  collaboratorReceived: number;
+  collaboratorToReceive: number;
+  commissionToInvoice: number;
+  collaboratorCashToReceive: number;
 }
 
 interface EarningsData {
@@ -46,6 +53,9 @@ interface EarningsData {
   orders: EarningOrder[];
   summary: { count: number; totalCollected: number };
   breakdown: Breakdown;
+  pendingOcpi: { total: number; count: number; unknownCount: number };
+  identificationOcpi: { extrasCf: number; cerere: number };
+  distributions: { on: string; perSideRon: number; collaboratorCashRon: number; collaboratorInvoicedRon: number }[];
   lastSettlement: {
     settledOn: string;
     cutoffFriendlyOrderId: string;
@@ -85,7 +95,7 @@ export default function CollaboratorDecontPage() {
 function CollaboratorDecontInner() {
   const previewAs = usePreviewAs();
   const months = useMemo(monthOptions, []);
-  const [month, setMonth] = useState(months[0]!.value);
+  const [month, setMonth] = useState('all');
   const [data, setData] = useState<EarningsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -178,8 +188,6 @@ function CollaboratorDecontInner() {
               ['Partea ta (50%)', b.sharePerSide, ''],
               ['− Comision 15 lei/comandă (îl facturezi separat)', -b.commission, ''],
               ['= Rest de primit din profit', b.collaboratorShare, 'font-semibold'],
-              ['Distribuit deja', -b.alreadyDistributed, ''],
-              [b.toSettle >= 0 ? '= De primit la decontul următor' : '= De reglat la decontul următor', b.toSettle, 'font-semibold'],
             ] as [string, number, string][]).map(([label, value, cls]) => (
               <div key={label} className="flex items-center justify-between py-1.5">
                 <dt className={`text-slate-600 ${cls}`}>{label}</dt>
@@ -200,6 +208,74 @@ function CollaboratorDecontInner() {
               {lei(data.lastSettlement.sharePerSideRon)} de fiecare parte.
             </p>
           )}
+        </div>
+      )}
+
+      {!loading && b && data && data.pendingOcpi.count > 0 && (
+        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-5 text-sm">
+          <h2 className="mb-2 font-semibold text-amber-900">Taxe OCPI care urmează să fie plătite</h2>
+          <p className="text-amber-900">
+            {data.pendingOcpi.count} {data.pendingOcpi.count === 1 ? 'comandă încasată nu are' : 'comenzi încasate nu au'} încă
+            taxa OCPI trecută. Instituția nu eliberează gratuit, deci taxa se plătește oricum, chiar dacă dosarul
+            se rezolvă abia luna viitoare. Estimat: <strong>{lei(data.pendingOcpi.total)}</strong>
+            {data.pendingOcpi.unknownCount > 0 && (
+              <> plus {data.pendingOcpi.unknownCount} {data.pendingOcpi.unknownCount === 1 ? 'comandă' : 'comenzi'} fără bază de estimare (de completat)</>
+            )}
+            .
+          </p>
+          <p className="mt-2 text-amber-900">
+            Identificări: <strong>{data.identificationOcpi.extrasCf} lei</strong> dacă imobilul se identifică și scoți
+            direct extrasul CF, <strong>{data.identificationOcpi.cerere} lei</strong> dacă trebuie depusă cerere la OCPI.
+          </p>
+          <p className="mt-2 text-amber-900">
+            Taxele intră în calcul când le treci pe comandă. Dacă se plătesc toate, partea fiecăruia ar fi{' '}
+            <strong>{lei(b.projectedSharePerSide)}</strong> (acum {lei(b.sharePerSide)}). În tabel, comenzile fără taxă apar cu
+            suma estimată, în portocaliu.
+          </p>
+        </div>
+      )}
+
+      {!loading && b && data && month === 'all' && (
+        <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5 text-sm">
+          <h2 className="mb-3 font-semibold text-slate-900">Plăți către tine</h2>
+          <table className="mb-3 w-full">
+            <thead className="text-left text-xs uppercase text-slate-500">
+              <tr>
+                <th className="py-1">Decont</th>
+                <th className="py-1 text-right">Transfer</th>
+                <th className="py-1 text-right">Factură comision</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {data.distributions.map((d) => (
+                <tr key={d.on}>
+                  <td className="py-1.5">{new Date(d.on).toLocaleDateString('ro-RO')}</td>
+                  <td className="py-1.5 text-right tabular-nums">{lei(d.collaboratorCashRon)}</td>
+                  <td className="py-1.5 text-right tabular-nums">{lei(d.collaboratorInvoicedRon)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <dl className="divide-y divide-slate-100">
+            {([
+              ['Partea ta, toată perioada (50%)', b.sharePerSide, ''],
+              ['− Primit deja (transferuri + facturi)', -b.collaboratorReceived, ''],
+              [b.collaboratorToReceive >= 0 ? '= Mai ai de primit' : '= Primit în plus', b.collaboratorToReceive, 'font-semibold'],
+              ['  din care factură de comision (15 lei/comandă, TVA inclus)', b.commissionToInvoice, ''],
+              ['  din care transfer în cont', b.collaboratorCashToReceive, ''],
+            ] as [string, number, string][]).map(([label, value, cls]) => (
+              <div key={label} className="flex items-center justify-between py-1.5">
+                <dt className={`text-slate-600 ${cls}`}>{label}</dt>
+                <dd className={`tabular-nums text-slate-900 ${cls}`}>
+                  {value < 0 ? `−${lei(Math.abs(value))}` : lei(value)}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-2 text-xs text-slate-400">
+            Decontul e cumulat de la 07.07.2026: orice taxă care intră mai târziu corectează automat suma de aici.
+            Ce s-a plătit în plus la un decont anterior se scade singur.
+          </p>
         </div>
       )}
 
@@ -250,7 +326,11 @@ function CollaboratorDecontInner() {
                     {o.isTest ? '—' : lei(o.clientTotal)}
                   </td>
                   <td className="px-4 py-3 text-right text-slate-600">
-                    {o.isTest ? '—' : o.ocpiCost > 0 ? lei(o.ocpiCost) : <span className="text-slate-300">—</span>}
+                    {o.isTest ? '—' : o.ocpiCost > 0 ? lei(o.ocpiCost) : o.ocpiEstimate ? (
+                      <span className="text-amber-600" title="Taxa nu e încă trecută pe comandă; sumă estimată">~{lei(o.ocpiEstimate)}</span>
+                    ) : o.ocpiEstimate === null ? (
+                      <span className="text-amber-600">de completat</span>
+                    ) : <span className="text-slate-300">—</span>}
                   </td>
                 </tr>
               ))}
