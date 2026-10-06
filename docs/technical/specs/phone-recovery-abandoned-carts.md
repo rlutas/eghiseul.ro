@@ -66,7 +66,9 @@ partajat acum cu cronul) și o sortează pentru un om, nu pentru un cron:
 recență — vezi „Coada, a treia rundă" mai jos pentru motivație.
 
 `?includeContacted=1` arată și comenzile deja sunate (implicit ascunse).
-Răspunsul include `conversion: { contactedTotal, contactedConverted }` —
+> **Înlocuit 06.10.2026:** `conversion` a ieșit; vezi secțiunea „Recuperate și KPI”.
+
+Răspunsul includea `conversion: { contactedTotal, contactedConverted }` —
 proxy simplu: din toate comenzile sunate vreodată, câte au ieșit din
 `draft`/`abandoned`/`cancelled` (= au dus comanda mai departe).
 
@@ -121,6 +123,17 @@ Dialogul „Bifează sunat" are acum și „Ai oferit o reducere la telefon?":
   discount, email_status }`.
 - Butonul „Cupon" (→ `/admin/coupons` precompletat) rămâne pentru cupoane
   fixe (sumă) sau cu altă valabilitate.
+
+## Recuperate și KPI (06.10.2026)
+
+Clientul sunat plătește aproape mereu pe o comandă **nouă**, deci comanda sunată rămânea „neplătită” și vechiul indicator de conversie (comanda sunată a ieșit din draft/abandoned) arăta 0. Acum potrivirea se face pe email (`src/lib/orders/phone-recovery-wins.ts`):
+
+- **Recuperată** = există o comandă plătită cu același email (lowercase `customer_data.contact.email`) cu `paid_at` după apel minus o zi. Fereastra: apelurile din ultimele 90 de zile.
+- **Ascunsă din „De sunat”**: orice comandă din coadă al cărei client a plătit între timp altă comandă (`paid_at` după crearea comenzii abandonate, fără toleranță), sunată sau nu.
+- Răspunsul API are `recovered[]` (comanda sunată + comanda plătită: id, număr, sumă, dată) și `kpi: { calls7, calls30, recovered, recoveredLei, unpaidNoCall7 }`. `recovered`/`recoveredLei` numără o dată fiecare comandă plătită (două apeluri la același client = o recuperare).
+- UI: 4 carduri sus (apeluri 7/30 zile, au plătit după apel + lei, nesunate în ultimele 7 zile, rata de recuperare) și tabul „✅ Recuperate” lângă „De sunat”.
+
+Cifre la 06.10.2026 (citire producție): 20 de apeluri în 30 de zile, 4 în ultimele 7; 2 comenzi plătite după apel, 1.744,80 lei; în coadă 20 de clienți nesunați (3 din ultimele 7 zile), 4 ascunși pentru că au plătit pe altă comandă.
 
 ## UI — `/admin/recuperare-telefonica`
 

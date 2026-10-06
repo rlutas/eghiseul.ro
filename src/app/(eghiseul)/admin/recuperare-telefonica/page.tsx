@@ -51,6 +51,35 @@ interface PriorityRow {
   freshness: 0 | 1 | 2;
 }
 
+interface RecoveredRow {
+  id: string;
+  friendlyOrderId: string | null;
+  serviceName: string;
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+  phone: string | null;
+  phoneContactedAt: string;
+  phoneContactedBy: string | null;
+  phoneContactNotes: string | null;
+  paidOrderId: string;
+  paidOrderRef: string;
+  paidTotalRon: number;
+  paidAt: string;
+}
+
+interface Kpi {
+  calls7: number;
+  calls30: number;
+  recovered: number;
+  recoveredLei: number;
+  unpaidNoCall7: number;
+}
+
+const fmtLei = (n: number) => n.toLocaleString('ro-RO', { maximumFractionDigits: 0 });
+const fmtDate = (iso: string) =>
+  new Date(iso).toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', timeZone: 'Europe/Bucharest' });
+
 function timeAgo(iso: string): string {
   const ms = Date.now() - new Date(iso).getTime();
   const hours = Math.floor(ms / 3_600_000);
@@ -81,7 +110,9 @@ export default function RecuperareTelefonicaPage() {
   const [rows, setRows] = useState<PriorityRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [includeContacted, setIncludeContacted] = useState(false);
-  const [conversion, setConversion] = useState<{ contactedTotal: number; contactedConverted: number } | null>(null);
+  const [kpi, setKpi] = useState<Kpi | null>(null);
+  const [recovered, setRecovered] = useState<RecoveredRow[]>([]);
+  const [view, setView] = useState<'open' | 'recovered'>('open');
   const [contactTarget, setContactTarget] = useState<PriorityRow | null>(null);
   const [notes, setNotes] = useState('');
   const [discountPercent, setDiscountPercent] = useState('');
@@ -98,7 +129,8 @@ export default function RecuperareTelefonicaPage() {
       const json = await res.json();
       if (json.success) {
         setRows(json.data.rows);
-        setConversion(json.data.conversion);
+        setKpi(json.data.kpi ?? null);
+        setRecovered(json.data.recovered ?? []);
       } else {
         toast.error(json.error?.message || 'Eroare la încărcare');
       }
@@ -164,10 +196,6 @@ export default function RecuperareTelefonicaPage() {
     }
   };
 
-  const conversionPct =
-    conversion && conversion.contactedTotal > 0
-      ? Math.round((conversion.contactedConverted / conversion.contactedTotal) * 100)
-      : null;
 
   return (
     <div className="space-y-5">
@@ -180,9 +208,6 @@ export default function RecuperareTelefonicaPage() {
           <p className="mt-0.5 text-sm text-slate-500">
             {rows.length} {rows.length === 1 ? 'client' : 'clienți'} de sunat (ultimele 30 zile, un rând per email) · prioritate:
             telefon străin + stare civilă, apoi cele din ultimele 24 h, apoi cine a completat mai mult.
-            {conversionPct !== null && (
-              <> · conversie după apel: <strong>{conversionPct}%</strong> ({conversion?.contactedConverted}/{conversion?.contactedTotal})</>
-            )}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -200,7 +225,102 @@ export default function RecuperareTelefonicaPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border bg-white">
+      {kpi && (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="rounded-lg border bg-white p-3">
+            <div className="text-xs text-slate-500">Apeluri</div>
+            <div className="text-xl font-bold text-slate-900">{kpi.calls7} <span className="text-sm font-normal text-slate-500">în 7 zile</span></div>
+            <div className="text-xs text-slate-500">{kpi.calls30} în 30 de zile</div>
+          </div>
+          <div className="rounded-lg border border-green-200 bg-green-50 p-3">
+            <div className="text-xs text-green-800">Au plătit după apel</div>
+            <div className="text-xl font-bold text-green-900">{kpi.recovered} {kpi.recovered === 1 ? 'client' : 'clienți'}</div>
+            <div className="text-xs text-green-800">{fmtLei(kpi.recoveredLei)} lei recuperați (90 de zile)</div>
+          </div>
+          <div className={`rounded-lg border p-3 ${kpi.unpaidNoCall7 > 0 ? 'border-amber-200 bg-amber-50' : 'bg-white'}`}>
+            <div className="text-xs text-amber-800">Nesunate, ultimele 7 zile</div>
+            <div className="text-xl font-bold text-amber-900">{kpi.unpaidNoCall7}</div>
+            <div className="text-xs text-amber-800">comenzi neplătite fără apel</div>
+          </div>
+          <div className="rounded-lg border bg-white p-3">
+            <div className="text-xs text-slate-500">Rata de recuperare</div>
+            <div className="text-xl font-bold text-slate-900">
+              {kpi.calls30 > 0 ? `${Math.round((kpi.recovered / kpi.calls30) * 100)}%` : '—'}
+            </div>
+            <div className="text-xs text-slate-500">clienți care au plătit / apeluri în 30 de zile</div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex gap-2">
+        <Button variant={view === 'open' ? 'default' : 'outline'} size="sm" onClick={() => setView('open')}>
+          De sunat ({rows.length})
+        </Button>
+        <Button variant={view === 'recovered' ? 'default' : 'outline'} size="sm" onClick={() => setView('recovered')}>
+          ✅ Recuperate ({recovered.length})
+        </Button>
+      </div>
+
+      {view === 'recovered' && (
+        <div className="rounded-lg border bg-white">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b text-left text-xs text-slate-500">
+                <th className="px-3 py-2">Client</th>
+                <th className="px-3 py-2">Serviciu sunat</th>
+                <th className="px-3 py-2">Apel</th>
+                <th className="px-3 py-2">A plătit</th>
+                <th className="px-3 py-2 text-right">Acțiuni</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recovered.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-3 py-10 text-center text-muted-foreground">
+                    Niciun client recuperat în ultimele 90 de zile.
+                  </td>
+                </tr>
+              ) : (
+                recovered.map((r) => (
+                  <tr key={r.id} className="border-b last:border-0 hover:bg-slate-50">
+                    <td className="px-3 py-2">
+                      <div className="font-medium text-slate-900">
+                        {[r.firstName, r.lastName].filter(Boolean).join(' ') || '—'}
+                      </div>
+                      <div className="text-xs text-muted-foreground">{r.email}</div>
+                    </td>
+                    <td className="px-3 py-2">{r.serviceName}</td>
+                    <td className="px-3 py-2 text-xs text-muted-foreground">
+                      {fmtDate(r.phoneContactedAt)}
+                      {r.phoneContactedBy ? ` · ${r.phoneContactedBy}` : ''}
+                      {r.phoneContactNotes && (
+                        <div className="max-w-[220px] truncate" title={r.phoneContactNotes}>{r.phoneContactNotes}</div>
+                      )}
+                    </td>
+                    <td className="px-3 py-2">
+                      <span className="inline-flex items-center gap-1 rounded bg-green-50 px-1.5 py-0.5 text-xs font-semibold text-green-800">
+                        ✅ A plătit după apel · {fmtLei(r.paidTotalRon)} lei · {r.paidOrderRef}
+                      </span>
+                      <div className="text-[11px] text-muted-foreground">pe {fmtDate(r.paidAt)}</div>
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <a
+                        href={`/admin/orders/${r.paidOrderId}`}
+                        className="inline-flex h-8 items-center gap-1 rounded-md border px-2 text-xs hover:bg-slate-50"
+                        title="Deschide comanda plătită"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <div className={`rounded-lg border bg-white ${view === 'open' ? '' : 'hidden'}`}>
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b text-left text-xs text-slate-500">

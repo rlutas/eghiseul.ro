@@ -37,8 +37,16 @@ import {
   identifiableName,
 } from '@/lib/orders/abandoned-progress';
 import { isSuspiciousEmail, isUndeliverable } from '@/lib/email/deliverability';
+import {
+  buildPaidIndex,
+  findPaymentAfter,
+  summarizeCalls,
+  type PaidOrderRef,
+} from '@/lib/orders/phone-recovery-wins';
 
 const MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+/** Recovered calls are looked up this far back (calls started 16.09.2026). */
+const RECOVERY_LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
 
 // Servicii de stare civilă — prioritate mare: diaspora, termene de ambasadă/
 // oficiu stare civilă, valoare/urgență ridicată (cercetare telefon vs email).
@@ -73,6 +81,23 @@ interface PriorityRow {
   duplicateCount: number;
   /** 0 = <24 h, 1 = <72 h, 2 = mai vechi. */
   freshness: 0 | 1 | 2;
+}
+
+interface RecoveredRow {
+  id: string;
+  friendlyOrderId: string | null;
+  serviceName: string;
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+  phone: string | null;
+  phoneContactedAt: string;
+  phoneContactedBy: string | null;
+  phoneContactNotes: string | null;
+  paidOrderId: string;
+  paidOrderRef: string;
+  paidTotalRon: number;
+  paidAt: string;
 }
 
 const DAY = 86_400_000;
@@ -130,6 +155,26 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // Paid orders of the lookback window, indexed by email: a client who paid on
+  // ANOTHER order after starting this one is not someone to call any more.
+  const lookbackIso = new Date(Date.now() - RECOVERY_LOOKBACK_MS).toISOString();
+  const { data: paidRows } = await admin
+    .from('orders')
+    .select('id, friendly_order_id, order_number, total_price, paid_at, email:customer_data->contact->>email')
+    .eq('payment_status', 'paid')
+    .gte('paid_at', lookbackIso)
+    .limit(5000);
+  const paidIndex = buildPaidIndex(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((paidRows ?? []) as any[]).map((p) => ({
+      email: p.email ?? '',
+      paidAt: p.paid_at,
+      totalRon: Number(p.total_price ?? 0),
+      ref: p.friendly_order_id ?? p.order_number ?? String(p.id).slice(0, 8),
+      orderId: p.id,
+    })) as PaidOrderRef[]
+  );
+
   const rows: PriorityRow[] = [];
   for (const order of data ?? []) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -146,6 +191,16 @@ export async function GET(request: NextRequest) {
     const email = ((cd.contact?.email ?? '') as string).trim().toLowerCase() || null;
     if (email && (isUndeliverable(email) || isSuspiciousEmail(email))) {
       continue; // adresă inventată — apelul ar fi pe un „client" fictiv
+    }
+    // Already paid on another order (on their own or after a call): not „de sunat".
+    const paidLater = findPaymentAfter(
+      paidIndex,
+      email,
+      order.phone_contacted_at ?? order.created_at,
+      order.phone_contacted_at ? undefined : 0
+    );
+    if (paidLater) {
+      continue;
     }
     const phone = (cd.contact?.phone ?? null) as string | null;
     const foreign = isForeignPhone(phone);
@@ -211,21 +266,61 @@ export async function GET(request: NextRequest) {
   rows.length = 0;
   rows.push(...deduped);
 
-  // Conversie: din toate comenzile sunate vreodată (orice vechime, orice
-  // status), câte au ieșit din draft/abandoned = au dus comanda mai departe.
-  // Proxy simplu — nu urmărim apeluri individuale, doar bifa curentă.
-  // `from()` nou pentru fiecare: builder-ul postgrest-js își mută URL-ul la
-  // fiecare filtru, deci refolosirea lui `ordersTable` ar moșteni filtrele
-  // cozii (status/vechime/limit) și ar da mereu 0.
-  const { count: contactedTotal } = await admin
+  // Calls of the lookback window: who paid afterwards (on any order, usually a
+  // new one) is a recovery, shown in its own list instead of the open queue.
+  const { data: contactedRows } = await admin
     .from('orders')
-    .select('id', { count: 'exact', head: true })
-    .not('phone_contacted_at', 'is', null);
-  const { count: contactedConverted } = await admin
-    .from('orders')
-    .select('id', { count: 'exact', head: true })
+    .select('id, friendly_order_id, customer_data, phone_contacted_at, phone_contacted_by, phone_contact_notes, services(name)')
     .not('phone_contacted_at', 'is', null)
-    .not('status', 'in', '(draft,abandoned,cancelled)');
+    .gte('phone_contacted_at', lookbackIso)
+    .order('phone_contacted_at', { ascending: false })
+    .limit(1000);
+  const contacted = (contactedRows ?? []) as unknown as Array<{
+    id: string;
+    friendly_order_id: string | null;
+    customer_data: unknown;
+    phone_contacted_at: string;
+    phone_contacted_by: string | null;
+    phone_contact_notes: string | null;
+    services: { name: string } | null;
+  }>;
+  const recovered: RecoveredRow[] = [];
+  for (const c of contacted) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cd = (c.customer_data ?? {}) as any;
+    const email = ((cd.contact?.email ?? '') as string).trim().toLowerCase() || null;
+    const paid = findPaymentAfter(paidIndex, email, c.phone_contacted_at);
+    if (!paid) continue;
+    const name = identifiableName(c.customer_data);
+    recovered.push({
+      id: c.id,
+      friendlyOrderId: c.friendly_order_id,
+      serviceName: c.services?.name ?? 'necunoscut',
+      firstName: name?.firstName || null,
+      lastName: name?.lastName || null,
+      email,
+      phone: (cd.contact?.phone ?? null) as string | null,
+      phoneContactedAt: c.phone_contacted_at,
+      phoneContactedBy: c.phone_contacted_by,
+      phoneContactNotes: c.phone_contact_notes,
+      paidOrderId: paid.orderId,
+      paidOrderRef: paid.ref,
+      paidTotalRon: paid.totalRon,
+      paidAt: paid.paidAt,
+    });
+  }
+  const callStats = summarizeCalls(
+    contacted.map((c) => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      email: ((c.customer_data as any)?.contact?.email ?? null) as string | null,
+      phoneContactedAt: c.phone_contacted_at,
+    })),
+    paidIndex
+  );
+  const weekAgo = Date.now() - 7 * 86_400_000;
+  const unpaidNoCall7 = rows.filter(
+    (r) => !r.phoneContactedAt && new Date(r.createdAt).getTime() >= weekAgo
+  ).length;
 
   return NextResponse.json({
     success: true,
@@ -237,9 +332,10 @@ export async function GET(request: NextRequest) {
         tier1: rows.filter((r) => r.tier === 1).length,
         tier0: rows.filter((r) => r.tier === 0).length,
       },
-      conversion: {
-        contactedTotal: contactedTotal ?? 0,
-        contactedConverted: contactedConverted ?? 0,
+      recovered,
+      kpi: {
+        ...callStats,
+        unpaidNoCall7,
       },
     },
   });
