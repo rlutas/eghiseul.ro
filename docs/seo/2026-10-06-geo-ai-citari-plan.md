@@ -129,3 +129,17 @@ Regulile din `.claude/rules/content-and-seo.md` rămân: fără date inventate, 
 - Prima comparație: 06.11.2026 (o lună de date CJO).
 
 Surse: legăturile din tabelul de la §1 (accesate 06.10.2026).
+
+## Anexă 06.10: Bing „AI Performance” (Copilot + parteneri), ultimele 3 luni
+
+**eghiseul.ro:** 70.700 de citări, în medie 45 de pagini citate pe zi, 399 de întrebări.
+- Domină calculatoarele: „calcul salariu net” 6.700 (10,8% din citările pe acea întrebare), „calculator tva” 2.200, „verificare rovinieta” 2.100, „calculator termene judiciare” 1.400 (21,8%).
+- Pe documente: „certificat casatorie” 898 (27,7%), „certificat de integritate comportamentala” 695 (36,5%), „certificat de casatorie” 581 (25,5%).
+
+**cazierjudiciaronline.com:** 1.900 de citări, ~5 pagini pe zi, 16 întrebări. Cele mai citate:
+- „cazier judiciar persoana juridica” 94 (17,1%), „cazier judiciar online persoane juridice” 70 (27,6%);
+- valabilitatea: „valabilitate cazier judiciar” 89 (37,1%), „cat este valabil cazierul judiciar” 32 (26,9%), „cazier judiciar valabilitate” 9 (64,3%);
+- „cazier fiscal persoana juridica” 12 (100%) — pagina care acum explică faptul că facem doar persoane fizice;
+- „formular cerere cazier judiciar” 6 (100%), „program cazier judiciar bucuresti” 19.
+
+**Ce înseamnă:** Copilot ne citează deja mult, mai ales pe întrebări de tip „cât e valabil”, „ce acte”, „cum calculez”. Paginile de valabilitate și cele pentru persoane juridice sunt cele mai citate pe CJO, deci acolo merită blocurile de răspuns și data de actualizare. Raportul nu arată clicurile din AI; comenzile din AI le vedem în `orders.attribution` (canal `ai_assistant`).
