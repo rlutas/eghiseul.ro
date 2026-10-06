@@ -19,10 +19,11 @@ Pașii tehnici (script, voce, randare, comprimare) sunt în `README.md` din proi
 1. Hook în primele 2 secunde: întrebarea pe care o pune omul („Ți-a cerut angajatorul cazier și nu știi dacă cel vechi mai e bun?”).
 2. Răspunsul, imediat.
 3. Detaliile, câte o idee pe cadru, cadre de 2–6 secunde.
-4. „La ghișeu vs. online prin noi”, corect în ambele sensuri: la ghișeu e gratuit, dar cu drum, coadă, program limitat, uneori trebuie să revii; prin noi: online, fără drum, avocatul depune și ridică, scan pe email, originalul prin curier oriunde, apostilă/traducere în aceeași comandă.
+4. „La ghișeu vs. online prin noi” (la diaspora: „consulat sau procură vs. online”; la ANAF: „ghișeu sau SPV vs. online”), corect în ambele sensuri: la ghișeu e gratuit, dar cu drum, coadă, program limitat, uneori trebuie să revii; prin noi: online, fără drum, avocatul depune și ridică, scan pe email, originalul prin curier oriunde, apostilă/traducere în aceeași comandă.
 5. Card de preț și termen: „de la X lei” cu termenul standard · varianta urgentă pe rândul ei, cu prețul ei · rating Google din `SOCIAL_PROOF`.
 6. Opțiunile din aceeași comandă, când contează, **fără prețuri** (prețurile stau pe site; singurul preț din clip e cardul de la pasul 5). La cazier: Apostila de la Haga, Traducere autorizată, Legalizare notarială, Apostilă notarială (pe documente), Livrare oriunde în străinătate.
 7. Final: „Îl comanzi online pe eghiseul.ro”, „Abonează-te”, mențiunea de serviciu privat. Pe Shorts: hook → răspuns → ghișeu vs. online → preț → final.
+8. Pentru firme sau limitări ale serviciului, spunem limita deschis (ex.: cazierul fiscal prin noi doar pentru persoane fizice; pentru firmă se cere pe numele asociatului sau al administratorului; supralegalizarea nu o facem).
 
 ## Text pe ecran și animație
 
@@ -62,16 +63,19 @@ Pentru urcarea din browser (limită 10 MB pe fișier), fișierele se comprimă l
 
 - YouTube (canalul eGhiseul, @eghiseul, personalizat pe 06.10): titlu ≤ 70 de caractere, descriere cu capitole, surse și link cu `utm_source=youtube&utm_medium=video&utm_campaign=<slug>`, taguri, miniatură, `.srt`, elemente de final pe ultimele ~11 s (cardul de final). Clipul se urcă întâi ca privat, Raul îl aprobă, apoi devine public.
 - Facebook + Instagram: din Meta Business Suite, pagina EGhiseul cu postare pe Instagram în același timp; format 4:5 sau 9:16; link în comentariu/bio, cu UTM. Necesită login Facebook în browser.
-- Comenzile din clipuri se văd în admin la canalul „social · youtube”.
+- Capitolele YouTube: pornesc de la 0:00, minimum 3, fiecare de cel puțin 10 s; hook-ul nu primește capitol (capitolele prea scurte le sare automat exportul).
+- Fiecare clip lung dă și 2–3 **Reels reciclate** (25–45 s, din scenele lui, fără voce nouă), cu text și link propriu (`utm_content=<tăietura>`). Detalii și calendar: [plan-postari-video-2026-10.md](plan-postari-video-2026-10.md).
+- Textele pentru Shorts, Facebook și Instagram (hook + 2–3 rânduri + link cu UTM + hashtaguri) se generează odată cu descrierea YouTube; pe Instagram linkul merge în primul comentariu.
+- Comenzile din clipuri se văd în admin la canalul „social”, cu sursa `youtube`, `facebook` sau `instagram`.
 
 ## Ritm și subiecte
 
-1–2 clipuri lungi + 3 Shorts pe săptămână. Subiecte, după cerere (citări AI, căutări, comenzi):
+2 clipuri lungi + 3–4 Shorts/Reels pe săptămână (calendarul pe octombrie: [plan-postari-video-2026-10.md](plan-postari-video-2026-10.md)). Subiecte, după cerere (citări AI, căutări, comenzi):
 
-1. Cât e valabil cazierul judiciar (gata, în test)
-2. Cazierul judiciar din străinătate: consulat, procură sau online prin avocat
+1. Cât e valabil cazierul judiciar (gata, aprobat)
+2. Cazierul judiciar din străinătate: consulat, procură sau online prin avocat (gata)
 3. Cazierul pentru cetățenie, rezidență sau muncă în străinătate (apostilă + traducere)
-4. Cazierul fiscal: sancțiuni, nu datorii; valabil 30 de zile
+4. Cazierul fiscal: sancțiuni, nu datorii; valabil 30 de zile (gata)
 5. Certificatul de integritate comportamentală: cine îl cere
 6. Certificatul de căsătorie: duplicat și din străinătate
 7. Extrasul multilingv: în ce 23 de state merge fără traducere
@@ -83,5 +87,5 @@ Pentru urcarea din browser (limită 10 MB pe fișier), fișierele se comprimă l
 
 ## Ce rămâne de făcut (06.10, seara)
 
-- Refacerea celorlalte 2 clipuri și a trailerului cu vocea standard, apoi urcarea pe YouTube (o ciornă privată veche e deja în Studio și trebuie înlocuită).
+- Urcarea pe YouTube a celor 3 clipuri și a trailerului, refăcute cu vocea standard (o ciornă privată veche e deja în Studio și trebuie înlocuită), după calendarul din [plan-postari-video-2026-10.md](plan-postari-video-2026-10.md).
 - Facebook/Instagram după login în Meta Business Suite.
