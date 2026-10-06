@@ -139,8 +139,8 @@ Cota e de circa 10 cereri pe zi pentru fiecare proprietate.
 
 | # | Ce | De ce | Stare |
 |---|---|---|---|
-| H1 | **CJO: emailuri lifecycle** (reminder la 6 luni când expiră cazierul, cerere de recenzie, cross-sell spre fiscal/auto) | CJO are ~110 clienți pe lună și nu le trimite nimic după livrare (crons doar abandon + auto-complete). Pe eghiseul expirarea a adus deja o comandă plătită. Cost de achiziție zero | ⬜ |
+| H1 | **CJO: emailuri lifecycle** (reminder la 6 luni când expiră cazierul, cerere de recenzie, cross-sell spre fiscal/auto) | CJO are ~110 clienți pe lună și nu le trimite nimic după livrare (crons doar abandon + auto-complete). Pe eghiseul expirarea a adus deja o comandă plătită. Cost de achiziție zero | 🔄 06.10: construit (expirare, recenzie pe profilul eGhiseul.ro, cross-sell), testat, simulare: 22/12/16 în prima zi; ⏸ așteaptă migrarea 035 pe DB-ul CJO (Raul), apoi pornim doar expirare + recenzie |
 | H2 | **CJO: audit de conversie pe paginile de oraș** (de la vizită la începerea comenzii: prețul și butonul deasupra pliului, termen, ce primești) | 73% din cei care încep plătesc; pierderea e înainte de formular | ⬜ |
-| H3 | **ecazier: titlu și descriere pe paginile de cazier auto** (pozițiile 4–8, deci CTR-ul e pârghia, ca la C2) | singurul serviciu unde ecazier e aproape de prima pagină | ⬜ |
+| H3 | **ecazier: titlu și descriere pe paginile de cazier auto** (pozițiile 4–8, deci CTR-ul e pârghia, ca la C2) | singurul serviciu unde ecazier e aproape de prima pagină | ✅ 06.10 live (8 pagini cazier auto; „documentul oficial” scos de pe ecazier) |
 | H4 | documentero: E3 (apostila, 830 → 1.400+ cuvinte) și E4 (linkuri în text din articolele eghiseul despre stare civilă) | ghiduri 1–2/săpt., regula 2 | ✅ 06.10 |
 | H5 | Warm-up 600/zi (B3) | condițiile sunt îndeplinite | ⬜ 07.10 |
