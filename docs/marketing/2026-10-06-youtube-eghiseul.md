@@ -1,60 +1,82 @@
-# Canalul YouTube eGhiseul.ro: setup, primele 3 clipuri și cum măsurăm
+# Canalul YouTube eGhiseul.ro: setup, primele clipuri și cum măsurăm
 
 De ce: mențiunile brandului pe YouTube sunt cel mai puternic semnal măsurat pentru a fi citat de asistenții AI (vezi `docs/seo/2026-10-06-geo-ai-citari-plan.md`). Clipurile sunt informative, nu reclame: răspund la întrebările pe care oamenii le pun deja, cu faptele de pe paginile noastre, și se termină cu un cadru scurt eghiseul.ro.
 
-Proiectul video (Remotion) e în `/Users/raul/Projects/eghiseul-videos` (repo git separat). Scripturile stau într-un singur fișier, `src/data/videos.ts`, iar fiecare fapt are sursa listată. Fișierele randate sunt în `out/<id>/`.
+Proiectul video (Remotion) e în `/Users/raul/Projects/eghiseul-videos` (repo git separat).
+- **Versiunea 2 (cea de urcat):** scripturile în `src/v2/data.ts`, fișierele randate în `out/v2/<id>/`, kitul de canal în `out/branding/`.
+- Versiunea 1 (doar text, fără sunet) a rămas în `out/<id>/`; nu se mai folosește.
+
+## Ce e nou în versiunea 2
+
+- **Intro de 2,5 s** cu logo-ul (sting sonor), apoi **întrebarea-cârlig** în primele 2 secunde („Ți-a cerut angajatorul cazier și nu știi dacă cel vechi mai e bun?”) și răspunsul imediat după.
+- **Voce în română** (vocea Ioana din macOS), **muzică de fundal** discretă și efecte scurte la tăieturi. Toată partea audio e generată de noi, deci nu are drepturi de autor de plătit și nu primește reclamații Content ID.
+- **Ritm mai rapid:** o idee pe cadru, cadre de 2–6 s, ilustrații animate (calendar, clădire, laptop, glob, documente generice), cifre mari, comparații „apare / nu apare”, subtitrări arse.
+- **Ecran final de 12 s** cu „Abonează-te” și două zone libere unde pui în YouTube Studio elementele de final (alt clip + abonare).
+- **3 formate per clip:** 16:9 pentru YouTube, 9:16 pentru Shorts, Reels și TikTok, 4:5 pentru feed-ul Facebook și Instagram.
+- Fără imagini generate cu AI: generatorul de imagini disponibil (Higgsfield) consumă credite plătite (≈6,5 credite pe imagine la calitate bună), așa că ilustrațiile sunt desenate în cod. Nu folosim nicăieri sigle, ștampile sau documente care să pară acte reale.
 
 ## 1. Setup canal (Raul)
 
-- [ ] Creezi canalul pe contul Google al firmei (nu pe unul personal), ca **cont de marcă**, ca să poată fi administrat de mai mulți oameni.
-- [ ] Nume: **eGhiseul.ro** · handle: **@eghiseul** (sau `@eghiseul.ro` dacă primul e luat).
-- [ ] Imagine de profil: logo-ul (`public/images/brand/logo.webp`). Banner: fundal navy cu logo-ul alb, fără text de reclamă.
-- [ ] Descrierea canalului:
+Textele gata de copiat sunt în `out/branding/channel.md`.
 
-  > Clipuri scurte despre actele de care ai nevoie în România: cazier judiciar, cazier fiscal, acte de stare civilă, carte funciară. Ce arată fiecare document, cât e valabil și cum îl obții, inclusiv gratuit, direct de la instituție.
-  >
-  > eGhiseul.ro este un serviciu privat de asistență, neafiliat instituțiilor statului. Documentele le eliberează instituțiile competente și pot fi cerute și direct, la ghișeu.
-
-- [ ] Linkuri pe canal: eghiseul.ro, cazierjudiciaronline.com, documentero.ro.
-- [ ] Setări implicite de încărcare: limba română, categoria „Educație”, comentarii moderate (ținute pentru aprobare dacă au linkuri).
-- [ ] Playlisturi: „Cazier judiciar”, „Cazier fiscal”, „Acte de stare civilă”, „Carte funciară și cadastru”.
-- [ ] Clipurile **nu** au sunet (doar text și subtitrări arse în imagine). Opțional: muzică discretă din YouTube Audio Library, adăugată direct în YouTube Studio la editare.
+- [ ] Creezi canalul pe contul Google al firmei, ca **cont de marcă** (poate fi administrat de mai mulți oameni).
+- [ ] Nume: **eGhiseul.ro** · handle: **@eghiseul** (sau `@eghiseul.ro`).
+- [ ] Imagine de profil: `out/branding/avatar.png` (800×800).
+- [ ] Banner: `out/branding/banner.png` (2560×1440; textul stă în zona sigură, vizibilă pe telefon).
+- [ ] Filigran video: `out/branding/watermark.png` (150×150), afișat pe toată durata.
+- [ ] Descrierea canalului și linkurile: din `out/branding/channel.md` (are declarația de neafiliere).
+- [ ] Trailer pentru vizitatorii neabonați: `out/v2/trailer/trailer-wide.mp4` (≈37 s).
+- [ ] Setări implicite de încărcare: limba română, categoria „Educație”, comentarii ținute pentru aprobare dacă au linkuri.
+- [ ] 4 playlisturi (nume și descrieri în `channel.md`): Cazierul judiciar · Cazier fiscal și acte pentru firme · Acte din străinătate · Shorts: răspunsuri în 60 de secunde.
 
 ## 2. Fișa de încărcare pentru fiecare clip
 
-Pentru fiecare: încarci MP4-ul, pui titlul și descrierea din `out/<id>/description.txt` (are capitole și link cu UTM), tagurile din `out/<id>/metadata.json`, miniatura PNG și fișierul de subtitrare `.srt` (limba: română). Shorts-ul îl încarci separat, cu `description-short.txt` și `<id>-short.srt`.
+Pentru fiecare clip, în `out/v2/<id>/`:
 
-### Clipul 1: valabilitatea cazierului judiciar
-- Video: `out/cazier-valabilitate/cazier-valabilitate.mp4` (1920×1080, 1:11, 4,6 MB)
-- Shorts: `out/cazier-valabilitate/cazier-valabilitate-short.mp4` (1080×1920, 0:50, 2,6 MB)
-- Titlu: **Cât e valabil cazierul judiciar și când îți trebuie unul nou**
-- Miniatură: `out/cazier-valabilitate/cazier-valabilitate-thumb.png`
-- Subtitrări: `cazier-valabilitate.srt`, `cazier-valabilitate-short.srt`
-- Playlist: Cazier judiciar
+| Ce urci | Fișier |
+|---|---|
+| YouTube (lung) | `<id>-wide.mp4` + `description.txt` (capitole, surse, link cu UTM) + `<id>-wide.srt` + `<id>-thumb.png` |
+| YouTube Shorts | `<id>-tall.mp4` + `description-short.txt` + `<id>-tall.srt` (titlul scurt e `shortTitle` din `metadata.json`) |
+| Facebook / Instagram feed | `<id>-feed.mp4` (4:5) + `description-facebook-instagram.txt` |
+| Reels / TikTok | același `<id>-tall.mp4` |
 
-### Clipul 2: cazierul judiciar din străinătate
-- Video: `out/cazier-strainatate/cazier-strainatate.mp4` (1920×1080, 1:00, 3,8 MB)
-- Shorts: `out/cazier-strainatate/cazier-strainatate-short.mp4` (1080×1920, 0:40, 2,3 MB)
-- Titlu: **Cazierul judiciar din străinătate: cele 3 variante**
-- Miniatură: `out/cazier-strainatate/cazier-strainatate-thumb.png`
-- Subtitrări: `cazier-strainatate.srt`, `cazier-strainatate-short.srt`
-- Playlist: Cazier judiciar
+Titlurile și tagurile sunt în `metadata.json`.
 
-### Clipul 3: cazierul fiscal
-- Video: `out/cazier-fiscal/cazier-fiscal.mp4` (1920×1080, 0:58, 3,0 MB)
-- Shorts: `out/cazier-fiscal/cazier-fiscal-short.mp4` (1080×1920, 0:40, 1,9 MB)
-- Titlu: **Cazierul fiscal: ce arată (sancțiuni, nu datorii) și cât e valabil**
-- Miniatură: `out/cazier-fiscal/cazier-fiscal-thumb.png`
-- Subtitrări: `cazier-fiscal.srt`, `cazier-fiscal-short.srt`
-- Playlist: Cazier fiscal
+| Clip | Titlu YouTube | Lung | Shorts | Feed |
+|---|---|---|---|---|
+| `cazier-valabilitate` | Cât e valabil cazierul judiciar și când îți trebuie unul nou | 1:18 | 0:45 | 0:45 |
+| `cazier-strainatate` | Cazierul judiciar din străinătate: cele 3 variante (și ordinea corectă) | 1:05 | 0:37 | 0:37 |
+| `cazier-fiscal` | Cazierul fiscal NU arată datoriile. Ce arată și cât e valabil | 0:57 | 0:41 | 0:41 |
+| `trailer` | eGhiseul: acte, cazier, certificate, explicate simplu | 0:37 | 0:25 | 0:25 |
 
-## 3. Ritm
+Elementele de final în YouTube Studio: pe ultimele 12 s pui „Abonare” peste butonul roșu și „Cel mai recent videoclip” / „Cel mai potrivit” în cele două chenare punctate.
 
-1–2 clipuri pe săptămână, în aceeași zi (de exemplu marțea): clipul lung plus Shorts-ul lui. Următoarele subiecte, din ce caută oamenii și ce ne citează deja AI-ul: extrasul de carte funciară (ce arată, cum îl citești), certificatul constatator pentru bancă, extrasul multilingv (Convenția CIEC, 23 de state), certificatul de celibat pentru căsătoria în străinătate. Faptele se iau numai de pe paginile noastre verificate; un clip nou se adaugă în `src/data/videos.ts`, iar randarea durează sub un minut.
+## 3. Facebook și Instagram
 
-## 4. Cum măsurăm
+- Pagina de Facebook a eGhiseul se leagă de contul de Instagram din **Meta Business Suite**; acolo programezi postarea o singură dată și bifezi ambele (Facebook + Instagram), deci apare automat și pe Instagram.
+- Formatul pentru feed e `<id>-feed.mp4` (4:5), pentru Reels `<id>-tall.mp4` (9:16).
+- Linkul din descriere are `utm_source=facebook&utm_medium=social`; pe Instagram linkul nu e clicabil în descriere, deci pui linkul în bio și scrii „link în bio”.
 
-- **YouTube Studio**, lunar: vizualizări, timp de vizionare, clicuri pe link (Statistici avansate → Surse de trafic externe), căutările din YouTube care aduc clipurile.
-- **Comenzi**: linkurile au `utm_source=youtube&utm_medium=video&utm_campaign=<id>` (Shorts: `<id>-short`), deci comenzile apar în `orders.attribution` și în tabelul „Comenzi pe canal” din `/admin/marketing`. De verificat după primele comenzi că `utm_source=youtube` e clasificat corect (nu „direct”).
-- **Citări AI**: raportul „AI Performance” din Bing Webmaster și mențiunile brandului; ținta e să apară canalul printre sursele răspunsurilor la „cât e valabil cazierul judiciar” etc.
+## 4. Ritm și subiecte următoare
+
+1–2 clipuri pe săptămână (lungul + Shorts + feed, aceeași zi). Următoarele subiecte, din ce caută oamenii și ce ne citează deja AI-ul:
+- extrasul de carte funciară (ce arată, cum îl citești);
+- certificatul constatator pentru bancă;
+- extrasul multilingv (Convenția CIEC nr. 16, 23 de state);
+- certificatul de celibat pentru căsătoria în străinătate.
+
+Faptele se iau numai de pe paginile noastre verificate. Un clip nou se adaugă în `src/v2/data.ts`, apoi:
+
+```bash
+cd /Users/raul/Projects/eghiseul-videos
+npx tsx scripts/tts.ts            # vocea, pe scene
+npx tsx scripts/export-meta-v2.ts # subtitrări, descrieri, metadata
+./scripts/render-v2.sh            # randează toate formatele
+```
+
+## 5. Cum măsurăm
+
+- **YouTube Studio**, lunar: vizualizări, retenție în primele 5 s (arată dacă cârligul merge), clicuri pe link, căutările care aduc clipurile.
+- **Comenzi**: linkurile au `utm_source=youtube&utm_medium=video&utm_campaign=<id>` (Shorts: `<id>-short`) și `utm_source=facebook&utm_medium=social` pe Facebook/Instagram; apar în `orders.attribution` și în „Comenzi pe canal” din `/admin/marketing`. `utm_source=youtube` e clasificat ca „social · youtube” (corectat pe 06.10).
+- **Citări AI**: raportul „AI Performance” din Bing Webmaster; ținta e ca site-ul și canalul să apară la „cât e valabil cazierul judiciar” etc.
 - Prag de decizie: după 8 clipuri (≈1 lună), dacă nu vedem vizualizări din căutare sau trafic spre site, schimbăm subiectele, nu ritmul.
