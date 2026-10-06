@@ -252,7 +252,7 @@ export default async function CertificatIntegritatePage() {
                       </div>
                       <div>
                         <p className="font-semibold text-secondary-900 text-sm">Livrare pe Email</p>
-                        <p className="text-xs text-neutral-500">PDF semnat electronic IGPR</p>
+                        <p className="text-xs text-neutral-500">Scan pe email, originalul prin curier</p>
                       </div>
                     </div>
 
@@ -290,7 +290,7 @@ export default async function CertificatIntegritatePage() {
               {[
                 { icon: Landmark, value: 'IGPR', label: 'Document al Poliției' },
                 { icon: Clock, value: formatEstimatedDays(service), label: 'Livrare estimată' },
-                { icon: Mail, value: 'Pe email', label: 'PDF semnat electronic' },
+                { icon: Mail, value: 'Scan + original', label: 'Email și curier' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
               ].map((t) => (
                 <div key={t.label} className="flex flex-col items-center gap-1.5">
@@ -446,8 +446,8 @@ export default async function CertificatIntegritatePage() {
                 Cum Arată Certificatul de Integritate Comportamentală — Specimen
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Documentul pe care îl primești este emis de IGPR (Poliția Română) conform Legii 118/2019,
-                semnat electronic și livrat pe email.
+                Certificatul îl eliberează Poliția Română, conform Legii 118/2019, pe hârtie. Îl ridică avocatul;
+                primești scanul pe email și, dacă alegi livrarea, originalul prin curier.
               </p>
             </div>
 
@@ -483,9 +483,9 @@ export default async function CertificatIntegritatePage() {
                 <ul className="space-y-4">
                   {[
                     { icon: Landmark, title: 'Emis de IGPR (Poliția Română)', desc: 'Eliberat de Inspectoratul General al Poliției Române, conform Legii 118/2019.' },
-                    { icon: Shield, title: 'Semnătură electronică', desc: 'Are aceeași valoare legală ca varianta cu ștampilă — îl folosești la angajator sau în dosar.' },
+                    { icon: Shield, title: 'Certificatul original, pe hârtie', desc: 'Același document ca la ghișeul poliției. Dacă angajatorul cere originalul, alegi livrarea prin curier.' },
                     { icon: Scale, title: 'Atestă integritatea comportamentală', desc: 'Confirmă lipsa sancțiunilor pentru infracțiuni asupra minorilor și a persoanelor vulnerabile.' },
-                    { icon: Mail, title: 'Livrat pe email, în PDF', desc: 'Gata de printat sau trimis mai departe, în zile lucrătoare de la plată.' },
+                    { icon: Mail, title: 'Scanul, pe email', desc: 'Îl vezi imediat ce e eliberat; unde e acceptată o copie, îl poți trimite mai departe.' },
                   ].map((f) => (
                     <li key={f.title} className="flex items-start gap-3.5">
                       <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-100 to-primary-200">
@@ -597,7 +597,7 @@ export default async function CertificatIntegritatePage() {
             { q: 'Certificatul de integritate comportamentală este gratuit?', a: 'Nu. IGPR percepe o taxă oficială pentru eliberare. Prin eGhișeul plătești prețul afișat, cu taxa oficială inclusă, fără costuri suplimentare.' },
             { q: 'Pot obține certificatul în Cluj, București sau alt oraș?', a: 'Da. Pentru că serviciul este 100% online, îl poți obține din orice județ — București, Cluj, Iași, Timișoara, Constanța sau oriunde te afli — fără să te deplasezi la un sediu IGPR local.' },
             { q: '„Adeverința de integritate comportamentală” este același lucru cu certificatul?', a: 'Da. Unele instituții folosesc denumirea de adeverință, dar se referă la același document emis de IGPR conform Legii 118/2019.' },
-            { q: 'Certificatul vine pe email sau pe hârtie?', a: 'Pe email, ca PDF semnat electronic de IGPR. La cerere, certificatul poate fi livrat și prin curier.' },
+            { q: 'Certificatul vine pe email sau pe hârtie?', a: 'Pe hârtie: Poliția Română îl eliberează la ghișeu, iar avocatul îl ridică. Îți trimitem scanul pe email și, dacă alegi livrarea, originalul prin curier.' },
           ]}
         />
 

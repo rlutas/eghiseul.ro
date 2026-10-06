@@ -85,7 +85,7 @@ const jsonLdGraph = buildServicePageGraph({
   description:
     'Serviciu de obținere a Cazierului Fiscal (certificat de cazier fiscal) de la ANAF pentru ' +
     'persoană fizică. Documentul care arată dacă titularul are fapte sancționate de legile fiscale înscrise. ' +
-    'Procesare 100% online, fără cont SPV, livrare email.',
+    'Procesare 100% online, fără cont SPV; scanul pe email, originalul prin curier.',
   serviceType: 'Document Processing — Fiscal',
   datePublished: DATE_PUBLISHED,
   dateModified: DATE_MODIFIED,
@@ -181,7 +181,7 @@ export default async function CazierFiscalOnlinePage() {
                       'Completezi formularul cu datele tale (CNP)',
                       'Verificăm și depunem cererea la ANAF',
                       'Plătești securizat, fără cont SPV',
-                      `Primești cazierul fiscal pe email în ${formatEstimatedDays(service)}`,
+                      `Primești cazierul fiscal scanat pe email în ${formatEstimatedDays(service)}`,
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
@@ -232,8 +232,8 @@ export default async function CazierFiscalOnlinePage() {
                         <Mail className="h-5 w-5 text-blue-600" aria-hidden="true" />
                       </div>
                       <div>
-                        <p className="font-semibold text-secondary-900 text-sm">Livrare pe Email</p>
-                        <p className="text-xs text-neutral-500">PDF semnat electronic ANAF</p>
+                        <p className="font-semibold text-secondary-900 text-sm">Livrare</p>
+                        <p className="text-xs text-neutral-500">Scan pe email, originalul prin curier</p>
                       </div>
                     </div>
 
@@ -283,9 +283,9 @@ export default async function CazierFiscalOnlinePage() {
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
-                { icon: Landmark, value: 'ANAF', label: 'Document semnat' },
+                { icon: Landmark, value: 'ANAF', label: 'Eliberează certificatul' },
                 { icon: Clock, value: formatEstimatedDays(service), label: 'Livrare estimată' },
-                { icon: Mail, value: 'Pe email', label: 'Fără cont SPV' },
+                { icon: Mail, value: 'Scan + original', label: 'Email și curier' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
               ].map((t) => (
                 <div key={t.label} className="flex flex-col items-center gap-1.5">
@@ -323,7 +323,7 @@ export default async function CazierFiscalOnlinePage() {
               <p>
                 Prin eGhișeul obții <strong>cazierul fiscal online</strong>, fără drum la ghișeul ANAF. Ai nevoie
                 doar de CNP și un act de identitate. Noi depunem cererea și îți trimitem
-                <strong> certificatul de cazier fiscal</strong> pe email, semnat electronic — o alternativă rapidă la
+                <strong> certificatul de cazier fiscal</strong> scanat pe email, iar originalul prin curier, dacă îl alegi: o alternativă la
                 procedura clasică de tip <strong>anaf cazier fiscal online</strong>.
               </p>
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
@@ -335,7 +335,7 @@ export default async function CazierFiscalOnlinePage() {
                   dar ai nevoie de un <strong>cont SPV activ și semnătură electronică</strong> sau de o deplasare la
                   ghișeu. Prin noi obții documentul <strong>100% online, fără cont SPV</strong> și fără deplasare:
                   plătești <strong>{service.base_price} RON</strong>, noi ne ocupăm de relația cu ANAF, iar tu
-                  <strong> primești cazierul fiscal pe email</strong>.
+                  <strong> primești cazierul fiscal scanat pe email</strong>, iar originalul prin curier, dacă îl alegi.
                 </p>
               </div>
 
@@ -352,7 +352,7 @@ export default async function CazierFiscalOnlinePage() {
                 <p>
                   Poți face verificarea prin <strong>Spațiul Privat Virtual (SPV)</strong> al ANAF (cu cont și
                   semnătură electronică) sau prin eGhișeul, complet online și fără cont SPV: completezi formularul cu
-                  CNP-ul tău, noi depunem cererea la ANAF, iar tu primești cazierul fiscal pe email, semnat electronic.
+                  CNP-ul tău, noi depunem cererea la ANAF, iar tu primești cazierul fiscal scanat pe email și, la cerere, originalul prin curier.
                   Astfel verifici exact ce conține cazierul tău fiscal, fără drum la ghișeu.
                 </p>
               </div>
@@ -430,7 +430,7 @@ export default async function CazierFiscalOnlinePage() {
                 { step: 1, title: 'Completezi Formularul', desc: 'Introduci datele tale personale, inclusiv CNP-ul, iar avocatul colaborator depune cererea la ANAF în numele tău.', icon: FileText },
                 { step: 2, title: 'Verificare Identitate', desc: 'Încarci actul de identitate și un selfie pentru validarea KYC, conform cerințelor.', icon: ScanFace },
                 { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay. ANAF nu percepe taxă pentru certificat; plătești doar serviciul nostru.', icon: CreditCard },
-                { step: 4, title: 'Primești Documentul', desc: `În ${formatEstimatedDays(service)} primești cazierul fiscal pe email, opțional și prin curier.`, icon: CheckCircle },
+                { step: 4, title: 'Primești Documentul', desc: `În ${formatEstimatedDays(service)} primești cazierul fiscal scanat pe email; originalul vine prin curier, dacă alegi livrarea.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -456,8 +456,8 @@ export default async function CazierFiscalOnlinePage() {
                 Cum Arată Cazierul Fiscal — Specimen
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Documentul pe care îl primești are antetul ANAF și este semnat electronic —
-                cu aceeași valoare legală ca varianta de la ghișeu.
+                E același certificat pe care îl dă ghișeul ANAF: pe hârtie, cu antetul ANAF. Îl ridică
+                avocatul, ți-l trimitem scanat pe email și, dacă alegi livrarea, originalul prin curier.
               </p>
             </div>
 
@@ -488,14 +488,14 @@ export default async function CazierFiscalOnlinePage() {
                 </h3>
                 <p className="text-neutral-600 leading-relaxed mb-6">
                   Cazierul fiscal pe care îl primești este <strong>identic cu cel eliberat la ghișeul ANAF</strong> —
-                  doar că îl primești pe email, fără drum și fără cont SPV.
+                  doar că îl ridică avocatul: primești scanul pe email și originalul prin curier, fără drum și fără cont SPV.
                 </p>
                 <ul className="space-y-4">
                   {[
                     { icon: Landmark, title: 'Antet ANAF', desc: 'Emis de Agenția Națională de Administrare Fiscală, cu numărul și data înregistrării.' },
-                    { icon: Shield, title: 'Semnătură electronică', desc: 'Are aceeași valoare legală ca varianta cu ștampilă — îl folosești la ONRC, notar sau bancă.' },
+                    { icon: Shield, title: 'Certificatul original, pe hârtie', desc: 'Același document ca la ghișeul ANAF. Dacă instituția cere originalul, alegi livrarea prin curier, în țară sau în străinătate.' },
                     { icon: Receipt, title: 'Arată ce e înscris pe numele tău', desc: 'Confirmă că nu ai fapte sancționate de legile fiscale înscrise sau le enumeră, la data emiterii.' },
-                    { icon: Mail, title: 'Livrat pe email, în PDF', desc: 'Gata de printat sau trimis mai departe, fără deplasare la ghișeu.' },
+                    { icon: Mail, title: 'Scanul, pe email', desc: 'Îl vezi imediat ce e eliberat, fără deplasare la ghișeu. Unde e acceptată o copie, îl poți trimite mai departe.' },
                   ].map((f) => (
                     <li key={f.title} className="flex items-start gap-3.5">
                       <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary-100 to-primary-200">
@@ -571,7 +571,7 @@ export default async function CazierFiscalOnlinePage() {
             { q: 'De ce aveți nevoie de datele mele personale?', a: 'CNP-ul și actul de identitate sunt necesare pentru a depune cererea de cazier fiscal în numele tău la ANAF și pentru validarea identității (KYC). Datele sunt prelucrate securizat și folosite exclusiv pentru emiterea documentului.' },
             { q: 'Pot cere cazier fiscal pentru o firmă?', a: 'Această pagină acoperă cazierul fiscal pentru persoană fizică. Pentru persoane juridice (firme) procedura și actele diferă — contactează-ne și te ajutăm cu varianta potrivită.' },
             { q: 'Cazierul fiscal este gratuit?', a: 'Îl poți obține gratuit prin Spațiul Privat Virtual (SPV) al ANAF dacă ai cont SPV și semnătură electronică. Prin noi plătești un tarif pentru serviciul complet 100% online, fără cont SPV și fără deplasare la ghișeu.' },
-            { q: 'Cazierul fiscal vine ca PDF semnat de ANAF?', a: 'Pe email, ca PDF semnat electronic de ANAF. Opțional, îl poți primi și fizic prin curier, dacă alegi această opțiune la comandă.' },
+            { q: 'Cazierul fiscal vine ca PDF semnat de ANAF?', a: 'Nu. ANAF eliberează certificatul pe hârtie, la ghișeu; avocatul îl ridică, iar noi ți-l trimitem scanat pe email și, dacă alegi livrarea, originalul prin curier, în țară sau în străinătate. Varianta electronică, semnată de ANAF, există doar dacă îl ceri singur din SPV.' },
             { q: 'Cum verific cazierul fiscal?', a: 'Nu există o verificare separată de eliberare: singurul mod oficial de a verifica situația ta în cazierul fiscal este să soliciți certificatul de cazier fiscal de la ANAF. Îl poți obține prin SPV (cu cont și semnătură electronică) sau prin eGhișeul, complet online și fără cont SPV.' },
             { q: 'Care e diferența dintre cazierul fiscal și certificatul de atestare fiscală?', a: 'Cazierul fiscal arată dacă figurezi cu fapte sancționate de legile fiscale; datoriile nu apar în el. Certificatul de atestare fiscală arată situația obligațiilor tale de plată la un moment dat. Sunt documente ANAF diferite. Această pagină se referă la cazierul fiscal.' },
             { q: 'Pot obține cazierul fiscal fără cont SPV?', a: 'Da. Prin eGhișeul depui cererea fără cont în Spațiul Privat Virtual și fără semnătură electronică proprie — ai nevoie doar de CNP și un act de identitate, iar noi ne ocupăm de relația cu ANAF.' },

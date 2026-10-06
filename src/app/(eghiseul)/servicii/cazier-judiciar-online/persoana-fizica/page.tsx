@@ -415,7 +415,7 @@ export default async function CazierJudiciarPFPage() {
                 </div>
                 <h3 className="text-lg font-bold text-secondary-900 mb-1.5">Cazier Judiciar — Persoană Fizică</h3>
                 <p className="text-sm text-neutral-600 leading-relaxed mb-5 flex-1">
-                  Documentul emis de IGPR (Poliția Română), semnat electronic eIDAS. Livrat pe email.
+                  Certificatul eliberat de Poliția Română, pe hârtie. Scanul îl primești pe email, originalul prin curier.
                 </p>
                 <div className="flex items-baseline gap-1 mb-1">
                   <span className="text-3xl font-black text-secondary-900">{(service.base_price / 1.21).toFixed(2)}</span>
@@ -574,7 +574,7 @@ export default async function CazierJudiciarPFPage() {
                   ['Deplasare la ghișeu', false, false, true],
                   ['Disponibil din diaspora', true, 'Variabil', false],
                   ['Asistență avocat inclus', true, false, false],
-                  ['Semnătură electronică eIDAS', true, 'Variabil', false],
+                  ['Originalul prin curier, și în străinătate', true, 'Variabil', false],
                   ['Livrare pe email', 'Automat', true, 'Ridici fizic'],
                 ].map((row, i) => (
                   <div key={row[0] as string} className="contents">

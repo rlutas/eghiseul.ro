@@ -498,7 +498,7 @@ export default async function CazierJudiciarPJPage() {
                 </div>
                 <h3 className="text-lg font-bold text-secondary-900 mb-1.5">Cazier Judiciar — Persoană Juridică</h3>
                 <p className="text-sm text-neutral-600 leading-relaxed mb-5 flex-1">
-                  Documentul emis de IGPR (Poliția Română) pentru firmă, semnat electronic eIDAS. Livrat pe email.
+                  Certificatul eliberat de Poliția Română pentru firmă, pe hârtie. Scanul îl primești pe email, originalul prin curier.
                 </p>
                 <div className="flex items-baseline gap-1 mb-1">
                   <span className="text-3xl font-black text-secondary-900">{(service.base_price / 1.21).toFixed(2)}</span>
@@ -616,7 +616,7 @@ export default async function CazierJudiciarPJPage() {
                   ['Deplasare la ghișeu', false, false, true],
                   ['Auto-completare date firmă (CUI)', true, 'Variabil', false],
                   ['Asistență avocat inclus', true, false, false],
-                  ['Semnătură electronică eIDAS', true, 'Variabil', false],
+                  ['Originalul prin curier, și în străinătate', true, 'Variabil', false],
                   ['Livrare pe email', 'Automat', true, 'Ridici fizic'],
                 ].map((row, i) => (
                   <div key={row[0] as string} className="contents">
@@ -720,7 +720,7 @@ export default async function CazierJudiciarPJPage() {
                 'CUI-ul firmei (Cod Unic de Identificare)',
                 'Date reprezentant legal (CNP, adresă)',
                 'Carte identitate reprezentant',
-                'Semnătură electronică',
+                'Semnătura pe împuternicire (o desenezi pe telefon)',
               ].map((doc, index) => (
                 <div
                   key={index}
