@@ -57,6 +57,9 @@ const nextConfig: NextConfig = {
     const SHARED = 'api|_next|comanda|account|orders|auth|completare|reincarca-poza|documentero|images|og|icons|fonts|favicon\\.ico|icon\\.png|apple-icon\\.png|manifest\\.json|\\.well-known';
     return {
       beforeFiles: [
+        // IndexNow key file, per host (src/lib/seo/indexnow.ts). First, so the
+        // documentero catch-all below does not swallow it.
+        { source: '/:key([0-9a-f]{32}).txt', destination: '/api/indexnow-key/:key/' },
         { source: '/', has: onDocumentero, destination: '/documentero' },
         { source: '/robots.txt', has: onDocumentero, destination: '/documentero/robots.txt' },
         { source: '/sitemap.xml', has: onDocumentero, destination: '/documentero/sitemap.xml' },
