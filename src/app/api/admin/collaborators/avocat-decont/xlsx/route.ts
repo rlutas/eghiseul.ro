@@ -16,7 +16,7 @@ import { createClient } from '@/lib/supabase/server';
 import { requirePermission } from '@/lib/admin/permissions';
 import { buildDecont, platformLabel, round2, ONORARIU_PER_COMANDA, TVA, type DecontRow } from '@/lib/admin/avocat-decont';
 
-interface CostLine { label: string; amount: number }
+interface CostLine { label: string; amount: number; note?: string }
 
 interface ExportBody {
   month?: string;
@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
   const tva = round2(summary.total - summary.total / TVA);
   line('TVA 21%', -tva, 'inclus în sumele de mai sus', { top: true });
   line('Comision Stripe', -stripeFee, stripeFee === stripeFeeReal ? 'real, din tranzacțiile sincronizate' : `real: ${fmt(stripeFeeReal)}`);
-  for (const c of costs) line(c.label, -Math.abs(Number(c.amount)));
+  for (const c of costs) line(c.label, -Math.abs(Number(c.amount)), typeof c.note === 'string' ? c.note.slice(0, 300) : '');
   const costsSum = costs.reduce((s, c) => s + Math.abs(Number(c.amount)), 0);
   const ramas = round2(summary.total - tva - stripeFee - costsSum);
   line('TOTAL RĂMAS', ramas, '', { bold: true, top: true });

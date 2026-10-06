@@ -570,11 +570,15 @@ function AvocatDecont() {
   // Cheltuielile lunii — se tastează la generare (nu sunt fixe în cod);
   // valorile de start sunt cele stabilite de Raul (06.10.2026); reclama
   // pornește de la 0 și se completează lunar.
-  const [costs, setCosts] = useState<{ label: string; amount: string }[]>([
-    { label: 'Taxe angajați', amount: '12000' },
-    { label: 'Programe / hosting / domenii', amount: '1000' },
-    { label: 'Contabilitate', amount: '1500' },
-    { label: 'Reclamă', amount: '0' },
+  const [costs, setCosts] = useState<{ label: string; amount: string; note: string }[]>([
+    {
+      label: 'Taxe angajați',
+      amount: '19025',
+      note: 'Carla 4.500 + Angela 4.325 + Maria 4.500 + Carla 1.500 + Maria 1.000 + Angela 500 + taxe angajat BMR 2.700',
+    },
+    { label: 'Programe / hosting / domenii', amount: '1000', note: '' },
+    { label: 'Contabilitate', amount: '1500', note: 'EDIGITALIZARE SRL și BMR DIGITAL' },
+    { label: 'Reclamă', amount: '0', note: '' },
   ]);
   const [splitRaul, setSplitRaul] = useState('55');
   const [profitTax, setProfitTax] = useState('16');
@@ -593,7 +597,7 @@ function AvocatDecont() {
           platform,
           costs: costs
             .filter((c) => c.label.trim() && Number(c.amount))
-            .map((c) => ({ label: c.label.trim(), amount: Number(c.amount) })),
+            .map((c) => ({ label: c.label.trim(), amount: Number(c.amount), note: c.note.trim() })),
           splitRaulPercent: Number(splitRaul) || 55,
           profitTaxPercent: Number(profitTax) || 0,
           dividendTaxPercent: Number(dividendTax) || 0,
@@ -704,13 +708,19 @@ function AvocatDecont() {
                   inputMode="decimal"
                   className="w-32 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
                 />
+                <input
+                  value={c.note}
+                  onChange={(e) => setCosts(costs.map((x, j) => (j === i ? { ...x, note: e.target.value } : x)))}
+                  placeholder="Comentariu (apare în Excel)"
+                  className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+                />
                 <button type="button" onClick={() => setCosts(costs.filter((_, j) => j !== i))} className="rounded-lg border border-slate-300 bg-white px-2 text-slate-400 hover:text-rose-600"><X className="h-4 w-4" /></button>
               </div>
             ))}
           </div>
           <button
             type="button"
-            onClick={() => setCosts([...costs, { label: '', amount: '' }])}
+            onClick={() => setCosts([...costs, { label: '', amount: '', note: '' }])}
             className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-emerald-700 hover:underline"
           >
             <Plus className="h-3 w-3" /> Adaugă cheltuială
