@@ -228,7 +228,7 @@ pentru fiecare cifră, humanizer, verificare tsc + build + teste, apoi UN commit
 | 21 | `/` (homepage) | ⬜ lot 3 | AI 14,4; poziție 9,27→23,91 |
 | 22 | `/curs-valutar` | ⬜ lot 3 | 487 cuv. pe 186k expuneri |
 | 23 | `/servicii/rovinieta-online` | ⬜ lot 3 | 759 cuv., singura pagină de serviciu sub 800 |
-| 24 | `/servicii/cazier-judiciar-online` | ⬜ lot 4 (servicii) | AI 21,3 — cel mai prost scor, pagina comercială #1 |
+| 24 | `/servicii/cazier-judiciar-online` | ✅ livrat 06.10 (D2; 11 erori de fond: scan, nu PDF eIDAS; apostilă 198; taxa din 2017; anulare 30 min; FAQ cu HTML brut; 4.579→3.988 cuv. cu tot cu recenzii) | `changelog/2026-10-06-pagina-cazier-judiciar-rescrisa.md` |
 | 25 | `/servicii/cazier-fiscal-online` | ⬜ lot 4 | căzută 8,48→48,42 |
 | 26 | `/servicii/extras-de-carte-funciara` | ⬜ lot 4 | căzută 7,84→22,32; backlink money.ro |
 | 27 | `/servicii/eliberare-certificat-de-nastere` | ⬜ lot 4 | 1.714 clicuri, AI 13,5 |
