@@ -355,7 +355,12 @@ export default async function PlanAmplasamentDelimitarePage() {
                   Oamenii sună des cerând plan de amplasament când, de fapt, terenul lor nu e încă înscris în
                   cadastru. Dacă imobilul nu are număr cadastral, nu există nicio planșă de copiat: trebuie
                   întocmită o documentație nouă, de un expert autorizat care iese pe teren și măsoară. Ce facem noi
-                  e să scoatem din arhivă planul unei lucrări deja recepționate.
+                  e să scoatem din arhivă planul unei lucrări deja recepționate. Cum îți dai seama de care ai nevoie
+                  am explicat în ghidul{' '}
+                  <Link href="/plan-de-amplasament-si-delimitare-copie-sau-intocmire/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                    plan de amplasament și delimitare: copie din arhivă sau plan nou
+                  </Link>
+                  .
                 </p>
               </div>
 

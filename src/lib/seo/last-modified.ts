@@ -40,6 +40,7 @@ export const PAGE_LAST_MODIFIED: Record<string, string> = {
   'schimbare-certificat-de-nastere-vechi': '2026-09-25',
   'sms-fals-amenda-ghiseul-ro': '2026-08-28',
   'tabel-varsta-pensionare-anticipata-femei': '2026-06-16',
+  'plan-de-amplasament-si-delimitare-copie-sau-intocmire': '2026-10-06',
   'taxa-cazier-judiciar': '2026-08-24',
   'totul-despre-cartea-funciara-colectiva': '2026-08-24',
   'tva-9-locuinte-31-iulie-2026': '2026-09-09',

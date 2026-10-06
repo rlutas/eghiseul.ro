@@ -115,7 +115,7 @@ export default function Page() {
       <p>
         A doua parte e onorariul persoanei autorizate ANCPI, topograful. El măsoară imobilul,
         întocmește documentația cadastrală, la terenuri inclusiv{' '}
-        <Link href="/servicii/plan-amplasament-delimitare/">
+        <Link href="/plan-de-amplasament-si-delimitare-copie-sau-intocmire/">
           planul de amplasament și delimitare (PAD)
         </Link>
         , și o depune la OCPI. Onorariul lui e preț de piață: se negociază, diferă de la un județ
