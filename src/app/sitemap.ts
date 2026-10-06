@@ -23,7 +23,7 @@ import {
   HARDCODED_TOOL_SLUGS,
   HARDCODED_ARTICLE_SLUGS,
 } from '@/lib/seo/constants';
-import { pageLastModified } from '@/lib/seo/last-modified';
+import { pageLastModified, pathLastModified } from '@/lib/seo/last-modified';
 
 type SitemapEntry = MetadataRoute.Sitemap[number];
 
@@ -46,12 +46,20 @@ const STATIC_PAGES: SitemapEntry[] = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const entries: MetadataRoute.Sitemap = [...STATIC_PAGES];
+  // Data reală a ultimei modificări pe fiecare URL (registru din git, vezi
+  // lib/seo/last-modified.ts). Fără ea, 86 din 112 URL-uri n-aveau `lastmod`
+  // (audit 06.10.2026) și IndexNow nu le vedea schimbările.
+  const withPathDate = (e: SitemapEntry): SitemapEntry => ({
+    ...e,
+    lastModified: e.lastModified ?? pathLastModified(new URL(e.url).pathname),
+  });
+  const entries: MetadataRoute.Sitemap = STATIC_PAGES.map(withPathDate);
 
   // 1. Hardcoded service pages — high priority (manual SEO content)
   for (const slug of HARDCODED_SERVICE_SLUGS) {
     entries.push({
       url: `${BASE_URL}/servicii/${slug}/`,
+      lastModified: pathLastModified(`/servicii/${slug}/`),
       changeFrequency: 'weekly',
       priority: 0.9,
     });
@@ -61,6 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const path of HARDCODED_SERVICE_SUBROUTE_PATHS) {
     entries.push({
       url: `${BASE_URL}/${path}/`,
+      lastModified: pathLastModified(`/${path}/`),
       changeFrequency: 'weekly',
       priority: 0.8,
     });
@@ -70,6 +79,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const slug of HARDCODED_CALCULATOR_SLUGS) {
     entries.push({
       url: `${BASE_URL}/calculator/${slug}/`,
+      lastModified: pathLastModified(`/calculator/${slug}/`),
       changeFrequency: 'monthly',
       priority: 0.8,
     });
@@ -79,6 +89,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const slug of HARDCODED_TOOL_SLUGS) {
     entries.push({
       url: `${BASE_URL}/tools/${slug}/`,
+      lastModified: pathLastModified(`/tools/${slug}/`),
       changeFrequency: 'monthly',
       priority: 0.8,
     });
