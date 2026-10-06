@@ -31,6 +31,7 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
+import { ServiceAnswerBlock } from '@/components/services/service-answer-block';
 import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 const SERVICE_SLUG = 'extras-multilingv-certificat-nastere';
@@ -40,7 +41,7 @@ const DESCRIPTION =
   'Extrasul multilingv al actului de naștere (Convenția CIEC nr. 16) e acceptat fără traducere și ' +
   'fără apostilă în Italia, Spania, Germania, Franța și alte 19 state. 798 RON totul inclus.';
 const DATE_PUBLISHED = '2026-06-25';
-const DATE_MODIFIED = '2026-07-08';
+const DATE_MODIFIED = '2026-10-06';
 
 export const revalidate = 3600;
 
@@ -259,6 +260,21 @@ export default async function ExtrasMultilingvNasterePage() {
             </div>
           </div>
         </section>
+
+        <ServiceAnswerBlock
+          updated={DATE_MODIFIED}
+          facts={[
+            { label: 'Cine îl eliberează', value: 'Oficiul de stare civilă' },
+            { label: 'Preț', value: `${service.base_price} lei cu TVA` },
+            { label: 'Termen', value: formatEstimatedDays(service) },
+            { label: 'Unde se folosește', value: 'în cele 23 de state ale Convenției CIEC nr. 16' },
+          ]}
+        >
+          Extrasul multilingv al actului de naștere e documentul din Convenția CIEC nr. 16 (Viena, 1976). În statele
+          care aplică convenția, printre care Italia, Spania, Germania și Franța, e primit fără traducere, legalizare sau
+          apostilă. În fața autorităților române nu se folosește, iar pentru Regatul Unit, Irlanda sau SUA îți trebuie
+          duplicatul certificatului, cu traducere (plus apostilă în afara UE).
+        </ServiceAnswerBlock>
 
         <PrivateServiceNotice
           institutionLabel="direct la Starea Civilă a primăriei care deține actul"

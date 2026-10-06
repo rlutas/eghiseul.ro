@@ -32,6 +32,7 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
+import { ServiceAnswerBlock } from '@/components/services/service-answer-block';
 import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // Database slug (order pipeline identifier). URL path uses the SEO-friendly
@@ -43,7 +44,7 @@ const TITLE = 'Certificat de Celibat Online România — Rapid, de la Starea Civ
 const DESCRIPTION =
   "Certificat de celibat online de la Starea Civilă, 698 RON cu taxele incluse, fără drum la ghișeu. Pentru căsătorie în străinătate, cetățenie sau altă localitate. Email + curier.";
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-06-14';
+const DATE_MODIFIED = '2026-10-06';
 
 export const revalidate = 3600;
 
@@ -263,6 +264,21 @@ export default async function CertificatCelibatPage() {
             </div>
           </div>
         </section>
+
+        <ServiceAnswerBlock
+          updated={DATE_MODIFIED}
+          facts={[
+            { label: 'Cine îl eliberează', value: 'Oficiul de stare civilă al locului nașterii' },
+            { label: 'Preț', value: `${service.base_price} lei cu TVA` },
+            { label: 'Termen', value: formatEstimatedDays(service) },
+            { label: 'Valabil', value: 'legea nu fixează un termen; statul străin cere de obicei sub 3-6 luni' },
+          ]}
+        >
+          Certificatul de celibat se numește legal adeverință privind statutul civil (Anexa 18 la H.G. 255/2024). O
+          eliberează oficiul de stare civilă care păstrează actul tău de naștere și confirmă că în registrele din România
+          nu figurezi căsătorit. Se cere de obicei pentru o căsătorie în străinătate; cererea o depune avocatul, pe bază
+          de împuternicire avocațială, fără să vii în țară.
+        </ServiceAnswerBlock>
 
         <PrivateServiceNotice
           institutionLabel="direct la Starea Civilă a primăriei"

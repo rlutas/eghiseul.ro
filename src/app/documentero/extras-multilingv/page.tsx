@@ -85,7 +85,7 @@ export default async function ExtrasMultilingvPage() {
         />
 
         <QuickAnswer updated={DATE_MODIFIED}>
-          Extrasul multilingv al actului de naștere e documentul prevăzut de Convenția CIEC nr. 16 (Viena, 1976), la care România a aderat prin Legea nr. 65/2012. Îl eliberează oficiul de stare civilă care păstrează actul de naștere și are aceeași putere doveditoare ca certificatul. În cele 23 de state care aplică convenția e primit fără traducere, fără legalizare și fără apostilă; în fața autorităților române nu se folosește. Îl poate cere titularul, părintele pentru minor sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}). Termen legal de eliberare: cel mult 30 de zile.
+          Extrasul multilingv al actului de naștere e documentul prevăzut de Convenția CIEC nr. 16 (Viena, 1976), la care România a aderat prin Legea nr. 65/2012. Îl eliberează oficiul de stare civilă care păstrează actul de naștere și are aceeași putere doveditoare ca certificatul. În cele 23 de state care aplică convenția e primit fără traducere, fără legalizare și fără apostilă; în fața autorităților române nu se folosește. Îl poate cere titularul, părintele pentru minor sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}). Termen legal de eliberare: cel mult 30 de zile. Prin noi costă {lei(pN.basePrice)} lei pentru naștere și {lei(pC.basePrice)} lei pentru căsătorie, cu onorariul avocatului inclus.
         </QuickAnswer>
 
         <Section className="mt-10">

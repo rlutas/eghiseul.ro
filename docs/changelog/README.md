@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-10-06 | 🟣 **„Pe scurt” pe paginile de vânzare + acces pentru toți roboții AI** — `ServiceAnswerBlock` pe 7 pagini eghiseul, preț în `QuickAnswer` pe 4 pagini documentero, „Actualizat la” = `dateModified`; robots cu toți crawlerii AI și fetcherii asistenților (aceștia pot deschide primul pas din `/comanda/`) | [2026-10-06-raspuns-pe-scurt-si-roboti-ai.md](2026-10-06-raspuns-pe-scurt-si-roboti-ai.md) |
 | 2026-10-06 | 🟣 **Anunțuri fixate în Ghid + procedura de recuperare telefonică** — `loadAnnouncements()` din `docs/admin/anunturi/`, bloc „Am citit” (localStorage) sus în `/admin/ghid`; anunțul de azi + `admin/recuperare-telefonica` în `CURATED_GUIDES` | [2026-10-06-anunt-echipa.md](2026-10-06-anunt-echipa.md) |
 | 2026-10-06 | 🟣 **Linkuri în text către ghidurile CJO (reabilitare)** — `/calculator/reabilitare/` și articolul cazier vs integritate trimit spre `/ghid-reabilitare-cazier` și `/dupa-cat-timp-se-sterge-cazierul`; ancore descriptive, fără `/servicii/*`; plus un link din articolul avocatei | [2026-10-06-linkuri-catre-cjo.md](2026-10-06-linkuri-catre-cjo.md) |
 | 2026-10-06 | 🟣 **Canalul pe fiecare comandă (Google, Bing, AI, social, email, direct)** — `classifyAttribution` + `channel`/`source` în `orders.attribution`, tabel „pe canal” în KPI marketing, referrer Stripe ignorat, expirare 90 de zile | [2026-10-06-atribuire-canal-comenzi.md](2026-10-06-atribuire-canal-comenzi.md) |

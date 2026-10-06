@@ -31,6 +31,7 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
+import { ServiceAnswerBlock } from '@/components/services/service-answer-block';
 import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // Database slug (order pipeline identifier). URL path uses the descriptive
@@ -43,7 +44,7 @@ const DESCRIPTION =
   'Duplicat certificat de naștere online de la Starea Civilă, 998 RON, fără deplasare. ' +
   'Pentru act pierdut, din altă localitate sau diaspora. Email + curier.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-09-25';
+const DATE_MODIFIED = '2026-10-06';
 
 export const revalidate = 3600;
 
@@ -259,6 +260,20 @@ export default async function CertificatNasterePage() {
             </div>
           </div>
         </section>
+
+        <ServiceAnswerBlock
+          updated={DATE_MODIFIED}
+          facts={[
+            { label: 'Cine îl eliberează', value: 'Oficiul de stare civilă' },
+            { label: 'Preț', value: `${service.base_price} lei cu TVA` },
+            { label: 'Termen', value: formatEstimatedDays(service) },
+            { label: 'Primești', value: 'Originalul, prin curier în țară sau în străinătate' },
+          ]}
+        >
+          Duplicatul certificatului de naștere îl eliberează oficiul de stare civilă, pe baza actului din registru, când
+          certificatul s-a pierdut, s-a deteriorat sau trebuie înlocuit cu modelul nou. Dacă nu poți merge la primărie,
+          cererea o depune avocatul pe bază de împuternicire avocațială, iar originalul ți-l trimitem prin curier.
+        </ServiceAnswerBlock>
 
         <PrivateServiceNotice
           institutionLabel="la Starea Civilă din localitatea de înregistrare sau pe hub.mai.gov.ro"

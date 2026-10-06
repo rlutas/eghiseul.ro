@@ -17,7 +17,7 @@ const TITLE = 'Certificat de Naștere Online: Duplicat prin Avocat, Livrat Acas�
 const DESCRIPTION =
   'Duplicat certificat de naștere obținut de un avocat de la starea civilă: pierdut, deteriorat, model vechi sau pentru străinătate. Semnezi pe telefon, fără programare, fără notar. Originalul vine prin curier.';
 const DATE_PUBLISHED = '2026-09-19';
-const DATE_MODIFIED = '2026-10-05';
+const DATE_MODIFIED = '2026-10-06';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -115,7 +115,7 @@ export default async function NasterePage() {
         />
 
         <QuickAnswer updated={DATE_MODIFIED}>
-          Duplicatul certificatului de naștere se eliberează de oficiul de stare civilă, pe baza actului de naștere din registru, și din 2023 se poate cere la orice primărie din România. Cererea o depune titularul, părintele pentru minor sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}). Termenul legal este de cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală de câțiva lei. Prin documentero.ro, avocatul depune cererea în locul tău și primești originalul prin curier.
+          Duplicatul certificatului de naștere se eliberează de oficiul de stare civilă, pe baza actului de naștere din registru, și din 2023 se poate cere la orice primărie din România. Cererea o depune titularul, părintele pentru minor sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}). Termenul legal este de cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală de câțiva lei. Prin documentero.ro, avocatul depune cererea în locul tău și primești originalul prin curier. Prețul la noi: {lei(p.basePrice)} lei, cu onorariul și taxele incluse.
         </QuickAnswer>
 
         <Section id="situatii" className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
