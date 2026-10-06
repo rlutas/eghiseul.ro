@@ -118,7 +118,10 @@ Cota e de circa 10 cereri pe zi pentru fiecare proprietate.
 | 05.10 | cazierjudiciaronline.com | `/`, `/cazier-fiscal-online`, `/valabilitate-cazier-fiscal`, `/cazier-fiscal-persoana-juridica`, `/cazier-judiciar-online/constanta`, `/iasi`, `/brasov` | solicitată; la `/craiova` am atins cota zilnică |
 | 06.10, 08:50 și 10:30 | ecazier.ro | `/ghid-alegere-tip-cazier` | ⏸ „Cotă depășită” de două ori: cota pare să se reseteze la 24 h după cererile de ieri (~12:00), nu la miezul nopții. Reîncercare automată 12:23 |
 | 06.10, 08:55 și 10:35 | cazierjudiciaronline.com | `/cazier-judiciar-online/craiova`, `/targu-mures`, `/sibiu`, `/timisoara`, `/oradea`, `/cluj`, `/buzau`, `/galati`, `/ploiesti`, `/verificare-cazier-fiscal-online` | ⏸ cotă depășită; `/craiova` și `/targu-mures` sunt deja indexate (cererea doar grăbește recitirea). Reîncercare 12:23 |
-| 06.10 (de făcut, 12:23) | eghiseul.ro | `/servicii/cazier-judiciar-online/` (D2), `/plan-de-amplasament-si-delimitare-copie-sau-intocmire/` (D6) | ⬜ |
+| 06.10, 12:25–12:55 | ecazier.ro | `/ghid-alegere-tip-cazier` | ✅ solicitată |
+| 06.10, 12:25–12:55 | cazierjudiciaronline.com | `/craiova`, `/targu-mures`, `/sibiu`, `/timisoara`, `/oradea`, `/cluj`, `/buzau`, `/galati` | ✅ solicitate; cota atinsă la `/ploiesti` |
+| 07.10 (de făcut) | cazierjudiciaronline.com | `/cazier-judiciar-online/ploiesti`, `/cazier-fiscal-online` (`/verificare-cazier-fiscal-online` nu există în sitemap) | ⬜ |
+| 06.10 | eghiseul.ro (proprietate URL-prefix, cont u/0) | `/servicii/cazier-judiciar-online/` (D2) ✅; `/plan-de-amplasament-si-delimitare-copie-sau-intocmire/` „Cotă depășită” | ⬜ PAD pe 07.10 (e deja la Bing) |
 
 ---
 
@@ -147,3 +150,21 @@ Cota e de circa 10 cereri pe zi pentru fiecare proprietate.
 | H3 | **ecazier: titlu și descriere pe paginile de cazier auto** (pozițiile 4–8, deci CTR-ul e pârghia, ca la C2) | singurul serviciu unde ecazier e aproape de prima pagină | ✅ 06.10 live (8 pagini cazier auto; „documentul oficial” scos de pe ecazier) |
 | H4 | documentero: E3 (apostila, 830 → 1.400+ cuvinte) și E4 (linkuri în text din articolele eghiseul despre stare civilă) | ghiduri 1–2/săpt., regula 2 | ✅ 06.10 |
 | H5 | Warm-up 600/zi (B3) | condițiile sunt îndeplinite | ⬜ 07.10 |
+
+## Bing Ads: verificat 06.10 (Raul a cerut)
+
+Bing Keyword Research, România, ultimele 3 luni (impresii organice în Bing = aproximarea cererii):
+
+| Căutare | Impresii / 3 luni |
+|---|---|
+| cazier judiciar online | 2.400 |
+| cazier online | 531 |
+| cazier judiciar | 345 |
+| cazier judiciar online gratuit | 177 (intenție gratuită, negativ) |
+| eliberare cazier judiciar online | 54 |
+| cazier fiscal online | 109 |
+| cazier fiscal | sub pragul de date |
+
+≈ 1.100 de căutări pe lună pe cazier judiciar și ~35 pe fiscal, în tot Bing România. eghiseul primește din Bing 6.100 de clicuri în 3 luni, dar majoritatea pe calculatoare și curs BNR; „cazier judiciar online” 4.200 impresii, 43 de clicuri, poziția 7,35.
+
+Politica Microsoft Advertising (aug. 2026): serviciile private pentru documente guvernamentale cer pre-aprobare prin „Government Services Advertising Program”, cu autorizare de la instituție (memoria `situatie-vanzari-2026-10`). Restul (stare civilă, CF, constatator) n-au fost măsurate: extensia Chrome s-a deconectat.
