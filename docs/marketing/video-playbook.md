@@ -21,13 +21,14 @@ Pașii tehnici (script, voce, randare, comprimare) sunt în `README.md` din proi
 3. Detaliile, câte o idee pe cadru, cadre de 2–6 secunde.
 4. „La ghișeu vs. online prin noi”, corect în ambele sensuri: la ghișeu e gratuit, dar cu drum, coadă, program limitat, uneori trebuie să revii; prin noi: online, fără drum, avocatul depune și ridică, scan pe email, originalul prin curier oriunde, apostilă/traducere în aceeași comandă.
 5. Card de preț și termen: „de la X lei” cu termenul standard · varianta urgentă pe rândul ei, cu prețul ei · rating Google din `SOCIAL_PROOF`.
-6. Opțiunile din aceeași comandă, când contează (la cazier: apostilă, traducere autorizată, legalizare, livrare oriunde în lume).
+6. Opțiunile din aceeași comandă, când contează, **fără prețuri** (prețurile stau pe site; singurul preț din clip e cardul de la pasul 5). La cazier: Apostila de la Haga, Traducere autorizată, Legalizare notarială, Apostilă notarială (pe documente), Livrare oriunde în străinătate.
 7. Final: „Îl comanzi online pe eghiseul.ro”, „Abonează-te”, mențiunea de serviciu privat. Pe Shorts: hook → răspuns → ghișeu vs. online → preț → final.
 
 ## Text pe ecran și animație
 
 - Textul de pe ecran **completează** vocea, nu o repetă cuvânt cu cuvânt: cuvinte-cheie de 3–6 cuvinte, cifre mari, iconițe, comparații, liste.
 - Ce apare e sincronizat cu ce spune vocea în acel moment.
+- **Orice listă rostită apare și pe ecran**, element cu element (ex.: „profesori, educatori, asistenți sociali, personal medical” = 4 carduri; „copii sau persoane vulnerabile” = 2 etichete). Nu lăsa vocea să enumere peste un cadru gol.
 - Ce apare e sincronizat cu ce spune vocea în acel moment: fiecare element dintr-o listă sau comparație apare chiar înainte să fie rostit și se aprinde auriu cât se vorbește despre el.
 - Fiecare cadru se mișcă ușor până la tăietură (zoom lent, iconițe care plutesc, bara de progres); cadrele trec unul în altul prin suprapunere, fără tăietură seacă; cadrul următor intră cu ~0,27 s înainte de fraza lui; pauze între fraze ≤ 0,25 s.
 - Subtitrări: pe YouTube orizontal nu se ard în imagine (se urcă `.srt` separat); pe Shorts, Reels și Facebook/Instagram, subtitrări scurte de 2–4 cuvinte, sincronizate pe cuvânt, cu cuvântul rostit în auriu.
