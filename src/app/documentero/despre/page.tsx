@@ -72,7 +72,7 @@ export default function DesprePage() {
                   ['Duplicat certificat de naștere', '/certificat-de-nastere/'],
                   ['Duplicat certificat de căsătorie, inclusiv cu mențiunea de divorț', '/certificat-de-casatorie/'],
                   ['Certificat de celibat (adeverință privind statutul civil, Anexa 18)', '/certificat-de-celibat/'],
-                  ['Extras multilingv de naștere sau de căsătorie, pentru UE', '/extras-multilingv/'],
+                  ['Extras multilingv de naștere sau de căsătorie, pentru străinătate', '/extras-multilingv/'],
                 ].map(([t, h]) => (
                   <li key={h} className="border-t border-d-line pt-3 first:border-t-0 first:pt-0">
                     <Link href={h} className="font-semibold hover:text-d-acc">{t}</Link>
@@ -124,7 +124,7 @@ export default function DesprePage() {
             Ce obținem: <Link href="/certificat-de-nastere/" className="font-semibold underline underline-offset-2 hover:text-d-acc">duplicatul certificatului de naștere</Link>,{' '}
             <Link href="/certificat-de-casatorie/" className="font-semibold underline underline-offset-2 hover:text-d-acc">duplicatul certificatului de căsătorie</Link>,{' '}
             <Link href="/certificat-de-celibat/" className="font-semibold underline underline-offset-2 hover:text-d-acc">certificatul de celibat</Link> și{' '}
-            <Link href="/extras-multilingv/" className="font-semibold underline underline-offset-2 hover:text-d-acc">extrasele multilingve</Link> pentru UE. Procedurile, explicate pe înțeles, sunt în{' '}
+            <Link href="/extras-multilingv/" className="font-semibold underline underline-offset-2 hover:text-d-acc">extrasele multilingve</Link> pentru străinătate. Procedurile, explicate pe înțeles, sunt în{' '}
             <Link href="/ghiduri/" className="font-semibold underline underline-offset-2 hover:text-d-acc">ghiduri</Link>.
           </p>
         </Section>

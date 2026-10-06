@@ -367,7 +367,7 @@ export default function Page() {
         {
           slug: 'extras-multilingv-certificat-nastere',
           label: 'Extras multilingv de naștere',
-          desc: 'Pentru stagiul lucrat în UE — valabil direct, fără traducere și fără apostilă.',
+          desc: 'Pentru stagiul lucrat în străinătate: fără traducere și fără apostilă în statele Convenției CIEC nr. 16.',
         },
       ]}
       faqs={[

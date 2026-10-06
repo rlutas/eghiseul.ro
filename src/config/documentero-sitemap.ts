@@ -19,7 +19,7 @@ export const DOCUMENTERO_SITEMAP: DocumenteroSitemapEntry[] = [
   { path: '/certificat-de-nastere/', lastModified: '2026-10-05', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/certificat-de-casatorie/', lastModified: '2026-09-21', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/certificat-de-celibat/', lastModified: '2026-10-05', changeFrequency: 'monthly', priority: 0.9 },
-  { path: '/extras-multilingv/', lastModified: '2026-09-21', changeFrequency: 'monthly', priority: 0.9 },
+  { path: '/extras-multilingv/', lastModified: '2026-10-06', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/ghiduri/', lastModified: '2026-10-05', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/ghiduri/certificat-de-nastere-pierdut/', lastModified: '2026-09-21', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/ghiduri/apostila-acte-stare-civila/', lastModified: '2026-09-20', changeFrequency: 'monthly', priority: 0.7 },

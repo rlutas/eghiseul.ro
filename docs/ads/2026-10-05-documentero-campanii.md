@@ -63,7 +63,7 @@ Un semnal pentru nota de politică (§7): **doi intermediari (unul e cabinet de 
 | Certificat de celibat (adeverință privind statutul civil, Anexa 18, fosta Anexa 9) | `/certificat-de-celibat/` (index) | **698 lei** | legal **≤30 de zile**; valabil 6 luni în RO, majoritatea statelor UE îl cer mai nou de 90 de zile | apostilă Haga +198 · traducere +178,50 · legalizare +99 · apostilă notari +83,30; curierul se adaugă la final |
 | Certificat de naștere, duplicat | `/certificat-de-nastere/` (index) | **998 lei** | legal ≤30 de zile | extras multilingv în aceeași comandă +398 · apostilă +198 · traducere +178,50 · legalizare +99 |
 | Certificat de căsătorie, duplicat (și cu mențiunea de divorț) | `/certificat-de-casatorie/` (index) | **998 lei** | legal ≤30 de zile | extras multilingv căsătorie +398 · apostilă +198 · traducere +178,50 · legalizare +99 |
-| Extras multilingv de naștere (Reg. UE 2016/1191) | `/extras-multilingv/` (index) | **798 lei** | legal ≤30 de zile; nu expiră | + duplicat certificat de naștere +498 |
+| Extras multilingv de naștere (Convenția CIEC nr. 16; corectat 06.10, vezi `documentero/extras-multilingv-fapte.md`) | `/extras-multilingv/` (index) | **798 lei** | legal ≤30 de zile; convenția nu fixează un termen de valabilitate | + duplicat certificat de naștere +498 |
 | Extras multilingv de căsătorie | `/extras-multilingv/#casatorie` (secțiune pe aceeași pagină) | **798 lei** | legal ≤30 de zile | – |
 | Cazier fiscal PF și PJ | `/cazier-fiscal-online/` (**noindex**, live) | **198 lei** | **3 zile lucrătoare**, standard; valabil 30 de zile | procesare urgentă +100 (= 298 lei, „prioritate la depunere”, **fără termen afișat**) · traducere +178,50 · apostilă Haga +198 |
 
@@ -95,14 +95,14 @@ Locația și limba se setează pe campanie. De aceea fiecare serviciu are campan
 | C2 | **Cazier fiscal – RO** | F1 Persoană fizică · F2 Persoană juridică | România | **40 lei** | 27% |
 | C3 | **Certificat de naștere** | N1 Duplicat · N2 Pierdut / model nou | RO + cele 9 țări | **25 lei** | 17% |
 | C4 | **Certificat de căsătorie** | M1 Duplicat | RO + cele 9 țări | **15 lei** | 10% |
-| C5 | **Extras multilingv** | X1 Naștere · X2 Căsătorie | RO + IT, ES, DE, FR, AT, BE, NL, IE (**fără UK**) | **25 lei** | 17% |
+| C5 | **Extras multilingv** | X1 Naștere · X2 Căsătorie | RO + IT, ES, DE, FR, AT, BE, NL (**fără UK și IE**) | **25 lei** | 17% |
 | – | *Faza 2: Cazier judiciar* | *J1–J5, Anexa* | – | *0* | – |
 | | **Total** | | | **150 lei** | |
 
 **De ce așa:**
 
 - **Celibat și fiscal au 85 de lei din 150 (57%).** Sunt primele în decizie. Celibatul are cel mai clar profil de cumpărător (data căsătoriei e fixă, deci omul are un termen), iar fiscalul are cel mai mic preț, deci cel mai rapid feedback de conversie.
-- **Extras multilingv fără Regatul Unit.** Regulamentul (UE) 2016/1191 se aplică doar între statele membre. În UK extrasul nu scutește de traducere și apostilă, deci un clic de acolo ar cumpăra produsul greșit. Pentru UK, landingul trimite la duplicat + apostilă + traducere (C3/C4).
+- **Extras multilingv fără Regatul Unit și Irlanda.** (Corectat 06.10.) Extrasul pe care îl obținem e cel din Convenția CIEC nr. 16 (Legea 65/2012), nu formularul din Regulamentul (UE) 2016/1191. E acceptat fără traducere doar în cele 23 de state care aplică convenția: Italia, Spania, Germania, Franța, Austria, Belgia, Olanda, Luxemburg, Portugalia, Polonia, Elveția, Turcia, Republica Moldova și altele. UK și Irlanda nu sunt printre ele, deci un clic de acolo ar cumpăra produsul greșit. Pentru ei, landingul trimite la duplicat + traducere (+ apostilă în afara UE), C3/C4. Elveția ar fi o țintă validă dacă vrei să extinzi.
 - **România rămâne în campaniile de stare civilă.** Mulți comandă din țară pentru o căsătorie sau o rezidență în străinătate. Dacă după 14 zile RO cheltuie fără conversii, o excluzi (raportul **Locații → Unde s-au aflat utilizatorii**).
 - **Cazierul fiscal doar în România.** Landingul nu are argument de diaspora, iar volumul din străinătate ar fi mic.
 - **Fiecare campanie de stare civilă își acoperă singură toate țările.** Am ales să nu le spargem în „RO” și „Diaspora”, pentru că la 15–45 lei/zi împărțirea ar lăsa fiecare jumătate fără date. Separi abia când o țară depășește constant ~50% din cheltuială.
@@ -648,7 +648,7 @@ Textele sunt validate cu un script (`gen_ads.py`, rulat la 05.10.2026; ieșirea:
 |---|---|---|
 | D1 | Consulatul trimite cererea tot la primărie, în 30–60 de zile. Prin avocat, intră direct. | 88 |
 | D2 | Documentero e serviciu privat, neafiliat cu instituțiile. Prețul e afișat: 998 lei. **[PIN descriere poz. 1]** | 83 |
-| D3 | Pentru UE adaugi extrasul multilingv (+398 lei), în același plic, fără traducere. | 81 |
+| D3 | Pentru Italia, Spania, Germania adaugi extrasul multilingv (+398 lei), fără traducere. | 86 |
 | D4 | Certificatul e gratuit la ghișeu. Plătești avocatul, dosarul, urmărirea și livrarea. | 84 |
 
 ### N2 Naștere – pierdut / model nou  
@@ -740,7 +740,7 @@ Textele sunt validate cu un script (`gen_ads.py`, rulat la 05.10.2026; ieșirea:
 | D1 | Serviciu privat, neafiliat cu primăriile. Avocatul depune cererea cu împuternicire. **[PIN descriere poz. 1]** | 83 |
 | D2 | 998 lei, onorariu avocat, taxe și TVA incluse. Apostila și traducerea se aleg separat. | 86 |
 | D3 | Duplicatul poartă mențiunile ulterioare, inclusiv divorțul înregistrat în România. | 82 |
-| D4 | Pentru UE, extrasul multilingv de căsătorie (+398 lei) merge fără traducere. | 76 |
+| D4 | În Italia, Spania, Germania, extrasul de căsătorie (+398 lei) merge fără traducere. | 83 |
 
 **RSA B – din străinătate**
 
@@ -774,16 +774,16 @@ Textele sunt validate cu un script (`gen_ads.py`, rulat la 05.10.2026; ieșirea:
 *Final URL:* `https://documentero.ro/extras-multilingv/`  
 *Display path:* `documentero.ro/extras/multilingv`
 
-**RSA A – acceptat în UE**
+**RSA A – acceptat în 23 de state**
 
 | # | Titlu (≤30) | Car. |
 |---|---|---|
 | H1 | Extras Multilingv de Naștere | 28 |
-| H2 | Acceptat în UE Fără Traducere | 29 |
-| H3 | Fără Apostilă în Statele UE | 27 |
+| H2 | Fără Traducere în 23 de State | 29 |
+| H3 | Fără Apostilă în Italia | 23 |
 | H4 | Obținut prin Avocat | 19 |
 | H5 | 798 lei, Tot Inclus | 19 |
-| H6 | Formularul UE 2016/1191 | 23 |
+| H6 | Convenția CIEC nr. 16 | 21 |
 | H7 | Semnezi de pe Telefon | 21 |
 | H8 | Curier Oriunde în UE | 20 |
 | H9 | Serviciu Privat, Neafiliat | 26 |
@@ -797,7 +797,7 @@ Textele sunt validate cu un script (`gen_ads.py`, rulat la 05.10.2026; ieșirea:
 | # | Descriere (≤90) | Car. |
 |---|---|---|
 | D1 | Serviciu privat, neafiliat cu primăriile. Avocatul depune cererea cu împuternicire. **[PIN descriere poz. 1]** | 83 |
-| D2 | 798 lei cu onorariu, taxe și TVA. Acceptat în orice stat UE fără traducere și apostilă. | 87 |
+| D2 | 798 lei cu onorariu, taxe și TVA. Fără traducere și apostilă în 23 de state. | 76 |
 | D3 | Adaugi și duplicatul certificatului de naștere, dintr-o singură depunere, cu +498 lei. | 86 |
 | D4 | Pentru școala copilului, căsătorie, rezidență sau pensie în Italia, Spania, Germania. | 85 |
 
@@ -812,20 +812,20 @@ Textele sunt validate cu un script (`gen_ads.py`, rulat la 05.10.2026; ieșirea:
 | H5 | Neafiliat cu Primăriile | 23 |
 | H6 | Serviciu Privat Documentero | 27 |
 | H7 | Tarif Serviciu: 798 lei | 23 |
-| H8 | Extrasul Nu Expiră | 18 |
+| H8 | Acceptat în 23 de State | 23 |
 | H9 | Fără Programare la Consulat | 27 |
 | H10 | Pentru Școală, Rezidență | 24 |
 | H11 | Vezi Prețul și Termenul | 23 |
 | H12 | Comandă Online de Oriunde | 25 |
 | H13 | Semnezi din Străinătate | 23 |
-| H14 | Acceptat în Orice Stat UE | 25 |
+| H14 | Italia, Spania, Germania | 24 |
 | H15 | Comandă Extrasul Acum | 21 |
 
 | # | Descriere (≤90) | Car. |
 |---|---|---|
 | D1 | Extrasul e gratuit la ghișeu. Plătești avocatul, dosarul, urmărirea și livrarea. | 80 |
 | D2 | Documentero e serviciu privat. Extrasul îl eliberează starea civilă; noi îl obținem. **[PIN descriere poz. 1]** | 84 |
-| D3 | Regulamentul UE 2016/1191 a scos traducerea și apostila pentru actele de stare civilă. | 86 |
+| D3 | Convenția CIEC nr. 16: fără traducere în Italia, Spania, Germania, Franța și altele. | 84 |
 | D4 | Consulatul trimite cererea tot în țară, în 30–60 de zile. Prin avocat, intră direct. | 84 |
 
 ### X2 Extras multilingv – căsătorie  
@@ -833,13 +833,13 @@ Textele sunt validate cu un script (`gen_ads.py`, rulat la 05.10.2026; ieșirea:
 *Final URL:* `https://documentero.ro/extras-multilingv/#casatorie`  
 *Display path:* `documentero.ro/extras/casatorie`
 
-**RSA A – acceptat în UE**
+**RSA A – acceptat în 23 de state**
 
 | # | Titlu (≤30) | Car. |
 |---|---|---|
 | H1 | Extras Multilingv Căsătorie | 27 |
-| H2 | Acceptat în UE Fără Traducere | 29 |
-| H3 | Fără Apostilă în Statele UE | 27 |
+| H2 | Fără Traducere în 23 de State | 29 |
+| H3 | Fără Apostilă în Italia | 23 |
 | H4 | Obținut prin Avocat | 19 |
 | H5 | 798 lei, Tot Inclus | 19 |
 | H6 | Oricare dintre Soți Poate Cere | 30 |
@@ -856,9 +856,9 @@ Textele sunt validate cu un script (`gen_ads.py`, rulat la 05.10.2026; ieșirea:
 | # | Descriere (≤90) | Car. |
 |---|---|---|
 | D1 | Serviciu privat, neafiliat cu primăriile. Avocatul depune cererea cu împuternicire. **[PIN descriere poz. 1]** | 83 |
-| D2 | 798 lei cu onorariu, taxe și TVA. Instituțiile UE îl acceptă fără traducere și apostilă. | 88 |
-| D3 | Dacă ai divorțat, mențiunea apare și pe extras, dacă e înscrisă pe actul din România. | 85 |
-| D4 | Pentru rezidența partenerului, schimbarea numelui sau pensia de urmaș, în UE. | 77 |
+| D2 | 798 lei cu onorariu, taxe și TVA. Statele convenției îl acceptă fără traducere. | 79 |
+| D3 | Dacă ai divorțat, mențiunea apare și pe extras, dacă e înscrisă pe actul din România. ⚠️ neverificat pe formularul CIEC B; scoate-o dacă nu se confirmă | 85 |
+| D4 | Pentru rezidența partenerului, schimbarea numelui sau pensia de urmaș, în străinătate. | 86 |
 
 **RSA B – fără traducere**
 
@@ -872,7 +872,7 @@ Textele sunt validate cu un script (`gen_ads.py`, rulat la 05.10.2026; ieșirea:
 | H6 | Serviciu Privat Documentero | 27 |
 | H7 | Tarif Serviciu: 798 lei | 23 |
 | H8 | Fără Programare la Consulat | 27 |
-| H9 | Acceptat în Orice Stat UE | 25 |
+| H9 | Acceptat în 23 de State | 23 |
 | H10 | Cu Mențiunea de Divorț | 22 |
 | H11 | Vezi Prețul și Termenul | 23 |
 | H12 | Comandă Online de Oriunde | 25 |
@@ -900,7 +900,7 @@ Textele sunt validate cu un script (`gen_ads.py`, rulat la 05.10.2026; ieșirea:
 | Certificat de celibat | 21 | 698 lei, tot inclus | 19 | Anexa 18, fosta Anexa 9 | 23 | `https://documentero.ro/certificat-de-celibat/` |
 | Certificat de naștere | 21 | Duplicat, 998 lei | 17 | Model nou, cu CNP | 17 | `https://documentero.ro/certificat-de-nastere/` |
 | Certificat de căsătorie | 23 | Duplicat, 998 lei | 17 | Și cu mențiunea de divorț | 25 | `https://documentero.ro/certificat-de-casatorie/` |
-| Extras multilingv | 17 | 798 lei, acceptat în UE | 23 | Fără traducere și apostilă | 26 | `https://documentero.ro/extras-multilingv/` |
+| Extras multilingv | 17 | 798 lei, în 23 de state | 22 | Fără traducere și apostilă | 26 | `https://documentero.ro/extras-multilingv/` |
 | Ghiduri | 7 | Apostila pe acte de stare civilă | 32 | Procură: notar, consulat, avocat | 32 | `https://documentero.ro/ghiduri/` |
 | Despre noi și avocat | 20 | Serviciu privat, date firmă | 27 | Avocat înscris în Barou | 23 | `https://documentero.ro/despre/` |
 | Contact | 7 | Email și telefon | 16 | L–V 08:00–16:00 | 15 | `https://documentero.ro/contact/` |
@@ -996,7 +996,7 @@ Textele sunt validate cu un script (`gen_ads.py`, rulat la 05.10.2026; ieșirea:
 | Certificat de celibat | 21 | Anexa 18, tot inclus | 20 | 698 | `https://documentero.ro/certificat-de-celibat/` |
 | Duplicat naștere | 16 | Model nou, cu CNP | 17 | 998 | `https://documentero.ro/certificat-de-nastere/` |
 | Duplicat căsătorie | 18 | Și cu mențiune de divorț | 24 | 998 | `https://documentero.ro/certificat-de-casatorie/` |
-| Extras multilingv | 17 | Acceptat în UE | 14 | 798 | `https://documentero.ro/extras-multilingv/` |
+| Extras multilingv | 17 | În 23 de state | 14 | 798 | `https://documentero.ro/extras-multilingv/` |
 
 **Cazier fiscal (C2)**
 

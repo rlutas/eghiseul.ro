@@ -71,7 +71,7 @@ export default function Page() {
           <li><strong>Certificat de naștere</strong>: duplicat, pentru actul pierdut, deteriorat sau de model vechi.</li>
           <li><strong>Certificat de căsătorie</strong>: duplicat, inclusiv cu mențiunea de divorț.</li>
           <li><strong>Certificat de celibat (adeverința privind statutul civil, Anexa 18, fosta Anexa 9)</strong>: dovada stării civile, de regulă pentru căsătorie în străinătate.</li>
-          <li><strong>Extras multilingv de naștere</strong> și <strong>extras multilingv de căsătorie</strong>: formularele standard multilingve prevăzute de Regulamentul (UE) 2016/1191, acceptate în statele Uniunii Europene fără traducere și fără apostilă.</li>
+          <li><strong>Extras multilingv de naștere</strong> și <strong>extras multilingv de căsătorie</strong>: extrasele multilingve prevăzute de Convenția CIEC nr. 16 (Viena, 1976), la care România a aderat prin Legea nr. 65/2012, acceptate fără traducere și fără apostilă în statele care aplică convenția. Extrasele nu se folosesc în fața autorităților române.</li>
         </ul>
         <p>
           Nu prestăm alte servicii pe această platformă. Traducerea autorizată și apostila, atunci când sunt afișate

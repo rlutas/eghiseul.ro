@@ -291,7 +291,7 @@ export default async function CelibatPage() {
         <RelatedServices
           items={[
             ['Certificat de naștere, duplicat', 'Îl cer împreună cu celibatul aproape toate statele.', '/certificat-de-nastere/'],
-            ['Extras multilingv de naștere', 'În UE înlocuiește traducerea și apostila pentru certificatul de naștere.', '/extras-multilingv/'],
+            ['Extras multilingv de naștere', 'În statele Convenției CIEC nr. 16 ține loc de certificatul de naștere tradus.', '/extras-multilingv/'],
             ['Certificat de căsătorie cu mențiunea de divorț', 'Dacă ai fost căsătorit, unele state îl cer lângă certificatul de celibat.', '/certificat-de-casatorie/'],
           ]}
         />
