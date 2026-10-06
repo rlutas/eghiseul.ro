@@ -18,9 +18,13 @@
  * GA4), fiind strict necesar pentru a ști ce canal aduce comenzi.
  */
 
+import { isIgnoredReferrer } from '@/lib/analytics/attribution-channel';
+
 const STORAGE_KEY = 'eg_attribution';
 /** O vizită din altă sursă după atâta timp = sesiune nouă → actualizăm `last`. */
 const SESSION_GAP_MS = 30 * 60 * 1000;
+/** După 90 de zile fără vizită, atribuirea veche nu mai spune nimic: o luăm de la capăt. */
+const MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000;
 
 export interface TouchPoint {
   utm_source?: string;
@@ -28,7 +32,7 @@ export interface TouchPoint {
   utm_campaign?: string;
   utm_term?: string;
   utm_content?: string;
-  /** Click ID-uri de platformă: Google (gclid/gbraid/wbraid), Meta (fbclid). */
+  /** Click ID-uri de platformă: Google (gclid/gbraid/wbraid), Meta (fbclid), Microsoft (msclkid), TikTok (ttclid), LinkedIn (li_fat_id). */
   click_id?: string;
   click_platform?: string;
   /** ChatGPT Ads: identificatorul de atribuire OpenAI (`?oppref=`), trimis server-side la plată. */
@@ -53,6 +57,7 @@ const CLICK_IDS: Array<[string, string]> = [
   ['fbclid', 'meta'],
   ['ttclid', 'tiktok'],
   ['msclkid', 'microsoft'],
+  ['li_fat_id', 'linkedin'],
 ];
 
 function readCurrentTouch(): TouchPoint {
@@ -88,8 +93,10 @@ function readCurrentTouch(): TouchPoint {
 
   // Referrer intern nu e o sursă nouă — ne interesează doar de unde a venit
   // în site, nu cum navighează prin el.
+  // Întoarcerea de la plată (Stripe, 3-D Secure) nu e o sursă nouă: altfel
+  // `last` devine „checkout.stripe.com" și pierdem canalul real.
   const ref = document.referrer;
-  if (ref && !ref.includes(window.location.host)) {
+  if (ref && !ref.includes(window.location.host) && !isIgnoredReferrer(ref)) {
     touch.referrer = ref.slice(0, 300);
   }
 
@@ -107,7 +114,9 @@ function read(): Attribution | null {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Attribution;
-    return parsed?.first && parsed?.last ? parsed : null;
+    if (!parsed?.first || !parsed?.last) return null;
+    if (Date.now() - new Date(parsed.updated).getTime() > MAX_AGE_MS) return null;
+    return parsed;
   } catch {
     return null;
   }

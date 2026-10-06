@@ -11,6 +11,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BarChart3, RefreshCw } from 'lucide-react';
+import { CHANNEL_LABEL, type Channel } from '@/lib/analytics/attribution-channel';
 
 interface Attributed {
   orders: number;
@@ -24,6 +25,7 @@ interface Kpis {
   lifecycle: Record<string, { sent: number } & Attributed>;
   warmup: { sent: number; sentAll: number; unsubscribed: number } & Attributed;
   campaigns: Array<{ id: string; name: string; status: string; sent: number } & Attributed>;
+  byChannel?: Array<{ channel: Channel; source: string; platform: string } & Attributed>;
 }
 
 const ron = (n: number) => `${n.toLocaleString('ro-RO', { maximumFractionDigits: 0 })} RON`;
@@ -163,6 +165,41 @@ export function MarketingKpisCard() {
             </tbody>
           </table>
         </div>
+
+        {/* De unde vin TOATE comenzile plătite, nu doar cele din email. */}
+        {data?.byChannel && data.byChannel.length > 0 && (
+          <div className="space-y-2 pt-2">
+            <h3 className="text-sm font-semibold text-slate-900">Comenzi plătite pe canal (toate sursele)</h3>
+            <p className="text-xs text-muted-foreground">
+              Ultima sursă reală înainte de comandă: reclamă (click ID), email (UTM), motor de căutare, asistent AI sau rețea socială
+              (după site-ul de proveniență). „Direct” = fără sursă cunoscută (adresă tastată, aplicații care ascund sursa).
+            </p>
+            <div className="overflow-x-auto rounded-lg border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-slate-50 text-left text-xs text-slate-500">
+                    <th className="px-3 py-2">Canal</th>
+                    <th className="px-3 py-2">Sursă</th>
+                    <th className="px-3 py-2">Site</th>
+                    <th className="px-3 py-2 text-right">Comenzi</th>
+                    <th className="px-3 py-2 text-right">Venit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.byChannel.map((r) => (
+                    <tr key={`${r.platform}-${r.channel}-${r.source}`} className="border-b last:border-0">
+                      <td className="px-3 py-2 font-medium text-slate-900">{CHANNEL_LABEL[r.channel] ?? r.channel}</td>
+                      <td className="px-3 py-2 text-slate-700">{r.source}</td>
+                      <td className="px-3 py-2 text-slate-500">{r.platform}</td>
+                      <td className="px-3 py-2 text-right font-semibold text-slate-900">{r.orders}</td>
+                      <td className="px-3 py-2 text-right text-slate-700">{ron(r.revenueRon)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

@@ -12,6 +12,7 @@
  * Permission: settings.manage
  */
 
+import { classifyAttribution, type AttributionLike, type Channel } from '@/lib/analytics/attribution-channel';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
   // ── Comenzi plătite în fereastră, cu atribuirea lor (o singură citire) ──
   const { data: paidRaw } = await admin
     .from('orders')
-    .select('id, total_price, attribution, recovery_email_step, phone_contacted_at, coupon_code, paid_at')
+    .select('id, total_price, attribution, recovery_email_step, phone_contacted_at, coupon_code, paid_at, platform')
     .not('paid_at', 'is', null)
     .gte('paid_at', since)
     .eq('is_test', false)
@@ -57,7 +58,8 @@ export async function GET(request: NextRequest) {
   const paid: Array<{
     id: string;
     total_price: number | null;
-    attribution: { last?: { utm_medium?: string; utm_campaign?: string } } | null;
+    attribution: ({ last?: { utm_medium?: string; utm_campaign?: string } } & AttributionLike) | null;
+    platform?: string | null;
     recovery_email_step: number | null;
     phone_contacted_at: string | null;
     coupon_code: string | null;
@@ -69,6 +71,21 @@ export async function GET(request: NextRequest) {
   };
   const byUtm = (medium: string, campaign?: string) =>
     attributed((o) => o.attribution?.last?.utm_medium === medium && (!campaign || o.attribution?.last?.utm_campaign === campaign));
+
+  // ── Comenzi plătite pe canal (toate sursele, nu doar emailul) ──────────
+  // Clasificat la citire, ca să intre și comenzile de dinainte de 06.10, când
+  // canalul nu era salvat pe comandă.
+  const channelMap = new Map<string, { channel: Channel; source: string; platform: string; orders: number; revenueRon: number }>();
+  for (const o of paid) {
+    const { channel, source } = classifyAttribution(o.attribution);
+    const platform = o.platform ?? 'eghiseul';
+    const key = `${platform}|${channel}|${source}`;
+    const row = channelMap.get(key) ?? { channel, source, platform, orders: 0, revenueRon: 0 };
+    row.orders += 1;
+    row.revenueRon = Math.round((row.revenueRon + Number(o.total_price ?? 0)) * 100) / 100;
+    channelMap.set(key, row);
+  }
+  const byChannel = [...channelMap.values()].sort((a, b) => b.revenueRon - a.revenueRon);
 
   // ── Recovery (3 pași) ───────────────────────────────────────────────────
   const { data: recoveryEvents } = await admin
@@ -133,6 +150,7 @@ export async function GET(request: NextRequest) {
       days,
       since,
       paidOrdersInWindow: paid.length,
+      byChannel,
       recovery: { sent: recoverySent, converted: recoveryConverted, couponsUsed: recoveryCouponsUsed },
       phone: { contacted: phoneContacted ?? 0, contactedAll: phoneContactedAll ?? 0, converted: phoneConverted, couponsUsed: phoneCouponsUsed },
       lifecycle,

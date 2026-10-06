@@ -53,6 +53,7 @@ Montare: `<CookieConsent />` în `src/app/layout.tsx` (root). **GA4 NU mai e în
 | Cookie | Emitent | Categorie | Durată |
 |---|---|---|---|
 | `eg_cookie_consent` | eGhișeul | strict necesar | 6 luni |
+| `eg_attribution` (localStorage, nu cookie) | eGhișeul / documentero, per host | atribuire proprie: de unde vine comanda (UTM, click ID, referrer, pagina de aterizare); fără date personale, fără terți | 90 de zile de la ultima vizită |
 | `sb-*` | Supabase (auth) | strict necesar | sesiune |
 | `__stripe_mid` / `__stripe_sid` | Stripe (checkout, antifraudă) | strict necesar | 1 an / 30 min |
 | `_ga`, `_ga_*` | Google Analytics | analiză — **doar cu acord** | până la 2 ani |
