@@ -9,7 +9,7 @@ Primele 4 săptămâni pe YouTube, Facebook și Instagram, cu clipurile făcute 
 | Trailer canal | 0:35 | 0:34 | 0:34 | — |
 | Cât e valabil cazierul judiciar | 1:50 | 0:56 | 0:56 | ce apare (0:43) · pentru străinătate (0:42) · integritate (0:43) |
 | Cazierul judiciar din străinătate | 1:57 | 0:55 | 0:55 | cine ți-l cere (0:35) · apostilă și traducere (0:42) |
-| Cazierul fiscal nu arată datoriile | 1:17 | 0:56 | 0:56 | firmă: pe numele cui (0:42) · fiscal vs. atestare (0:25) |
+| Cazierul fiscal nu arată datoriile | 1:21 | 0:55 | 0:55 | firmă: pe numele cui (0:43) · fiscal vs. atestare (0:25) |
 
 Toate cu vocea standard, prețuri verificate pe paginile live la 06.10 și mențiunea de serviciu privat.
 
@@ -27,6 +27,18 @@ Din 25.10 România trece la ora de iarnă, odată cu toată Europa, deci diferen
 **TikTok** e opțional și vine abia după cele 4 săptămâni: se folosesc aceleași fișiere 9:16, cu textul pentru Instagram. Îl pornim doar dacă Reels-urile aduc vizualizări pe Facebook/Instagram.
 
 ### Săptămâna 1 (07–13.10): ce avem gata
+
+**Programate în YouTube Studio pe 06.10** (devin publice singure, ora României):
+
+| Când | Clip | Link |
+|---|---|---|
+| Mi 07.10 18:00 | Trailer | https://youtu.be/1K0_nKbcaGQ |
+| Mi 07.10 19:00 | Lung: Cât e valabil cazierul judiciar | https://youtu.be/GxMe0-e5emw |
+| Vi 09.10 18:00 | Short: Cât e valabil cazierul judiciar | https://youtube.com/shorts/jCCPou5R0eI |
+| Sâ 10.10 11:00 | Lung: Cazierul judiciar din străinătate | https://youtu.be/JGgPR9nhWJM |
+| Du 11.10 12:00 | Short: Cazierul judiciar din străinătate | https://youtube.com/shorts/D15gF6qRFRU |
+
+Clipul cu cazierul fiscal e refăcut (fără „PDF semnat electronic”: scan pe email + original prin curier) și așteaptă aprobarea lui Raul. Facebook/Instagram așteaptă login în Meta Business Suite.
 
 | Zi | Ora | Unde | Ce |
 |---|---|---|---|
