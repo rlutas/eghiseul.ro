@@ -38,7 +38,9 @@ Din 25.10 România trece la ora de iarnă, odată cu toată Europa, deci diferen
 | Sâ 10.10 11:00 | Lung: Cazierul judiciar din străinătate | https://youtu.be/JGgPR9nhWJM |
 | Du 11.10 12:00 | Short: Cazierul judiciar din străinătate | https://youtube.com/shorts/D15gF6qRFRU |
 
-Clipul cu cazierul fiscal e refăcut (fără „PDF semnat electronic”: scan pe email + original prin curier) și așteaptă aprobarea lui Raul. Facebook/Instagram așteaptă login în Meta Business Suite.
+Clipul cu cazierul fiscal e refăcut (fără „PDF semnat electronic”: scan pe email + original prin curier) și așteaptă aprobarea lui Raul. Facebook, programate pe 06.10 din Meta Business Suite (doar pagina EGhiseul): Reel „Cât e valabil cazierul” Jo 08.10 19:00, Reel „Cazierul din străinătate” Du 11.10 18:00.
+
+⚠️ Instagram: pagina EGhiseul e legată în Meta de contul personal `iamraul92`, nu de un cont eGhiseul. Pe Instagram nu postăm până nu există un cont de business eGhiseul legat de pagină.
 
 | Zi | Ora | Unde | Ce |
 |---|---|---|---|
