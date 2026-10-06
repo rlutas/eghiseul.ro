@@ -46,6 +46,10 @@
       "schedule": "40 7 * * *"
     },
     {
+      "path": "/api/cron/indexnow/",
+      "schedule": "40 4 * * *"
+    },
+    {
       "path": "/api/cron/vehicle-reminders/",
       "schedule": "50 7 * * *"
     }
