@@ -520,7 +520,7 @@ export default async function CertificatCasatoriePage() {
                 </p>
                 <ul className="space-y-4">
                   {[
-                    { icon: Landmark, title: 'Antet oficial Stare Civilă', desc: 'Emis de Serviciul de Stare Civilă din cadrul primăriei unde a fost înregistrată căsătoria.' },
+                    { icon: Landmark, title: 'Antet Stare Civilă', desc: 'Emis de Serviciul de Stare Civilă din cadrul primăriei unde a fost înregistrată căsătoria.' },
                     { icon: FileText, title: 'Document original, nu copie', desc: 'Primești un certificat nou, oficial — duplicatul care înlocuiește originalul pierdut sau deteriorat.' },
                     { icon: Shield, title: 'Valabil legal', desc: 'Îl folosești la notar, bancă, instanță sau pentru dosare de cetățenie, la fel ca originalul.' },
                     { icon: Truck, title: 'Livrat prin curier', desc: 'Documentul fizic ajunge la tine prin curier, în zile lucrătoare — nu este generat instant.' },

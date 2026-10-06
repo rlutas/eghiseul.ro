@@ -492,7 +492,7 @@ export default async function CazierFiscalOnlinePage() {
                 </p>
                 <ul className="space-y-4">
                   {[
-                    { icon: Landmark, title: 'Antet oficial ANAF', desc: 'Emis de Agenția Națională de Administrare Fiscală, cu numărul și data înregistrării.' },
+                    { icon: Landmark, title: 'Antet ANAF', desc: 'Emis de Agenția Națională de Administrare Fiscală, cu numărul și data înregistrării.' },
                     { icon: Shield, title: 'Semnătură electronică', desc: 'Are aceeași valoare legală ca varianta cu ștampilă — îl folosești la ONRC, notar sau bancă.' },
                     { icon: Receipt, title: 'Arată ce e înscris pe numele tău', desc: 'Confirmă că nu ai fapte sancționate de legile fiscale înscrise sau le enumeră, la data emiterii.' },
                     { icon: Mail, title: 'Livrat pe email, în PDF', desc: 'Gata de printat sau trimis mai departe, fără deplasare la ghișeu.' },

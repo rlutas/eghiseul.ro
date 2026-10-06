@@ -216,7 +216,7 @@ export function classifyTouch(t: TouchLike | null | undefined): ChannelResult | 
     const host = src.replace(/^www\./, '');
     const ai = matchHost(host, AI_ASSISTANTS) ?? (/^(chatgpt|perplexity|copilot|gemini|claude)$/.test(src) ? src : null);
     if (ai) return { channel: 'ai_assistant', source: ai };
-    const social = matchHost(host, SOCIAL) ?? (/^(facebook|fb|instagram|ig|tiktok|linkedin|whatsapp|x|twitter)$/.test(src) ? src.replace(/^fb$/, 'facebook').replace(/^ig$/, 'instagram').replace(/^twitter$/, 'x') : null);
+    const social = matchHost(host, SOCIAL) ?? (/^(facebook|fb|instagram|ig|tiktok|linkedin|whatsapp|x|twitter|youtube|yt|reddit|pinterest|telegram)$/.test(src) ? src.replace(/^fb$/, 'facebook').replace(/^ig$/, 'instagram').replace(/^twitter$/, 'x').replace(/^yt$/, 'youtube') : null);
     if (social) return { channel: 'social', source: social };
     const engine = matchHost(host, SEARCH_ENGINES) ?? (/^(google|bing)$/.test(src) ? src : null);
     if (engine) return { channel: 'organic_search', source: engine };

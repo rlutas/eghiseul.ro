@@ -737,7 +737,7 @@ export default async function ExtrasCarteFunciaraPage() {
                 </p>
                 <ul className="space-y-4">
                   {[
-                    { icon: Landmark, title: 'Antet oficial ANCPI / OCPI', desc: 'Emis de Oficiul de Cadastru și Publicitate Imobiliară, cu seria și codul de înregistrare.' },
+                    { icon: Landmark, title: 'Antet ANCPI / OCPI', desc: 'Emis de Oficiul de Cadastru și Publicitate Imobiliară, cu seria și codul de înregistrare.' },
                     { icon: Shield, title: 'Semnătură electronică eIDAS', desc: 'Are aceeași valoare legală ca varianta cu ștampilă — îl folosești la notar, bancă sau în instanță.' },
                     { icon: Search, title: 'Cod de verificare unic', desc: 'Are cod de verificare, iar autenticitatea se poate confirma la OCPI.' },
                     { icon: Mail, title: 'Livrat pe email, în PDF', desc: 'Gata de printat sau trimis mai departe, imediat ce ajunge de la OCPI.' },

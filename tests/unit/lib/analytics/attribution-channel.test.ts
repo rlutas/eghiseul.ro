@@ -107,3 +107,9 @@ describe('classifyAttribution', () => {
   });
   void at;
 });
+
+describe('youtube utm', () => {
+  it('classifies our YouTube video links as social', () => {
+    expect(classifyTouch({ utm_source: 'youtube', utm_medium: 'video' } as never)).toEqual({ channel: 'social', source: 'youtube' });
+  });
+});

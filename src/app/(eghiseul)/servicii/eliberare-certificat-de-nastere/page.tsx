@@ -539,7 +539,7 @@ export default async function CertificatNasterePage() {
                 </p>
                 <ul className="space-y-4">
                   {[
-                    { icon: Landmark, title: 'Antet oficial Stare Civilă', desc: 'Emis de Serviciul de Stare Civilă al primăriei, pe modelul nou, cu filigran și cod unic.' },
+                    { icon: Landmark, title: 'Antet Stare Civilă', desc: 'Emis de Serviciul de Stare Civilă al primăriei, pe modelul nou, cu filigran și cod unic.' },
                     { icon: FileText, title: 'Document original, nu copie', desc: 'Primești un duplicat original al certificatului, nu o simplă fotocopie.' },
                     { icon: Scale, title: 'Valabil legal', desc: 'Îl folosești la notar, la căsătorie, pentru pașaport sau pentru dosare de cetățenie.' },
                     { icon: Mail, title: 'Livrat prin curier', desc: 'Originalul ajunge la tine prin curier în zile lucrătoare, cu tracking pe email.' },

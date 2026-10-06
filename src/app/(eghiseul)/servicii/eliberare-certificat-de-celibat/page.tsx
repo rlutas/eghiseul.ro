@@ -462,7 +462,7 @@ export default async function CertificatCelibatPage() {
                 </p>
                 <ul className="space-y-4">
                   {[
-                    { icon: Landmark, title: 'Antet oficial Stare Civilă', desc: 'Emis de Serviciul de Stare Civilă din cadrul primăriei localității tale de domiciliu.' },
+                    { icon: Landmark, title: 'Antet Stare Civilă', desc: 'Emis de Serviciul de Stare Civilă din cadrul primăriei localității tale de domiciliu.' },
                     { icon: Heart, title: 'Atestă statutul de necăsătorit', desc: 'Confirmă oficial că nu ești căsătorit(ă) la data eliberării, pe baza registrelor de stare civilă.' },
                     { icon: Shield, title: 'Valabil legal', desc: 'Îl folosești intern și pentru căsătoria în străinătate (cu apostilă) sau pentru dosare de cetățenie.' },
                     { icon: Truck, title: 'Livrat prin curier', desc: 'Documentul fizic ajunge la tine prin curier, în zile lucrătoare — nu este generat instant.' },
