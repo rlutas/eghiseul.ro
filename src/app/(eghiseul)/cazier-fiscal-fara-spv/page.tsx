@@ -429,11 +429,11 @@ export default function Page() {
         Art. 9 alin. (1) admite două forme de mandat pentru persoanele fizice: procura autentică
         și împuternicirea avocațială. E calea pentru cine e plecat și nu trece de video, pentru
         cine are actul expirat, pentru cine are nevoie de cazierul unei firme în care nu e
-        reprezentant legal dar are mandat de la acesta, și pentru cine vrea documentul pe email
-        fără să se ocupe. Asta facem noi: prin serviciul de{' '}
+        reprezentant legal dar are mandat de la acesta, și pentru cine nu vrea să se ocupe de drum
+        și de coadă. Asta facem noi: prin serviciul de{' '}
         <Link href="/servicii/cazier-fiscal-online/">cazier fiscal online</Link> depunem cererea
-        cu împuternicire și îți trimitem certificatul în 1–3 zile lucrătoare, pentru 198 RON cu
-        TVA. Plătești munca, nu documentul; certificatul în sine nu costă nimic la nicio cale.
+        cu împuternicire, avocatul ridică certificatul pe hârtie, iar tu primești scanul pe email și
+        originalul prin curier, în 1–3 zile lucrătoare, pentru 198 RON cu TVA. Plătești munca, nu documentul; certificatul în sine nu costă nimic la nicio cale.
         Dacă ești în țară, ai act valabil și un ghișeu în apropiere, varianta 2 e mai rapidă și
         gratuită.
       </p>

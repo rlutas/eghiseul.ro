@@ -16,8 +16,8 @@ export const revalidate = 3600;
 const PATH = '/cazier-fiscal-online/';
 const TITLE = 'Cazier fiscal online, fără SPV și fără drum la ANAF';
 const DESCRIPTION =
-  'Cazier fiscal pentru persoane fizice, obținut de avocat cu împuternicire, fără cont SPV și fără drum la ANAF. PDF pe email. Serviciu privat, nu ANAF.';
-const UPDATED = '2026-10-05';
+  'Cazier fiscal pentru persoane fizice, obținut de avocat, fără cont SPV și fără drum la ANAF. Scan pe email, originalul prin curier. Serviciu privat.';
+const UPDATED = '2026-10-06';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -73,11 +73,11 @@ export default async function CazierFiscalAdsPage() {
           crumb="Cazier fiscal"
           eyebrow="Persoane fizice · serviciu privat, nu ANAF"
           title="Cazier fiscal fără SPV și fără drum la ANAF."
-          intro="Semnezi împuternicirea pe telefon, avocatul depune cererea, iar ANAF eliberează cazierul fiscal. Îl primești în PDF pe email, gata de pus la dosar."
+          intro="Semnezi împuternicirea pe telefon, avocatul depune cererea, iar ANAF eliberează cazierul fiscal. Îl primești scanat pe email, iar originalul prin curier, dacă îl alegi."
           orderSlug="cazier-fiscal"
           cta="Comandă cazierul fiscal"
           secondary={{ label: 'Variantele gratuite', href: '#variante' }}
-          facts={[[`${p.estimatedDays ?? 3} zile`, 'lucrătoare, standard'], ['Fără SPV', 'nu-ți trebuie cont ANAF'], ['PDF', 'pe email']]}
+          facts={[[`${p.estimatedDays ?? 3} zile`, 'lucrătoare, standard'], ['Fără SPV', 'nu-ți trebuie cont ANAF'], ['Scan + original', 'email și curier']]}
           media={<Image src="/images/documentero/avocat-ghiseu-stare-civila.webp" alt="Avocata depune o cerere la ghișeu" width={1264} height={848} className="h-full w-full object-cover" sizes="(min-width: 1024px) 760px, 100vw" />}
           priceLabel="Cazier fiscal"
           price={p.basePrice}
@@ -117,7 +117,7 @@ export default async function CazierFiscalAdsPage() {
                 ['Completezi formularul', 'Datele tale, actul de identitate și semnătura.'],
                 ['Plătești online', 'Cu cardul, prin Stripe. Primești factură pe email.'],
                 ['Avocatul depune cererea', 'Cu împuternicire avocațială, la ANAF.'],
-                ['Primești cazierul fiscal', 'PDF pe email, gata de pus la dosar.'],
+                ['Primești cazierul fiscal', 'Scanat pe email; originalul prin curier, în țară sau în străinătate.'],
               ].map(([t, d], i) => (
                 <Card key={t} className="flex flex-col gap-2.5 rounded-2xl p-6">
                   <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-d-ink font-bold text-d-bg">{i + 1}</span>
@@ -133,7 +133,7 @@ export default async function CazierFiscalAdsPage() {
               {[
                 'Onorariul avocatului și împuternicirea',
                 'Depunerea cererii la ANAF și urmărirea ei',
-                'Cazierul fiscal în PDF, pe email',
+                'Cazierul fiscal scanat pe email, originalul prin curier',
                 'Banii înapoi dacă cererea nu se poate rezolva',
               ].map((t) => (
                 <li key={t} className="flex items-start gap-2.5"><Check className="mt-0.5 shrink-0 text-d-acc" /><span>{t}</span></li>

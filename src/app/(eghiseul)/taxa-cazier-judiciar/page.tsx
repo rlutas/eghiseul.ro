@@ -47,7 +47,7 @@ export default function Page() {
         },
         {
           q: 'Atunci ce plătesc dacă îl cer online?',
-          a: 'Serviciul, nu taxa: un avocat împuternicit de tine depune cererea, ridică certificatul și ți-l trimite semnat electronic. La noi costă 198 de lei pentru persoane fizice, cu factură.',
+          a: 'Serviciul, nu taxa: un avocat împuternicit de tine depune cererea, ridică certificatul, ți-l trimite scanat pe email și, dacă alegi livrarea, originalul prin curier. La noi costă 198 de lei pentru persoane fizice, cu factură.',
         },
         {
           q: 'Pot obține cazier judiciar pentru altcineva?',
