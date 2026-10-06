@@ -104,6 +104,8 @@ Stare și explicație: `seo/2026-10-05-ecazier-documentero-stare-organic.md`. 14
 | G1 | CI roșu de la commitul de warm-up (testul nu știa de interogarea de numărare) | ✅ 05.10 |
 | G2 | Tokenul local Vercel CLI expirat: variabilele s-au pus din dashboard | ✅ 06.10 (Raul s-a logat) |
 | G3 | Blocantul de reclame din Chrome strică salvările în Google Ads: excepție pentru ads.google.com | ⬜ Raul |
+| G4 | Curățenie în `~/Projects`: 23 de worktree-uri lăsate ca foldere separate (`egh-wt-*`, `cjo-wt-*`, `avt-wt-*`, `*-wt-winback` și cele din `.claude/worktrees/`), toate deja în `main`, push-uite și deployate (Vercel `success` pe eghiseul și CJO, avocat verificat live pe Netlify) | ✅ 06.10 seara: șterse cu branch-urile lor; fiecare repo are acum un singur checkout pe `main`. Regula nouă: worktree-uri doar în `<repo>/.claude/worktrees/`, șterse după merge (`CLAUDE.md`) |
+| G5 | Același lucru pe proiectele vecine: angeloff-rebuild (13 copii) și rovinieta-online (3) | ✅ 06.10: 7 șterse (identice cu `main`); 9 MUTATE în `<repo>/.claude/worktrees/` pentru că au `.env`/media proprii sau commit-uri nefinalizate (`plati` pe angeloff, `rov-fix` pe rovinieta, lăsate așa la cererea lui Raul). ⚠️ angeloff-rebuild n-are remote GitHub, codul există doar pe Mac |
 
 ## Jurnal: cereri de indexare în Search Console
 
@@ -140,6 +142,8 @@ Cota e de circa 10 cereri pe zi pentru fiecare proprietate.
 - Decontări: plățile ecazier (`EFC-`/`EJC-`) se leagă acum de factură; facturile lipsă de pe payouturile din 18.08 și 07.10 se leagă cu „Backfill 90 zile”.
 - Decont avocată: factura lunară a cabinetului se scade înainte de dividende, bloc „De plată către Gabriela”, valori de pornire.
 - Decont topograf: extras lunar (luna trecută implicit), plata pe lună, factura de comision, comenzile pe servicii, taxele OCPI care urmează; septembrie plătit (414,48 fiecare). Reclama de test pe imobiliare (570 lei) e trecută pe septembrie și oprită.
+
+**Verificare de seară (06.10, ~18:00)**, comenzi plătite din DB, săptămâni de luni: eghiseul 74 → 52 → 20 → 17 → 27 → 26 → 13 → 20 (de la 10.08 la 28.09), deci ~o treime din nivelul dinainte de update și stagnează; CJO 33 → 23 → 22 → 18, scade. eghiseul, 30 de zile: 41 plătite cu prima vizită din căutare (14.268 lei), 44 fără sursă (15.896 lei), **0 din reclame plătite**. documentero: 3 comenzi începute azi, 0 plătite. Google Ads: celibatul rămâne la 0 afișări (vezi A3).
 
 ## Următorii pași propuși (06.10)
 

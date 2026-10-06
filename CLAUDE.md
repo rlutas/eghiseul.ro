@@ -69,6 +69,12 @@ fișier `docs/changelog/YYYY-MM-DD-<slug>.md` care începe cu
 Procedură nouă pentru echipă → `docs/admin/<slug>.md` + `CURATED_GUIDES` în
 `src/lib/knowledge/docs.ts`. Detalii: `.claude/rules/documentation.md`.
 
+### Worktree-uri
+
+Lucrul în paralel (agenți, branch-uri) se face DOAR în `<repo>/.claude/worktrees/<nume>`,
+niciodată ca folder separat în `~/Projects` (`egh-wt-*`, `cjo-wt-*`). După merge:
+`git worktree remove` + `git branch -d`. Curățenia din 06.10: `docs/changelog/2026-10-06-curatenie-worktree-uri.md`.
+
 ### Database Operations
 Vezi `.claude/rules/database.md` pentru reguli detaliate. Ghid complet: `docs/deployment/DATABASE_MIGRATIONS.md`
 

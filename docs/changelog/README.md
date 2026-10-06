@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-10-06 | ✅ **Curățenie worktree-uri + verificare că totul e live** — 23 de worktree-uri (eghiseul, CJO, avocat) verificate în `main` și deployate, apoi șterse; angeloff/rovinieta: 7 șterse, 9 mutate în `<repo>/.claude/worktrees/`; regulă nouă în `CLAUDE.md` | [2026-10-06-curatenie-worktree-uri.md](2026-10-06-curatenie-worktree-uri.md) |
 | 2026-10-06 | 🔴 **Cazierul fiscal (și judiciarul, integritatea) nu vine ca PDF semnat electronic** — texte corectate pe eghiseul (fiscal, judiciar PF/PJ, integritate, taxa cazier, fără SPV) și documentero fiscal: certificat pe hârtie, scan pe email, original prin curier; SPV rămâne singura cale cu PDF semnat ANAF; DB verificat, fără migrare | [2026-10-06-cazier-fiscal-scan-si-original.md](2026-10-06-cazier-fiscal-scan-si-original.md) |
 | 2026-10-06 | ✅ **Sitemap cu `lastmod` real pe toate paginile eghiseul și documentero** — registru `PATH_LAST_MODIFIED` din git (fără commit-urile de mutare), 112/112 URL-uri cu dată; documentero re-datat; test anti-dată-de-build | [2026-10-06-sitemap-lastmod.md](2026-10-06-sitemap-lastmod.md) |
 | 2026-10-06 | 🟣 **„Pe scurt” pe paginile de vânzare + acces pentru toți roboții AI** — `ServiceAnswerBlock` pe 7 pagini eghiseul, preț în `QuickAnswer` pe 4 pagini documentero, „Actualizat la” = `dateModified`; robots cu toți crawlerii AI și fetcherii asistenților (aceștia pot deschide primul pas din `/comanda/`) | [2026-10-06-raspuns-pe-scurt-si-roboti-ai.md](2026-10-06-raspuns-pe-scurt-si-roboti-ai.md) |
