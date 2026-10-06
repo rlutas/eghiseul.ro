@@ -108,11 +108,33 @@ export function SettlementStatement({
                   </p>
                 )}
                 <p className="mt-2 text-xs text-slate-600">
-                  Factură comision (TVA inclus): <strong>{lei(p.commissionToInvoice)}</strong>
+                  Factură comision: <strong>{lei(p.commissionToInvoice)}</strong>
                   <br />
                   Transfer în cont: <strong>{lei(p.transferToCollaborator)}</strong>
                 </p>
               </div>
+            </div>
+
+            <div className="mt-4 rounded-md border border-slate-200 bg-slate-50 p-3">
+              <p className="mb-2 font-semibold text-slate-900">
+                {you ? 'Factura ta către EDIGITALIZARE SRL' : 'Factura de comision de la Mircea'}
+              </p>
+              <dl>
+                <Row
+                  label={`Comision ${name.toLowerCase()}: ${s.commissionOrderCount} comenzi × 15 lei`}
+                  value={p.commissionThisMonth}
+                />
+                {p.commissionCorrectionPrior !== 0 && (
+                  <Row
+                    label={p.commissionCorrectionPrior < 0 ? 'Facturat în plus pe facturile anterioare' : 'Rămas nefacturat din lunile anterioare'}
+                    value={p.commissionCorrectionPrior}
+                  />
+                )}
+                <Row label="De facturat (TVA inclus în sumă)" value={p.commissionToInvoice} strong />
+              </dl>
+              <p className="mt-1 text-xs text-slate-500">
+                Suma de pe factură e cu TVA inclus: 15 lei pe comandă înseamnă 15 lei în total, nu 15 lei + TVA.
+              </p>
             </div>
 
             <div className="mt-4 border-t border-slate-200 pt-3">

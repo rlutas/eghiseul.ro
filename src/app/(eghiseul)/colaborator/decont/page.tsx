@@ -19,6 +19,7 @@ interface EarningOrder {
   ocpiCost: number;
   /** Taxa estimată când nu e încă înregistrată; null = de completat. */
   ocpiEstimate?: number | null;
+  commission?: number;
   isTest: boolean;
 }
 
@@ -166,6 +167,7 @@ function CollaboratorDecontInner() {
                 <th className="px-4 py-3">Plătită la</th>
                 <th className="px-4 py-3 text-right">Încasat client (TVA incl.)</th>
                 <th className="px-4 py-3 text-right">Taxă OCPI</th>
+                <th className="px-4 py-3 text-right">Comisionul tău</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -198,6 +200,9 @@ function CollaboratorDecontInner() {
                     ) : o.ocpiEstimate === null ? (
                       <span className="text-amber-600">de completat</span>
                     ) : <span className="text-slate-300">—</span>}
+                  </td>
+                  <td className="px-4 py-3 text-right text-slate-600">
+                    {o.isTest || !o.commission ? <span className="text-slate-300">—</span> : lei(o.commission)}
                   </td>
                 </tr>
               ))}

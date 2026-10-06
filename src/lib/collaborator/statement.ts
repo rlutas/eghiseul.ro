@@ -54,6 +54,8 @@ export interface MonthlyStatement {
   /** This month's orders and costs only. */
   result: SettlementBreakdown;
   orderCount: number;
+  /** Orders this month that carry his 15 lei commission. */
+  commissionOrderCount: number;
   /** OCPI fees not yet recorded on this month's orders (informative). */
   pending: { total: number; count: number; unknownCount: number };
   /** Payment for this month, null when the month was paid together with a later one. */
@@ -67,6 +69,10 @@ export interface MonthlyStatement {
     collaboratorExtraPrior: number;
     collaboratorDue: number;
     commissionToInvoice: number;
+    /** Commission earned on this month's orders (VAT included). */
+    commissionThisMonth: number;
+    /** commissionToInvoice − commissionThisMonth: earlier invoices over (−) or under (+) the rule. */
+    commissionCorrectionPrior: number;
     transferToCollaborator: number;
     paid: StatementPayment[];
     remainingEach: number;
@@ -107,7 +113,7 @@ function breakdownFor(orders: StatementOrder[], costs: StatementCost[]) {
     otherCosts: costs.reduce((s, c) => s + (Number(c.amount) || 0), 0),
     pendingOcpi: pending.total,
   });
-  return { result, pending, count: billable.length };
+  return { result, pending, count: billable.length, commissionCount: billable.filter((o) => o.commission > 0).length };
 }
 
 export function buildMonthlyStatement(
@@ -138,6 +144,7 @@ export function buildMonthlyStatement(
     inProgress: month >= bucharestMonth(now.toISOString()),
     result: own.result,
     orderCount: own.count,
+    commissionOrderCount: own.commissionCount,
     pending: own.pending,
   };
 
@@ -172,6 +179,8 @@ export function buildMonthlyStatement(
       collaboratorExtraPrior: round2(collaboratorExtraPrior),
       collaboratorDue: round2(collaboratorDue),
       commissionToInvoice: round2(commissionToInvoice),
+      commissionThisMonth: own.result.commission,
+      commissionCorrectionPrior: round2(commissionToInvoice - own.result.commission),
       transferToCollaborator: round2(collaboratorDue - commissionToInvoice),
       paid: paid.map((d) => ({
         on: d.on,
