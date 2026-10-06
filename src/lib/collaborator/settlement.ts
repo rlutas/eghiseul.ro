@@ -73,6 +73,18 @@ export const DISTRIBUTIONS = [
     collaboratorInvoicedRon: 635.25,
     reference: 'docs/operations/decont-mircea-2026-08-26.md',
   },
+  {
+    // Cumulative settlement up to 30.09.2026 (Raul decided to pay now and let
+    // the ~720 lei of pending OCPI fees correct themselves next month).
+    on: '2026-10-06',
+    perSideRon: 414.48,
+    // 414,48 minus the 110,25 he got on top on SM 153 (525 + VAT instead of
+    // 15 lei with VAT included) = 304,23 = transfer + commission invoice.
+    collaboratorCashRon: 204.48,
+    collaboratorCommissionRon: 99.75,
+    collaboratorInvoicedRon: 99.75,
+    reference: 'docs/changelog/2026-10-06-decont-mircea-taxe-si-plati.md',
+  },
 ] as const;
 
 /** Total primit de colaborator până acum: transferuri + facturi de comision plătite. */

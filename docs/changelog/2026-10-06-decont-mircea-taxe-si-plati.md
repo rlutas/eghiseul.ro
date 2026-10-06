@@ -19,3 +19,5 @@
 - Data: `collaborator_period_costs` row, 570 lei, Google Ads imobiliare, 2026-09.
 
 Status at 06.10 (paid until 30.09, 199 orders): share per side 4.731,09; distributed 4.316,61; Raul 414,48; Mircea 304,23 (invoice 99,75 + transfer 204,48). 19 orders still without an OCPI fee (16 identifications ≈ 720 lei estimated, 3 with no baseline).
+
+**Paid 06.10.2026** (Raul): recorded as the second `DISTRIBUTIONS` entry (per side 414,48; Mircea transfer 204,48 + commission invoice 99,75). After it the cumulative balance is 0; the ~720 lei of pending OCPI fees will show as an overpayment next month and come off the October settlement.
