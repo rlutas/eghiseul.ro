@@ -2,6 +2,7 @@
 
 | Document | Conținut |
 |---|---|
+| [`video-social/`](video-social/README.md) | **Video și rețele sociale** (YouTube, Facebook, boost): ce rulează, ce e deschis, planul de postări, cum facem clipurile, cum reluăm |
 | [`email-marketing-plan-2026-09.md`](email-marketing-plan-2026-09.md) | Plan A–Z email marketing: date reale din DB, sinteză cercetare (experți/benchmark-uri), strategie de listă (72k contacte), fluxuri, roadmap fazat |
 
 Legat de acest domeniu, dar documentat separat pentru că e feature de admin:

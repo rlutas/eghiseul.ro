@@ -1,6 +1,6 @@
 # Plan de postări video: 07.10 – 03.11.2026
 
-Primele 4 săptămâni pe YouTube, Facebook și Instagram, cu clipurile făcute după standardul din [video-playbook.md](video-playbook.md). Clipurile gata de urcat (MP4 ≤ 9,5 MB, miniatură, `.srt`, descrieri, texte pentru postări) stau în folderul de upload, câte un dosar pe clip, plus un subdosar `reels/` cu Reels-urile tăiate din clipul lung.
+Primele 4 săptămâni pe YouTube, Facebook și Instagram, cu clipurile făcute după standardul din [playbook-clipuri.md](playbook-clipuri.md). Clipurile gata de urcat (MP4 ≤ 9,5 MB, miniatură, `.srt`, descrieri, texte pentru postări) stau în `/Users/raul/Projects/eghiseul-videos/out/upload/` (local, nu pe GitHub), câte un dosar pe clip, plus un subdosar `reels/` cu Reels-urile tăiate din clipul lung.
 
 ## Ce avem gata (06.10)
 
@@ -140,7 +140,7 @@ Pe Instagram, primul comentariu e linkul cu UTM (îl găsești la finalul `capti
 
 ## Coada de producție
 
-Subiectele vin din [video-playbook.md](video-playbook.md) (ordinea după cerere: citări în asistenții AI, căutări din Search Console, comenzi). Fiecare clip nou trece prin aceiași pași: script cu fapte și prețuri luate de pe pagina live → voce (doar frazele noi) → randare în 3 formate + 2–3 Reels reciclate → Raul aprobă clipul lung → programare.
+Subiectele vin din [playbook-clipuri.md](playbook-clipuri.md) (ordinea după cerere: citări în asistenții AI, căutări din Search Console, comenzi). Fiecare clip nou trece prin aceiași pași: script cu fapte și prețuri luate de pe pagina live → voce (doar frazele noi) → randare în 3 formate + 2–3 Reels reciclate → Raul aprobă clipul lung → programare.
 
 | Termen script | Publicare | Clip | Pagina-sursă |
 |---|---|---|---|

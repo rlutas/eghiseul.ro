@@ -64,13 +64,13 @@ Pentru urcarea din browser (limită 10 MB pe fișier), fișierele se comprimă l
 - YouTube (canalul eGhiseul, @eghiseul, personalizat pe 06.10): titlu ≤ 70 de caractere, descriere cu capitole, surse și link cu `utm_source=youtube&utm_medium=video&utm_campaign=<slug>`, taguri, miniatură, `.srt`, elemente de final pe ultimele ~11 s (cardul de final). Clipul se urcă întâi ca privat, Raul îl aprobă, apoi devine public.
 - Facebook + Instagram: din Meta Business Suite, pagina EGhiseul cu postare pe Instagram în același timp; format 4:5 sau 9:16; link în comentariu/bio, cu UTM. Necesită login Facebook în browser.
 - Capitolele YouTube: pornesc de la 0:00, minimum 3, fiecare de cel puțin 10 s; hook-ul nu primește capitol (capitolele prea scurte le sare automat exportul).
-- Fiecare clip lung dă și 2–3 **Reels reciclate** (25–45 s, din scenele lui, fără voce nouă), cu text și link propriu (`utm_content=<tăietura>`). Detalii și calendar: [plan-postari-video-2026-10.md](plan-postari-video-2026-10.md).
+- Fiecare clip lung dă și 2–3 **Reels reciclate** (25–45 s, din scenele lui, fără voce nouă), cu text și link propriu (`utm_content=<tăietura>`). Detalii și calendar: [plan-postari-2026-10.md](plan-postari-2026-10.md).
 - Textele pentru Shorts, Facebook și Instagram (hook + 2–3 rânduri + link cu UTM + hashtaguri) se generează odată cu descrierea YouTube; pe Instagram linkul merge în primul comentariu.
 - Comenzile din clipuri se văd în admin la canalul „social”, cu sursa `youtube`, `facebook` sau `instagram`.
 
 ## Ritm și subiecte
 
-2 clipuri lungi + 3–4 Shorts/Reels pe săptămână (calendarul pe octombrie: [plan-postari-video-2026-10.md](plan-postari-video-2026-10.md)). Subiecte, după cerere (citări AI, căutări, comenzi):
+2 clipuri lungi + 3–4 Shorts/Reels pe săptămână (calendarul pe octombrie: [plan-postari-2026-10.md](plan-postari-2026-10.md)). Subiecte, după cerere (citări AI, căutări, comenzi):
 
 1. Cât e valabil cazierul judiciar (gata, aprobat)
 2. Cazierul judiciar din străinătate: consulat, procură sau online prin avocat (gata)
@@ -87,7 +87,7 @@ Pentru urcarea din browser (limită 10 MB pe fișier), fișierele se comprimă l
 
 ## Stare (06.10, seara)
 
-- YouTube: trailer, cele 2 clipuri lungi (valabilitate, străinătate) și cele 2 Shorts sunt programate 07–11.10. Linkurile sunt în [plan-postari-video-2026-10.md](plan-postari-video-2026-10.md).
+- YouTube: trailer, cele 2 clipuri lungi (valabilitate, străinătate) și cele 2 Shorts sunt programate 07–11.10. Linkurile sunt în [plan-postari-2026-10.md](plan-postari-2026-10.md).
 - Facebook: 2 Reels programate (08.10 și 11.10), doar pe pagina EGhiseul. Testul de boost e descris în plan.
 - Instagram: oprit. Pagina e legată de contul personal `iamraul92`; e nevoie de un cont Instagram eGhiseul.
 - Cazierul fiscal: refăcut fără „PDF semnat electronic” (scanul pe email + originalul prin curier). Așteaptă aprobarea lui Raul, apoi se programează pe 13.10, la 12:30.

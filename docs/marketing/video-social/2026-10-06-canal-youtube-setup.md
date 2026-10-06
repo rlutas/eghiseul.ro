@@ -1,5 +1,7 @@
 # Canalul YouTube eGhiseul.ro: setup, primele clipuri și cum măsurăm
 
+> **Document istoric (06.10, dimineața).** Descrie setup-ul canalului și versiunea 2 a clipurilor, cu vocea din macOS. Standardul actual e versiunea 3, cu vocea ElevenLabs: vezi [playbook-clipuri.md](playbook-clipuri.md). Ce e programat: [plan-postari-2026-10.md](plan-postari-2026-10.md).
+
 De ce: mențiunile brandului pe YouTube sunt cel mai puternic semnal măsurat pentru a fi citat de asistenții AI (vezi `docs/seo/2026-10-06-geo-ai-citari-plan.md`). Clipurile sunt informative, nu reclame: răspund la întrebările pe care oamenii le pun deja, cu faptele de pe paginile noastre, și se termină cu un cadru scurt eghiseul.ro.
 
 Proiectul video (Remotion) e în `/Users/raul/Projects/eghiseul-videos` (repo git separat).
