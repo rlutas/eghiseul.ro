@@ -9,7 +9,7 @@ const WHATSAPP =
 const TRUST = [
   { icon: ShieldCheck, label: 'Avocat înscris în Barou' },
   { icon: FileText, label: 'Documente emise de autorități' },
-  { icon: Clock, label: 'Livrare 24-48h' },
+  { icon: Clock, label: 'Livrare prin curier' },
   { icon: Star, label: `${SOCIAL_PROOF.ratingValue}/5 din ${SOCIAL_PROOF.reviewCount} recenzii` },
 ];
 

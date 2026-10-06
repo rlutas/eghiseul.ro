@@ -10,6 +10,8 @@ import { ServicesMegaMenu } from '@/components/shared/services-mega-menu';
 import { CalculatorsMegaMenu } from '@/components/shared/calculators-mega-menu';
 import { HeaderServiceSearch } from '@/components/shared/header-service-search';
 import { SERVICES_NAV } from '@/config/services-nav';
+import { GOOGLE_REVIEWS_URL, GOOGLE_RATING } from '@/config/contact';
+import { SOCIAL_PROOF } from '@/lib/seo/constants';
 import { CALCULATORS_NAV } from '@/config/calculators-nav';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import {
@@ -168,14 +170,19 @@ export function Header() {
               </a>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-white/70">Peste 200.000 documente procesate</span>
-              <span className="flex items-center gap-1">
+              <a
+                href={GOOGLE_REVIEWS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 hover:opacity-80"
+                title="Profilul nostru Google"
+              >
                 <svg className="w-4 h-4 text-[#FBBC04] fill-[#FBBC04]" viewBox="0 0 24 24">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
-                <span className="text-white font-medium">4.9/5</span>
-                <span className="text-white/50 text-xs">Google</span>
-              </span>
+                <span className="text-white font-medium">{String(GOOGLE_RATING).replace('.', ',')}/5</span>
+                <span className="text-white/50 text-xs">din peste {SOCIAL_PROOF.roundedDown} recenzii Google</span>
+              </a>
             </div>
           </div>
         </div>

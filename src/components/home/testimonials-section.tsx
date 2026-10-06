@@ -1,4 +1,4 @@
-import { Star, MessageSquare, Users, PenLine, ArrowUpRight } from 'lucide-react';
+import { Star, MessageSquare, PenLine, ArrowUpRight } from 'lucide-react';
 import { REVIEWS } from '@/config/reviews';
 import { GOOGLE_REVIEWS_URL, GOOGLE_REVIEW_WRITE_URL, GOOGLE_RATING } from '@/config/contact';
 import { SOCIAL_PROOF } from '@/lib/seo';
@@ -6,7 +6,6 @@ import { SOCIAL_PROOF } from '@/lib/seo';
 const STATS = [
   { icon: Star, value: `${GOOGLE_RATING}/5`, label: 'Rating mediu' },
   { icon: MessageSquare, value: String(SOCIAL_PROOF.reviewCount), label: 'Recenzii Google' },
-  { icon: Users, value: '150k+', label: 'Clienți mulțumiți' },
 ];
 
 const FEATURED = REVIEWS.slice(0, 6);
@@ -29,8 +28,8 @@ export function TestimonialsSection() {
           <p className="text-sm font-bold uppercase tracking-wider text-primary-500 mb-3">Recenzii clienți</p>
           <h2 className="text-3xl lg:text-[2.25rem] font-extrabold text-white leading-tight mb-4">Ce spun clienții noștri</h2>
           <p className="text-lg text-white/70 leading-relaxed max-w-[600px] mx-auto">
-            Peste 150.000 de români ne-au acordat încrederea pentru obținerea documentelor. Iată ce spun
-            despre experiența lor.
+            Recenzii lăsate de clienți pe profilul nostru Google. Le poți citi pe toate acolo, inclusiv
+            pe cele mai puțin bune.
           </p>
 
           {/* Stats */}

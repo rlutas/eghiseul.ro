@@ -12,7 +12,7 @@ interface ServiceItem {
 }
 
 const PF_SERVICES: ServiceItem[] = [
-  { name: 'Cazier Judiciar Online', href: '/servicii/cazier-judiciar-online/', img: '/images/specimens/cazier-judiciar.png', badge: 'popular', desc: 'Cazier judiciar online pentru angajare, permis auto sau viză. Livrare în 24-48h, fără deplasare la ghișeu.' },
+  { name: 'Cazier Judiciar Online', href: '/servicii/cazier-judiciar-online/', img: '/images/specimens/cazier-judiciar.png', badge: 'popular', desc: 'Cazier judiciar online pentru angajare, permis auto sau viză. Termen 3-5 zile lucrătoare, fără deplasare la ghișeu.' },
   { name: 'Certificat de Integritate Comportamentală', href: '/servicii/certificat-de-integritate-comportamentala/', img: '/images/specimens/certificat-integritate.png', badge: null, desc: 'Certificat de integritate comportamentală online pentru profesori, medici și personal care lucrează cu minori.' },
   { name: 'Cazier Fiscal Online', href: '/servicii/cazier-fiscal-online/', img: '/images/specimens/cazier-fiscal.png', badge: null, desc: 'Cazier fiscal online de la ANAF. Necesar pentru licitații publice, contracte cu statul și acte notariale.' },
   { name: 'Cazier Auto Online', href: '/servicii/cazier-auto-online/', img: '/images/specimens/cazier-auto.png', badge: null, desc: 'Cazier auto online cu istoricul sancțiunilor rutiere. Pentru angajare șofer profesionist, Uber, Bolt sau taxi.' },

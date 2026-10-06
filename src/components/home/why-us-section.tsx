@@ -5,8 +5,8 @@ import { SOCIAL_PROOF } from '@/lib/seo';
 const BENEFITS = [
   {
     icon: Zap,
-    title: 'Procesare rapidă 24-48h',
-    desc: 'Documentele fizice ajung prin curier în 24-48 ore, iar cele digitale instant pe email.',
+    title: 'Livrare prin curier sau pe email',
+    desc: 'După ce instituția eliberează documentul, curierul îl aduce în 24-48 de ore. Cele digitale vin pe email.',
   },
   {
     icon: ShieldCheck,
@@ -66,8 +66,8 @@ export function WhyUsSection() {
 
             {/* badge clienți — jos stânga, suprapus */}
             <div className="absolute -bottom-5 -left-4 sm:-left-6 rounded-2xl bg-gradient-to-br from-secondary-900 to-[#0C1A2F] px-6 py-4 sm:px-7 sm:py-5 shadow-[0_20px_40px_rgba(6,16,31,0.35)]">
-              <div className="text-3xl sm:text-[38px] font-extrabold text-primary-500 leading-none">150k+</div>
-              <div className="mt-1 text-[13px] sm:text-sm font-semibold text-white/90">Clienți mulțumiți</div>
+              <div className="text-3xl sm:text-[38px] font-extrabold text-primary-500 leading-none">{String(SOCIAL_PROOF.ratingValue).replace('.', ',')}/5</div>
+              <div className="mt-1 text-[13px] sm:text-sm font-semibold text-white/90">din peste {SOCIAL_PROOF.roundedDown} recenzii Google</div>
             </div>
           </div>
 

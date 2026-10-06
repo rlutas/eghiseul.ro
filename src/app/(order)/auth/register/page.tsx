@@ -1,5 +1,6 @@
 'use client';
 
+import { SOCIAL_PROOF } from '@/lib/seo/constants';
 import { useBrand } from '@/lib/brand/client';
 
 import { useState } from 'react';
@@ -120,14 +121,14 @@ export default function RegisterPage() {
             Creează-ți contul gratuit
           </h1>
           <p className="text-lg text-white/80 mb-10">
-            {brand.id === 'eghiseul' ? 'Alătură-te celor peste 200.000 de clienți care au ales eGhișeul.ro pentru documentele lor.' : `Contul pe ${brand.name}: comenzile, documentele și statusul într-un singur loc.`}
+            {`Contul pe ${brand.name}: comenzile, documentele și statusul într-un singur loc.`}
           </p>
 
           <div className="space-y-6">
             {[
               { icon: FileText, title: 'Toate documentele într-un loc', desc: 'Cazier, certificate, extras CF și multe altele' },
-              { icon: Clock, title: 'Livrare rapidă', desc: 'Documente în 24-48h, fără cozi' },
-              { icon: Shield, title: '100% Legal și sigur', desc: 'Documente, recunoscute de stat' },
+              { icon: Clock, title: 'Termen afișat dinainte', desc: 'Fiecare serviciu are prețul și termenul pe pagină' },
+              { icon: Shield, title: 'Eliberate de instituții', desc: 'Noi le obținem, instituția competentă le eliberează' },
               { icon: CheckCircle, title: 'Fără deplasări', desc: 'Tot procesul se face online' },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-4">
@@ -152,8 +153,8 @@ export default function RegisterPage() {
               ))}
             </div>
             <div>
-              <p className="text-white text-sm font-medium">200,000+ clienți mulțumiți</p>
-              <p className="text-white/60 text-xs">4.9/5 pe Google Reviews</p>
+              <p className="text-white text-sm font-medium">{String(SOCIAL_PROOF.ratingValue).replace('.', ',')}/5 pe Google</p>
+              <p className="text-white/60 text-xs">din peste {SOCIAL_PROOF.roundedDown} recenzii</p>
             </div>
           </div>
         </div>

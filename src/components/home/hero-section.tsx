@@ -24,7 +24,7 @@ export function HeroSection() {
           <div className="flex-1 min-w-[280px] max-w-[680px] text-center lg:text-left px-1 sm:px-0">
             <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl lg:text-5xl leading-[1.2]">
               Cazier Judiciar și Documente Online –{' '}
-              <span className="text-primary-500">Prin Avocat, Fără Cozi, Livrare 24-48h</span>
+              <span className="text-primary-500">Prin Avocat, Fără Cozi, Livrare prin Curier</span>
             </h1>
 
             <p className="mt-4 sm:mt-6 text-base sm:text-lg text-white/85 leading-relaxed">
@@ -145,7 +145,7 @@ export function HeroSection() {
             <div className="flex flex-wrap justify-center gap-3 sm:gap-6 pt-4 sm:pt-5 border-t border-neutral-200">
               <div className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-500" />
-                <span className="text-[10px] sm:text-xs text-neutral-600 font-medium">Livrare 24-48h</span>
+                <span className="text-[10px] sm:text-xs text-neutral-600 font-medium">Preț și termen afișate</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Monitor className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-500" />
@@ -153,7 +153,7 @@ export function HeroSection() {
               </div>
               <div className="flex items-center gap-1.5">
                 <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-500" />
-                <span className="text-[10px] sm:text-xs text-neutral-600 font-medium">150k+ Clienți</span>
+                <span className="text-[10px] sm:text-xs text-neutral-600 font-medium">Avocat în Barou</span>
               </div>
             </div>
           </div>
