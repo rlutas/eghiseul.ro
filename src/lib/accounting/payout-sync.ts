@@ -10,7 +10,8 @@
  * Attribution order:
  *   1. charge metadata: app_id === 'cjo'  → cjo
  *   2. charge metadata: orderNumber / order number in description prefix
- *      E-/EJC- → eghiseul · CJO-/CAO-/CFO-/CIC-/EJC → per prefix
+ *      E- → eghiseul · CJO-/CAO-/CFO-/CIC- (CJO) and EJC-/EFC- (ecazier,
+ *      same DB as CJO; rare, only when paid on our Stripe account) → cjo
  *   3. otherwise 'necunoscut' (still listed — signal for manual action)
  *
  * Env prerequisites: CJO_SUPABASE_URL/KEY (CJO enrichment) — set in Vercel
@@ -32,11 +33,13 @@ import {
   type OblioDocLite,
 } from '@/lib/accounting/extra-invoice-match';
 
-/** Order-number regex: E-260710-F3AYS, EJC-..., CJO-20260710-86615, CAO-, CFO-, CIC- */
-const ORDER_RE = /\b(E|EJC|CJO|CAO|CFO|CIC)-[A-Z0-9-]+\b/i;
+/** Order-number regex: E-260710-F3AYS, CJO-20260710-86615, CAO-, CFO-, CIC-, EJC-, EFC- */
+const ORDER_RE = /\b(E|EJC|EFC|CJO|CAO|CFO|CIC)-[A-Z0-9-]+\b/i;
 
-const EGH_PREFIXES = new Set(['E', 'EJC']);
-const CJO_PREFIXES = new Set(['CJO', 'CAO', 'CFO', 'CIC']);
+const EGH_PREFIXES = new Set(['E']);
+// EJC-/EFC- are ecazier orders. They live in the CJO database; one landed on
+// our Stripe account on 02.10.2026 (EFC-20261002-61612) and stayed unmatched.
+const CJO_PREFIXES = new Set(['CJO', 'CAO', 'CFO', 'CIC', 'EJC', 'EFC']);
 
 export interface PayoutSyncResult {
   payoutsSynced: number;

@@ -568,16 +568,18 @@ function AvocatDecont() {
   const [showExport, setShowExport] = useState(false);
   const [exporting, setExporting] = useState(false);
   // Cheltuielile lunii — se tastează la generare (nu sunt fixe în cod);
-  // valorile de start sunt cele din foaia de iunie 2026.
+  // valorile de start sunt cele stabilite de Raul (06.10.2026); reclama
+  // pornește de la 0 și se completează lunar.
   const [costs, setCosts] = useState<{ label: string; amount: string }[]>([
     { label: 'Taxe angajați', amount: '12000' },
     { label: 'Programe / hosting / domenii', amount: '1000' },
-    { label: 'Contabilitate', amount: '2500' },
+    { label: 'Contabilitate', amount: '1500' },
+    { label: 'Reclamă', amount: '0' },
   ]);
   const [splitRaul, setSplitRaul] = useState('55');
   const [profitTax, setProfitTax] = useState('16');
   const [dividendTax, setDividendTax] = useState('16');
-  const [facturaCabinet, setFacturaCabinet] = useState('');
+  const [facturaCabinet, setFacturaCabinet] = useState('1250');
   const months = useMemo(() => monthOptions(), []);
 
   async function downloadXlsx() {
