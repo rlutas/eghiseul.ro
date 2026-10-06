@@ -195,6 +195,11 @@ export default function Page() {
       <p>
         Odată eliberat, noul exemplar îl anulează pe cel anterior (art. 166 alin. (2)). Dacă cel
         vechi reapare într-un sertar peste un an, nu mai are valoare; nu îl folosi la un dosar.
+        Dacă ești plecat din țară și l-ai pierdut, pașii sunt în{' '}
+        <a href="https://documentero.ro/ghiduri/certificat-de-nastere-pierdut/">
+          ghidul pentru certificatul de naștere pierdut
+        </a>
+        .
       </p>
 
       <h3>De unde și cât durează</h3>
@@ -358,6 +363,11 @@ export default function Page() {
         <Link href="/cum-vor-arata-documentele-de-stare-civila-2025/">
           articolul despre documentele de stare civilă
         </Link>
+        . Cine pune apostila (Prefectura pe original, Camera Notarilor pe traducerea legalizată) și
+        în ce ordine se fac apostila și traducerea e explicat în{' '}
+        <a href="https://documentero.ro/ghiduri/apostila-acte-stare-civila/">
+          ghidul despre apostila pe actele de stare civilă
+        </a>
         .
       </p>
       <p>

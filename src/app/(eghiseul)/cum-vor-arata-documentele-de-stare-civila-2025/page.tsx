@@ -222,7 +222,12 @@ export default function Page() {
         Legea 119/1996 permite eliberarea certificatului către trei categorii: titularul, persoana
         împuternicită prin <strong>procură specială autentificată</strong> și avocatul care are{' '}
         <strong>împuternicire avocațială</strong>. Asta e baza pe care funcționează orice
-        intermediere, inclusiv a noastră.
+        intermediere, inclusiv a noastră. Diferențele practice dintre o procură la notarul străin, una
+        la consulat și împuternicirea avocațială sunt în{' '}
+        <a href="https://documentero.ro/ghiduri/procura-din-strainatate-notar-consulat-avocat/">
+          ghidul despre procura din străinătate
+        </a>
+        .
       </p>
       <p>
         Prin{' '}

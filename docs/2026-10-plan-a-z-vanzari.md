@@ -79,8 +79,8 @@ Regulă: maximum 1–2 pagini rescrise pe săptămână (`.claude/rules/content-
 |---|---|---|
 | E1 | Ghid „Certificat de naștere vechi / tipizat: mai e valabil?” | ✅ 05.10 |
 | E2 | Ghid „Valabilitatea certificatului de celibat” (+ corectat „6 luni în România” pe pagina de celibat: Anexa 18 nu are termen) | ✅ 05.10 |
-| E3 | Ghidul de apostilă extins de la 830 la 1.400+ cuvinte (acum pe poziția 51) | ⬜ săpt. 42 |
-| E4 | Linkuri în text spre documentero din articolele eghiseul despre stare civilă | ⬜ săpt. 42 |
+| E3 | Ghidul de apostilă extins de la 830 la 1.400+ cuvinte (acum pe poziția 51) | ✅ 06.10 (836 → 1.615 cuvinte în pagină; cine pune apostila pe ce act, ordinea cu traducerea, din străinătate, gratuită la Prefectură din 2017, FAQ + surse) |
+| E4 | Linkuri în text spre documentero din articolele eghiseul despre stare civilă | ✅ 06.10 (4 linkuri: căsătorie → valabilitate celibat; naștere → certificat pierdut și apostilă; documente 2025 → procura din străinătate) |
 | E6 | Tabelul pe țări de pe pagina de celibat zice „apostilă: da” în UE (Regulamentul 2016/1191 o scutește) — lăsat așa, decizie Raul 05.10 | ⏸ |
 | E7 | Contul de serviciu `claude-seo@caziere.iam.gserviceaccount.com` adăugat ca utilizator în GSC documentero (pentru inspecții prin API) | ✅ 05.10 (18/18 indexate) |
 | E5 | Tabelul de măsurare săptămânală (`documentero/continut-si-seo.md`) | ⬜ în fiecare luni |
@@ -142,5 +142,5 @@ Cota e de circa 10 cereri pe zi pentru fiecare proprietate.
 | H1 | **CJO: emailuri lifecycle** (reminder la 6 luni când expiră cazierul, cerere de recenzie, cross-sell spre fiscal/auto) | CJO are ~110 clienți pe lună și nu le trimite nimic după livrare (crons doar abandon + auto-complete). Pe eghiseul expirarea a adus deja o comandă plătită. Cost de achiziție zero | ⬜ |
 | H2 | **CJO: audit de conversie pe paginile de oraș** (de la vizită la începerea comenzii: prețul și butonul deasupra pliului, termen, ce primești) | 73% din cei care încep plătesc; pierderea e înainte de formular | ⬜ |
 | H3 | **ecazier: titlu și descriere pe paginile de cazier auto** (pozițiile 4–8, deci CTR-ul e pârghia, ca la C2) | singurul serviciu unde ecazier e aproape de prima pagină | ⬜ |
-| H4 | documentero: E3 (apostila, 830 → 1.400+ cuvinte) și E4 (linkuri în text din articolele eghiseul despre stare civilă) | ghiduri 1–2/săpt., regula 2 | ⬜ săpt. 42 |
+| H4 | documentero: E3 (apostila, 830 → 1.400+ cuvinte) și E4 (linkuri în text din articolele eghiseul despre stare civilă) | ghiduri 1–2/săpt., regula 2 | ✅ 06.10 |
 | H5 | Warm-up 600/zi (B3) | condițiile sunt îndeplinite | ⬜ 07.10 |

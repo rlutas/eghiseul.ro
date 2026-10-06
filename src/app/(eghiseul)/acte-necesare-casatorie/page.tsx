@@ -314,7 +314,12 @@ export default function Page() {
         românilor de autoritățile din străinătate, ca dovadă că nu sunt deja căsătoriți, și îl
         obținem prin{' '}
         <Link href={serviceUrl('certificat-celibat')}>serviciul de certificat de celibat</Link>.
-        Pentru drumul invers, un dosar românesc depus într-un stat al Convenției de la Viena,{' '}
+        Adeverința nu are termen scris pe ea; ce vechime acceptă Germania, Italia, Spania sau Franța
+        am adunat într-un{' '}
+        <a href="https://documentero.ro/ghiduri/valabilitate-certificat-de-celibat/">
+          ghid despre valabilitatea certificatului de celibat
+        </a>
+        . Pentru drumul invers, un dosar românesc depus într-un stat al Convenției de la Viena,{' '}
         <Link href={serviceUrl('extras-multilingv-certificat-casatorie')}>
           extrasul multilingv al actului de căsătorie
         </Link>{' '}

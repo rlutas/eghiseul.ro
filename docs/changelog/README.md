@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-10-06 | ✅ **documentero: ghidul de apostilă extins (E3) + 4 linkuri din articolele eghiseul (E4)** — 836 → 1.615 cuvinte, cine apostilează ce (Prefectură / Camera Notarilor), orice prefectură pentru stare civilă, gratuit din 2017, FAQPage; linkuri din căsătorie, naștere, documente 2025 | [2026-10-06-documentero-apostila-si-linkuri.md](2026-10-06-documentero-apostila-si-linkuri.md) |
 | 2026-10-06 | ✅ **eghiseul: scoase cifrele neverificabile** — header „200.000 documente procesate” → rating Google real din `SOCIAL_PROOF`; „150k/200k clienți” și „Livrare 24-48h” ca termen scoase de pe home și register; `social-proof-section` nefolosit șters | [2026-10-06-eghiseul-cifre-neverificabile.md](2026-10-06-eghiseul-cifre-neverificabile.md) |
 | 2026-10-06 | 🟣 **Ghid PAD: copie din arhiva OCPI sau plan nou** — `/plan-de-amplasament-si-delimitare-copie-sau-intocmire/` (Article + FAQPage, Ord. ANCPI 600/2023), linkuri din pagina serviciului PAD și din articolul despre costul cadastrului | [2026-10-06-ghid-plan-amplasament-copie-sau-nou.md](2026-10-06-ghid-plan-amplasament-copie-sau-nou.md) |
 | 2026-10-06 | 🟣 **Decont topograf: taxele OCPI care urmează + plățile către colaborator, în portal** — `pendingOcpiSummary` pe toate comenzile fără taxă (identificare 20/100 lei), `ocpiEstimate` per comandă, card „Plăți către tine” (transfer + factură comision, rest de primit); reclamă septembrie 570 lei | [2026-10-06-decont-mircea-taxe-si-plati.md](2026-10-06-decont-mircea-taxe-si-plati.md) |
