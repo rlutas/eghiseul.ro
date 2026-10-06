@@ -3,6 +3,7 @@
 
 ## Pentru echipă
 
+- **Comenzile lunii pe servicii:** tabel cu numărul de comenzi, câte sunt finalizate, încasat, taxe OCPI (și câte n-au taxă) și comisionul pe fiecare serviciu, cu total.
 - **Factura de comision:** în plata lunii apare clar cât trebuie să factureze topograful (comenzile lunii cu comision × 15 lei, TVA inclus în sumă; ce s-a plătit în plus înainte se scade din transfer, nu din factură); în tabel, fiecare comandă are comisionul lui.
 - **Decontul topografului e acum un extras pe luna trecută** (implicit septembrie, în portal și în admin), în trei casete: rezultatul lunii (încasat → TVA → taxe → Stripe → reclamă → profit → impozite → partea fiecăruia), plata pentru lună (partea lunii + corecția din lunile trecute = de plată, separat pe factura de comision și transfer, apoi ce s-a plătit și dacă e achitat), taxele OCPI care urmează. Cifrele cumulate care nu aveau sens pe o singură lună au dispărut.
 - Decontul din portalul colaboratorului se deschide acum pe „Toată perioada”, cu tot calculul la vedere.
@@ -29,3 +30,5 @@ Status at 06.10 (paid until 30.09, 199 orders): share per side 4.731,09; distrib
 **Commission invoice box (same day):** the payment card shows what the collaborator must invoice: the month's commission (orders with commission × 15 lei, VAT included), the correction for earlier invoices, and the amount to invoice. September: 12 × 15 = 180, minus 80,25 over-invoiced on SM 153 = 99,75. The portal order table has a "Comisionul tău" column.
 
 **Correction (Raul, same day):** the invoice is always the month's full commission (September 12 × 15 = 180); excess paid earlier comes off the transfer. The 06.10 payout is recorded as invoice 180 + transfer 124,23 (= 304,23).
+
+**Per-service table (same day):** `MonthlyStatement.byService` (orders, completed, collected, OCPI, orders without OCPI, commission) rendered under the statement in both views.

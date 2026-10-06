@@ -197,9 +197,9 @@ export async function GET(request: NextRequest) {
     // for it, what was paid.
     const statement = collaboratorId !== '__avocat__' && isMonth
       ? buildMonthlyStatement(
-          allOrders.map((o: { paidAt: string | null; total: number; ocpiCost: number; stripeFee: number; fee: number; serviceSlug: string; status: string; isTest: boolean }) => ({
+          allOrders.map((o: { paidAt: string | null; total: number; ocpiCost: number; stripeFee: number; fee: number; serviceSlug: string; service: string; status: string; isTest: boolean }) => ({
             paidAt: o.paidAt, total: o.total, ocpiCost: o.ocpiCost, stripeFee: o.stripeFee,
-            commission: o.fee, serviceSlug: o.serviceSlug, status: o.status, isTest: o.isTest,
+            commission: o.fee, serviceSlug: o.serviceSlug, serviceName: o.service, status: o.status, isTest: o.isTest,
           })),
           costRowsAll.map((c) => ({ amount: Number(c.amount_ron) || 0, periodStart: c.period_start })),
           month

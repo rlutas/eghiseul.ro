@@ -156,6 +156,52 @@ export function SettlementStatement({
         )}
       </section>
 
+      {/* Orders of the month by service */}
+      {s.byService.length > 0 && (
+        <section className="overflow-x-auto rounded-lg border border-slate-200 bg-white p-5 text-sm lg:col-span-2">
+          <h2 className="mb-3 text-base font-semibold text-slate-900">Comenzile din {name.toLowerCase()}, pe servicii</h2>
+          <table className="w-full min-w-[640px]">
+            <thead className="text-left text-xs uppercase text-slate-500">
+              <tr>
+                <th className="py-1.5 pr-3">Serviciu</th>
+                <th className="py-1.5 pr-3 text-right">Comenzi</th>
+                <th className="py-1.5 pr-3 text-right">Finalizate</th>
+                <th className="py-1.5 pr-3 text-right">Încasat</th>
+                <th className="py-1.5 pr-3 text-right">Taxe OCPI</th>
+                <th className="py-1.5 text-right">Comision</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {s.byService.map((l) => (
+                <tr key={l.service}>
+                  <td className="py-1.5 pr-3 text-slate-800">{l.service}</td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums">{l.orders}</td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums">{l.completed}</td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums">{lei(l.collected)}</td>
+                  <td className="py-1.5 pr-3 text-right tabular-nums">
+                    {lei(l.ocpi)}
+                    {l.withoutOcpi > 0 && <span className="ml-1 text-xs text-amber-600">({l.withoutOcpi} fără taxă)</span>}
+                  </td>
+                  <td className="py-1.5 text-right tabular-nums">
+                    {l.commissionOrders > 0 ? `${l.commissionOrders} × 15 = ${lei(l.commission)}` : <span className="text-slate-400">fără comision</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot className="border-t border-slate-200 font-semibold text-slate-900">
+              <tr>
+                <td className="py-1.5 pr-3">Total</td>
+                <td className="py-1.5 pr-3 text-right tabular-nums">{s.orderCount}</td>
+                <td className="py-1.5 pr-3 text-right tabular-nums">{s.byService.reduce((a, l) => a + l.completed, 0)}</td>
+                <td className="py-1.5 pr-3 text-right tabular-nums">{lei(r.collectedWithVat)}</td>
+                <td className="py-1.5 pr-3 text-right tabular-nums">{lei(r.ocpiCosts)}</td>
+                <td className="py-1.5 text-right tabular-nums">{s.commissionOrderCount} × 15 = {lei(r.commission)}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </section>
+      )}
+
       {/* 3. OCPI fees still to come for this month's orders */}
       {s.pending.count > 0 && (
         <section className="rounded-lg border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900 lg:col-span-2">

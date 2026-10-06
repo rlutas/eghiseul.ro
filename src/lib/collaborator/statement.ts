@@ -29,8 +29,21 @@ export interface StatementOrder {
   stripeFee: number;
   commission: number;
   serviceSlug: string;
+  /** Display name of the service (for the per-service table). */
+  serviceName?: string;
   status: string;
   isTest: boolean;
+}
+
+export interface StatementServiceLine {
+  service: string;
+  orders: number;
+  completed: number;
+  collected: number;
+  ocpi: number;
+  withoutOcpi: number;
+  commissionOrders: number;
+  commission: number;
 }
 
 export interface StatementCost {
@@ -56,6 +69,8 @@ export interface MonthlyStatement {
   orderCount: number;
   /** Orders this month that carry his 15 lei commission. */
   commissionOrderCount: number;
+  /** This month's orders grouped by service. */
+  byService: StatementServiceLine[];
   /** OCPI fees not yet recorded on this month's orders (informative). */
   pending: { total: number; count: number; unknownCount: number };
   /** Payment for this month, null when the month was paid together with a later one. */
@@ -114,6 +129,29 @@ function breakdownFor(orders: StatementOrder[], costs: StatementCost[]) {
   return { result, pending, count: billable.length, commissionCount: billable.filter((o) => o.commission > 0).length };
 }
 
+const DONE = new Set(['completed', 'delivered']);
+
+function groupByService(orders: StatementOrder[]): StatementServiceLine[] {
+  const map = new Map<string, StatementServiceLine>();
+  for (const o of orders) {
+    const key = o.serviceName || o.serviceSlug;
+    const l = map.get(key) ?? {
+      service: key, orders: 0, completed: 0, collected: 0, ocpi: 0, withoutOcpi: 0, commissionOrders: 0, commission: 0,
+    };
+    l.orders += 1;
+    if (DONE.has(o.status)) l.completed += 1;
+    l.collected = round2(l.collected + o.total);
+    l.ocpi = round2(l.ocpi + o.ocpiCost);
+    if (!(o.ocpiCost > 0)) l.withoutOcpi += 1;
+    if (o.commission > 0) {
+      l.commissionOrders += 1;
+      l.commission = round2(l.commission + o.commission);
+    }
+    map.set(key, l);
+  }
+  return [...map.values()].sort((a, b) => b.orders - a.orders);
+}
+
 export function buildMonthlyStatement(
   allOrders: StatementOrder[],
   allCosts: StatementCost[],
@@ -143,6 +181,7 @@ export function buildMonthlyStatement(
     result: own.result,
     orderCount: own.count,
     commissionOrderCount: own.commissionCount,
+    byService: groupByService(allOrders.filter((o) => !o.isTest && orderMonth(o) === month)),
     pending: own.pending,
   };
 

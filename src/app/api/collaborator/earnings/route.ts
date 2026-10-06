@@ -181,7 +181,7 @@ export async function GET(request: NextRequest) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           allOrders.map((o: any) => ({
             paidAt: o.paidAt, total: o.clientTotal, ocpiCost: o.ocpiCost, stripeFee: o.stripeFee,
-            commission: o.commission, serviceSlug: o.serviceSlug, status: o.status, isTest: o.isTest,
+            commission: o.commission, serviceSlug: o.serviceSlug, serviceName: o.service, status: o.status, isTest: o.isTest,
           })),
           ((periodCostRows ?? []) as Array<{ amount_ron: number; period_start: string }>).map((c) => ({
             amount: Number(c.amount_ron) || 0, periodStart: c.period_start,
