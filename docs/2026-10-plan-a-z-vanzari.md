@@ -94,7 +94,7 @@ Stare și explicație: `seo/2026-10-05-ecazier-documentero-stare-organic.md`. 14
 | F0 | Legături interne pe ecazier: blocuri „Citește și” pe ghiduri, linkuri în text spre `/` (înainte mergeau spre `/comanda`, care e noindex), `/ghiduri` de la 1 la 9 linkuri, `/` de la 1 la 6 | ✅ 05.10 publicat |
 | F1 | Linkuri din CJO spre ecazier, în text (4): `/cazier-auto-online` → Uber/Bolt și puncte de penalizare; `/comparatie-servicii` → auto vs judiciar; `/impact-cazier-angajare` → fișa de evidență. Spre `/cazier-fiscal` nu punem, pentru că ar concura cu pagina de fiscal a CJO | ✅ 05.10 publicat |
 | F2 | Linkuri din eghiseul (footer + 3 în articole, niciunul din `/servicii/`) și din avocat-tarta (footer + articolul de apărare penală) | ✅ 05.10 publicat (inclusiv avocat-tarta, Netlify) |
-| F3 | Import în Bing Webmaster Tools + cerere de indexare pentru `/`, `/ghiduri`, cele două ghiduri | ⬜ (Raul, din browser) |
+| F3 | Import în Bing Webmaster Tools + cerere de indexare | ✅ 06.10: ecazier.ro și documentero.ro importate din GSC (Raul), sitemap trimis pe amândouă; URL Submission: ecazier 12, documentero 13, eghiseul 107 (tot sitemap-ul), CJO 67 (tot sitemap-ul fără paginile legale). eghiseul și CJO aveau deja sitemap-ul citit pe 05.10, 0 erori. IndexNow în lucru |
 | F4 | 19.10: dacă `/cazier-auto` nu e indexată și nu avem backlinkuri, oprim investiția | ⏸ |
 
 ## G. Infrastructură
@@ -106,6 +106,9 @@ Stare și explicație: `seo/2026-10-05-ecazier-documentero-stare-organic.md`. 14
 | G3 | Blocantul de reclame din Chrome strică salvările în Google Ads: excepție pentru ads.google.com | ⬜ Raul |
 
 ## Jurnal: cereri de indexare în Search Console
+
+Bing (06.10, URL Submission): ecazier 12 · documentero 13 · eghiseul 107 · CJO 67 — toate „Success”. Cota Bing e 100/zi pe ecazier/documentero și 10.000/zi pe eghiseul/CJO.
+
 
 Cota e de circa 10 cereri pe zi pentru fiecare proprietate.
 
