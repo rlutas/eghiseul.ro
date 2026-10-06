@@ -32,3 +32,5 @@ Status at 06.10 (paid until 30.09, 199 orders): share per side 4.731,09; distrib
 **Correction (Raul, same day):** the invoice is always the month's full commission (September 12 × 15 = 180); excess paid earlier comes off the transfer. The 06.10 payout is recorded as invoice 180 + transfer 124,23 (= 304,23).
 
 **Per-service table (same day):** `MonthlyStatement.byService` (orders, completed, collected, OCPI, orders without OCPI, commission) rendered under the statement in both views.
+
+**Correction 2 (Raul, same day):** the 110,25 VAT on SM 153 is NOT an overpayment (VAT is deducted, the invoice cost 525 — see `docs/operations/decont-mircea-2026-09-07-regularizare.md`). `collaboratorInvoicedRon` for 26.08 = 525. September: both sides 414,48; Mircea = invoice 180 + transfer 234,48. The only deduction is the 444,82 August correction.

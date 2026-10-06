@@ -68,11 +68,12 @@ export const DISTRIBUTIONS = [
     collaboratorCashRon: 3791.61,
     collaboratorCommissionRon: 525,
     /**
-     * What his commission invoice for this distribution actually paid out:
-     * Mirandsof SM 153, 635,25 = 525 + VAT, paid 07.09.2026. The rule since
-     * then is 15 lei WITH VAT included, so 110,25 of it counts as an advance.
+     * Value of his commission invoice for this payout: Mirandsof SM 153 =
+     * 525 + 110,25 VAT = 635,25, paid 07.09. The VAT is deducted by the
+     * company, so it costs 525 and he got the same value as Raul (4.316,61).
+     * See docs/operations/decont-mircea-2026-09-07-regularizare.md.
      */
-    collaboratorInvoicedRon: 635.25,
+    collaboratorInvoicedRon: 525,
     reference: 'docs/operations/decont-mircea-2026-08-26.md',
   },
   {
@@ -81,10 +82,9 @@ export const DISTRIBUTIONS = [
     on: '2026-10-06',
     forMonth: '2026-09',
     perSideRon: 414.48,
-    // 414,48 minus the 110,25 he got on top on SM 153 (525 + VAT instead of
-    // 15 lei with VAT included) = 304,23. He invoices September's commission
-    // in full (12 × 15 = 180, Raul 06.10); the excess comes off the transfer.
-    collaboratorCashRon: 124.23,
+    // He invoices September's commission in full (12 × 15 = 180, VAT
+    // included); the rest of the 414,48 is a transfer.
+    collaboratorCashRon: 234.48,
     collaboratorCommissionRon: 180,
     collaboratorInvoicedRon: 180,
     reference: 'docs/changelog/2026-10-06-decont-mircea-taxe-si-plati.md',
