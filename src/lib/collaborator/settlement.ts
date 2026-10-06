@@ -82,10 +82,11 @@ export const DISTRIBUTIONS = [
     forMonth: '2026-09',
     perSideRon: 414.48,
     // 414,48 minus the 110,25 he got on top on SM 153 (525 + VAT instead of
-    // 15 lei with VAT included) = 304,23 = transfer + commission invoice.
-    collaboratorCashRon: 204.48,
-    collaboratorCommissionRon: 99.75,
-    collaboratorInvoicedRon: 99.75,
+    // 15 lei with VAT included) = 304,23. He invoices September's commission
+    // in full (12 × 15 = 180, Raul 06.10); the excess comes off the transfer.
+    collaboratorCashRon: 124.23,
+    collaboratorCommissionRon: 180,
+    collaboratorInvoicedRon: 180,
     reference: 'docs/changelog/2026-10-06-decont-mircea-taxe-si-plati.md',
   },
 ] as const;

@@ -104,7 +104,7 @@ export function SettlementStatement({
                 <p className="text-lg font-bold tabular-nums text-secondary-900">{lei(p.collaboratorDue)}</p>
                 {p.collaboratorExtraPrior !== 0 && (
                   <p className="mt-1 text-xs text-slate-500">
-                    {lei(p.dueEach)} minus {lei(p.collaboratorExtraPrior)} primiți în plus pe factura anterioară (TVA)
+                    {lei(p.dueEach)} minus {lei(p.collaboratorExtraPrior)} primiți în plus la plata anterioară (se scad din transfer)
                   </p>
                 )}
                 <p className="mt-2 text-xs text-slate-600">
@@ -124,12 +124,6 @@ export function SettlementStatement({
                   label={`Comision ${name.toLowerCase()}: ${s.commissionOrderCount} comenzi × 15 lei`}
                   value={p.commissionThisMonth}
                 />
-                {p.commissionCorrectionPrior !== 0 && (
-                  <Row
-                    label={p.commissionCorrectionPrior < 0 ? 'Facturat în plus pe facturile anterioare' : 'Rămas nefacturat din lunile anterioare'}
-                    value={p.commissionCorrectionPrior}
-                  />
-                )}
                 <Row label="De facturat (TVA inclus în sumă)" value={p.commissionToInvoice} strong />
               </dl>
               <p className="mt-1 text-xs text-slate-500">

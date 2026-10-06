@@ -71,8 +71,6 @@ export interface MonthlyStatement {
     commissionToInvoice: number;
     /** Commission earned on this month's orders (VAT included). */
     commissionThisMonth: number;
-    /** commissionToInvoice − commissionThisMonth: earlier invoices over (−) or under (+) the rule. */
-    commissionCorrectionPrior: number;
     transferToCollaborator: number;
     paid: StatementPayment[];
     remainingEach: number;
@@ -155,17 +153,15 @@ export function buildMonthlyStatement(
 
   const priorEach = prior.reduce((s, d) => s + d.perSideRon, 0);
   const priorCollaborator = prior.reduce((s, d) => s + d.collaboratorCashRon + d.collaboratorInvoicedRon, 0);
-  const priorInvoiced = prior.reduce((s, d) => s + d.collaboratorInvoicedRon, 0);
 
   let dueEach = cumulative.sharePerSide - priorEach;
   // Rounding between the monthly and cumulative waterfalls can leave a ban.
   if (Math.abs(dueEach - own.result.sharePerSide) < 0.05) dueEach = own.result.sharePerSide;
   const collaboratorExtraPrior = priorCollaborator - priorEach;
   const collaboratorDue = dueEach - collaboratorExtraPrior;
-  const commissionToInvoice = Math.min(
-    Math.max(0, cumulative.commission - priorInvoiced),
-    Math.max(0, collaboratorDue)
-  );
+  // He invoices exactly this month's commission (orders × 15 lei, VAT
+  // included); anything paid in excess earlier comes off the transfer.
+  const commissionToInvoice = Math.min(own.result.commission, Math.max(0, collaboratorDue));
   const paidEach = paid.reduce((s, d) => s + d.perSideRon, 0);
   const paidCollaborator = paid.reduce((s, d) => s + d.collaboratorCashRon + d.collaboratorInvoicedRon, 0);
 
@@ -180,7 +176,6 @@ export function buildMonthlyStatement(
       collaboratorDue: round2(collaboratorDue),
       commissionToInvoice: round2(commissionToInvoice),
       commissionThisMonth: own.result.commission,
-      commissionCorrectionPrior: round2(commissionToInvoice - own.result.commission),
       transferToCollaborator: round2(collaboratorDue - commissionToInvoice),
       paid: paid.map((d) => ({
         on: d.on,
