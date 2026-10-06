@@ -13,11 +13,11 @@ import { DOCUMENTERO_INDEXABLE } from '@/config/documentero-nav';
 export const revalidate = 3600;
 
 const PATH = '/extras-multilingv/';
-const TITLE = 'Extras Multilingv Certificat de Naștere: Acceptat în UE, prin Avocat';
+const TITLE = 'Extras Multilingv Certificat de Naștere: în 23 de State, prin Avocat';
 const DESCRIPTION =
-  'Extrasul multilingv al actului de naștere (Regulamentul UE 2016/1191), obținut de un avocat de la starea civilă și livrat prin curier. Acceptat în toată Uniunea fără traducere și fără apostilă. Variantă și pentru căsătorie.';
+  'Extras multilingv de naștere (Convenția CIEC nr. 16), obținut prin avocat: fără traducere și apostilă în Italia, Spania, Germania, Franța și alte 19 state.';
 const DATE_PUBLISHED = '2026-09-19';
-const DATE_MODIFIED = '2026-09-21';
+const DATE_MODIFIED = '2026-10-06';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -28,15 +28,16 @@ export const metadata = buildPageMetadata({
   noindex: !DOCUMENTERO_INDEXABLE,
 });
 
-const COUNTRIES = ['Italia', 'Spania', 'Germania', 'Franța', 'Austria', 'Belgia', 'Olanda', 'Portugalia', 'Grecia', 'Irlanda', 'Suedia', 'Danemarca', 'Polonia', 'Ungaria', 'Cehia', '+ restul UE'];
+// States where Convention CIEC no. 16 is in force, besides Romania (ciec1.org status chart, 2026).
+const COUNTRIES = ['Italia', 'Spania', 'Germania', 'Franța', 'Austria', 'Belgia', 'Olanda', 'Luxemburg', 'Portugalia', 'Polonia', 'Elveția', 'Turcia', 'Republica Moldova', 'Bulgaria', 'Croația', 'Slovenia', 'Lituania', 'Estonia', 'Serbia', 'Bosnia și Herțegovina', 'Muntenegru', 'Macedonia de Nord', 'Capul Verde'];
 
 const FAQ = [
   { q: 'Cât durează?', a: `Legal, până la 30 de zile de la depunere. La comenzile noastre de extras de naștere din vara lui 2026, jumătate au ajuns la client în cel mult ${PROCESSING_STATS.byService['extras-multilingv-certificat-nastere'].medianDays} zile de la plată, cu curier cu tot. Dacă actul e deja scanat, primăria îl eliberează în câteva zile.` },
-  { q: 'Are termen de valabilitate?', a: 'Extrasul nu expiră. Unele autorități cer însă un document mai nou de 3–6 luni; verifică cu instituția care ți-l cere.' },
-  { q: 'Extrasul multilingv înlocuiește certificatul de naștere?', a: 'În fața instituțiilor din UE, da: are aceleași date, pe formularul standard european. În România ți se cere în continuare certificatul. De aceea mulți comandă amândouă, în aceeași depunere.' },
+  { q: 'Are termen de valabilitate?', a: 'Convenția nu îi stabilește un termen. Unele autorități cer însă un document eliberat în ultimele 3–6 luni; verifică la instituția care ți-l cere.' },
+  { q: 'Extrasul multilingv înlocuiește certificatul de naștere?', a: 'În fața autorităților din statele care aplică Convenția CIEC nr. 16, da: are aceeași putere doveditoare ca certificatul. În România nu se folosește; aici ți se cere certificatul. De aceea mulți comandă amândouă, în aceeași depunere.' },
   { q: 'Pot cere extrasul pentru copilul meu?', a: 'Da, ca părinte. Pentru un alt adult, doar el semnează împuternicirea.' },
-  { q: 'Ce diferență e față de „certificatul cu traducere pe verso”?', a: 'Formularul UE e recunoscut prin regulament, în toate statele; traducerea pe verso e o practică mai veche, acceptată neuniform.' },
-  { q: 'E același lucru cu „certificatul de naștere internațional”?', a: 'Așa îi spun mulți. Există și extrasul multilingv după Convenția CIEC nr. 16 (Viena, 1976), acceptat în statele semnatare, inclusiv în afara UE (de exemplu Elveția, Turcia, Moldova). Pentru UE se folosește formularul din Regulamentul 2016/1191. Îți spunem care e potrivit pentru țara ta.' },
+  { q: 'Ce diferență e față de un certificat tradus?', a: 'Extrasul multilingv e acceptat fără traducere în toate statele care aplică Convenția CIEC nr. 16. Un certificat tradus e primit după regulile fiecărei instituții, iar traducerea autorizată o plătești separat.' },
+  { q: 'E același lucru cu „certificatul de naștere internațional”?', a: 'Așa îi spun mulți. Temeiul lui e Convenția CIEC nr. 16 (Viena, 1976), la care România a aderat prin Legea nr. 65/2012. Nu-l confunda cu formularul standard multilingv din Regulamentul (UE) 2016/1191: acela e o anexă de traducere care însoțește certificatul și se folosește doar între statele UE.' },
   { q: 'Trebuie să merg la notar pentru împuternicire?', a: `Nu. Împuternicirea avocațială se semnează electronic în formular și e recunoscută de starea civilă în temeiul ${LEGAL_BASIS.shortGen}.` },
 ];
 
@@ -69,13 +70,13 @@ export default async function ExtrasMultilingvPage() {
       <main id="main-content">
         <ServiceHero
           crumb="Extras multilingv de naștere"
-          eyebrow="Regulamentul UE 2016/1191 · formular standard multilingv"
-          title="Extrasul multilingv de naștere: acceptat în UE fără traducere și fără apostilă."
-          intro="Un formular oficial, emis de starea civilă din România, cu datele tale de naștere în toate limbile Uniunii. Îl depui direct la primăria, notarul sau autoritatea din statul UE unde locuiești. Avocatul nostru îl obține și ți-l trimite prin curier."
+          eyebrow="Convenția CIEC nr. 16 · Legea nr. 65/2012"
+          title="Extrasul multilingv de naștere: fără traducere și fără apostilă în 23 de state."
+          intro="Un extras al actului tău de naștere, eliberat de starea civilă din România, cu rubricile în română și franceză și traducerea lor pe verso. Îl depui direct la primăria, notarul sau autoritatea din statul unde locuiești, dacă statul aplică Convenția CIEC nr. 16. Avocatul nostru îl obține și ți-l trimite prin curier."
           orderSlug="extras-multilingv-certificat-nastere"
           cta="Comandă extrasul"
           secondary={{ label: 'Când nu e suficient', href: '#limite' }}
-          facts={[['24 de limbi', 'rubricile formularului UE'], ['0 traduceri', 'și 0 apostile, în UE'], ['≤ 30 de zile', 'termen legal de eliberare']]}
+          facts={[['23 de state', 'îl acceptă fără traducere'], ['0 apostile', 'în statele convenției'], ['≤ 30 de zile', 'termen legal de eliberare']]}
           priceLabel="Extras multilingv de naștere"
           price={pN.basePrice}
           optionsTitle="Pachet"
@@ -84,7 +85,7 @@ export default async function ExtrasMultilingvPage() {
         />
 
         <QuickAnswer updated={DATE_MODIFIED}>
-          Extrasul multilingv al actului de naștere este formularul standard multilingv din Regulamentul (UE) 2016/1191, emis de oficiul de stare civilă din România pe baza actului de naștere. Are datele certificatului cu rubricile în toate limbile oficiale ale Uniunii și este acceptat în orice stat membru fără traducere autorizată și fără apostilă. Îl poate cere titularul, părintele pentru minor sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}). Nu expiră; termen legal de eliberare: cel mult 30 de zile.
+          Extrasul multilingv al actului de naștere e documentul prevăzut de Convenția CIEC nr. 16 (Viena, 1976), la care România a aderat prin Legea nr. 65/2012. Îl eliberează oficiul de stare civilă care păstrează actul de naștere și are aceeași putere doveditoare ca certificatul. În cele 23 de state care aplică convenția e primit fără traducere, fără legalizare și fără apostilă; în fața autorităților române nu se folosește. Îl poate cere titularul, părintele pentru minor sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}). Termen legal de eliberare: cel mult 30 de zile.
         </QuickAnswer>
 
         <Section className="mt-10">
@@ -101,10 +102,10 @@ export default async function ExtrasMultilingvPage() {
           </div>
           <div className="flex flex-col gap-4 lg:col-span-5 lg:col-start-8">
             <Eyebrow>Extras sau certificat?</Eyebrow>
-            <H2 className="sm:text-[36px]">Extrasul e certificatul, tradus oficial în 24 de limbi.</H2>
-            <p className="m-0 text-[16px] leading-[1.6] text-d-muted">Are aceleași date ca certificatul de naștere (nume, dată, loc, părinți), dar pe formularul standard european din Regulamentul 2016/1191. Autoritatea străină nu mai poate cere traducere autorizată sau apostilă pentru el.</p>
+            <H2 className="sm:text-[36px]">Extrasul are aceeași putere doveditoare ca certificatul.</H2>
+            <p className="m-0 text-[16px] leading-[1.6] text-d-muted">Are aceleași date ca certificatul de naștere (nume, dată, loc, părinți), pe formularul din Convenția CIEC nr. 16. Statele care au aderat la convenție îl primesc fără traducere, fără legalizare și fără apostilă.</p>
             <ul className="m-0 flex list-none flex-col gap-2.5 p-0 text-[15px]">
-              {['Emis de starea civilă din România, cu ștampilă', 'Valabil în toate statele membre UE', 'Fără traducere, fără apostilă, fără notar', 'Se cere de obicei împreună cu certificatul'].map((t) => (
+              {['Eliberat de starea civilă din România, cu ștampilă', 'Acceptat în cele 23 de state ale convenției', 'Fără traducere, fără apostilă, fără notar', 'Nu se folosește în fața autorităților române'].map((t) => (
                 <li key={t} className="flex items-center gap-2.5"><Check className="shrink-0 text-d-acc" /> {t}</li>
               ))}
             </ul>
@@ -116,7 +117,7 @@ export default async function ExtrasMultilingvPage() {
             <div className="flex flex-col gap-3 lg:col-span-8">
               <Eyebrow>Extras multilingv de căsătorie</Eyebrow>
               <H2 className="sm:text-[32px]">Aceeași procedură, pentru actul de căsătorie.</H2>
-              <Prose paras={['Pentru rezidența partenerului, schimbarea numelui în actele străine sau pensia de urmaș, instituțiile din UE acceptă extrasul multilingv de căsătorie în locul certificatului tradus și apostilat. Îl cere oricare dintre soți; avocatul depune la primăria care păstrează actul de căsătorie. Dacă ai divorțat, mențiunea apare și pe extras, cu condiția să fie înscrisă pe actul de căsătorie din România.']} />
+              <Prose paras={['Pentru rezidența partenerului, schimbarea numelui în actele străine sau pensia de urmaș, instituțiile din statele convenției acceptă extrasul multilingv de căsătorie în locul certificatului tradus. Îl cere oricare dintre soți; avocatul depune la primăria care păstrează actul de căsătorie. Dacă ai divorțat, mențiunea apare și pe extras, cu condiția să fie înscrisă pe actul de căsătorie din România.']} />
               <p className="m-0 text-[14px] text-d-muted">
                 Ai nevoie și de certificatul de căsătorie pe hârtie? Vezi <Link href="/certificat-de-casatorie/" className="font-semibold text-d-ink underline underline-offset-2 hover:text-d-acc">duplicatul certificatului de căsătorie</Link>, cu extrasul ca opțiune în aceeași comandă.
               </p>
@@ -135,8 +136,8 @@ export default async function ExtrasMultilingvPage() {
           </div>
           <div className="grid gap-5 md:grid-cols-3 lg:col-span-8">
             {[
-              ['În afara UE', 'Marea Britanie, SUA, Canada, Elveția, Norvegia: acolo ai nevoie de certificat + apostilă (Haga) + traducere. Vezi pagina certificatului de naștere.', '/certificat-de-nastere/'],
-              ['Autoritatea cere expres certificatul', 'Unele consulate și instanțe cer certificatul cu apostilă chiar și în UE. Verificăm cu tine țara și scopul.', '/ghiduri/apostila-acte-stare-civila/'],
+              ['În statele care n-au aderat', 'Regatul Unit, Irlanda, țările nordice, Cehia, Slovacia, Ungaria, Grecia, SUA, Canada: extrasul nu e recunoscut automat. Acolo folosești certificatul, cu traducere și, în afara UE, cu apostilă.', '/certificat-de-nastere/'],
+              ['Autoritatea cere expres certificatul', 'Unele consulate și instanțe cer certificatul chiar și într-un stat al convenției. Verificăm cu tine țara și scopul.', '/ghiduri/apostila-acte-stare-civila/'],
               ['Pentru celibat', 'Extrasul nu atestă starea civilă actuală. Pentru căsătorie ai nevoie de adeverința privind statutul civil, certificatul de celibat.', '/certificat-de-celibat/'],
             ].map(([t, d, h]) => (
               <Link key={t} href={h} className="flex flex-col gap-2 rounded-2xl border border-d-line bg-d-card p-6 hover:border-d-acc">
@@ -150,42 +151,42 @@ export default async function ExtrasMultilingvPage() {
 
         <Section className="mt-24 flex flex-col gap-5 lg:mt-32">
           <div className="flex flex-col gap-3">
-            <Eyebrow>Două formulare, două temeiuri</Eyebrow>
-            <H2 className="sm:text-[36px]">Formularul UE sau extrasul CIEC? Depinde de țară.</H2>
-            <p className="m-0 max-w-[760px] text-[15px] leading-[1.6] text-d-muted">România emite două tipuri de extras multilingv. Amândouă vin de la starea civilă și amândouă au rubricile traduse; diferă unde sunt recunoscute automat.</p>
+            <Eyebrow>Două documente, două temeiuri</Eyebrow>
+            <H2 className="sm:text-[36px]">Extrasul CIEC sau formularul UE? Nu sunt același lucru.</H2>
+            <p className="m-0 max-w-[760px] text-[15px] leading-[1.6] text-d-muted">Ce comanzi la noi e extrasul multilingv după Convenția CIEC nr. 16. Formularul standard multilingv din Regulamentul (UE) 2016/1191 e altceva: o anexă care însoțește certificatul și ține loc de traducere, doar între statele UE.</p>
           </div>
           <InfoTable
-            head={['', 'Formular standard multilingv UE', 'Extras multilingv CIEC']}
+            head={['', 'Extras multilingv CIEC (ce comanzi la noi)', 'Formular standard multilingv UE']}
             rows={[
-              ['Temei', 'Regulamentul (UE) 2016/1191', 'Convenția CIEC nr. 16, Viena, 1976'],
-              ['Unde e acceptat fără traducere', 'în toate cele 27 de state membre UE', 'în statele semnatare ale convenției: UE, Elveția, Turcia, Moldova, Muntenegru, Macedonia de Nord și altele'],
-              ['Apostilă', 'nu, în UE', 'nu, în statele semnatare'],
-              ['Ce este, tehnic', 'un formular anexat certificatului, care îl „traduce”', 'un extras de sine stătător după actul de naștere'],
-              ['Când îl recomandăm', 'instituție dintr-un stat UE', 'stat semnatar din afara UE sau instituție care îl cere expres'],
+              ['Temei', 'Convenția CIEC nr. 16 (Viena, 1976); Legea nr. 65/2012; HG nr. 727/2013', 'Regulamentul (UE) 2016/1191'],
+              ['Ce este', 'un extras de sine stătător, cu aceeași putere doveditoare ca certificatul', 'o anexă de traducere, fără valoare proprie; se prezintă doar împreună cu certificatul'],
+              ['Unde e acceptat fără traducere', 'în cele 23 de state ale convenției, inclusiv Elveția, Turcia și Republica Moldova', 'în statele membre UE, atașat certificatului'],
+              ['Apostilă', 'nu, în statele convenției', 'certificatul e scutit de apostilă între statele UE'],
+              ['În România', 'nu se folosește', 'nu e cazul'],
             ]}
           />
-          <p className="m-0 text-[14px] text-d-muted">Scrie țara și instituția în formular; alegem varianta potrivită și îți spunem dacă e nevoie și de certificatul propriu-zis.</p>
+          <p className="m-0 text-[14px] text-d-muted">Scrie țara și instituția în formular; îți spunem dacă extrasul e suficient acolo sau îți trebuie și certificatul.</p>
         </Section>
 
         <SeoBlock
           title="Extras multilingv de naștere online: ce este, cine îl acceptă, cât costă"
           intro={[
-            'Extrasul multilingv al actului de naștere este formularul standard european introdus prin Regulamentul (UE) 2016/1191. Are exact datele din certificatul tău de naștere, dar tipărite pe formularul cu rubricile traduse în toate limbile oficiale ale Uniunii. De aceea o primărie din Italia, un „Bürgeramt” din Germania sau un „registro civil” din Spania îl acceptă ca atare: fără traducere autorizată, fără apostilă, fără legalizare. Mulți îl caută drept „certificat de naștere multilingv” sau „certificat de naștere internațional”; e același document.',
+            'Extrasul multilingv al actului de naștere e documentul prevăzut de Convenția CIEC nr. 16, semnată la Viena în 1976, la care România a aderat prin Legea nr. 65/2012. Are datele din certificatul tău de naștere, cu rubricile în română și franceză și traducerea lor pe verso. De aceea o primărie din Italia, un „Standesamt” din Germania sau un „registro civil” din Spania îl acceptă ca atare: fără traducere autorizată, fără apostilă, fără legalizare. Mulți îl caută drept „certificat de naștere multilingv” sau „certificat de naștere internațional”; e același document.',
             `Îl eliberează oficiul de stare civilă care păstrează actul de naștere, la cerere, titularului sau unui avocat cu împuternicire (${LEGAL_BASIS.short}). Se cere de obicei împreună cu duplicatul certificatului, pentru că unele instituții străine vor amândouă. De aceea avem pachetul: extrasul și certificatul, dintr-o singură depunere, ${lei(pN.basePrice)} + ${lei(pachet)} lei.`,
           ]}
           acte={['Act de identitate valabil (buletin sau pașaport), poză față-verso', 'Datele nașterii: data, localitatea, numele părinților', 'Țara în care folosești extrasul', 'Semnătura ta, în formular']}
           rows={[
             ['Unde depui', 'la primăria care are actul, cu programare', 'nicăieri; depune avocatul'],
-            ['Traducere', 'nu e nevoie (formular UE)', 'nu e nevoie'],
-            ['Apostilă', 'nu e nevoie în UE', 'nu e nevoie în UE; în afara UE îți spunem ce trebuie'],
+            ['Traducere', 'nu e nevoie în statele convenției', 'nu e nevoie în statele convenției'],
+            ['Apostilă', 'nu e nevoie în statele convenției', 'nu e nevoie în statele convenției; în rest îți spunem ce trebuie'],
             ['Taxă', '0 lei sau taxă locală', `${lei(pN.basePrice)} lei, tot inclus`],
             ['Termen', 'legal, până la 30 de zile', 'același termen; status la fiecare pas'],
             ['Din străinătate', 'consulat: 30–60 de zile', 'direct la primărie, curier internațional'],
           ]}
-          diasporaTitle="Pentru cine e gândit extrasul: cei care locuiesc în UE"
+          diasporaTitle="Pentru cine e gândit extrasul: cei care locuiesc în statele convenției"
           diaspora={[
-            'Cel mai des îl cer românii stabiliți în Italia, Spania, Germania și Franța, pentru înscrierea copilului la școală, pentru căsătorie, pentru dosarul de rezidență sau pentru pensie. Până în 2019 aceleași instituții cereau certificatul cu traducere legalizată și apostilă, două drumuri în plus și 300–400 de lei. Regulamentul 2016/1191 a scos exact aceste două cerințe pentru actele de stare civilă între statele membre.',
-            'Atenție la două lucruri. Extrasul nu spune nimic despre starea civilă actuală: pentru căsătorie ai nevoie și de certificatul de celibat. Și nu e recunoscut automat în afara Uniunii: pentru Regatul Unit, Elveția, Norvegia, SUA sau Canada rămâne varianta certificat plus apostilă plus traducere, sau extrasul CIEC acolo unde statul e semnatar.',
+            'Cel mai des îl cer românii stabiliți în Italia, Spania, Germania și Franța, pentru înscrierea copilului la școală, pentru căsătorie, pentru dosarul de rezidență sau pentru pensie. Fără extras, instituțiile de acolo cer de obicei certificatul cu traducere autorizată, adică un drum și o cheltuială în plus.',
+            'Atenție la două lucruri. Extrasul nu spune nimic despre starea civilă actuală: pentru căsătorie ai nevoie și de certificatul de celibat. Și nu e recunoscut în statele care n-au aderat la convenție: Regatul Unit, Irlanda, țările nordice, Cehia, Slovacia, Ungaria, Grecia, SUA sau Canada. Acolo rămâne certificatul, cu traducere și, în afara UE, cu apostilă.',
           ]}
           guides={[
             { title: 'Apostila pe acte de stare civilă: când e nevoie și când nu', desc: 'Depinde de țară. Tabelul pe scurt.', href: '/ghiduri/apostila-acte-stare-civila/' },
@@ -211,7 +212,7 @@ export default async function ExtrasMultilingvPage() {
               {[
                 'Onorariul avocatului și împuternicirea avocațială, cu număr din registrul Baroului',
                 'Depunerea cererii și ridicarea extrasului de la primărie',
-                'Alegerea formularului potrivit pentru țara ta (UE sau CIEC)',
+                'Verificarea țării: îți spunem dacă extrasul e acceptat acolo',
                 'Scanul pe email în ziua ridicării, originalul prin curier, oriunde în UE',
                 'Banii înapoi dacă primăria refuză și nu se poate rezolva',
               ].map((t) => (
@@ -234,7 +235,7 @@ export default async function ExtrasMultilingvPage() {
 
         <RelatedServices
           items={[
-            ['Certificat de naștere, duplicat', 'Pentru România sau pentru statele din afara UE, cu apostilă și traducere.', '/certificat-de-nastere/'],
+            ['Certificat de naștere, duplicat', 'Pentru România sau pentru statele care nu aplică convenția.', '/certificat-de-nastere/'],
             ['Certificat de celibat', 'Pentru căsătoria în străinătate: extrasul nu atestă starea civilă actuală.', '/certificat-de-celibat/'],
             ['Certificat de căsătorie, duplicat', 'Cu extrasul multilingv de căsătorie ca opțiune, în aceeași comandă.', '/certificat-de-casatorie/'],
           ]}

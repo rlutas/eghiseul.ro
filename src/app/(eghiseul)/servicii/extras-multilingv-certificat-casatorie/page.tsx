@@ -35,10 +35,10 @@ import { PrivateServiceNotice } from '@/components/services/private-service-noti
 
 const SERVICE_SLUG = 'extras-multilingv-certificat-casatorie';
 const PAGE_PATH = '/servicii/extras-multilingv-certificat-casatorie/';
-const TITLE = 'Extras Multilingv Certificat de Căsătorie 2026 — pentru UE, Fără Traducere';
+const TITLE = 'Extras Multilingv Certificat de Căsătorie 2026 — Fără Traducere, prin Avocat';
 const DESCRIPTION =
-  'Extrasul multilingv de pe certificatul de căsătorie (formular standard UE) e recunoscut în ' +
-  'Uniunea Europeană fără traducere și fără apostilă. 798 RON totul inclus, fără deplasare.';
+  'Extrasul multilingv al actului de căsătorie (Convenția CIEC nr. 16) e acceptat fără traducere și ' +
+  'fără apostilă în Italia, Spania, Germania, Franța și alte 19 state. 798 RON totul inclus.';
 const DATE_PUBLISHED = '2026-06-25';
 const DATE_MODIFIED = '2026-07-08';
 
@@ -77,9 +77,9 @@ const jsonLdGraph = buildServicePageGraph({
   slug: SERVICE_SLUG,
   name: 'Extras Multilingv Certificat de Căsătorie',
   description:
-    'Serviciu de obținere a extrasului multilingv de pe certificatul de căsătorie (formular standard ' +
-    'multilingv conform Regulamentului (UE) 2016/1191), recunoscut în toate statele UE fără traducere ' +
-    'autorizată și fără apostilă. Procesare 100% online, depunere prin avocat partener, livrare ' +
+    'Serviciu de obținere a extrasului multilingv al actului de căsătorie (Convenția CIEC nr. 16, ' +
+    'Legea nr. 65/2012), acceptat fără traducere și fără apostilă în statele care aplică ' +
+    'convenția. Procesare 100% online, depunere prin avocat partener, livrare ' +
     'electronică și prin curier, inclusiv internațional.',
   serviceType: 'Document Processing — Civil Status',
   datePublished: DATE_PUBLISHED,
@@ -107,10 +107,10 @@ export default async function ExtrasMultilingvCasatoriePage() {
 
   // When you need the multilingual extract — main EU use cases
   const useCases = [
-    { icon: Heart, title: 'Recunoașterea căsătoriei', items: ['Căsătorie recunoscută în alt stat UE', 'Acte la autoritățile străine', 'Dosare de reîntregire a familiei'] },
-    { icon: Landmark, title: 'Regim matrimonial', items: ['Dovada regimului matrimonial', 'Acte notariale în UE', 'Achiziții imobiliare în străinătate'] },
-    { icon: User, title: 'Schimbarea numelui', items: ['Actualizarea numelui după căsătorie', 'Acte de identitate în alt stat UE', 'Conturi bancare și contracte'] },
-    { icon: Users, title: 'Dosare de familie', items: ['Permis de ședere pentru soț/soție', 'Alocații și asigurări sociale UE', 'Alte proceduri administrative'] },
+    { icon: Heart, title: 'Recunoașterea căsătoriei', items: ['Căsătorie dovedită în alt stat', 'Acte la autoritățile străine', 'Dosare de reîntregire a familiei'] },
+    { icon: Landmark, title: 'Regim matrimonial', items: ['Dovada regimului matrimonial', 'Acte notariale în străinătate', 'Achiziții imobiliare în străinătate'] },
+    { icon: User, title: 'Schimbarea numelui', items: ['Actualizarea numelui după căsătorie', 'Acte de identitate în alt stat', 'Conturi bancare și contracte'] },
+    { icon: Users, title: 'Dosare de familie', items: ['Permis de ședere pentru soț/soție', 'Alocații și asigurări sociale', 'Alte proceduri administrative'] },
   ];
 
   return (
@@ -147,7 +147,7 @@ export default async function ExtrasMultilingvCasatoriePage() {
                 <div className="flex flex-wrap gap-2 mb-4">
                   <Badge className="bg-primary-500 text-secondary-900 font-bold px-3 py-1">
                     <Globe className="h-3.5 w-3.5 mr-1" />
-                    Recunoscut în UE
+                    Acceptat în 23 de state
                   </Badge>
                   <Badge className="bg-green-600 text-white font-bold px-3 py-1">
                     <CheckCircle className="h-3.5 w-3.5 mr-1" />
@@ -161,13 +161,13 @@ export default async function ExtrasMultilingvCasatoriePage() {
 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-5">
                   Extras Multilingv{' '}
-                  <span className="block text-primary-500">Certificat de Căsătorie — pentru UE</span>
+                  <span className="block text-primary-500">Certificat de Căsătorie — pentru Străinătate</span>
                 </h1>
 
                 <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-6">
-                  Formularul standard multilingv (Regulamentul UE 2016/1191) care însoțește certificatul
-                  de căsătorie și îl face valabil în toate statele Uniunii Europene, fără traducere
-                  autorizată și fără apostilă.
+                  Extrasul multilingv al actului de căsătorie, după Convenția CIEC nr. 16 (Viena, 1976).
+                  Are aceeași putere doveditoare ca certificatul și e acceptat fără traducere și fără
+                  apostilă în Italia, Spania, Germania, Franța și alte 19 state.
                 </p>
 
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/20 mb-6">
@@ -272,7 +272,7 @@ export default async function ExtrasMultilingvCasatoriePage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
                 { icon: CalendarDays, value: formatEstimatedDays(service), label: 'Livrare estimată' },
-                { icon: Globe, value: 'Valabil în UE', label: 'Fără traducere, fără apostilă' },
+                { icon: Globe, value: 'Acceptat în 23 de state', label: 'Fără traducere, fără apostilă' },
                 { icon: Mail, value: 'Email + curier', label: 'Inclusiv internațional (DHL)' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
               ].map((t) => (
@@ -296,10 +296,11 @@ export default async function ExtrasMultilingvCasatoriePage() {
             </h2>
             <div className="space-y-4 text-neutral-700 leading-relaxed">
               <p>
-                Extrasul multilingv este formularul standard introdus prin{' '}
-                <strong>Regulamentul (UE) 2016/1191</strong>, care însoțește certificatul de căsătorie și
-                redă aceleași date în limbile oficiale ale statelor membre. Autoritatea din alt stat UE
-                îl citește direct, fără traducere autorizată și fără apostilă.
+                Extrasul multilingv e documentul prevăzut de <strong>Convenția CIEC nr. 16</strong>,
+                semnată la Viena în 1976, la care România a aderat prin Legea nr. 65/2012. Îl eliberează
+                starea civilă după actul de căsătorie din registru, cu rubricile în română și franceză și
+                traducerea lor pe verso. Autoritățile din statele care aplică convenția îl primesc
+                direct, fără traducere autorizată și fără apostilă.
               </p>
               <p>
                 Confuzia cea mai frecventă, și cea mai costisitoare: extrasul de căsătorie dovedește o
@@ -347,13 +348,13 @@ export default async function ExtrasMultilingvCasatoriePage() {
               </p>
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
                 <h3 className="font-bold text-secondary-900 mb-2">
-                  Important: doar pentru statele Uniunii Europene
+                  Important: doar în statele Convenției CIEC nr. 16
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  Formularul standard multilingv este recunoscut <strong>numai între statele membre UE</strong>.
-                  Pentru țări din afara Uniunii Europene (Marea Britanie, SUA, Canada etc.) rămâne necesară{' '}
-                  <strong>apostila de la Haga</strong> și, de regulă, o <strong>traducere legalizată</strong> a
-                  certificatului. Dacă nu ești sigur ce îți cere autoritatea străină, scrie-ne pe WhatsApp
+                  Extrasul multilingv e recunoscut fără traducere în <strong>23 de state</strong>: Italia, Spania, Germania, Franța, Austria, Belgia, Olanda, Luxemburg, Portugalia, Polonia, Elveția, Turcia, Republica Moldova, Bulgaria, Croația, Slovenia, Lituania, Estonia, Serbia, Bosnia și Herțegovina, Muntenegru, Macedonia de Nord și Capul Verde.
+                  Pentru celelalte (Marea Britanie, Irlanda, țările nordice, Cehia, Ungaria, Grecia, SUA,
+                  Canada etc.) folosești certificatul, cu <strong>traducere</strong> și, în afara UE, cu 
+                  <strong>apostila de la Haga</strong>. Dacă nu ești sigur ce îți cere autoritatea străină, scrie-ne pe WhatsApp
                   înainte de comandă.
                 </p>
               </div>
@@ -372,7 +373,7 @@ export default async function ExtrasMultilingvCasatoriePage() {
                 Când Ai Nevoie de Extrasul Multilingv?
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Ori de câte ori prezinți certificatul de căsătorie unei autorități dintr-un alt stat membru UE.
+                Ori de câte ori îți cere actul de căsătorie o autoritate dintr-un stat care aplică Convenția CIEC nr. 16.
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -401,15 +402,15 @@ export default async function ExtrasMultilingvCasatoriePage() {
                   Înlocuiește traducerea și apostila?
                 </h2>
                 <p className="text-neutral-600 max-w-2xl mx-auto">
-                  Da, în interiorul Uniunii Europene. Pentru un dosar depus în afara ei, schimbarea
-                  numelui cere din nou traducere și apostilă.
+                  Da, în statele care aplică Convenția CIEC nr. 16. Pentru un dosar depus în alt stat,
+                  schimbarea numelui cere certificatul, cu traducere și, în afara UE, cu apostilă.
                 </p>
               </div>
               <div className="grid md:grid-cols-2 gap-5">
                 <div className="bg-green-50 rounded-2xl p-6 border border-green-200">
                   <div className="flex items-center gap-2 mb-4">
                     <Globe className="w-6 h-6 text-green-600" />
-                    <h3 className="text-lg font-bold text-secondary-900">În statele membre UE</h3>
+                    <h3 className="text-lg font-bold text-secondary-900">În statele convenției</h3>
                   </div>
                   <ul className="space-y-2.5 text-sm text-neutral-700">
                     {[
@@ -428,13 +429,13 @@ export default async function ExtrasMultilingvCasatoriePage() {
                 <div className="bg-neutral-50 rounded-2xl p-6 border border-neutral-200">
                   <div className="flex items-center gap-2 mb-4">
                     <Plane className="w-6 h-6 text-neutral-500" />
-                    <h3 className="text-lg font-bold text-secondary-900">În afara UE</h3>
+                    <h3 className="text-lg font-bold text-secondary-900">În celelalte state</h3>
                   </div>
                   <ul className="space-y-2.5 text-sm text-neutral-700">
                     {[
-                      'Extrasul multilingv NU este suficient',
-                      'Rămâne necesară apostila de la Haga pe certificat',
-                      'De regulă se cere și traducere legalizată',
+                      'Extrasul multilingv NU e recunoscut automat',
+                      'Folosești certificatul, cu traducere autorizată',
+                      'În afara UE se cere și apostila de la Haga',
                       'Verifică cerințele exacte ale autorității străine înainte de comandă',
                     ].map((row) => (
                       <li key={row} className="flex items-start gap-2">
@@ -446,7 +447,8 @@ export default async function ExtrasMultilingvCasatoriePage() {
                 </div>
               </div>
               <p className="text-sm text-neutral-600 text-center mt-6 max-w-2xl mx-auto">
-                Extrasul multilingv nu circulă singur — el <strong>însoțește certificatul de căsătorie</strong>.
+                Extrasul multilingv nu se folosește în fața autorităților române; acolo îți trebuie{' '}
+                <strong>certificatul de căsătorie</strong>.
                 Dacă actul tău e pierdut sau deteriorat, vezi ghidul despre{' '}
                 <Link href="/acte-necesare-casatorie/" className="text-primary-600 font-medium hover:underline">
                   duplicatul certificatului de căsătorie
@@ -477,7 +479,7 @@ export default async function ExtrasMultilingvCasatoriePage() {
             <div className="grid md:grid-cols-2 gap-5 max-w-3xl mx-auto mb-8">
               <div className="bg-white rounded-2xl p-6 border-2 border-neutral-200">
                 <h3 className="font-bold text-secondary-900 mb-1">Extras multilingv</h3>
-                <p className="text-sm text-neutral-600 mb-3">Formularul standard UE, pentru certificatul pe care îl ai deja.</p>
+                <p className="text-sm text-neutral-600 mb-3">Extrasul CIEC, eliberat după actul din registru.</p>
                 <p className="text-3xl font-extrabold text-secondary-900">{service.base_price} <span className="text-base font-semibold text-neutral-500">RON</span></p>
                 <p className="text-xs text-neutral-500 mt-1">Totul inclus — onorariu avocat + depunere</p>
               </div>
@@ -620,8 +622,8 @@ export default async function ExtrasMultilingvCasatoriePage() {
                 deja actul nou.
               </p>
               <p>
-                Două lucruri de știut înainte: instituțiile publice din UE acceptă formularul
-                standard ca atare, dar <strong>băncile și angajatorii privați își pot cere propriile
+                Două lucruri de știut înainte: instituțiile publice din statele convenției acceptă
+                extrasul ca atare, dar <strong>băncile și angajatorii privați își pot cere propriile
                 documente</strong>, iar dacă v-ați căsătorit în străinătate actul românesc există abia
                 după transcriere. Cere lista lor înainte, ca să nu comanzi de două ori.
               </p>
@@ -679,17 +681,17 @@ export default async function ExtrasMultilingvCasatoriePage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Extras Multilingv Certificat de Căsătorie"
           faqs={[
-            { q: 'Ce este extrasul multilingv de pe certificatul de căsătorie?', a: 'Este un formular standard multilingv, introdus prin Regulamentul (UE) 2016/1191, care însoțește certificatul de căsătorie și redă datele acestuia în limbile oficiale ale statelor membre. Rolul lui este să facă actul acceptat în alt stat UE fără traducere.' },
-            { q: 'Înlocuiește traducerea și apostila?', a: 'Da, în interiorul Uniunii Europene: formularul standard multilingv elimină nevoia de traducere autorizată și de apostilă pentru certificatul de căsătorie. Pentru țări din afara UE rămâne necesară apostila de la Haga plus traducerea legalizată.' },
+            { q: 'Ce este extrasul multilingv de pe certificatul de căsătorie?', a: 'Este extrasul prevăzut de Convenția CIEC nr. 16 (Viena, 1976), la care România a aderat prin Legea nr. 65/2012. Îl eliberează starea civilă după actul de căsătorie din registru, are aceeași putere doveditoare ca certificatul și e acceptat fără traducere în statele care aplică convenția. Nu e același lucru cu formularul standard multilingv din Regulamentul (UE) 2016/1191, care doar însoțește un certificat.' },
+            { q: 'Înlocuiește traducerea și apostila?', a: 'Da, în cele 23 de state care aplică Convenția CIEC nr. 16, între care Italia, Spania, Germania și Franța: extrasul e primit fără traducere, legalizare sau apostilă. În celelalte state folosești certificatul, cu traducere și, în afara UE, cu apostila de la Haga.' },
             { q: 'Cât costă extrasul multilingv?', a: 'Serviciul complet costă 798 RON — totul inclus: onorariul avocatului partener, depunerea cererii prin împuternicire și livrarea. Nu există taxe ascunse.' },
             { q: 'Pot comanda și certificatul de căsătorie împreună cu extrasul?', a: 'Da, și e varianta cea mai avantajoasă: adaugi certificatul (duplicat) la pachet pentru doar +498 RON, față de 998 RON cât costă comandat separat — economisești 500 RON. Există și calea inversă: comanzi certificatul de căsătorie la 998 RON și adaugi extrasul multilingv ca opțiune, la +398 RON.' },
-            { q: 'Când am nevoie de extrasul multilingv?', a: 'Când prezinți certificatul de căsătorie unei autorități dintr-un alt stat UE: recunoașterea căsătoriei, dovada regimului matrimonial, schimbarea numelui după căsătorie în actele din alt stat membru, permis de ședere pentru soț/soție sau alte dosare de familie.' },
+            { q: 'Când am nevoie de extrasul multilingv?', a: 'Când îți cere actul de căsătorie o autoritate dintr-un stat care aplică Convenția CIEC nr. 16: dovada căsătoriei, dovada regimului matrimonial, schimbarea numelui după căsătorie în actele din acel stat, permis de ședere pentru soț/soție sau alte dosare de familie.' },
             { q: 'De unde se eliberează și cine depune cererea?', a: 'Se eliberează de serviciul de stare civilă al primăriei care deține actul de căsătorie. Prin eGhișeul, avocatul nostru partener depune cererea prin împuternicire — pe care o semnezi electronic direct în formular — fără să te deplasezi la ghișeu.' },
             { q: 'Cât durează și cum primesc documentul?', a: `Termenul standard este de ${formatEstimatedDays(service)}, în funcție de oficiul stării civile care deține actul. Primești extrasul electronic pe email și/sau în original prin curier, inclusiv internațional prin DHL, oriunde în lume.` },
             { q: 'Ce acte îmi trebuie ca să comand?', a: 'Doar actul de identitate (îl scanezi în formular), un selfie cu actul pentru verificarea identității și datele actului de căsătorie: data, locul înregistrării și numele soților. Wizard-ul online te ghidează pas cu pas.' },
             { q: 'Mă căsătoresc în străinătate. Îmi trebuie extrasul ăsta?', a: 'Nu. Extrasul de căsătorie dovedește o căsătorie deja încheiată. Pentru o căsătorie viitoare, ofițerul de stare civilă din străinătate cere certificatul de celibat (dovada că nu ești căsătorit). Sunt două documente opuse ca sens.' },
             { q: 'Ce scrie, mai exact, în extras?', a: 'Numele soților înainte și după căsătorie, data și locul încheierii căsătoriei, plus datele de identificare ale fiecărui soț. Rubrica cu numele purtat după căsătorie e cea mai importantă în practică: e dovada care leagă numele vechi de cel nou.' },
-            { q: 'Îmi ajunge pentru schimbarea numelui în alt stat UE?', a: 'Pentru registrele civile și pentru majoritatea instituțiilor din UE, da — asta e exact scopul formularului standard. Băncile și angajatorii privați își pot cere propriile documente suplimentare; verifică lista lor înainte, ca să nu comanzi de două ori.' },
+            { q: 'Îmi ajunge pentru schimbarea numelui în alt stat?', a: 'În statele care aplică Convenția CIEC nr. 16, pentru registrele civile și pentru majoritatea instituțiilor publice, da: extrasul e primit fără traducere. Băncile și angajatorii privați își pot cere propriile documente suplimentare; verifică lista lor înainte, ca să nu comanzi de două ori.' },
             { q: 'Ne-am căsătorit în străinătate. Pot cere extrasul din România?', a: 'Doar după transcrierea certificatului străin de căsătorie în registrele de stare civilă din România. Fără act românesc de căsătorie nu există ce extras să se elibereze.' },
             { q: 'Am divorțat. Mai pot cere extrasul de căsătorie?', a: 'Da. Actul de căsătorie rămâne în registre și după divorț, iar extrasul se poate elibera în continuare — e util, de exemplu, când trebuie să dovedești numele purtat într-o anumită perioadă. Mențiunea de divorț se regăsește pe certificatul de căsătorie.' },
           ]}
@@ -713,7 +715,7 @@ export default async function ExtrasMultilingvCasatoriePage() {
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
                 Completezi datele online, fără drum la Starea Civilă. Primești documentul în {formatEstimatedDays(service)},
-                valabil în toată Uniunea Europeană.
+                acceptat în statele Convenției CIEC nr. 16.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
                 <OrderButton href={`/comanda/${SERVICE_SLUG}`}>Comandă Acum</OrderButton>

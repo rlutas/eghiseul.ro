@@ -28,7 +28,7 @@ const WHY = [
   ['Un avocat depune, nu tu', 'Legea 119/1996 permite avocaților să ceară acte de stare civilă cu împuternicire avocațială. Semnezi pe telefon, fără notar, fără programare.'],
   ['Un preț, cu tot inclus', 'Onorariu, împuternicire, depunere, ridicare, scan pe email. Curierul îl alegi la final. Nicio taxă de stat, fiindcă nu există.'],
   ['Spunem ce e realist', 'Termenul legal e 30 de zile. Te anunțăm la fiecare schimbare de stare, nu promitem „3 zile” ca să vindem.'],
-  ['Oriunde ai fi', 'Curier în România și internațional. Pentru UE, extrasul multilingv înlocuiește traducerea și apostila.'],
+  ['Oriunde ai fi', 'Curier în România și internațional. În 23 de state, între care Italia, Spania și Germania, extrasul multilingv ține loc de traducere și apostilă.'],
 ] as const;
 
 export default async function DocumenteroHome() {
@@ -43,8 +43,8 @@ export default async function DocumenteroHome() {
     { k: 'Naștere', t: 'Certificat de naștere', d: 'Duplicat: pierdut, deteriorat, model vechi, pentru străinătate.', pr: nastere.basePrice, h: '/certificat-de-nastere/', img: '/images/documentero/clienta-usa-certificat.webp', alt: 'Clientă în ușa apartamentului, cu certificatul de naștere scos din plic' },
     { k: 'Căsătorie', t: 'Certificat de căsătorie', d: 'Duplicat, inclusiv cu mențiunea de divorț sau pentru schimbarea numelui.', pr: casatorie.basePrice, h: '/certificat-de-casatorie/', img: '/images/documentero/cuplu-certificat-casatorie.webp', alt: 'Cuplu verificând certificatul de căsătorie' },
     { k: 'Celibat', t: 'Certificat de celibat (Anexa 18)', d: 'Pentru căsătorie, ședere sau notar în străinătate. Apostilă și traducere opționale.', pr: celibat.basePrice, h: '/certificat-de-celibat/', img: '/images/documentero/avocat-ghiseu-stare-civila.webp', alt: 'Avocata la ghișeul de stare civilă' },
-    { k: 'UE', t: 'Extras multilingv de naștere', d: 'Formularul standard UE: acceptat fără traducere și fără apostilă în toată Uniunea.', pr: mlN.basePrice, h: '/extras-multilingv/', img: null, alt: '' },
-    { k: 'UE', t: 'Extras multilingv de căsătorie', d: 'Aceeași procedură, pentru actul de căsătorie.', pr: mlC.basePrice, h: '/extras-multilingv/#casatorie', img: null, alt: '' },
+    { k: 'Străinătate', t: 'Extras multilingv de naștere', d: 'Acceptat fără traducere și fără apostilă în 23 de state, între care Italia, Spania și Germania.', pr: mlN.basePrice, h: '/extras-multilingv/', img: null, alt: '' },
+    { k: 'Străinătate', t: 'Extras multilingv de căsătorie', d: 'Aceeași procedură, pentru actul de căsătorie.', pr: mlC.basePrice, h: '/extras-multilingv/#casatorie', img: null, alt: '' },
   ];
 
   const steps = [
@@ -69,7 +69,7 @@ export default async function DocumenteroHome() {
               Actele de stare civilă, obținute de un avocat și aduse la ușa ta.
             </h1>
             <p className="d-rise m-0 max-w-[560px] text-[17px] leading-[1.55] text-d-muted sm:text-[19px]" style={{ animationDelay: '160ms' }}>
-              Certificat de naștere, de căsătorie, certificat de celibat sau extras multilingv pentru UE. Completezi în 5
+              Certificat de naștere, de căsătorie, certificat de celibat sau extras multilingv pentru străinătate. Completezi în 5
               minute, semnezi pe telefon, avocatul nostru depune cererea la starea civilă. Originalul vine prin curier,
               oriunde în România sau în lume.
             </p>

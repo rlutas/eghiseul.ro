@@ -33,7 +33,7 @@ const SITUATIONS: Array<[string, string, string?]> = [
   ['L-am pierdut sau mi-a fost furat', 'Fără declarație la poliție, fără anunț în Monitorul Oficial. Se cere direct duplicatul.', '/ghiduri/certificat-de-nastere-pierdut/'],
   ['E deteriorat sau plastifiat', 'Un certificat plastifiat nu mai e acceptat: nu se pot pune mențiuni pe el. Cel vechi se predă la eliberare.'],
   ['Am modelul vechi, tipizat', 'Rămâne valabil: H.G. 255/2024 o spune expres. Îl schimbi dacă e deteriorat sau dacă instituția vrea un exemplar eliberat recent.', '/ghiduri/certificat-de-nastere-vechi-tipizat/'],
-  ['Locuiesc în străinătate', 'Semnezi de acolo, fără procură la notar sau consulat. Livrăm oriunde; pentru UE adaugi extrasul multilingv.', '/ghiduri/procura-din-strainatate-notar-consulat-avocat/'],
+  ['Locuiesc în străinătate', 'Semnezi de acolo, fără procură la notar sau consulat. Livrăm oriunde; pentru statele Convenției CIEC adaugi extrasul multilingv.', '/ghiduri/procura-din-strainatate-notar-consulat-avocat/'],
   ['Pentru copilul meu', 'Părintele cere duplicatul minorului. Copilul de peste 14 ani semnează și el cererea.'],
   ['Pentru un părinte decedat', 'Pentru succesiune se cere un extras pentru uz oficial, nu un duplicat. Scrie-ne și îți spunem ce document e potrivit.', '/contact/'],
 ];
@@ -106,7 +106,7 @@ export default async function NasterePage() {
           price={p.basePrice}
           optionsTitle="Opțional, pentru străinătate"
           options={[
-            { name: 'Extras multilingv de naștere', desc: 'formularul UE, în același plic; fără traducere în UE', price: extras, featured: true },
+            { name: 'Extras multilingv de naștere', desc: 'în același plic; fără traducere în statele convenției', price: extras, featured: true },
             { name: 'Apostilă de la Haga', desc: 'Instituția Prefectului, pe original', price: apostila },
             { name: 'Traducere autorizată', desc: 'după apostilare', price: traducere },
             { name: 'Legalizare notarială', desc: 'copie legalizată, la cerere', price: legalizare },
@@ -174,12 +174,12 @@ export default async function NasterePage() {
             ['Taxă', '0 lei sau taxă locală', `${lei(p.basePrice)} lei, tot inclus`],
             ['Termen', 'legal, până la 30 de zile', 'același termen legal; te anunțăm la fiecare pas'],
             ['Din străinătate', 'consulat: 30–60 de zile', 'direct la primărie, curier internațional'],
-            ['Pentru UE', 'extras multilingv, drum separat', 'îl adaugi în aceeași comandă'],
+            ['Pentru statele convenției', 'extras multilingv, drum separat', 'îl adaugi în aceeași comandă'],
           ]}
           diasporaTitle="Duplicatul certificatului de naștere din străinătate"
           diaspora={[
             'Cei mai mulți clienți ai noștri pentru naștere locuiesc în Italia, Spania, Germania sau Regatul Unit și au nevoie de certificat pentru rezidență, cetățenie, căsătorie sau pentru pașaportul copilului. Consulatul poate prelua cererea, dar o trimite tot la primăria din România, cu termene de 30–60 de zile. Prin avocat, cererea intră direct la primărie.',
-            `Pentru instituțiile din UE, extrasul multilingv de naștere înlocuiește traducerea și apostila; îl adaugi în aceeași comandă, ${lei(extras)} lei, și pleacă în același plic. Pentru Regatul Unit, Elveția, SUA sau Canada rămâne duplicatul cu apostilă și traducere, pe care le facem noi, în ordinea corectă: întâi apostila pe original, apoi traducerea.`,
+            `Pentru instituțiile din statele Convenției CIEC nr. 16 (Italia, Spania, Germania, Franța și altele), extrasul multilingv de naștere înlocuiește traducerea și apostila; îl adaugi în aceeași comandă, ${lei(extras)} lei, și pleacă în același plic. Pentru Regatul Unit, Irlanda, SUA sau Canada rămâne duplicatul cu traducere și, în afara UE, apostilă, pe care le facem noi, în ordinea corectă: întâi apostila pe original, apoi traducerea.`,
           ]}
           guides={[
             { title: 'Certificat de naștere pierdut: ce faci în 2026', desc: 'Pașii, actele, termenul real.', href: '/ghiduri/certificat-de-nastere-pierdut/' },
@@ -242,7 +242,7 @@ export default async function NasterePage() {
             rows={[
               ['Buletin sau pașaport, în România', 'certificatul de naștere, de preferat modelul nou', 'duplicatul'],
               ['Pașaportul copilului', 'certificatul copilului, modelul cu CNP', 'duplicatul'],
-              ['Rezidență, școală, căsătorie în UE', 'certificat acceptat fără traducere', 'extrasul multilingv, singur sau cu duplicatul'],
+              ['Rezidență, școală, căsătorie într-un stat al convenției', 'certificat acceptat fără traducere', 'extrasul multilingv, singur sau cu duplicatul'],
               ['Cetățenie sau viză în afara UE', 'certificat apostilat și tradus', 'duplicatul cu apostilă și traducere'],
               ['Succesiune după un părinte', 'dovada filiației', 'extras pentru uz oficial; scrie-ne'],
               ['Rectificarea unei greșeli din act', 'nu duplicat', 'altă procedură; îți spunem pașii'],
@@ -255,7 +255,7 @@ export default async function NasterePage() {
             <div className="flex flex-col gap-3 lg:col-span-8">
               <Eyebrow>Pentru Uniunea Europeană</Eyebrow>
               <H2 className="sm:text-[32px]">Extrasul multilingv de naștere, în aceeași comandă.</H2>
-              <Prose paras={['Formularul standard UE (Regulamentul 2016/1191) are datele certificatului în toate limbile Uniunii și e acceptat în Italia, Spania, Germania sau Franța fără traducere și fără apostilă. Dacă ai nevoie de amândouă, bifezi opțiunea în formular și pleacă în același plic.']} />
+              <Prose paras={['Extrasul multilingv (Convenția CIEC nr. 16) are datele certificatului și e acceptat în Italia, Spania, Germania sau Franța fără traducere și fără apostilă. Dacă ai nevoie de amândouă, bifezi opțiunea în formular și pleacă în același plic.']} />
             </div>
             <div className="flex flex-col gap-3 lg:col-span-4">
               <div className="flex items-baseline gap-2"><span className="text-[48px] font-extrabold leading-none tracking-[-0.05em]">+ {lei(extras)}</span><span className="text-[18px] font-bold">lei</span></div>
@@ -276,7 +276,7 @@ export default async function NasterePage() {
 
         <RelatedServices
           items={[
-            ['Extras multilingv de naștere', 'Pentru UE: același act, acceptat fără traducere și fără apostilă.', '/extras-multilingv/'],
+            ['Extras multilingv de naștere', 'Aceleași date, acceptate fără traducere și apostilă în 23 de state.', '/extras-multilingv/'],
             ['Certificat de căsătorie, duplicat', 'Aceeași procedură, pentru actul de căsătorie. Cu mențiunea de divorț, dacă e cazul.', '/certificat-de-casatorie/'],
             ['Certificat de celibat', 'Pentru căsătoria în străinătate ți se cere împreună cu certificatul de naștere.', '/certificat-de-celibat/'],
           ]}

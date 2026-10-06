@@ -65,7 +65,7 @@ const SVC = {
   constatator: { href: '/servicii/certificat-constatator-online/', label: 'Certificat constatator online', desc: 'De la ONRC, doar cu CUI-ul firmei — eliberare instant, 24/7.' },
   nastere: { href: '/servicii/eliberare-certificat-de-nastere/', label: 'Certificat de naștere online', desc: 'Duplicat eliberat oficial, livrat oriunde.' },
   casatorie: { href: '/servicii/eliberare-certificat-de-casatorie/', label: 'Certificat de căsătorie online', desc: 'Duplicat de la Starea Civilă — cerut la dosarul de pensie când numele diferă de cel din acte.' },
-  multilingvNastere: { href: '/servicii/extras-multilingv-certificat-nastere/', label: 'Extras multilingv de naștere', desc: 'Valabil direct în UE, fără traducere și fără apostilă — pentru dosare depuse în străinătate.' },
+  multilingvNastere: { href: '/servicii/extras-multilingv-certificat-nastere/', label: 'Extras multilingv de naștere', desc: 'Fără traducere și fără apostilă în statele Convenției CIEC nr. 16, pentru dosare depuse în străinătate.' },
   identificareImobil: { href: '/servicii/identificare-imobil/', label: 'Identificare imobil', desc: 'Afli numărul de CF și cadastral când ai doar date vechi.' },
   copieCF: { href: '/servicii/copie-carte-funciara/', label: 'Copie carte funciară', desc: 'Copia CF-ului vechi, cu istoricul înscrierilor.' },
   urbanism: { href: '/servicii/certificat-urbanism-informare/', label: 'Certificat de urbanism pentru informare', desc: 'Afli ce se poate construi pe teren ÎNAINTE să cumperi — restricții, POT/CUT, interdicții.' },

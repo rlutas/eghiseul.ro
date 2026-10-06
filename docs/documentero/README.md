@@ -16,6 +16,7 @@ tehnic, cum arată, ce conținut are și ce mai e de făcut până la lansare.
 | Formularul de comandă: pașii, ce diferă față de eghiseul, ce rămâne comun | [`formular.md`](formular.md) |
 | Lansare: ce lipsește, în ordine, cine face | [`lansare.md`](lansare.md) |
 | Prompturile pentru pozele care lipsesc (le generează Raul) | [`prompturi-poze.md`](prompturi-poze.md) |
+| Extrasul multilingv: ce obținem de fapt (Convenția CIEC nr. 16, nu formularul UE), unde e acceptat, ce scriem în texte | [`extras-multilingv-fapte.md`](extras-multilingv-fapte.md) |
 
 ## Stare (21.09.2026: LANSAT)
 

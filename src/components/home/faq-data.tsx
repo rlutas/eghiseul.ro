@@ -137,7 +137,7 @@ export const HOMEPAGE_FAQ_ITEMS: HomepageFaqItem[] = [
           <li><strong>Țări membre Convenția de la Haga</strong> — cu apostilă</li>
           <li><strong>Alte țări</strong> — cu supralegalizare și traducere autorizată</li>
         </ul>
-        <p>Pentru documente destinate străinătății oferim și <Link href="/servicii/extras-multilingv-certificat-nastere/" className={A}>extras multilingv</Link>, care elimină nevoia de traducere în multe țări UE.</p>
+        <p>Pentru documente destinate străinătății oferim și <Link href="/servicii/extras-multilingv-certificat-nastere/" className={A}>extras multilingv</Link>, care elimină nevoia de traducere în statele Convenției CIEC nr. 16 (între care Italia, Spania, Germania și Franța).</p>
       </>
     ),
     plain: 'Da, cazierul judiciar din România este recunoscut internațional. În UE este recunoscut automat conform Regulamentului 2016/1191. Pentru țările membre Convenția de la Haga este necesar cu apostilă, iar pentru alte țări cu supralegalizare și traducere autorizată.',

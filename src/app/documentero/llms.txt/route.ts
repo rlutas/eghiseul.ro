@@ -13,7 +13,7 @@ export function GET(): Response {
   const lines = [
     '# documentero.ro',
     '',
-    '> Serviciu privat din România (eDigitalizare SRL, Satu Mare) care obține acte de stare civilă prin avocat: duplicat certificat de naștere, duplicat certificat de căsătorie, adeverință privind statutul civil (certificat de celibat) și extrase multilingve UE. Clientul semnează împuternicirea avocațială pe telefon; avocatul depune cererea la primărie; originalul ajunge prin curier, în România sau în străinătate. Nu suntem instituție publică; actele le eliberează oficiile de stare civilă.',
+    '> Serviciu privat din România (eDigitalizare SRL, Satu Mare) care obține acte de stare civilă prin avocat: duplicat certificat de naștere, duplicat certificat de căsătorie, adeverință privind statutul civil (certificat de celibat) și extrase multilingve (Convenția CIEC nr. 16). Clientul semnează împuternicirea avocațială pe telefon; avocatul depune cererea la primărie; originalul ajunge prin curier, în România sau în străinătate. Nu suntem instituție publică; actele le eliberează oficiile de stare civilă.',
     '',
     '## Servicii',
     ...services,

@@ -155,11 +155,11 @@ export default async function GhidApostilaPage() {
 
             <H id="s3">În UE: nu mai e nevoie</H>
             <P>De la 16 februarie 2019, Regulamentul (UE) 2016/1191 scoate apostila pentru documentele publice despre naștere, nume, căsătorie (inclusiv capacitatea de a te căsători și starea civilă), divorț, parteneriat înregistrat și deces, atunci când sunt emise de o autoritate dintr-un stat membru și prezentate unei autorități din alt stat membru. Un certificat de naștere românesc e acceptat fără apostilă în Italia, Spania, Germania sau Franța.</P>
-            <P>Pentru traducere, regulamentul a introdus formularul standard multilingv. Îl ceri de la același oficiu de stare civilă, se atașează la certificat și ține loc de traducere în multe situații. Nu circulă singur, ci doar împreună cu actul. Pentru UE, <A href="/extras-multilingv/">extrasul multilingv</A> e de obicei drumul cel mai scurt: fără apostilă și, de cele mai multe ori, fără traducere.</P>
+            <P>Pentru traducere, regulamentul a introdus formularul standard multilingv. Îl ceri de la același oficiu de stare civilă, se atașează la certificat și ține loc de traducere în multe situații. Nu circulă singur, ci doar împreună cu actul. Altceva e <A href="/extras-multilingv/">extrasul multilingv</A> emis după Convenția CIEC nr. 16: un document de sine stătător, acceptat fără traducere și fără apostilă în statele care aplică convenția, între care Italia, Spania, Germania și Franța. Acolo e de obicei drumul cel mai scurt.</P>
             <P>Regulamentul nu se aplică actelor folosite în afara UE și nu obligă un stat să recunoască efectele juridice ale unui act, ci doar autenticitatea lui. Unele consulate și instanțe cer totuși apostila, mai ales în dosare de cetățenie. Când nu ești sigur, cere lista de acte în scris de la instituția care te-a trimis după ele.</P>
 
             <H id="s4">În afara UE: apostila pe original</H>
-            <P>Pentru Regatul Unit, Elveția, Norvegia, Statele Unite, Canada sau Australia, toate semnatare ale Convenției de la Haga, apostila rămâne necesară. Se pune pe originalul certificatului. Pentru Elveția, Turcia sau Republica Moldova verifică întâi dacă nu îți ajunge extrasul multilingv emis după Convenția CIEC de la Viena din 1976, pe care aceste state îl acceptă. Cu unele state, România are tratate de asistență juridică prin care actele circulă fără nicio formalitate.</P>
+            <P>Pentru Regatul Unit, Elveția, Norvegia, Statele Unite, Canada sau Australia, toate semnatare ale Convenției de la Haga, apostila rămâne necesară. Se pune pe originalul certificatului. Pentru Elveția, Turcia sau Republica Moldova verifică întâi dacă nu îți ajunge <A href="/extras-multilingv/">extrasul multilingv</A>: aceste state aplică și ele Convenția CIEC nr. 16 de la Viena din 1976. Cu unele state, România are tratate de asistență juridică prin care actele circulă fără nicio formalitate.</P>
             <P>Cererea o poate depune titularul, soțul sau soția, o rudă până la gradul al doilea, o persoană cu procură notarială sau un avocat cu împuternicire avocațială. Avocatul nostru o depune în baza împuternicirii pe care o semnezi pe telefon, în aceeași comandă cu certificatul.</P>
             <P>Prefecturile pot refuza apostila pe certificatele vechi, tipizate, completate de mână sau deteriorate. În practică se cere întâi un duplicat, apoi apostila pe duplicat. De asta le comandăm împreună. Despre cum recunoști un certificat vechi și dacă mai e valabil, vezi <A href="/ghiduri/certificat-de-nastere-vechi-tipizat/">ghidul despre certificatele tipizate</A>.</P>
 
@@ -214,7 +214,7 @@ export default async function GhidApostilaPage() {
               ))}
             </Card>
             <div className="flex flex-col gap-3 rounded-2xl bg-d-ink p-5 text-d-bg">
-              <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-d-acc">Pentru UE</span>
+              <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-d-acc">În statele Convenției CIEC</span>
               <span className="text-[18px] font-bold leading-[1.25]">Extrasul multilingv: fără apostilă, fără traducere</span>
               <span className="text-[26px] font-extrabold tracking-[-0.04em]">{lei(extras.basePrice)} lei</span>
               <Link href="/extras-multilingv/" className="inline-flex h-[46px] items-center justify-center rounded-[10px] bg-d-acc text-[15px] font-bold text-d-ink hover:opacity-90">Vezi extrasul</Link>

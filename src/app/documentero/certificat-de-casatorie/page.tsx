@@ -30,7 +30,7 @@ export const metadata = buildPageMetadata({
 const CASES = [
   ['L-ai pierdut sau s-a deteriorat', 'Se eliberează un duplicat de la primăria unde s-a încheiat căsătoria. Cel vechi, dacă îl mai ai, se predă.'],
   ['Ai divorțat și îți trebuie cu mențiunea de divorț', 'Duplicatul nou poartă mențiunea, dacă divorțul a fost înregistrat în România. Sentința singură nu ține loc de certificat.'],
-  ['Ai nevoie de el în străinătate', 'Pentru UE, extrasul multilingv de căsătorie merge fără traducere. În afara UE: duplicat plus apostilă plus traducere.'],
+  ['Ai nevoie de el în străinătate', 'În statele Convenției CIEC nr. 16 (Italia, Spania, Germania, Franța și altele), extrasul multilingv de căsătorie merge fără traducere. În rest: duplicat cu traducere și, în afara UE, apostilă.'],
   ['Schimbi numele după căsătorie sau divorț', 'Banca, angajatorul sau evidența persoanelor cer certificatul actual, nu o copie veche.'],
 ] as const;
 
@@ -38,7 +38,7 @@ const NOT_A_SUBSTITUTE = [
   ['Sentința de divorț', 'Dovedește desfacerea căsătoriei, nu căsătoria. Autoritățile străine cer de regulă certificatul de căsătorie cu mențiunea de divorț înscrisă pe el.'],
   ['Certificatul de divorț de la notar sau de la primărie', 'Îl primești la divorțul prin acord. Nici el nu înlocuiește certificatul de căsătorie; mențiunea se înscrie pe actul de căsătorie și apare pe duplicat.'],
   ['O copie veche, xerox', 'Nu are mențiunile ulterioare (divorț, deces) și nu are elementele de siguranță. Băncile și consulatele o refuză.'],
-  ['Extrasul multilingv', 'E același act, pe formularul UE. Bun pentru instituțiile din Uniune, dar nu poartă mențiuni la fel de detaliat și nu e acceptat automat în afara UE.'],
+  ['Extrasul multilingv', 'Are aceleași date, pe formularul Convenției CIEC nr. 16. Bun pentru instituțiile din statele convenției, dar nu poartă mențiuni la fel de detaliat și nu e acceptat automat în celelalte state.'],
 ] as const;
 
 const FAQ = [
@@ -95,7 +95,7 @@ export default async function CasatoriePage() {
           priceLabel="Duplicat certificat de căsătorie"
           price={p.basePrice}
           options={[
-            { name: 'Extras multilingv de căsătorie', desc: 'pentru UE, în locul traducerii', price: extrasOpt },
+            { name: 'Extras multilingv de căsătorie', desc: 'în locul traducerii, în statele convenției', price: extrasOpt },
             { name: 'Apostilă de la Haga', desc: 'Instituția Prefectului, pe original', price: apostila },
             { name: 'Traducere autorizată', desc: 'după apostilare', price: traducere },
             { name: 'Legalizare notarială', desc: 'copie legalizată, la cerere', price: legalizare },
@@ -171,12 +171,12 @@ export default async function CasatoriePage() {
             ['Taxă', '0 lei sau taxă locală', `${lei(p.basePrice)} lei, tot inclus`],
             ['Termen', 'legal, până la 30 de zile', 'același termen; status la fiecare pas'],
             ['Mențiune de divorț', 'apare dacă e înregistrat în RO', 'verificăm înainte de plată'],
-            ['Pentru UE', 'extras multilingv, drum separat', 'îl adaugi în aceeași comandă'],
+            ['Pentru statele convenției', 'extras multilingv, drum separat', 'îl adaugi în aceeași comandă'],
           ]}
           diasporaTitle="Căsătorie încheiată în România, viață în străinătate"
           diaspora={[
             'Cel mai frecvent caz: cuplu căsătorit în România, stabilit în Italia, Spania sau Germania, care are nevoie de certificatul de căsătorie pentru rezidența partenerului, pentru schimbarea numelui în actele străine sau pentru pensia de urmaș. Consulatul preia cererea, dar o trimite tot în țară, cu termene de 30–60 de zile. Prin avocat, cererea intră direct la primărie.',
-            `Pentru instituțiile din UE, extrasul multilingv de căsătorie înlocuiește traducerea și apostila. Îl poți adăuga în aceeași comandă, ${lei(extrasOpt)} lei, și pleacă în același plic; separat costă ${lei(ml.basePrice)} lei. Pentru Regatul Unit, Elveția sau SUA rămâne duplicatul cu apostilă și traducere, pe care le facem noi în ordinea corectă.`,
+            `Pentru instituțiile din statele Convenției CIEC nr. 16 (Italia, Spania, Germania, Franța și altele), extrasul multilingv de căsătorie înlocuiește traducerea și apostila. Îl poți adăuga în aceeași comandă, ${lei(extrasOpt)} lei, și pleacă în același plic; separat costă ${lei(ml.basePrice)} lei. Pentru Regatul Unit, Irlanda sau SUA rămâne duplicatul cu traducere și, unde e nevoie, apostilă, pe care le facem noi în ordinea corectă.`,
           ]}
           guides={[
             { title: 'Apostila pe acte de stare civilă: când e nevoie și când nu', desc: 'În UE nu; în afara UE, pe original.', href: '/ghiduri/apostila-acte-stare-civila/' },
@@ -194,8 +194,8 @@ export default async function CasatoriePage() {
             head={['Ai nevoie de el pentru', 'Ce ți se cere de obicei', 'Ce comanzi']}
             rows={[
               ['Schimbarea numelui în buletin, la bancă, la angajator', 'certificatul de căsătorie actual', 'duplicatul'],
-              ['Rezidența soțului sau soției în UE', 'act de căsătorie acceptat fără traducere', 'extrasul multilingv, singur sau cu duplicatul'],
-              ['Schimbarea numelui în actele străine (UE)', 'act de căsătorie cu numele purtat după căsătorie', 'extrasul multilingv'],
+              ['Rezidența soțului sau soției într-un stat al convenției', 'act de căsătorie acceptat fără traducere', 'extrasul multilingv, singur sau cu duplicatul'],
+              ['Schimbarea numelui în actele străine (stat al convenției)', 'act de căsătorie cu numele purtat după căsătorie', 'extrasul multilingv'],
               ['O nouă căsătorie, după divorț, în străinătate', 'dovada căsătoriei anterioare și a divorțului', 'duplicatul cu mențiunea de divorț, plus certificatul de celibat'],
               ['Pensie de urmaș, succesiune', 'certificatul cu mențiunea de deces', 'duplicatul'],
               ['Viză, cetățenie în afara UE', 'certificat apostilat și tradus', 'duplicatul cu apostilă și traducere'],
@@ -243,7 +243,7 @@ export default async function CasatoriePage() {
 
         <RelatedServices
           items={[
-            ['Extras multilingv de căsătorie', 'Pentru UE: același act, acceptat fără traducere și fără apostilă.', '/extras-multilingv/#casatorie'],
+            ['Extras multilingv de căsătorie', 'Aceleași date, acceptate fără traducere și apostilă în 23 de state.', '/extras-multilingv/#casatorie'],
             ['Certificat de celibat', 'După divorț, pentru o nouă căsătorie în străinătate ți se cer amândouă.', '/certificat-de-celibat/'],
             ['Certificat de naștere, duplicat', 'Aceeași procedură, pentru actul de naștere.', '/certificat-de-nastere/'],
           ]}
