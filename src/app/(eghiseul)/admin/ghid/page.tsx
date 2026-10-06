@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   CURATED_GUIDES,
   loadAllTeamDocs,
+  loadAnnouncements,
   loadChangelog,
   loadPlatformVersion,
   loadTopFolders,
@@ -18,6 +19,7 @@ import { CATEGORIES, CATEGORY_LABEL, isCategoryId, type CategoryId } from '@/lib
 import { countOpenReports } from '@/lib/knowledge/reports';
 import { GhidAsk } from '@/components/knowledge/ghid-ask';
 import { MarkGhidSeen } from './mark-seen';
+import { GhidAnnouncement } from './announcement';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,12 +76,13 @@ export default async function GhidPage({
     redirect('/admin');
   }
 
-  const [allEntries, version, allDocs, folders, openReports] = await Promise.all([
+  const [allEntries, version, allDocs, folders, openReports, announcements] = await Promise.all([
     loadChangelog(),
     loadPlatformVersion(),
     loadAllTeamDocs(),
     loadTopFolders(),
     countOpenReports().catch(() => 0),
+    loadAnnouncements(1),
   ]);
 
   const curatedSlugs = new Set(CURATED_GUIDES.map((g) => g.slug));
@@ -123,6 +126,18 @@ export default async function GhidPage({
           </p>
         </div>
       </header>
+
+      {announcements.map((a) => (
+        <GhidAnnouncement
+          key={a.id}
+          id={a.id}
+          title={a.title}
+          dateLabel={a.date ? formatRoDate(a.date) : null}
+          href={`/admin/ghid/${a.slug}/`}
+          // H1 e deja titlul casetei; restul documentului e corpul anunțului.
+          html={renderMarkdown(a.content.replace(/^#\s+.+\n/m, ''), a.relPath)}
+        />
+      ))}
 
       <Suspense fallback={null}>
         <GhidAsk audience="team" page="/admin/ghid" />

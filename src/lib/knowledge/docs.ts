@@ -127,6 +127,13 @@ export interface GuideLink {
  */
 export const CURATED_GUIDES: GuideLink[] = [
   {
+    title: 'Recuperare telefonică: sunăm zilnic clienții care n-au plătit',
+    slug: 'admin/recuperare-telefonica',
+    category: 'clienti',
+    description:
+      'Coada „De sunat” pe eGhiseul și CazierJudiciarOnline: apel sau WhatsApp, „Marchează sunat” cu notă, tabul „✅ Recuperate” cu cine a plătit după apel. Ținta: toată coada sunată în aceeași zi.',
+  },
+  {
     title: 'Chatbotul din Ghid și raportarea problemelor',
     slug: 'admin/chatbot-si-raportare',
     category: 'admin',
@@ -446,4 +453,43 @@ export async function listDirectory(slug: string): Promise<DirectoryListing | nu
   // Fișierele datate (changelog, session-logs) — cele mai noi primele.
   files.sort((a, b) => b.relPath.localeCompare(a.relPath));
   return { slug, subdirs, files };
+}
+
+export interface Announcement {
+  /** Numele fișierului fără .md, ex. `2026-10-06-ce-s-a-schimbat`; cheia de „citit”. */
+  id: string;
+  slug: string;
+  relPath: string;
+  title: string;
+  /** YYYY-MM-DD din numele fișierului. */
+  date: string | null;
+  content: string;
+}
+
+/**
+ * Anunțurile pentru echipă: `docs/admin/anunturi/YYYY-MM-DD-<slug>.md`, cel
+ * mai nou primul. Apar fixate sus în /admin/ghid; fiind sub `admin/`, intră
+ * automat și în căutare și în corpusul chatbotului.
+ */
+export async function loadAnnouncements(limit = 1): Promise<Announcement[]> {
+  const files = (await listMarkdown('admin/anunturi'))
+    .filter((f) => !f.endsWith('/README.md'))
+    .sort()
+    .reverse()
+    .slice(0, limit);
+  const out: Announcement[] = [];
+  for (const rel of files) {
+    const content = await readIfExists(path.join(DOCS_ROOT, rel));
+    if (content === null) continue;
+    const id = path.basename(rel, '.md');
+    out.push({
+      id,
+      slug: rel.replace(/\.md$/, ''),
+      relPath: rel,
+      title: extractTitle(content) ?? id,
+      date: id.match(/^(\d{4}-\d{2}-\d{2})/)?.[1] ?? null,
+      content,
+    });
+  }
+  return out;
 }
