@@ -192,9 +192,9 @@ export default async function ExtrasCarteFunciaraPage() {
                 <div className="flex items-start gap-3 rounded-xl bg-primary-500/15 border border-primary-500/40 p-4 mb-6">
                   <Zap className="h-5 w-5 text-primary-500 flex-shrink-0 mt-0.5" />
                   <p className="text-white/95 text-sm sm:text-base leading-relaxed">
-                    <strong className="text-primary-500">Singurii din România</strong> care îți eliberează extrasul de
-                    carte funciară <strong>de obicei în aceeași zi lucrătoare, garantat în maximum 2</strong> — fără taxă de urgență, fără cont
-                    ANCPI și fără drum la ghișeu.
+                    <strong className="text-primary-500">Obținem extrasul de carte funciară</strong> de obicei în
+                    aceeași zi lucrătoare, fără taxă de urgență, fără cont ANCPI și fără drum la ghișeu. ANCPI îl
+                    eliberează, noi îl cerem în locul tău.
                   </p>
                 </div>
 
