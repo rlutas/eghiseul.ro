@@ -136,6 +136,13 @@ export const ARTICLES: ArticleMeta[] = [
     category: 'Comercial / ONRC',
   },
   {
+    slug: 'plan-de-amplasament-si-delimitare-copie-sau-intocmire',
+    title: 'Plan de amplasament și delimitare: copie din arhivă sau plan nou?',
+    excerpt: 'Când îți ajunge copia PAD-ului din arhiva OCPI și când trebuie un plan nou, întocmit de un topograf autorizat: prima înregistrare, dezlipire, construcție.',
+    category: 'Cadastru & imobiliare',
+    image: '/images/articole/cat-costa-cadastrul-si-intabularea.webp',
+  },
+  {
     slug: 'totul-despre-cartea-funciara-colectiva',
     title: 'Cartea funciară colectivă, pe înțeles',
     excerpt: 'Ce descrie cartea colectivă a blocului, ce găsești în părțile A, B și C și cum obții extrasul.',

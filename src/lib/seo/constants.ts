@@ -208,6 +208,7 @@ export const HARDCODED_ARTICLE_SLUGS = [
   'cele-4-tipuri-de-certificat-constatator-online',
   'totul-despre-cartea-funciara-colectiva',
   'cat-costa-cadastrul-si-intabularea',
+  'plan-de-amplasament-si-delimitare-copie-sau-intocmire',
   'ancpi-nu-functioneaza',
   'sms-fals-amenda-ghiseul-ro',
   'cazier-judiciar-vs-certificat-integritate-comportamentala',
