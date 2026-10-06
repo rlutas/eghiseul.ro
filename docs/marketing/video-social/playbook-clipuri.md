@@ -58,6 +58,8 @@ Pentru urcarea din browser (limită 10 MB pe fișier), fișierele se comprimă l
 - Fără cifre de clienți sau documente pe care nu le putem dovedi; ratingul vine din `SOCIAL_PROOF`.
 - În străinătate cazierul îl cer ambasadele și consulatele, dar și instituțiile de acolo (rezidență, cetățenie, permis de muncă, angajatori, școli); de regulă cu apostilă de la Haga și traducere autorizată. Instituția care cere decide formatul și vechimea acceptate.
 - Integritatea comportamentală: pentru posturile cu copii sau persoane vulnerabile (Legea 118/2019).
+- **Corectura unei afirmații se verifică pe cadre extrase din fișierul randat** (câte un cadru din fiecare scenă în care apare tema), în toate formatele și în Reels. Aceeași listă poate apărea în mai multe scene: pe 06.10, „PDF semnat, pe email” a rămas pe un cadru după ce vocea și descrierile fuseseră corectate.
+- Cazierul judiciar, cel fiscal și integritatea NU vin ca PDF semnat electronic: scanul pe email + originalul prin curier.
 
 ## Publicare
 
