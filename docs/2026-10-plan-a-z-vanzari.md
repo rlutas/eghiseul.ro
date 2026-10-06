@@ -28,9 +28,9 @@ Legendă: ✅ făcut · 🔄 în lucru · ⬜ de făcut · ⏸ așteaptă ceva
 |---|---|---|---|
 | A1 | Conversie „Achizitie documentero” + enhanced conversions + variabile Vercel | 05.10 | ✅ |
 | A2 | Campania C1 Certificat de celibat publicată (pornește 06.10, 45 lei/zi) | 05.10 | ✅ |
-| A3 | Verificare: anunț aprobat/respins, primele afișări și clicuri | 06.10 după-amiază | ⏸ |
+| A3 | Verificare: anunț aprobat/respins, primele afișări și clicuri | 06.10 după-amiază | 🔄 06.10, 10:00: anunțul e „Eligibil (limitat)”, politica „Documente guvernamentale și servicii oficiale”, „este obligatoriu un certificat”; 0 afișări (raportarea are întârziere). Verdictul după-amiază |
 | A4 | Termenii de căutare reali, negative noi, starea conversiei | 07.10 | ⏸ |
-| A5 | Dacă A3 trece: C2 Cazier fiscal (50 lei/zi, CPA istoric ~42) | după A3 | ⬜ |
+| A5 | Dacă A3 trece: C2 Cazier fiscal (40 lei/zi, CPA istoric ~42). **Doar grupul F1 Persoană fizică** (F2 PJ iese: cazierul fiscal îl facem doar pentru PF) + negative firmă/SRL/PJ/PFA. Landingul `/cazier-fiscal-online/` verificat 06.10: PF, 30 de zile, sancțiuni nu datorii, footer cu ANAF | după A3 (Raul, 06.10: așteptăm celibatul) | ⏸ |
 | A6 | C1: grupul CB2 (căsătorie în străinătate), RSA B, sitelinkuri | după A3 | ⬜ |
 | A7 | C3 Naștere, C4 Căsătorie, C5 Multilingv, cu buget mic (CPC max 2 lei) | după primele conversii | ⬜ |
 | A8 | Dacă A3 e respins: o singură contestație, cu captura paginii; fără pagini-paravan | doar dacă e cazul | ⏸ |
@@ -43,7 +43,7 @@ Planul complet: `ads/2026-10-05-documentero-lansare-ads.md`, `ads/2026-10-05-doc
 |---|---|---|---|
 | B1 | Warm-up din oră în oră, plafon zilnic setabil până la 5.000 | 05.10 | ✅ |
 | B2 | Plafon 300/zi | 05.10 | ✅ |
-| B3 | Urcăm la 600/zi dacă emailurile întoarse < 3% și plângerile < 0,1% (Resend) | 07.10 | ⬜ |
+| B3 | Urcăm la 600/zi dacă emailurile întoarse < 3% și plângerile < 0,1% (Resend) | 07.10 | ⬜ Verificat 06.10: 05.10 = 340 livrate, 3 întoarse (0,9%), 0 plângeri; dezabonări din 26.09 încoace: 1 la ~1.050 trimise (0,1%). Condițiile sunt îndeplinite |
 | B4 | 1.200/zi, apoi 2.000/zi, cu aceeași regulă | 09.10, 12.10 | ⬜ |
 | B5 | Câte comenzi vin din warm-up (cuponul `FIDEL-`, `utm_campaign=warmup`) | săptămânal | ⬜ |
 
@@ -70,6 +70,7 @@ Regulă: maximum 1–2 pagini rescrise pe săptămână (`.claude/rules/content-
 | D3 | `/` (homepage) | poziția a scăzut de la 9,3 la 23,9 | ⬜ săpt. 42 |
 | D4 | `/servicii/extras-de-carte-funciara` | poziția 7,8 → 22,3; are backlink de la money.ro | ⬜ săpt. 42 |
 | D5 | naștere, auto, căsătorie, celibat, integritate, constatator | lotul 4 | ⬜ săpt. 43–45 |
+| D7 | Header și prima pagină: scoase „Peste 200.000 documente procesate”, „150k/200k clienți”, „Livrare 24-48h” ca termen; acum ratingul real din `SOCIAL_PROOF` | regula 3 din `content-and-seo.md` (aceeași curățenie ca C3 pe CJO) | ✅ 06.10 |
 | D6 | Ghid nou „Plan de amplasament și delimitare: copie din arhivă sau plan nou” (`/plan-de-amplasament-si-delimitare-copie-sau-intocmire/`) | concurenții fac reclamă pe PAD nou (măsurătoare); noi vindem copia, iar ghidul lămurește diferența și trimite cumpărătorul de copie la serviciu | ✅ 06.10 |
 
 ## E. documentero.ro (domeniu nou)
@@ -101,7 +102,7 @@ Stare și explicație: `seo/2026-10-05-ecazier-documentero-stare-organic.md`. 14
 | # | Ce | Stare |
 |---|---|---|
 | G1 | CI roșu de la commitul de warm-up (testul nu știa de interogarea de numărare) | ✅ 05.10 |
-| G2 | Tokenul local Vercel CLI expirat: variabilele s-au pus din dashboard | ⬜ Raul: `! npx vercel login` |
+| G2 | Tokenul local Vercel CLI expirat: variabilele s-au pus din dashboard | ✅ 06.10 (Raul s-a logat) |
 | G3 | Blocantul de reclame din Chrome strică salvările în Google Ads: excepție pentru ads.google.com | ⬜ Raul |
 
 ## Jurnal: cereri de indexare în Search Console
@@ -112,5 +113,34 @@ Cota e de circa 10 cereri pe zi pentru fiecare proprietate.
 |---|---|---|---|
 | 05.10 | documentero.ro | `/ghiduri/valabilitate-certificat-de-celibat/`, `/ghiduri/certificat-de-nastere-vechi-tipizat/`, `/certificat-de-celibat/` | solicitată |
 | 05.10 | cazierjudiciaronline.com | `/`, `/cazier-fiscal-online`, `/valabilitate-cazier-fiscal`, `/cazier-fiscal-persoana-juridica`, `/cazier-judiciar-online/constanta`, `/iasi`, `/brasov` | solicitată; la `/craiova` am atins cota zilnică |
-| 06.10 (de făcut) | ecazier.ro | `/ghid-alegere-tip-cazier` (05.10: cota depășită) | ⬜ |
-| 06.10 (de făcut) | cazierjudiciaronline.com | `/cazier-judiciar-online/craiova`, `/targu-mures`, `/sibiu`, `/timisoara`, `/oradea`, `/cluj`, `/buzau`, `/galati`, `/ploiesti`, `/verificare-cazier-fiscal-online` | ⬜ |
+| 06.10, 08:50 și 10:30 | ecazier.ro | `/ghid-alegere-tip-cazier` | ⏸ „Cotă depășită” de două ori: cota pare să se reseteze la 24 h după cererile de ieri (~12:00), nu la miezul nopții. Reîncercare automată 12:23 |
+| 06.10, 08:55 și 10:35 | cazierjudiciaronline.com | `/cazier-judiciar-online/craiova`, `/targu-mures`, `/sibiu`, `/timisoara`, `/oradea`, `/cluj`, `/buzau`, `/galati`, `/ploiesti`, `/verificare-cazier-fiscal-online` | ⏸ cotă depășită; `/craiova` și `/targu-mures` sunt deja indexate (cererea doar grăbește recitirea). Reîncercare 12:23 |
+| 06.10 (de făcut, 12:23) | eghiseul.ro | `/servicii/cazier-judiciar-online/` (D2), `/plan-de-amplasament-si-delimitare-copie-sau-intocmire/` (D6) | ⬜ |
+
+---
+
+## Jurnal 06.10.2026
+
+**Vânzări** (comenzi plătite pe săptămână ISO, 36 → 40): eghiseul 13 · 27 · 27 · 13 · 20; CJO 21 · 33 · 23 · 22 · **17** (scade a treia săptămână la rând); ecazier 0 · 0 · 0 · 0 · 1; documentero 0. Săptămâna 41 abia a început (luni–marți dimineață: eghiseul 1, CJO 2).
+
+**CJO: problema e traficul spre comandă, nu plata.** În ultimele 14 zile 49 de comenzi începute, 36 plătite (73%). Cine începe comanda plătește; puțini o încep din ~15k clicuri organice pe lună.
+
+**Email** (ultimele 21 de zile, după `orders.attribution`): 11 comenzi începute din email, 3 plătite (warm-up 1, recovery 1, reminder expirare 1). Warm-up: 1.600 de contacte atinse din 72k, 300/zi din 05.10. Lifecycle trimite zilnic (în ultimele 7 zile: cross-sell 21, recenzie 20, expirare 11, 0 erori). Cuponul `FIDEL-` n-a fost folosit încă.
+
+**Ce s-a livrat azi**
+- D2 rescrisă și publicată, cu fapte verificate (prețuri = baza de date; 3 afirmații nesigure scoase sau confirmate din cod), skill-urile `seo-page`, `clean-user-facing-text`, `humanizer`, 0 caractere invizibile.
+- D6 ghid PAD (copie vs plan nou), surse Ordinul ANCPI 600/2023; linkuri dinspre serviciul PAD și articolul despre costul cadastrului.
+- D7 cifrele neverificabile scoase de pe eghiseul.
+- Decontări: plățile ecazier (`EFC-`/`EJC-`) se leagă acum de factură; facturile lipsă de pe payouturile din 18.08 și 07.10 se leagă cu „Backfill 90 zile”.
+- Decont avocată: factura lunară a cabinetului se scade înainte de dividende, bloc „De plată către Gabriela”, valori de pornire.
+- Decont topograf: extras lunar (luna trecută implicit), plata pe lună, factura de comision, comenzile pe servicii, taxele OCPI care urmează; septembrie plătit (414,48 fiecare). Reclama de test pe imobiliare (570 lei) e trecută pe septembrie și oprită.
+
+## Următorii pași propuși (06.10)
+
+| # | Ce | De ce | Stare |
+|---|---|---|---|
+| H1 | **CJO: emailuri lifecycle** (reminder la 6 luni când expiră cazierul, cerere de recenzie, cross-sell spre fiscal/auto) | CJO are ~110 clienți pe lună și nu le trimite nimic după livrare (crons doar abandon + auto-complete). Pe eghiseul expirarea a adus deja o comandă plătită. Cost de achiziție zero | ⬜ |
+| H2 | **CJO: audit de conversie pe paginile de oraș** (de la vizită la începerea comenzii: prețul și butonul deasupra pliului, termen, ce primești) | 73% din cei care încep plătesc; pierderea e înainte de formular | ⬜ |
+| H3 | **ecazier: titlu și descriere pe paginile de cazier auto** (pozițiile 4–8, deci CTR-ul e pârghia, ca la C2) | singurul serviciu unde ecazier e aproape de prima pagină | ⬜ |
+| H4 | documentero: E3 (apostila, 830 → 1.400+ cuvinte) și E4 (linkuri în text din articolele eghiseul despre stare civilă) | ghiduri 1–2/săpt., regula 2 | ⬜ săpt. 42 |
+| H5 | Warm-up 600/zi (B3) | condițiile sunt îndeplinite | ⬜ 07.10 |
