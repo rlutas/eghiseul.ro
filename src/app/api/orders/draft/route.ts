@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { classifyAttribution } from '@/lib/analytics/attribution-channel';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { generateOrderId, validateOrderId } from '@/lib/order-id';
@@ -341,8 +342,14 @@ export async function POST(request: NextRequest) {
     // care a generat efectiv comanda.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const attribution = (body as any)?.attribution;
-    if (attribution && typeof attribution === 'object') {
-      insertData.attribution = attribution;
+    // Canalul (google_ads, organic_search, ai_assistant…) e calculat aici, o
+    // dată, și salvat lângă atingeri; vezi lib/analytics/attribution-channel.
+    const storedAttribution =
+      attribution && typeof attribution === 'object'
+        ? { ...attribution, ...classifyAttribution(attribution) }
+        : null;
+    if (storedAttribution) {
+      insertData.attribution = storedAttribution;
     }
 
     console.log('Attempting to insert draft order with data:', JSON.stringify(insertData, null, 2));
@@ -408,7 +415,7 @@ export async function POST(request: NextRequest) {
           payment_status: 'unpaid',
           // Aceeași atribuire ca pe calea principală — altfel comenzile care
           // trec prin retry (coliziune de ID) ar rămâne fără sursă.
-          ...(attribution && typeof attribution === 'object' ? { attribution } : {}),
+          ...(storedAttribution ? { attribution: storedAttribution } : {}),
         };
         const { data: retryOrder, error: retryError } = await adminClient
           .from('orders')

@@ -1,5 +1,6 @@
 'use client';
 
+import { classifyAttribution, CHANNEL_LABEL } from '@/lib/analytics/attribution-channel';
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -2847,6 +2848,16 @@ export default function AdminOrderDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+            {(() => {
+              const c = classifyAttribution(order.attribution);
+              return (
+                <p className="text-sm">
+                  <span className="text-neutral-500">Canal: </span>
+                  <span className="font-semibold text-neutral-900">{CHANNEL_LABEL[c.channel]}</span>
+                  <span className="text-neutral-500"> · {c.source}</span>
+                </p>
+              );
+            })()}
             <AttributionBlock label="Prima vizită" touch={order.attribution.first} />
             {/* `last` se afișează doar dacă diferă — altfel e zgomot. */}
             {order.attribution.last &&
