@@ -66,7 +66,7 @@ Regulă: maximum 1–2 pagini rescrise pe săptămână (`.claude/rules/content-
 | # | Pagină | Motiv | Stare |
 |---|---|---|---|
 | D1 | `/servicii/cazier-fiscal-online` | pagina e indexată, dar invizibilă din 21.08 (de la ~2.000 la ~20 de expuneri pe săptămână): retrogradare la nivel de domeniu. Cererea s-a mutat pe CJO (C6). Rescrierea se amână până apar semne de revenire | ⏸ săpt. 42 |
-| D2 | `/servicii/cazier-judiciar-online` | cel mai prost scor AI (21,3), pagina comercială nr. 1 | ⬜ săpt. 41 |
+| D2 | `/servicii/cazier-judiciar-online` | cel mai prost scor AI (21,3), pagina comercială nr. 1 | ✅ 06.10 (`changelog/2026-10-06-pagina-cazier-judiciar-rescrisa.md`) |
 | D3 | `/` (homepage) | poziția a scăzut de la 9,3 la 23,9 | ⬜ săpt. 42 |
 | D4 | `/servicii/extras-de-carte-funciara` | poziția 7,8 → 22,3; are backlink de la money.ro | ⬜ săpt. 42 |
 | D5 | naștere, auto, căsătorie, celibat, integritate, constatator | lotul 4 | ⬜ săpt. 43–45 |
