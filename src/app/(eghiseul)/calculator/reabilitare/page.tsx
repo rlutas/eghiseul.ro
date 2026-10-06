@@ -108,7 +108,12 @@ export default function Page() {
       <p>
         Reabilitarea nu operează automat: la împlinirea termenului, persoana trebuie să introducă
         cerere la instanță, dovedind că a achitat cheltuielile de judecată și despăgubirile civile
-        și că nu a săvârșit o nouă infracțiune în interval.
+        și că nu a săvârșit o nouă infracțiune în interval. Ce acte se atașează cererii și cum
+        decurge procedura la instanță găsești în{' '}
+        <a href="https://cazierjudiciaronline.com/ghid-reabilitare-cazier">
+          ghidul complet despre reabilitare și ștergerea din cazier
+        </a>
+        .
       </p>
 
       <h2>Greșeli frecvente la calculul reabilitării</h2>

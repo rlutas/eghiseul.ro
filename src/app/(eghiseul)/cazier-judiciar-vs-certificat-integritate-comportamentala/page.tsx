@@ -87,6 +87,16 @@ export default function Page() {
         <li>Hotărârile străine recunoscute în România;</li>
         <li>Informații privind amnistii sau reabilitări.</li>
       </ul>
+      <p>
+        Mențiunile nu rămân acolo pentru totdeauna: o condamnare se șterge prin reabilitare, la un
+        termen care depinde de pedeapsă. Data o poți estima cu{' '}
+        <Link href="/calculator/reabilitare/">calculatorul de reabilitare</Link>, iar ce se întâmplă
+        în caz de amnistie sau grațiere e explicat în articolul despre{' '}
+        <a href="https://cazierjudiciaronline.com/dupa-cat-timp-se-sterge-cazierul">
+          după cât timp se șterge o condamnare din cazier
+        </a>
+        .
+      </p>
 
       <h3>Când este necesar</h3>
       <p>Cazierul judiciar este solicitat în numeroase situații administrative și juridice, precum:</p>
