@@ -17,7 +17,7 @@ const TITLE = 'Certificat de Celibat Online (Anexa 18), Obținut prin Avocat';
 const DESCRIPTION =
   'Certificat de celibat (adeverința privind statutul civil, Anexa 18, fosta Anexa 9) obținut de un avocat de la starea civilă, fără să vii în țară. Pentru căsătorie, ședere sau notar în străinătate. Apostilă și traducere opționale.';
 const DATE_PUBLISHED = '2026-09-19';
-const DATE_MODIFIED = '2026-10-05';
+const DATE_MODIFIED = '2026-10-06';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -111,7 +111,7 @@ export default async function CelibatPage() {
         />
 
         <QuickAnswer updated={DATE_MODIFIED}>
-          Certificatul de celibat este, în legea română, adeverința privind statutul civil (Anexa 18 la H.G. 255/2024, fosta Anexa 9). O eliberează oficiul de stare civilă care păstrează actul tău de naștere și confirmă că în registrele din România nu figurezi căsătorit. Cererea o poate depune titularul sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}); nu e nevoie să vii în țară. Formularul nu are termen de valabilitate; statul care îl primește îl vrea, de regulă, eliberat în ultimele 3 sau 6 luni. Termen legal: cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală.
+          Certificatul de celibat este, în legea română, adeverința privind statutul civil (Anexa 18 la H.G. 255/2024, fosta Anexa 9). O eliberează oficiul de stare civilă care păstrează actul tău de naștere și confirmă că în registrele din România nu figurezi căsătorit. Cererea o poate depune titularul sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}); nu e nevoie să vii în țară. Formularul nu are termen de valabilitate; statul care îl primește îl vrea, de regulă, eliberat în ultimele 3 sau 6 luni. Termen legal: cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală. Prin documentero.ro costă {lei(p.basePrice)} lei, cu onorariul avocatului și taxele incluse, iar originalul îți vine prin curier, și în străinătate.
         </QuickAnswer>
 
         <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">

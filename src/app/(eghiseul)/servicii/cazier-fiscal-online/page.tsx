@@ -33,6 +33,7 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
+import { ServiceAnswerBlock } from '@/components/services/service-answer-block';
 import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 
 // Database slug (order pipeline identifier). URL path uses the WP slug
@@ -45,7 +46,7 @@ const DESCRIPTION =
   'Cazier fiscal online de la ANAF pentru persoană fizică, fără cont SPV și fără drum la ' +
   'ghișeu. Arată dacă ai fapte fiscale sancționate înscrise, valabil 30 de zile. 198 RON.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-09-25';
+const DATE_MODIFIED = '2026-10-06';
 
 export const revalidate = 3600;
 
@@ -256,6 +257,20 @@ export default async function CazierFiscalOnlinePage() {
             </div>
           </div>
         </section>
+
+        <ServiceAnswerBlock
+          updated={DATE_MODIFIED}
+          facts={[
+            { label: 'Cine îl eliberează', value: 'ANAF' },
+            { label: 'Preț', value: `${service.base_price} lei cu TVA` },
+            { label: 'Termen', value: formatEstimatedDays(service) },
+            { label: 'Valabil', value: '30 de zile, pentru scopul cerut' },
+          ]}
+        >
+          Cazierul fiscal îl eliberează ANAF, gratuit la ghișeu sau din SPV dacă ai cont. Arată faptele sancționate de
+          legislația fiscală, nu datoriile. Fără cont SPV, îl obținem noi prin avocat, doar pentru persoane fizice; pentru
+          o firmă se cere pe numele asociatului sau al administratorului.
+        </ServiceAnswerBlock>
 
         <PrivateServiceNotice
           institutionLabel="direct la ANAF sau prin SPV"

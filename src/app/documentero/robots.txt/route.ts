@@ -1,4 +1,5 @@
 import { BRANDS } from '@/lib/brand/brands';
+import { AI_ASSISTANT_FETCHERS, AI_CRAWLERS } from '@/lib/seo/ai-bots';
 
 /**
  * robots.txt for documentero.ro (served through the host rewrite in
@@ -8,11 +9,23 @@ import { BRANDS } from '@/lib/brand/brands';
 const DISALLOW = ['/admin/', '/api/', '/comanda/', '/auth/', '/account/', '/orders/', '/completare/', '/reincarca-poza/'];
 
 export function GET(): Response {
-  const lines = [
-    'User-agent: *',
+  // Same groups as eghiseul's robots.ts: every AI crawler explicitly allowed;
+  // assistant fetchers may open the first order step (still noindex).
+  const assistantDisallow = DISALLOW.filter((p) => p !== '/comanda/').concat([
+    '/comanda/checkout/',
+    '/comanda/success/',
+    '/comanda/status/',
+  ]);
+  const group = (agents: string[], disallow: string[]) => [
+    ...agents.map((a) => `User-agent: ${a}`),
     'Allow: /',
-    ...DISALLOW.map((p) => `Disallow: ${p}`),
+    ...disallow.map((p) => `Disallow: ${p}`),
     '',
+  ];
+  const lines = [
+    ...group(['*'], DISALLOW),
+    ...group([...AI_CRAWLERS], DISALLOW),
+    ...group([...AI_ASSISTANT_FETCHERS], assistantDisallow),
     `Sitemap: ${BRANDS.documentero.baseUrl}/sitemap.xml`,
     '',
   ];

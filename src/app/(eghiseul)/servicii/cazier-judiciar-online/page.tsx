@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Footer } from '@/components/home/footer';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
+import { ServiceAnswerBlock } from '@/components/services/service-answer-block';
 import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 import { ServiceFAQ, type FAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
@@ -412,6 +413,21 @@ export default function CazierJudiciarHubPage() {
             </div>
           </div>
         </section>
+
+        <ServiceAnswerBlock
+          updated={DATE_MODIFIED}
+          facts={[
+            { label: 'Cine îl eliberează', value: 'Poliția Română (IPJ / DCPI)' },
+            { label: 'Preț', value: '198 lei cu TVA; urgent 278 lei' },
+            { label: 'Termen', value: '3-5 zile lucrătoare; urgent 1-2' },
+            { label: 'Primești', value: 'Scan pe email, originalul prin curier' },
+          ]}
+        >
+          Certificatul de cazier judiciar îl eliberează Poliția Română, gratuit la ghișeu sau online pe hub.mai.gov.ro.
+          Dacă nu poți merge, îl obținem noi: un avocat depune cererea pe bază de împuternicire avocațială, pentru
+          persoane fizice, firme și cetățeni străini, inclusiv când stai în străinătate. Certificatul e valabil 6 luni de
+          la eliberare.
+        </ServiceAnswerBlock>
 
         <PrivateServiceNotice
           institutionLabel="gratuit, la ghișeul IPJ sau online pe hub.mai.gov.ro"

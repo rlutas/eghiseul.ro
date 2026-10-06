@@ -34,6 +34,7 @@ import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT_LABEL } from '@/config/contact';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL, serviceUrl } from '@/lib/seo';
 import { getImobiliareServices } from '@/lib/services/imobiliare';
 import { ServiceSwitcher } from '@/components/services/service-switcher';
+import { ServiceAnswerBlock } from '@/components/services/service-answer-block';
 import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 import { RelatedServicesLinks } from '@/components/services/related-services-links';
 
@@ -47,7 +48,7 @@ const DESCRIPTION =
   'Extras de carte funciară de la ANCPI, obținut de noi și trimis pe email, de obicei în aceeași zi lucrătoare, maximum 2 zile lucrătoare. ' +
   'inclusiv noaptea și în weekend. Fără cont ANCPI, fără taxă de urgență. 4.9★ din 450+ recenzii.';
 const DATE_PUBLISHED = '2026-06-13';
-const DATE_MODIFIED = '2026-07-13';
+const DATE_MODIFIED = '2026-10-06';
 
 export const revalidate = 3600;
 
@@ -280,6 +281,21 @@ export default async function ExtrasCarteFunciaraPage() {
             </div>
           </div>
         </section>
+
+        <ServiceAnswerBlock
+          updated={DATE_MODIFIED}
+          facts={[
+            { label: 'Cine îl eliberează', value: 'ANCPI, prin oficiul de cadastru (OCPI)' },
+            { label: 'Preț', value: `${service.base_price} lei, cu taxa ANCPI` },
+            { label: 'Termen', value: 'de regulă în aceeași zi lucrătoare, max. 2' },
+            { label: 'Primești', value: 'PDF semnat electronic, pe email' },
+          ]}
+        >
+          Extrasul de carte funciară pentru informare arată proprietarul, suprafața și sarcinile unui imobil (ipotecă,
+          sechestru, servituți). Îl eliberează ANCPI. Ai nevoie de numărul de carte funciară sau de numărul cadastral;
+          dacă nu le știi, le aflăm după adresă. Noi depunem cererea în sistemul ANCPI și îți trimitem extrasul, fără
+          cont și fără drum la ghișeu.
+        </ServiceAnswerBlock>
 
         <PrivateServiceNotice
           institutionLabel="direct la OCPI/ANCPI"

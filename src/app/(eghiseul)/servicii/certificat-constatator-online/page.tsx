@@ -31,6 +31,7 @@ import { ServiceFAQ } from '@/components/services/service-faq';
 import { ReviewsSection } from '@/components/services/reviews-section';
 import { buildPageMetadata, buildServicePageGraph, BASE_URL } from '@/lib/seo';
 import { ServicePrice } from '@/components/services/service-price';
+import { ServiceAnswerBlock } from '@/components/services/service-answer-block';
 import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT_LABEL } from '@/config/contact';
 
@@ -44,7 +45,7 @@ const DESCRIPTION =
   'Obținem certificatul constatator de la ONRC în câteva minute, 24/7 — inclusiv noaptea ' +
   'și în weekend. Doar cu CUI-ul firmei: pe firmă, PF sau cu istoric. 89 RON, taxe ONRC incluse.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-08-31';
+const DATE_MODIFIED = '2026-10-06';
 
 export const revalidate = 3600;
 
@@ -287,6 +288,20 @@ export default async function CertificatConstatatorPage() {
             </div>
           </div>
         </section>
+
+        <ServiceAnswerBlock
+          updated={DATE_MODIFIED}
+          facts={[
+            { label: 'Cine îl eliberează', value: 'ONRC (Registrul Comerțului)' },
+            { label: 'Preț', value: `${service.base_price} lei, cu taxele ONRC` },
+            { label: 'Termen', value: 'câteva minute, 24/7' },
+            { label: 'Primești', value: 'PDF semnat electronic de ONRC, pe email' },
+          ]}
+        >
+          Certificatul constatator arată datele la zi ale unei firme: sediul, asociații,
+          administratorii, capitalul și activitățile autorizate. Îl eliberează ONRC. Îl cerem noi din sistemul ONRC
+          pe baza CUI-ului, fără cont și fără semnătură electronică din partea ta.
+        </ServiceAnswerBlock>
 
         <PrivateServiceNotice
           institutionLabel="la ghișeele ONRC sau prin portalul RECOM online"

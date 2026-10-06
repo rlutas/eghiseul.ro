@@ -16,7 +16,7 @@ const TITLE = 'Certificat de Căsătorie Online: Duplicat, cu Mențiune de Divor
 const DESCRIPTION =
   'Duplicat certificat de căsătorie obținut de un avocat de la starea civilă: pierdut, deteriorat, cu mențiunea de divorț sau pentru străinătate. Semnezi pe telefon, primești originalul prin curier.';
 const DATE_PUBLISHED = '2026-09-19';
-const DATE_MODIFIED = '2026-09-21';
+const DATE_MODIFIED = '2026-10-06';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -104,7 +104,7 @@ export default async function CasatoriePage() {
         />
 
         <QuickAnswer updated={DATE_MODIFIED}>
-          Duplicatul certificatului de căsătorie se eliberează de oficiul de stare civilă pe baza actului de căsătorie din registru și poartă mențiunile ulterioare: divorțul înregistrat în România sau decesul unuia dintre soți. Din 2023 cererea se depune la orice primărie din țară. Poate cere oricare dintre soți, personal sau printr-un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}). Termen legal: cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală.
+          Duplicatul certificatului de căsătorie se eliberează de oficiul de stare civilă pe baza actului de căsătorie din registru și poartă mențiunile ulterioare: divorțul înregistrat în România sau decesul unuia dintre soți. Din 2023 cererea se depune la orice primărie din țară. Poate cere oricare dintre soți, personal sau printr-un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}). Termen legal: cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală. Prin documentero.ro, avocatul depune cererea în locul tău, pentru {lei(p.basePrice)} lei cu tot cu taxe, iar originalul vine prin curier.
         </QuickAnswer>
 
         <Section id="divort" className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">

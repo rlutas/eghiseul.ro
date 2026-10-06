@@ -3,9 +3,9 @@
  *
  * Policy (per SEO master plan 2026-05-20):
  * - Allow standard crawlers everywhere except private routes
- * - Allow AI crawlers (GPTBot, ClaudeBot, PerplexityBot, OAI-SearchBot,
- *   Google-Extended) — modern E-E-A-T signal + visibility in AI Overviews,
- *   ChatGPT search, Perplexity, etc. (~15-25% of discovery traffic by 2026)
+ * - Allow every AI crawler and assistant fetcher (list below; Raul 06.10.2026:
+ *   „deblochează toți AI”) — visibility in ChatGPT search, Copilot, Perplexity,
+ *   Gemini, Claude. Assistant fetchers may also open the first order step.
  * - Block:
  *   - /admin/   (admin panel, not for indexing)
  *   - /api/     (API routes, no human-readable content)
@@ -16,6 +16,7 @@
 
 import type { MetadataRoute } from 'next';
 import { BASE_URL } from '@/lib/seo/constants';
+import { AI_ASSISTANT_FETCHERS, AI_CRAWLERS } from '@/lib/seo/ai-bots';
 
 const DISALLOW_PATHS = [
   '/admin/',
@@ -26,25 +27,33 @@ const DISALLOW_PATHS = [
   '/orders/',
 ];
 
+/**
+ * Assistant fetchers (ChatGPT-User, Claude-User, Perplexity-User) act for a
+ * person who asked them to open a page, so they may open the first step of
+ * the order form (`/comanda/<serviciu>/`, still noindex through the order
+ * layout). Checkout, status and success pages carry order ids and stay closed.
+ */
+const ASSISTANT_DISALLOW_PATHS = [
+  '/admin/',
+  '/api/',
+  '/comanda/checkout/',
+  '/comanda/success/',
+  '/comanda/status/',
+  '/auth/',
+  '/account/',
+  '/orders/',
+];
+
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       // Default policy for all crawlers
       { userAgent: '*', allow: '/', disallow: DISALLOW_PATHS },
-      // Explicitly allow major AI crawlers (some default to denied without an entry)
-      { userAgent: 'GPTBot', allow: '/', disallow: DISALLOW_PATHS },
-      { userAgent: 'OAI-SearchBot', allow: '/', disallow: DISALLOW_PATHS },
-      { userAgent: 'ChatGPT-User', allow: '/', disallow: DISALLOW_PATHS },
-      { userAgent: 'ClaudeBot', allow: '/', disallow: DISALLOW_PATHS },
-      { userAgent: 'Claude-Web', allow: '/', disallow: DISALLOW_PATHS },
-      { userAgent: 'Claude-SearchBot', allow: '/', disallow: DISALLOW_PATHS },
-      { userAgent: 'Claude-User', allow: '/', disallow: DISALLOW_PATHS },
-      { userAgent: 'PerplexityBot', allow: '/', disallow: DISALLOW_PATHS },
-      { userAgent: 'Perplexity-User', allow: '/', disallow: DISALLOW_PATHS },
-      { userAgent: 'Meta-ExternalAgent', allow: '/', disallow: DISALLOW_PATHS },
-      { userAgent: 'MistralAI-User', allow: '/', disallow: DISALLOW_PATHS },
-      { userAgent: 'Google-Extended', allow: '/', disallow: DISALLOW_PATHS },
-      { userAgent: 'Applebot-Extended', allow: '/', disallow: DISALLOW_PATHS },
+      // Explicitly allow AI crawlers (some default to denied without an entry)
+      ...AI_CRAWLERS.map((userAgent) => ({ userAgent, allow: '/', disallow: DISALLOW_PATHS })),
+      // Assistant fetchers may open the first step of the order form
+      ...AI_ASSISTANT_FETCHERS.map((userAgent) => ({ userAgent, allow: '/', disallow: ASSISTANT_DISALLOW_PATHS })),
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,
     // `host` era emis ca `Host: https://eghiseul.ro` — sintaxă greșită pentru o
