@@ -28,7 +28,7 @@ Legendă: ✅ făcut · 🔄 în lucru · ⬜ de făcut · ⏸ așteaptă ceva
 |---|---|---|---|
 | A1 | Conversie „Achizitie documentero” + enhanced conversions + variabile Vercel | 05.10 | ✅ |
 | A2 | Campania C1 Certificat de celibat publicată (pornește 06.10, 45 lei/zi) | 05.10 | ✅ |
-| A3 | Verificare: anunț aprobat/respins, primele afișări și clicuri | 06.10 după-amiază | 🔄 06.10, 10:00: anunțul e „Eligibil (limitat)”, politica „Documente guvernamentale și servicii oficiale”, „este obligatoriu un certificat”; 0 afișări (raportarea are întârziere). Verdictul după-amiază |
+| A3 | Verificare: anunț aprobat/respins, primele afișări și clicuri | 06.10 după-amiază | 🔴 06.10, ~16:00: **0 afișări, 0 clicuri, 0 lei** în prima zi (buget 45 lei/zi). Anunțul „Eligibil (limitat)” pe politica „Documente guvernamentale și servicii oficiale”, cu „este obligatoriu un certificat”. Raportarea are 1–3 h întârziere, dar zero până la ~13:00 pe 12 țări arată că limitarea blochează difuzarea. Verdict: practic respins. Următorul pas: **A8, o singură contestație** cu captura paginii — ⏸ aștept decizia lui Raul. Recontrol 07.10 dimineața (ziua completă) |
 | A4 | Termenii de căutare reali, negative noi, starea conversiei | 07.10 | ⏸ |
 | A5 | Dacă A3 trece: C2 Cazier fiscal (40 lei/zi, CPA istoric ~42). **Doar grupul F1 Persoană fizică** (F2 PJ iese: cazierul fiscal îl facem doar pentru PF) + negative firmă/SRL/PJ/PFA. Landingul `/cazier-fiscal-online/` verificat 06.10: PF, 30 de zile, sancțiuni nu datorii, footer cu ANAF | după A3 (Raul, 06.10: așteptăm celibatul) | ⏸ |
 | A6 | C1: grupul CB2 (căsătorie în străinătate), RSA B, sitelinkuri | după A3 | ⬜ |
