@@ -20,10 +20,12 @@ Rescrierea D2 din planul de vânzări pe octombrie (`docs/2026-10-plan-a-z-vanza
 
 | | înainte | după |
 |---|---|---|
-| title | Cazier Judiciar Online 2026 — Fără Drumuri, în 3-5 Zile | Cazier Judiciar Online: 198 lei, 3-5 Zile, Fără Drum |
-| description | Obține cazierul judiciar online de la Poliția Română, fără cozi. Persoane fizice și firme, livrare în 3-5 zile pe email sau curier. Comandă în 5 minute. | Poliția eliberează cazierul, noi îl obținem prin avocat, pe împuternicire. Persoane fizice, firme și cetățeni străini. Scan pe email, originalul prin curier, și în diaspora. |
+| title (cu sufixul „ \| eGhiseul.ro”) | Cazier Judiciar Online 2026 — Fără Drumuri, în 3-5 Zile (71 caractere) | Cazier Judiciar Online: 198 lei, 3-5 Zile (55) |
+| description | Obține cazierul judiciar online de la Poliția Română, fără cozi. Persoane fizice și firme, livrare în 3-5 zile pe email sau curier. Comandă în 5 minute. | Poliția eliberează cazierul, noi îl obținem prin avocat. Persoane fizice, firme, străini. Scan pe email, originalul prin curier, și în diaspora. (144) |
 
-Prețul în titlu urmează ce a mers pe CJO (C2/C6).
+Prețul în titlu urmează ce a mers pe CJO (C2/C6). H2-urile acoperă căutările reale: persoană fizică/juridică, online sau la ghișeu, din străinătate, cât durează, preț; valabilitatea e H3 în secțiunea despre conținut. Un singur H1. JSON-LD valid (`Service`, `FAQPage` cu FAQ vizibil, fără `aggregateRating`).
+
+**Afirmații pe care nu le-am putut verifica în textul consolidat curent și le-am scos:** termenul de „până la 10 zile” la consulat și „certificatul de la consulat se folosește doar în străinătate” (ambele vin din OG 1/2016, art. 29 alin. 3–4 din L. 290/2004, dar forma în vigoare n-am putut-o citi). Pagina spune acum că termenul și taxele diferă de la consulat la consulat și trimite clientul să întrebe. „Baroul Satu Mare” rămâne: e în cod (`src/lib/registry/client.ts`, `src/lib/documentero/content.ts`).
 
 **Erori de fond reparate**
 
@@ -61,5 +63,7 @@ Prețul în titlu urmează ce a mers pe CJO (C2/C6).
 | Jaccard după vs înainte | | 0,096 |
 
 Pagina era deja diferită de surori; problema ei era calitatea și faptele, nu duplicarea. Mai puține cuvinte după, pentru că a ieșit umplutura (tabelul de 29 de situații, cardurile de „încredere").
+
+Text: zero caractere invizibile (U+200B/200C/200D/2060/FEFF/00AD) în pagina randată; scor stilometric 0,03 (nivel „low”). Titlurile cardurilor și ale butoanelor trecute din Title Case în frază normală.
 
 Verificat: `tsc --noEmit` curat, `eslint` pe fișier curat, `vitest run tests/unit` 2.053/2.053, pagina randată local (200).

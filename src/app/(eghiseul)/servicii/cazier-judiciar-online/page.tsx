@@ -45,10 +45,10 @@ import {
 
 const PAGE_PATH = '/servicii/cazier-judiciar-online/';
 // Root layout appends „ | eGhiseul.ro", so keep this under ~50 characters.
-const TITLE = 'Cazier Judiciar Online: 198 lei, 3-5 Zile, Fără Drum';
+const TITLE = 'Cazier Judiciar Online: 198 lei, 3-5 Zile';
 const DESCRIPTION =
-  'Poliția eliberează cazierul, noi îl obținem prin avocat, pe împuternicire. ' +
-  'Persoane fizice, firme și cetățeni străini. Scan pe email, originalul prin curier, și în diaspora.';
+  'Poliția eliberează cazierul, noi îl obținem prin avocat. Persoane fizice, firme, străini. ' +
+  'Scan pe email, originalul prin curier, și în diaspora.';
 
 const DATE_PUBLISHED = '2026-04-16';
 const DATE_MODIFIED = '2026-10-06';
@@ -226,8 +226,8 @@ const FAQ_ITEMS: FAQ[] = [
   },
   {
     category: 'strainatate',
-    q: 'Locuiesc în străinătate. Am vreo variantă gratuită?',
-    a: 'Da: la consulatul României. Certificatul eliberat prin consulat se folosește însă doar în străinătate, iar termenul poate ajunge la 10 zile. O a doua variantă este o persoană din țară care îl ridică pentru tine, cu procură. Prin noi plătești 198 lei, nu mergi la consulat, iar originalul îl primești prin curier internațional, cu apostila și traducerea făcute în aceeași comandă, dacă le bifezi.',
+    q: 'Locuiesc în străinătate. Ce variante am?',
+    a: 'Poți cere cazierul la consulatul României din țara în care stai. Termenul și eventualele taxe diferă de la un consulat la altul, așa că întreabă-i direct. A doua variantă e o persoană din țară care îl ridică pentru tine, cu procură. Prin noi plătești 198 lei și nu mergi nicăieri, iar originalul îți vine prin curier internațional. Apostila și traducerea se fac în aceeași comandă, dacă le bifezi.',
   },
   {
     category: 'strainatate',
@@ -304,7 +304,7 @@ export default function CazierJudiciarHubPage() {
                     {/* NU „Serviciu Juridic Oficial" — „oficial" despre serviciu (nu despre
                         document) declanșează politica Google Ads „Documente guvernamentale
                         și servicii oficiale" (vezi memoria google-ads-documente-oficiale). */}
-                    Asistență prin Avocat în Barou
+                    Asistență prin avocat în barou
                   </Badge>
                   <Badge className="bg-green-600 text-white font-bold px-3 py-1">
                     <Clock className="h-3.5 w-3.5 mr-1" />
@@ -423,7 +423,7 @@ export default function CazierJudiciarHubPage() {
           <div className="container mx-auto px-4 max-w-[1000px]">
             <div className="text-center mb-10">
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Pentru tine sau pentru firmă?
+                Cazier judiciar pentru persoană fizică sau juridică
               </h2>
               <p className="text-neutral-600 max-w-xl mx-auto">
                 Sunt două certificate diferite: cazierul firmei nu spune nimic despre administrator,
@@ -440,7 +440,7 @@ export default function CazierJudiciarHubPage() {
                         <User className="w-8 h-8 text-primary-600 group-hover:text-secondary-900" />
                       </div>
                       <h3 className="text-xl lg:text-2xl font-bold text-secondary-900 mb-3">
-                        Persoană Fizică
+                        Persoană fizică
                       </h3>
                       <p className="text-neutral-600 mb-5 flex-1">
                         Cazierul tău, pe CNP. Tot aici intră titularii de PFA, întreprindere individuală
@@ -483,7 +483,7 @@ export default function CazierJudiciarHubPage() {
                         <Building2 className="w-8 h-8 text-blue-600 group-hover:text-secondary-900" />
                       </div>
                       <h3 className="text-xl lg:text-2xl font-bold text-secondary-900 mb-3">
-                        Persoană Juridică (Firmă)
+                        Persoană juridică (firmă)
                       </h3>
                       <p className="text-neutral-600 mb-5 flex-1">
                         Cazierul societății, pe CUI: SRL, SA, ONG, cooperativă. Îl cer de regulă licitațiile
@@ -582,7 +582,7 @@ export default function CazierJudiciarHubPage() {
                 apare, cel mai simplu e să ceri certificatul și să vezi.
               </p>
 
-              <h3 className="text-lg font-bold text-secondary-900 pt-2">Cât e valabil</h3>
+              <h3 className="text-lg font-bold text-secondary-900 pt-2">Cât e valabil cazierul judiciar</h3>
               <p>
                 <strong>Șase luni de la eliberare</strong> (Legea 290/2004, art. 27). Asta e regula legii; instituția
                 care ți-l cere poate pretinde unul mai recent, iar ambasadele și angajatorii din străinătate o fac des.
@@ -614,7 +614,7 @@ export default function CazierJudiciarHubPage() {
           <div className="container mx-auto px-4 max-w-[1200px]">
             <div className="text-center mb-12">
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Cum arată certificatul și când merită să mergi singur
+                Cazier judiciar online sau la ghișeu
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
                 Certificatul e același, indiferent cine depune cererea. Diferă doar drumul până la el.
@@ -709,9 +709,9 @@ export default function CazierJudiciarHubPage() {
                 })()}
 
                 <p className="text-sm text-neutral-600 mt-4 leading-relaxed">
-                  Pe scurt: dacă ești în același oraș cu un ghișeu de cazier și ai o oră liberă în timpul
+                  Dacă ești în același oraș cu un ghișeu de cazier și ai o oră liberă în timpul
                   programului, mergi singur. Nu plătești nimic și pleci, de cele mai multe ori, cu certificatul în
-                  mână. Serviciul nostru are sens când ești în altă localitate, în altă țară, sau ai nevoie și de
+                  mână. Serviciul nostru are sens când ești în altă localitate, în altă țară sau ai nevoie și de
                   traducere și apostilă. Cum s-a ajuns la „gratuit” găsești în{' '}
                   <Link href="/taxa-cazier-judiciar/" className={linkClass}>
                     ghidul despre taxa de cazier judiciar
@@ -773,24 +773,23 @@ export default function CazierJudiciarHubPage() {
         <section className="py-12 lg:py-20 bg-neutral-50">
           <div className="container mx-auto px-4 max-w-[900px]">
             <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-6 text-center">
-              Ai nevoie de cazier și ești în străinătate
+              Cazier judiciar din străinătate
             </h2>
             <div className="bg-white rounded-2xl p-6 lg:p-8 border border-neutral-200 space-y-4 text-neutral-700 leading-relaxed">
               <p>Ai trei drumuri, și doar unul trece prin noi:</p>
               <ol className="space-y-3 list-decimal pl-5">
                 <li>
-                  <strong className="text-secondary-900">Consulatul României.</strong> E gratuit, dar mergi personal
-                  la consulat, termenul poate ajunge la 10 zile, iar certificatul eliberat acolo se folosește doar în
-                  străinătate.
+                  <strong className="text-secondary-900">Consulatul României.</strong> Mergi personal la consulat.
+                  Termenul și eventualele taxe diferă de la un consulat la altul, așa că întreabă-i înainte.
                 </li>
                 <li>
-                  <strong className="text-secondary-900">Cineva din țară, cu procură.</strong> Gratuit la ghișeu, dar
-                  procura notarială făcută în străinătate costă și ea, iar originalul trebuie apoi trimis la tine.
+                  <strong className="text-secondary-900">Cineva din țară, cu procură.</strong> La ghișeu e gratuit,
+                  dar procura notarială făcută în străinătate costă, iar originalul trebuie apoi trimis la tine.
                 </li>
                 <li>
                   <strong className="text-secondary-900">Prin noi, 198 lei.</strong> Semnezi împuternicirea pe ecran,
-                  avocatul ridică certificatul din țară, iar originalul pleacă prin Poșta Română (100 lei, cu
-                  urmărire) sau DHL (250 lei, mai rapid).
+                  avocatul ridică certificatul din țară, iar originalul pleacă prin Poșta Română (100 lei) sau
+                  DHL (250 lei, mai rapid).
                 </li>
               </ol>
 
@@ -817,7 +816,7 @@ export default function CazierJudiciarHubPage() {
           </div>
           <div className="relative container mx-auto px-4 max-w-[1100px]">
             <div className="text-center mb-14">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Ce se întâmplă după ce plătești</h2>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white mb-3">Cât durează: ce se întâmplă după plată</h2>
               <p className="text-white/70 max-w-2xl mx-auto">
                 Termenul de 3-5 zile lucrătoare (1-2 cu urgență) se numără de la plată. Fiecare pas îl vezi pe
                 pagina de status a comenzii și primești email la fiecare schimbare.
@@ -853,7 +852,7 @@ export default function CazierJudiciarHubPage() {
           <div className="container mx-auto px-4 max-w-[1000px]">
             <div className="text-center mb-12">
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                Cât costă, cu tot cu opțiuni
+                Preț cazier judiciar online, cu opțiuni
               </h2>
               <p className="text-neutral-600">
                 Prețuri cu TVA 21%. Vezi totalul exact înainte de plată, iar opțiunile se pot adăuga și după.
@@ -1180,7 +1179,7 @@ export default function CazierJudiciarHubPage() {
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold rounded-lg transition-colors"
                 >
                   <User className="w-5 h-5" />
-                  Comandă pentru Persoană Fizică
+                  Comandă pentru persoană fizică
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
@@ -1188,7 +1187,7 @@ export default function CazierJudiciarHubPage() {
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-lg border border-white/20 transition-colors"
                 >
                   <Building2 className="w-5 h-5" />
-                  Comandă pentru Firmă (PJ)
+                  Comandă pentru firmă (PJ)
                 </Link>
               </div>
 
