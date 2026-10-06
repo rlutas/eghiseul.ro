@@ -6,26 +6,58 @@ Tot ce ține de clipuri, YouTube, Facebook/Instagram și boost stă în dosarul 
 
 ## Ce rulează acum
 
-| Când | Unde | Ce | Stare |
-|---|---|---|---|
-| Mi 07.10, 18:00 | YouTube | Trailer (https://youtu.be/1K0_nKbcaGQ) | programat |
-| Mi 07.10, 19:00 | YouTube | Cât e valabil cazierul judiciar (https://youtu.be/GxMe0-e5emw) | programat |
-| Jo 08.10, 19:00 | Facebook | Reel: Cât e valabil cazierul judiciar | programat; boost pus de Raul |
-| Vi 09.10, 18:00 | YouTube Shorts | Short: valabilitate (https://youtube.com/shorts/jCCPou5R0eI) | programat |
-| Sâ 10.10, 11:00 | YouTube | Cazierul judiciar din străinătate (https://youtu.be/JGgPR9nhWJM) | programat |
-| Du 11.10, 12:00 | YouTube Shorts | Short: străinătate (https://youtube.com/shorts/D15gF6qRFRU) | programat |
-| Du 11.10, 18:00 | Facebook | Reel: Cazierul judiciar din străinătate | programat; boost pus de Raul |
+**YouTube** (ora României):
 
-Calendarul complet pe 4 săptămâni (07.10–03.11): [plan-postari-2026-10.md](plan-postari-2026-10.md).
+| Când | Ce | Link | Stare |
+|---|---|---|---|
+| Mi 07.10, 18:00 | Trailer | https://youtu.be/1K0_nKbcaGQ | programat |
+| Mi 07.10, 19:00 | Lung: Cât e valabil cazierul judiciar | https://youtu.be/GxMe0-e5emw | programat |
+| Vi 09.10, 18:00 | Short: valabilitate | https://youtube.com/shorts/jCCPou5R0eI | programat |
+| Sâ 10.10, 11:00 | Lung: Cazierul judiciar din străinătate | https://youtu.be/JGgPR9nhWJM | programat |
+| Du 11.10, 12:00 | Short: străinătate | https://youtube.com/shorts/D15gF6qRFRU | programat |
+| Jo 15.10, 19:00 | Short: Ce apare pe cazier (și ce nu)? | https://youtube.com/shorts/NHNwBNGNm_0 | programat |
+| Du 18.10, 18:00 | Short: Apostilă și traducere, în ce ordine | https://youtube.com/shorts/ZARiCG_CK_w | programat |
+| Ma 13.10, 12:30 | Lung: Cazierul fiscal (versiunea corectată) | — | **de urcat** (limita zilnică YouTube atinsă pe 06.10) |
+| Mi 14.10, 18:00 | Short: Cazierul fiscal (corectat) | — | **de urcat** |
+| Mi 21.10, 12:30 | Short: Cazier fiscal sau atestare fiscală? | — | **de urcat** |
+| Du 25.10, 18:00 | Short: Cine îți cere cazierul în străinătate | — | **de urcat** |
+| Mi 28.10, 19:00 | Short: Cazier pentru străinătate, întreabă înainte | — | **de urcat** |
+| Du 01.11, 18:00 | Short: Cazier fiscal pentru firmă, pe numele cui? | — | **de urcat** |
+
+Pe canal stau și două clipuri **private** cu cazierul fiscal, varianta veche cu „PDF semnat, pe email” pe un cadru (`9n8tacyTz9M`, `B-IVkvPU_NA`). Nu se publică; Raul le poate șterge.
+
+**Facebook** (pagina EGhiseul, fără Instagram), toate programate:
+
+| Când | Reel |
+|---|---|
+| Jo 08.10, 19:00 | Cât e valabil cazierul judiciar (boost pus de Raul) |
+| Du 11.10, 18:00 | Cazierul judiciar din străinătate (boost pus de Raul) |
+| Mi 14.10, 12:30 | Cazierul fiscal nu arată datoriile (corectat) |
+| Jo 15.10, 19:00 | Ce apare pe cazier (și ce nu)? |
+| Du 18.10, 18:00 | Apostilă și traducere: în ce ordine |
+| Mi 21.10, 12:30 | Cazier fiscal sau atestare fiscală? |
+| Du 25.10, 18:00 | Cine îți cere cazierul în străinătate |
+| Mi 28.10, 19:00 | Cazier pentru străinătate: întreabă înainte |
+| Du 01.11, 18:00 | Cazier fiscal pentru firmă: pe numele cui? |
+
+În Drafts a rămas varianta veche a Reel-ului fiscal (cea cu „PDF semnat”). Nu se publică; se poate șterge.
+
+Calendarul complet: [plan-postari-2026-10.md](plan-postari-2026-10.md).
 
 ## Ce e deschis
 
-1. **Cazierul fiscal**: clipul e refăcut, fără „PDF semnat electronic”. Avem scanul pe email + originalul prin curier. Așteaptă aprobarea lui Raul, apoi se programează pe YouTube Ma 13.10, la 12:30, iar Reel-ul pe Facebook Mi 14.10, la 12:30.
-2. **Instagram**: oprit. În Meta, pagina EGhiseul e legată de contul personal `iamraul92`. E nevoie de un cont Instagram eGhiseul legat de pagină sau de decizia lui Raul să postăm pe iamraul92.
-3. **Clipul „seohut landscape side video”** din Shorts: îl șterge Raul din YouTube Studio.
-4. **Rezultatul boost-ului**: îl citim la 5 zile după ce pornește fiecare boost (~14.10 și ~17.10). Regula de decizie e în plan, la „Boost pe Facebook”.
-5. **Clipuri noi** din săptămâna 2: cazierul pentru cetățenie, rezidență sau muncă în străinătate (Sâ 17.10), apoi integritatea (Ma 20.10). Coada de producție e în plan.
-6. **YouTube, de făcut o dată**: trailerul setat ca trailer de canal, playlisturi, elemente de final și `.srt` urcat la clipurile lungi.
+1. **Verificarea canalului YouTube cu telefonul** (Raul): YouTube Studio → Setări → Canal → Eligibilitatea funcțiilor. Fără ea:
+   - limita de urcare pe zi e mică (am atins-o pe 06.10, după 9 clipuri);
+   - linkurile din descrieri nu se pot apăsa;
+   - miniaturile personalizate nu se aplică.
+2. **Urcarea pe YouTube a celor 6 clipuri „de urcat”** din tabelul de sus, după verificare sau după ce se resetează limita. Fișierele și textele sunt în `out/upload/`, textele Reels-urilor reciclate în `reels/<clip>--<tăietura>.txt`. Short-urile reciclate primesc „#shorts” în titlu și descriere.
+3. **Instagram**: oprit. În Meta, pagina EGhiseul e legată de contul personal `iamraul92`. E nevoie de un cont Instagram eGhiseul legat de pagină sau de decizia lui Raul să postăm pe iamraul92.
+4. **Clipul „seohut landscape side video”** din Shorts: îl șterge Raul.
+5. **Rezultatul boost-ului**: îl citim la 5 zile după ce pornește fiecare boost (~14.10 și ~17.10). Regula de decizie e în plan, la „Boost pe Facebook”.
+6. **Clipuri noi** din săptămâna 2: cazierul pentru cetățenie, rezidență sau muncă în străinătate (Sâ 17.10), apoi integritatea (Ma 20.10). Coada de producție e în plan.
+7. **YouTube, de făcut o dată**: trailerul setat ca trailer de canal, playlisturi, elemente de final și `.srt` urcat la clipurile lungi.
+
+**Lecția de pe 06.10:** o corectură de text se verifică pe **cadre extrase din fișierul randat**, nu doar în sursă. „PDF semnat” fusese scos din voce și din descrieri, dar a rămas pe un cadru. A fost prins abia în previzualizarea Facebook.
 
 ## Documentele din dosar
 
