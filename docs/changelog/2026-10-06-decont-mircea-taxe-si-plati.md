@@ -3,6 +3,7 @@
 
 ## Pentru echipă
 
+- **Decontul topografului e acum un extras pe luna trecută** (implicit septembrie, în portal și în admin), în trei casete: rezultatul lunii (încasat → TVA → taxe → Stripe → reclamă → profit → impozite → partea fiecăruia), plata pentru lună (partea lunii + corecția din lunile trecute = de plată, separat pe factura de comision și transfer, apoi ce s-a plătit și dacă e achitat), taxele OCPI care urmează. Cifrele cumulate care nu aveau sens pe o singură lună au dispărut.
 - Decontul din portalul colaboratorului se deschide acum pe „Toată perioada”, cu tot calculul la vedere.
 - **Taxe OCPI care urmează:** orice comandă plătită care n-are încă taxa trecută apare cu sumă estimată (portocaliu) și într-o casetă separată. Instituția nu eliberează gratuit, deci taxa se plătește chiar dacă dosarul se rezolvă luna viitoare.
 - **Regula la identificări:** 20 lei dacă imobilul se identifică și se scoate direct extrasul CF, 100 lei dacă trebuie depusă cerere la OCPI.
@@ -21,3 +22,5 @@
 Status at 06.10 (paid until 30.09, 199 orders): share per side 4.731,09; distributed 4.316,61; Raul 414,48; Mircea 304,23 (invoice 99,75 + transfer 204,48). 19 orders still without an OCPI fee (16 identifications ≈ 720 lei estimated, 3 with no baseline).
 
 **Paid 06.10.2026** (Raul): recorded as the second `DISTRIBUTIONS` entry (per side 414,48; Mircea transfer 204,48 + commission invoice 99,75). After it the cumulative balance is 0; the ~720 lei of pending OCPI fees will show as an overpayment next month and come off the October settlement.
+
+**Monthly statement (same day):** `src/lib/collaborator/statement.ts` (`buildMonthlyStatement`, Romanian-time months, `DISTRIBUTIONS[].forMonth`) + `src/components/collaborator/settlement-statement.tsx`, used by `/colaborator/decont` and `/admin/colaboratori` (both default to the previous month). Both routes now load all orders and filter the list by month, because the statement needs the earlier months. September: share 859,30, correction −444,82 → 414,48 each; Mircea 304,23 = invoice 99,75 + transfer 204,48; paid 06.10, settled.

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission, getCollaboratorServices } from '@/lib/admin/permissions';
 import { formatPersonName } from '@/lib/format/person-name';
+import { buildMonthlyStatement, bucharestMonth } from '@/lib/collaborator/statement';
 import { computeSettlementBreakdown, sumAncpiCosts, platformCostForRange, estimatePendingOcpi, SETTLEMENT_PERIOD_START } from '@/lib/collaborator/settlement';
 
 /**
@@ -65,7 +66,7 @@ export async function GET(request: NextRequest) {
     // the totals with unpaid/abandoned/cancelled orders.)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const admin = createAdminClient() as any;
-    let query = admin
+    const query = admin
       .from('orders')
       .select('id, friendly_order_id, order_number, status, total_price, customer_data, created_at, paid_at, is_test, services:service_id(name, slug, lawyer_fee_ron)')
       .in('service_id', serviceIds)
@@ -76,13 +77,15 @@ export async function GET(request: NextRequest) {
 
     let rangeStart = SETTLEMENT_PERIOD_START;
     let rangeEnd = new Date().toISOString();
-    if (/^\d{4}-\d{2}$/.test(month)) {
+    const isMonth = /^\d{4}-\d{2}$/.test(month);
+    if (isMonth) {
       const [y, m] = month.split('-').map(Number);
       rangeStart = new Date(Date.UTC(y, m - 1, 1)).toISOString();
       rangeEnd = new Date(Date.UTC(y, m, 1)).toISOString();
-      query = query.gte('paid_at', rangeStart).lt('paid_at', rangeEnd);
     }
 
+    // All orders are loaded: the monthly statement needs the earlier months
+    // too (the settlement is cumulative). The list is filtered by month below.
     const { data, error } = await query;
     if (error) {
       console.error('[admin] collaborator orders error:', error.message);
@@ -124,7 +127,7 @@ export async function GET(request: NextRequest) {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const orders = (data || []).map((o: any) => {
+    const allOrders = (data || []).map((o: any) => {
       const c = o.customer_data?.contact || {};
       const fee = Number(o.services?.lawyer_fee_ron) || 0;
       return {
@@ -145,18 +148,25 @@ export async function GET(request: NextRequest) {
       };
     });
 
+    // The list (and the totals below) cover the selected month only.
+    const orders = isMonth
+      ? allOrders.filter((o: { paidAt: string | null }) => !!o.paidAt && bucharestMonth(o.paidAt) === month)
+      : allOrders;
+
     // Test orders stay visible in the list (flagged) but owe no fee.
     const billable = orders.filter((o: { isTest: boolean }) => !o.isTest);
     const revenue = billable.reduce((s: number, o: { total: number }) => s + o.total, 0);
     const ocpiTotal = billable.reduce((s: number, o: { ocpiCost: number }) => s + o.ocpiCost, 0);
     // Cheltuielile de perioadă (reclamă etc.) pentru zona colaboratorului.
     let periodCosts = 0;
+    let costRowsAll: Array<{ amount_ron: number; period_start: string }> = [];
     if (collaboratorId !== '__avocat__') {
       const { data: costRows } = await admin
         .from('collaborator_period_costs')
         .select('amount_ron, period_start')
         .eq('collaborator_id', collaboratorId);
-      for (const c of (costRows ?? []) as Array<{ amount_ron: number; period_start: string }>) {
+      costRowsAll = (costRows ?? []) as Array<{ amount_ron: number; period_start: string }>;
+      for (const c of costRowsAll) {
         if (/^\d{4}-\d{2}$/.test(month) && !c.period_start.startsWith(month)) continue;
         periodCosts += Number(c.amount_ron) || 0;
       }
@@ -182,6 +192,19 @@ export async function GET(request: NextRequest) {
         ),
       }),
     };
+
+    // Monthly statement (topograf only): the month's result, what is owed
+    // for it, what was paid.
+    const statement = collaboratorId !== '__avocat__' && isMonth
+      ? buildMonthlyStatement(
+          allOrders.map((o: { paidAt: string | null; total: number; ocpiCost: number; stripeFee: number; fee: number; serviceSlug: string; status: string; isTest: boolean }) => ({
+            paidAt: o.paidAt, total: o.total, ocpiCost: o.ocpiCost, stripeFee: o.stripeFee,
+            commission: o.fee, serviceSlug: o.serviceSlug, status: o.status, isTest: o.isTest,
+          })),
+          costRowsAll.map((c) => ({ amount: Number(c.amount_ron) || 0, periodStart: c.period_start })),
+          month
+        )
+      : null;
 
     if (format === 'tsv') {
       const COLUMNS = ['Comandă', 'Serviciu', 'Client', 'Email', 'Status', 'Preț (RON)', 'Taxă OCPI (RON)', 'Onorariu (RON)', 'Test', 'Dată'];
@@ -216,7 +239,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ success: true, data: { orders, summary } });
+    return NextResponse.json({ success: true, data: { orders, summary, statement } });
   } catch (error) {
     console.error('[admin] collaborator orders error:', error);
     return NextResponse.json({ success: false, error: 'Eroare internă' }, { status: 500 });

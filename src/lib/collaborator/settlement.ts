@@ -61,6 +61,8 @@ export const SETTLEMENT_PERIOD_START = '2026-07-07T00:00:00.000Z';
 export const DISTRIBUTIONS = [
   {
     on: '2026-08-26',
+    /** Last month this payout covers (07.07–26.08, recalculated through August). */
+    forMonth: '2026-08',
     perSideRon: 4316.61,
     /** Colaboratorul a primit partea minus comisionul, pe care îl facturează. */
     collaboratorCashRon: 3791.61,
@@ -77,6 +79,7 @@ export const DISTRIBUTIONS = [
     // Cumulative settlement up to 30.09.2026 (Raul decided to pay now and let
     // the ~720 lei of pending OCPI fees correct themselves next month).
     on: '2026-10-06',
+    forMonth: '2026-09',
     perSideRon: 414.48,
     // 414,48 minus the 110,25 he got on top on SM 153 (525 + VAT instead of
     // 15 lei with VAT included) = 304,23 = transfer + commission invoice.

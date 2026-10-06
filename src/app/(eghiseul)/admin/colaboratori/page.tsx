@@ -1,5 +1,7 @@
 'use client';
 
+import { SettlementStatement } from '@/components/collaborator/settlement-statement';
+import { previousMonth, type MonthlyStatement } from '@/lib/collaborator/statement';
 import { useEffect, useMemo, useState } from 'react';
 import { Download, Users, ClipboardList, Wallet, Receipt, ListChecks, Eye, FileSpreadsheet, Plus, X, Loader2, Lock } from 'lucide-react';
 import { useAdminPermissions } from '@/hooks/use-admin-permissions';
@@ -877,8 +879,10 @@ export default function CollaboratorsAdminPage() {
   const { hasPermission } = useAdminPermissions();
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [selectedId, setSelectedId] = useState('');
-  const [month, setMonth] = useState('');
+  // Implicit: luna trecută, cea care se decontează.
+  const [month, setMonth] = useState(() => previousMonth());
   const [orders, setOrders] = useState<CollabOrder[]>([]);
+  const [statement, setStatement] = useState<MonthlyStatement | null>(null);
   const [summary, setSummary] = useState<Summary>({ count: 0, revenue: 0, fees: 0, breakdown: null });
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'servicii' | 'avocat'>('servicii');
@@ -911,6 +915,7 @@ export default function CollaboratorsAdminPage() {
       if (json.success) {
         setOrders(json.data.orders);
         setSummary(json.data.summary);
+        setStatement(json.data.statement ?? null);
       }
     })();
   }, [selectedId, month]);
@@ -1008,64 +1013,23 @@ export default function CollaboratorsAdminPage() {
           {selectedId && selectedId !== '__avocat__' && <AdvancesPanel collaboratorId={selectedId} />}
           {selectedId && selectedId !== '__avocat__' && <PeriodCostsPanel collaboratorId={selectedId} />}
 
-          {/* Summary — modelul 50/50 din lib-ul de decont (aceleași cifre ca
-              pagina colaboratorului); onorariul per comandă rămâne doar unde
-              nu există breakdown (avocat). */}
-          <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-4">
-            <div className="rounded-xl border border-slate-200 bg-white p-5">
-              <div className="flex items-center gap-2 text-slate-500"><ClipboardList className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Comenzi</span></div>
-              <p className="mt-1 text-2xl font-extrabold text-slate-900">{summary.count}</p>
-            </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-5">
-              <div className="flex items-center gap-2 text-slate-500"><Wallet className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Încasări (cu TVA)</span></div>
-              <p className="mt-1 text-2xl font-extrabold text-slate-900">{fmt(summary.revenue)} <span className="text-sm font-bold text-slate-400">RON</span></p>
-            </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-5">
-              <div className="flex items-center gap-2 text-slate-500"><Receipt className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">{summary.breakdown ? 'Taxe OCPI' : feeLabel}</span></div>
-              <p className="mt-1 text-2xl font-extrabold text-slate-900">{fmt(summary.breakdown ? summary.breakdown.ocpiCosts : summary.fees)} <span className="text-sm font-bold text-slate-400">RON</span></p>
-            </div>
-            {summary.breakdown && (
-              <div className="rounded-xl border border-primary-200 bg-primary-50 p-5">
-                <div className="flex items-center gap-2 text-primary-700"><Wallet className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Partea fiecăruia (50% net)</span></div>
-                <p className="mt-1 text-2xl font-extrabold text-secondary-900">{fmt(summary.breakdown.sharePerSide)} <span className="text-sm font-bold text-primary-700/60">RON</span></p>
+          {/* Extrasul lunii: rezultatul, plata, taxele care urmează (aceeași
+              componentă ca în portalul colaboratorului). Avocatul: doar totaluri. */}
+          {statement ? (
+            <SettlementStatement statement={statement} audience="admin" />
+          ) : (
+            <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="rounded-xl border border-slate-200 bg-white p-5">
+                <div className="flex items-center gap-2 text-slate-500"><ClipboardList className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Comenzi</span></div>
+                <p className="mt-1 text-2xl font-extrabold text-slate-900">{summary.count}</p>
               </div>
-            )}
-          </div>
-
-          {/* Împărțeala 50/50 pas cu pas — sursa unică: lib/collaborator/settlement */}
-          {summary.breakdown && (
-            <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5">
-              <h2 className="mb-2 text-sm font-semibold text-slate-900">Împărțeala 50/50 (perioada selectată)</h2>
-              <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm sm:grid-cols-4">
-                {([
-                  ['Net fără TVA', summary.breakdown.netOfVat],
-                  ['− Taxe OCPI', -summary.breakdown.ocpiCosts],
-                  ['− Comisioane Stripe', -summary.breakdown.stripeFees],
-                  ['− Reclamă și alte cheltuieli', -summary.breakdown.otherCosts],
-                  ['Profit brut', summary.breakdown.grossProfit],
-                  ['Taxe OCPI care urmează, fără taxă trecută (informativ)', summary.breakdown.pendingOcpi],
-                  ['− Impozit profit 16%', -summary.breakdown.profitTax],
-                  ['− Impozit dividende 16%', -summary.breakdown.dividendTax],
-                  ['Net de distribuit', summary.breakdown.distributable],
-                  ['Partea colaboratorului (50%)', summary.breakdown.sharePerSide],
-                  ['− Comision facturat de el', -summary.breakdown.commission],
-                  ['Rest de plată colaborator', summary.breakdown.collaboratorShare],
-                  ['Partea eGhiseul', summary.breakdown.sharePerSide],
-                  ['Distribuit deja (fiecare)', -summary.breakdown.alreadyDistributed],
-                  ['De reglat (fiecare)', summary.breakdown.toSettle],
-                  ['Partea fiecăruia după taxele care urmează', summary.breakdown.projectedSharePerSide],
-                  ['Colaborator: primit deja (transfer + facturi)', -summary.breakdown.collaboratorReceived],
-                  ['Colaborator: mai are de primit', summary.breakdown.collaboratorToReceive],
-                  ['  din care factură comision (TVA incl.)', summary.breakdown.commissionToInvoice],
-                  ['  din care transfer', summary.breakdown.collaboratorCashToReceive],
-                ] as [string, number][]).map(([label, value]) => (
-                  <div key={label} className="flex items-center justify-between border-b border-slate-100 py-1">
-                    <span className="text-slate-500">{label}</span>
-                    <span className="tabular-nums font-medium text-slate-900">
-                      {value < 0 ? `−${fmt(Math.abs(value))}` : fmt(value)}
-                    </span>
-                  </div>
-                ))}
+              <div className="rounded-xl border border-slate-200 bg-white p-5">
+                <div className="flex items-center gap-2 text-slate-500"><Wallet className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">Încasări (cu TVA)</span></div>
+                <p className="mt-1 text-2xl font-extrabold text-slate-900">{fmt(summary.revenue)} <span className="text-sm font-bold text-slate-400">RON</span></p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-white p-5">
+                <div className="flex items-center gap-2 text-slate-500"><Receipt className="h-4 w-4" /><span className="text-xs uppercase tracking-wide">{summary.breakdown ? 'Taxe OCPI' : feeLabel}</span></div>
+                <p className="mt-1 text-2xl font-extrabold text-slate-900">{fmt(summary.breakdown ? summary.breakdown.ocpiCosts : summary.fees)} <span className="text-sm font-bold text-slate-400">RON</span></p>
               </div>
             </div>
           )}

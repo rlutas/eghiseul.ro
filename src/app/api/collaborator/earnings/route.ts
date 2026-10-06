@@ -17,6 +17,7 @@ import {
   DISTRIBUTIONS,
   IDENTIFICATION_OCPI,
 } from '@/lib/collaborator/settlement';
+import { buildMonthlyStatement, bucharestMonth, previousMonth } from '@/lib/collaborator/statement';
 
 /**
  * Settlement view for the authenticated collaborator (topograph).
@@ -55,20 +56,17 @@ export async function GET(request: NextRequest) {
 
     const serviceIds = await getCollaboratorServices(collaboratorId);
 
-    const now = new Date();
-    const defaultMonth = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
+    // Default: last month, the one being settled.
+    const defaultMonth = previousMonth();
     const monthParam = searchParams.get('month') || '';
     const month = monthParam === 'all'
       ? 'all'
       : /^\d{4}-\d{2}$/.test(monthParam) ? monthParam : defaultMonth;
 
-    let start = SETTLEMENT_PERIOD_START;
-    let end: string | null = null;
-    if (month !== 'all') {
-      const [y, m] = month.split('-').map(Number);
-      start = new Date(Date.UTC(y!, m! - 1, 1)).toISOString();
-      end = new Date(Date.UTC(y!, m!, 1)).toISOString();
-    }
+    // All orders are loaded: the monthly statement needs the earlier months
+    // too (the settlement is cumulative). The list is filtered by month below.
+    const start = SETTLEMENT_PERIOD_START;
+    const end: string | null = null;
 
     // Same scope as the orders list: own services OR orders assigned directly.
     const scopeFilter = serviceIds.length > 0
@@ -134,7 +132,7 @@ export async function GET(request: NextRequest) {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const orders = (data ?? []).map((o: any) => {
+    const allOrders = (data ?? []).map((o: any) => {
       const p = o.customer_data?.property ?? {};
       return {
         id: o.id,
@@ -156,6 +154,10 @@ export async function GET(request: NextRequest) {
       };
     });
 
+    const orders = month === 'all'
+      ? allOrders
+      : allOrders.filter((o: { paidAt: string | null }) => !!o.paidAt && bucharestMonth(o.paidAt) === month);
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const billable = orders.filter((o: any) => !o.isTest);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -173,6 +175,19 @@ export async function GET(request: NextRequest) {
       .from('collaborator_period_costs')
       .select('amount_ron, period_start')
       .eq('collaborator_id', collaboratorId);
+    const statement = month === 'all'
+      ? null
+      : buildMonthlyStatement(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          allOrders.map((o: any) => ({
+            paidAt: o.paidAt, total: o.clientTotal, ocpiCost: o.ocpiCost, stripeFee: o.stripeFee,
+            commission: o.commission, serviceSlug: o.serviceSlug, status: o.status, isTest: o.isTest,
+          })),
+          ((periodCostRows ?? []) as Array<{ amount_ron: number; period_start: string }>).map((c) => ({
+            amount: Number(c.amount_ron) || 0, periodStart: c.period_start,
+          })),
+          month
+        );
     const otherCosts = ((periodCostRows ?? []) as Array<{ amount_ron: number; period_start: string }>)
       .filter((c) => (month === 'all' ? true : c.period_start.startsWith(month)))
       .reduce((s, c) => s + (Number(c.amount_ron) || 0), 0);
@@ -205,6 +220,7 @@ export async function GET(request: NextRequest) {
           totalCollected: breakdown.collectedWithVat,
         },
         breakdown,
+        statement,
         pendingOcpi: pending,
         identificationOcpi: IDENTIFICATION_OCPI,
         distributions: DISTRIBUTIONS.map((d) => ({
