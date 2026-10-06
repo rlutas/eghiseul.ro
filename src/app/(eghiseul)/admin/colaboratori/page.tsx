@@ -719,7 +719,7 @@ function AvocatDecont() {
               ['Partea Raul (%)', splitRaul, setSplitRaul],
               ['Impozit profit (%)', profitTax, setProfitTax],
               ['Impozit dividende (%)', dividendTax, setDividendTax],
-              ['Factura cabinet (RON)', facturaCabinet, setFacturaCabinet],
+              ['Factura lunară cabinet (RON)', facturaCabinet, setFacturaCabinet],
             ] as const).map(([label, value, setter]) => (
               <div key={label}>
                 <label className="mb-1 block text-xs font-medium text-slate-500">{label}</label>

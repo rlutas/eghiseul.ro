@@ -28,7 +28,7 @@ interface ExportBody {
   /** Impozit pe profit (%) și impozit pe dividende (%). */
   profitTaxPercent?: number;
   dividendTaxPercent?: number;
-  /** Factura cabinetului către noi, scăzută la final. */
+  /** Factura lunară a cabinetului către noi, scăzută înainte de dividende. */
   facturaCabinet?: number;
   /** Comisionul Stripe: implicit cel real, din tranzacțiile sincronizate. */
   stripeFeeOverride?: number;
@@ -181,18 +181,18 @@ export async function POST(request: NextRequest) {
   line(`RAUL (${splitRaul}%)`, partRaul, '', { bold: true });
   line(`GABRIELA (${round2(100 - splitRaul)}%)`, partGabi, '', { bold: true });
   line(`− Factura cabinet (${summary.count} × ${ONORARIU_PER_COMANDA})`, -summary.onorarii, 'onorariile, facturate separat de cabinet');
-  const dupaOnorarii = round2(partGabi - summary.onorarii);
-  line('RĂMAS GABRIELA', dupaOnorarii);
-  const dividende = round2((dupaOnorarii * dividendTax) / 100);
-  line(`Impozit dividende ${dividendTax}%`, -dividende);
-  const dupaDividende = round2(dupaOnorarii - dividende);
-  line('RĂMAS GABRIELA după dividende', dupaDividende);
-  if (facturaCabinet) {
-    line('− Factura cabinet (curentă)', -Math.abs(facturaCabinet));
-    line('RĂMAS TOTAL DUPĂ TOT', round2(dupaDividende - Math.abs(facturaCabinet)), '', { bold: true, top: true });
-  } else {
-    line('RĂMAS TOTAL DUPĂ TOT', dupaDividende, '', { bold: true, top: true });
+  // Both cabinet invoices (fees per contract + the monthly invoice) are paid
+  // to the cabinet, not as dividends, so both come off BEFORE dividend tax.
+  const facturaLunara = Math.abs(facturaCabinet || 0);
+  if (facturaLunara) {
+    line('− Factura cabinet (lunară)', -facturaLunara, 'facturată separat de cabinet');
   }
+  const dupaFacturi = round2(partGabi - summary.onorarii - facturaLunara);
+  line('RĂMAS GABRIELA', dupaFacturi);
+  const dividende = round2((dupaFacturi * dividendTax) / 100);
+  line(`Impozit dividende ${dividendTax}%`, -dividende);
+  const dupaDividende = round2(dupaFacturi - dividende);
+  line('RĂMAS GABRIELA după dividende', dupaDividende, '', { bold: true, top: true });
 
   // Avertismentele și notele de metodologie rămân DOAR în admin (Raul le vrea
   // afară din fișierul care pleacă la cabinet).
