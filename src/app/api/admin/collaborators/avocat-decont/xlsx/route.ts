@@ -194,6 +194,24 @@ export async function POST(request: NextRequest) {
   const dupaDividende = round2(dupaFacturi - dividende);
   line('RĂMAS GABRIELA după dividende', dupaDividende, '', { bold: true, top: true });
 
+  // How the money actually reaches her: two cabinet invoices + a transfer.
+  line('');
+  line('DE PLATĂ CĂTRE GABRIELA', null, '', { bold: true });
+  line(
+    `1. Factura cabinet — onorarii (${summary.count} × ${ONORARIU_PER_COMANDA})`,
+    summary.onorarii,
+    'facturată de cabinet, TVA inclus',
+  );
+  if (facturaLunara) {
+    line('2. Factura cabinet — lunară', facturaLunara, 'facturată de cabinet, TVA inclus');
+  }
+  line(
+    `${facturaLunara ? '3' : '2'}. Transfer în contul TM`,
+    dupaDividende,
+    'rămas după dividende',
+  );
+  line('TOTAL CĂTRE GABRIELA', round2(summary.onorarii + facturaLunara + dupaDividende), '', { bold: true, top: true });
+
   // Avertismentele și notele de metodologie rămân DOAR în admin (Raul le vrea
   // afară din fișierul care pleacă la cabinet).
 
