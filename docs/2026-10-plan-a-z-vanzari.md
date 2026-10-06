@@ -168,3 +168,12 @@ Bing Keyword Research, România, ultimele 3 luni (impresii organice în Bing = a
 ≈ 1.100 de căutări pe lună pe cazier judiciar și ~35 pe fiscal, în tot Bing România. eghiseul primește din Bing 6.100 de clicuri în 3 luni, dar majoritatea pe calculatoare și curs BNR; „cazier judiciar online” 4.200 impresii, 43 de clicuri, poziția 7,35.
 
 Politica Microsoft Advertising (aug. 2026): serviciile private pentru documente guvernamentale cer pre-aprobare prin „Government Services Advertising Program”, cu autorizare de la instituție (memoria `situatie-vanzari-2026-10`). Restul (stare civilă, CF, constatator) n-au fost măsurate: extensia Chrome s-a deconectat.
+
+## 06.10 după-amiază (Raul plecat, lucrat autonom)
+
+| # | Ce | Stare |
+|---|---|---|
+| H6 | **CJO: campanie de recâștigare** (`winback`): comenzi cu documentul expirat de peste 21 de zile, fără recomandă, o singură dată pe adresă; ton formal ca restul emailurilor CJO; migrarea 036 aplicată | ✅ LIVE: 58 trimise (fiscal 36, auto 22), 0 erori. Cazier judiciar = 0 acum (comenzile CJO pe platformă încep 09.04, expiră abia acum și le prinde reminderul). eghiseul: sărit, datele vechi din WPForms nu dovedesc cumpărarea |
+| H7 | **Recuperare telefonică**: eghiseul arată „✅ A plătit după apel” + taburi Recuperate/De sunat + carduri; CJO are coadă nouă (`/admin/recuperare-telefonica`, tel + WhatsApp, „Marchează sunat”), migrarea 037 aplicată | ✅ LIVE. eghiseul: 20 de clienți nesunați, 2 recuperați = 1.744,80 lei (cifra de 2.693 număra un client de două ori). CJO: 12 în coadă, 3.220,95 lei |
+| H8 | Analiză linkuri CJO: `seo/2026-10-06-cjo-backlinks-plan.md` | ✅ raport. Linkurile nu aduc comenzi în octombrie (4–12 săpt.). Risc: articole plătite fără `rel=sponsored` (ProTV, Antena 3, infocons) cu anchor exact. Propuneri: cerere `sponsored`, 3–5 linkuri naturale din rețea, comunicat cu date agregate, articol al avocatei în presa diasporei; fără linkuri cumpărate |
+| H9 | Analiză documentero + ecazier: `seo/2026-10-06-documentero-ecazier-pasi-urmatori.md` | ✅ raport. documentero: 4 drafturi neplătite (3.392 lei), 3 opriți la „date personale”; `orders.attribution` gol pe documentero. ecazier: 0 comenzi cazier auto; recomandare 19.10 = mentenanță dacă `/cazier-auto` nu intră în top 10 |
