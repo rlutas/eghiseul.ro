@@ -573,8 +573,9 @@ function AvocatDecont() {
   const [costs, setCosts] = useState<{ label: string; amount: string; note: string }[]>([
     {
       label: 'Taxe angajați',
-      amount: '19025',
-      note: 'Carla 4.500 + Angela 4.325 + Maria 4.500 + Carla 1.500 + Maria 1.000 + Angela 500 + taxe angajat BMR 2.700',
+      amount: '12000',
+      // Informative only: the real monthly employee cost; the decont deducts 12.000.
+      note: 'Informativ, cost real angajați 19.025: Carla 4.500 + Angela 4.325 + Maria 4.500 + Carla 1.500 + Maria 1.000 + Angela 500 + taxe angajat BMR 2.700',
     },
     { label: 'Programe / hosting / domenii', amount: '1000', note: '' },
     { label: 'Contabilitate', amount: '1500', note: 'EDIGITALIZARE SRL și BMR DIGITAL' },
