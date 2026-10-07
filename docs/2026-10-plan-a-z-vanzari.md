@@ -24,6 +24,27 @@ Legendă: ✅ făcut · 🔄 în lucru · ⬜ de făcut · ⏸ așteaptă ceva
 
 ## ▶ Planul de urmat (refăcut 07.10.2026)
 
+### ⏭ Unde am rămas (07.10, ~10:30): de aici se reia
+
+**Azi, după 13:00**
+1. Cereri de indexare pe CJO (proprietatea URL-prefix `https://cazierjudiciaronline.com/`, contul u/0): `/cazier-judiciar-online/ploiesti`, `/cazier-fiscal-online`, `/cazier-judiciar-diaspora`, plus cele 6 pagini cu titluri noi (integritate, gratuit, persoane fizice, călătorie cu minori, taxă, valabilitate). Cota e ~10 pe zi; ce nu intră, mâine.
+
+**În fiecare dimineață**
+2. Warm-up: emailurile întoarse pe ziua precedentă (Resend). Rămâne la 300/zi; creștem doar după 3 zile la rând sub 3% și fără plângeri. 07.10: 4,8% și o plângere de spam.
+3. Webhook-ul Resend (reactivat 07.10): crește numărul de contacte `suppressed` (27 la 07.10, 09:40)?
+
+**Luni 12.10**
+4. Măsurarea săptămânală: tabelul „Scor săptămânal” de mai jos + C4 (CJO) + E5 (documentero).
+5. Pagina săptămânii 42: **D4 extras CF** (ghidul de valabilitate CF a coborât de pe locul 1,8 pe 6,3), apoi D3 homepage.
+
+**Date fixe**
+6. 14.10: campania ChatGPT pe caziere expiră singură (blocată de politică, 0 €).
+7. 19.10: F4 ecazier + a doua măsurare C4. 21.10: testul titlurilor CJO (tabelul P1). 26.10: C5, paginile de oraș CJO.
+
+**Așteaptă decizia lui Raul** (tabelul de mai jos): test Meta cu clipuri (celibat/diaspora, caziere), repornim constatator sau extras CF pe ChatGPT, drafturile pentru linkuri (H10), contestația Google pe calea „avocat în Tabloul UNBR” (A8), excepția din blocantul de reclame (G3).
+
+**Ce am închis pe 07.10:** email (webhook Resend reactivat, contacte suprimate, warm-up filtrat; înapoi la 300/zi), titluri noi pe 6 pagini CJO, H11 (pagina CJO de diaspora), analiza reclamelor (Google, Microsoft și ChatGPT închise pe caziere și stare civilă; doar Meta e deschis), cererea de indexare pentru ghidul PAD pe eghiseul, planul refăcut.
+
 **Ținta, în ordine:** mai mult trafic care începe o comandă, pe CJO și eghiseul. Formularele rămân cum sunt (Raul, 07.10): cine începe comanda pe CJO plătește, iar pe paginile de serviciu eghiseul conversia e bună. Problema e numărul de vizitatori.
 
 **Cele 5 pârghii, de la cea mai rapidă la cea mai lentă:**
