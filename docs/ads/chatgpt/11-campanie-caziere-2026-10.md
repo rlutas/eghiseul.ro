@@ -4,7 +4,7 @@
 
 - Raul a cerut să încercăm caziere pe ChatGPT, deși politica OpenAI (v1.6, 10.09.2026) interzice în afara SUA „legal services”, inclusiv „document preparation”. Am rulat varianta **transparentă**: anunțul și pagina spun că avocatul obține actul. N-am ascuns avocatul ca să treacă de review.
 - **Cazier judiciar: blocat imediat.** Statusul este „Ad cannot serve in targeted countries — This ad's policy category has no eligible countries”. OpenAI l-a clasificat ca serviciu juridic (doar SUA).
-- **Cazier fiscal: în review** la 07.10, ~09:15. Probabil primește același verdict.
+- **Cazier fiscal: blocat și el** la 07.10, ~09:40, cu același mesaj. Testul s-a încheiat: **cazierele nu pot rula pe ChatGPT Ads în România** cât timp serviciul trece prin avocat. Cost: 0 €.
 - Nu facem apel pe „Wrong policy category?”: categoria e corectă, serviciul chiar trece prin avocat.
 
 ## Ce s-a creat
@@ -38,7 +38,7 @@ Prețuri și termene luate din `services` (cazier judiciar 198 lei / 5 zile, caz
 
 | Când | Ce | Unde |
 |---|---|---|
-| 08.10 | Verdictul pe cazier fiscal (aprobat / „cannot serve in targeted countries”) | Ads Manager → Ads |
+| ~~08.10~~ | ~~Verdictul pe cazier fiscal~~: venit pe 07.10, blocat | — |
 | zilnic, dacă difuzează | Afișări, clicuri, cost; comenzi începute și plătite cu `utm_campaign=cazier-fiscal-2026-10` | Ads Manager + `node scripts/check-chatgpt-ads.mjs` |
 | 14.10 | Campania se oprește singură. Decizie: o comandă plătită la ≤ 60 lei cost = continuăm; zero comenzi la 100+ clicuri = oprim | acest fișier |
 
@@ -51,3 +51,4 @@ Dacă și cazierul fiscal e blocat: campania nu cheltuie nimic (nu difuzează), 
 | 07.10 ~09:10 | Campania creată și publicată. Campaniile din septembrie (constatator, extras CF) erau deja oprite, fără afișări din 24.09 |
 | 07.10 ~09:12 | AG1 cazier judiciar: „Ad cannot serve in targeted countries”, categorie fără țări eligibile |
 | 07.10 ~09:15 | AG2 cazier fiscal: „In review” |
+| 07.10 ~09:40 | AG2 cazier fiscal: „Ad cannot serve in targeted countries”. Ambele blocate, 0 afișări, 0 €. Campania rămâne pornită până expiră pe 14.10, fără cost; dacă OpenAI schimbă vreodată clasificarea, difuzează singură în limita de 15 €/zi |
