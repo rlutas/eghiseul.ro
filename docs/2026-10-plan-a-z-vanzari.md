@@ -52,7 +52,7 @@ Regulă: **nu umblăm de două ori la aceeași pagină în mai puțin de 14 zile
 | Săptămâna | Ce facem | Decizii la final |
 |---|---|---|
 | **41 (05–11.10)** | ✅ CJO: pagini de oraș, homepage, fiscal; ✅ eghiseul: pagina de cazier judiciar (D2) + ghidul PAD (D6); ✅ documentero: 3 ghiduri; ✅ ecazier: linkuri + titluri cazier auto; ✅ 07.10 email reparat, warm-up 600/zi; ✅ 07.10 titluri noi pe 6 pagini CJO (P1). ⬜ cereri de indexare CJO după 13:00 (coada I5). ⬜ **09.10: warm-up 1.200/zi**, doar dacă 07–08.10 au sub 3% emailuri întoarse. YouTube: 10–11.10 clipul despre cazierul din străinătate | — |
-| **42 (12–18.10)** | **Luni 12.10: prima măsurare** (C4, E5, P2). Warm-up 2.000/zi dacă regula de 3% e respectată. P4: **D3 homepage eghiseul + D4 extras CF**. documentero: 1 ghid. YouTube: 13–14.10 cazierul fiscal | D1 (fiscal eghiseul): rescriem sau mai așteptăm |
+| **42 (12–18.10)** | **Luni 12.10: prima măsurare** (C4, E5, P2). Warm-up 2.000/zi dacă regula de 3% e respectată. P4: **D4 extras CF întâi** (ghidul de valabilitate CF a coborât de pe 1,8 pe 6,3 după 24.09, vezi `seo/2026-10-07-unde-stam-seo-ai-reclame.md`), apoi D3 homepage. documentero: 1 ghid. YouTube: 13–14.10 cazierul fiscal | D1 (fiscal eghiseul): rescriem sau mai așteptăm |
 | **43 (19–25.10)** | **19.10:** F4 (ecazier), a doua măsurare C4. **21.10:** testul P1 pe cele 6 pagini CJO din 07.10 (14 zile). P4: D5, primele 2 pagini (naștere, auto). H11 (textul de pe CJO pentru diaspora) | F4: ecazier rămâne doar în mentenanță? |
 | **44 (26.10–01.11)** | P4: D5, următoarele 2 (căsătorie, celibat). P1: următoarea serie de titluri, din coada de mai jos | **26.10: C5**, consolidăm paginile de oraș CJO sub 200 de expuneri pe lună? |
 | **45 (02–08.11)** | P4: D5, ultimele (integritate, constatator). Bilanțul lunii octombrie față de septembrie (58k lei) | ce păstrăm în noiembrie |
@@ -64,7 +64,8 @@ Regulă: **nu umblăm de două ori la aceeași pagină în mai puțin de 14 zile
 | A8 | Reclame pe documente după respingere: (1) raportăm cele 4 SRL-uri care rulează + tichetul Google, (2) o cerere de certificare pe ecazier pe calea „avocat în Tabloul UNBR” (Legea 290/2004 art. 31), (3) urmărim răspunsurile MAI. Analiza: `ads/2026-10-07-cine-ruleaza-si-ce-putem-face.md` | contestația simplă nu mai are sens: regula de la 05.10 cere un link guvernamental, nu un text mai bun |
 | H10 | Trimiterea drafturilor: cerere `rel=sponsored` la ProTV/Antena 3/infocons, comunicatul, articolul avocatei | P5 nu pornește fără ele |
 | G3 | Excepție în blocantul de reclame pentru ads.google.com | fără ea salvările din Google Ads se pierd |
-| — | Testul de boost pe Facebook (`marketing/video-social/`) | singurul canal plătit încă neîncercat pe clipuri |
+| — | Meta: test mic pe celibat/diaspora cu clipuri (singurul canal plătit deschis pe stare civilă; cererea e mică: ~100 afișări Google în 2 săpt., 14 citări AI în 3 luni) + boostul pe Facebook din `marketing/video-social/` | Google, Microsoft și ChatGPT sunt închise pe cazier și stare civilă (`seo/2026-10-07-unde-stam-seo-ai-reclame.md`) |
+| — | ChatGPT Ads (constatator + extras CF): 0 comenzi în 14 zile. Cheltuiala din Ads Manager; peste CPA 25 lei pe constatator, oprim | bani fără rezultat |
 
 ### P1: titluri și descrieri, baza și coada
 
