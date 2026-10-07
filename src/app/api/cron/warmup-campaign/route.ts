@@ -29,7 +29,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail, ResendError } from '@/lib/email/resend';
 import { buildWarmupSubject, buildWarmupHtml, buildWarmupText } from '@/lib/email/templates/warmup-reengagement';
-import { TEST_EMAILS, isUndeliverable } from '@/lib/email/deliverability';
+import { TEST_EMAILS, isUndeliverable, isSuspiciousEmail } from '@/lib/email/deliverability';
+import { isLikelyProviderTypo } from '@/lib/email-typo';
+import { emailDomainAcceptsMail } from '@/lib/email-mx';
 import { isLoyalContact, mintLoyaltyCoupon } from '@/lib/coupons/loyalty';
 
 // Resend: 2 req/s pe cont. Pauza asta ține cronul sub limită indiferent de
@@ -143,6 +145,17 @@ export async function POST(request: NextRequest) {
   // (vezi `sendEmail`), care deduplichează trimiterea efectivă.
   const results: Outcome[] = [];
 
+  // Lista e rece: pe 06.10 lotul de lead-uri WP a avut 5,6% bounce (prag 3%),
+  // între ele `gamil.com`, `gmail.ckm`. Filtrăm înainte de trimitere ce se
+  // poate prinde fără să trimitem: adrese inventate, domenii cu greșeală de
+  // tipar și domenii fără MX. Rezultatul MX e reținut per domeniu în rulare.
+  const mxCache = new Map<string, Promise<boolean | null>>();
+  const domainAcceptsMail = (email: string) => {
+    const domain = email.slice(email.lastIndexOf('@') + 1).toLowerCase();
+    if (!mxCache.has(domain)) mxCache.set(domain, emailDomainAcceptsMail(email));
+    return mxCache.get(domain)!;
+  };
+
   for (const contact of candidates) {
     const email = (contact.email ?? '').trim();
     const skipReason = !email
@@ -151,7 +164,13 @@ export async function POST(request: NextRequest) {
         ? 'test email'
         : isUndeliverable(email)
           ? 'undeliverable domain'
-          : null;
+          : isSuspiciousEmail(email)
+            ? 'suspicious address'
+            : isLikelyProviderTypo(email)
+              ? 'domain typo'
+              : (await domainAcceptsMail(email)) === false
+                ? 'no mx'
+                : null;
     if (skipReason) {
       await markSkipped(contact.id, skipReason);
       results.push({ contactId: contact.id, status: 'skipped', reason: skipReason });

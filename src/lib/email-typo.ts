@@ -39,3 +39,30 @@ export function suggestEmailCorrection(email: string): string | null {
   const suggestion = emailSpellChecker.run({ email: email.trim() });
   return suggestion ? suggestion.full : null;
 }
+
+/** Furnizorii mari: doar spre ei o „corectură" e sigur o greșeală de tipar. */
+const BIG_PROVIDERS = new Set([
+  'gmail.com', 'yahoo.com', 'yahoo.ro', 'hotmail.com', 'outlook.com', 'icloud.com', 'live.com', 'ymail.com',
+]);
+/** Domenii reale pe care matcher-ul fuzzy le „corectează" spre un furnizor mare. */
+const REAL_LOOKALIKES = new Set(['email.com', 'mail.com', 'gmx.com', 'live.it', 'live.ro']);
+
+/**
+ * Filtru pentru trimiteri în masă (warm-up): true doar când domeniul e o
+ * greșeală de tipar a unui furnizor mare (`gamil.com`, `gmail.con`,
+ * `yahoo.comm`). `suggestEmailCorrection` singur e prea agresiv pentru a
+ * exclude adrese: pe lista de 72k „corecta" și `libero.it`, `gmx.net`,
+ * `uaic.ro`, `yahoo.com.sg` — toate reale.
+ */
+export function isLikelyProviderTypo(email: string): boolean {
+  const at = email.lastIndexOf('@');
+  if (at <= 0) return false;
+  const domain = email.slice(at + 1).toLowerCase().trim();
+  if (HARD_TYPOS[domain]) return true;
+  if (BIG_PROVIDERS.has(domain) || REAL_LOOKALIKES.has(domain)) return false;
+  const suggested = suggestEmailCorrection(email);
+  if (!suggested) return false;
+  const target = suggested.slice(suggested.lastIndexOf('@') + 1).toLowerCase();
+  // `yahoo.com.sg` → `yahoo.com` e o variantă regională reală, nu o greșeală.
+  return BIG_PROVIDERS.has(target) && !domain.startsWith(`${target}.`);
+}

@@ -63,6 +63,10 @@ vi.mock('@/lib/email/resend', async (importOriginal) => ({
   sendEmail,
 }));
 
+// No real DNS in unit tests: every domain accepts mail unless a test says otherwise.
+const { emailDomainAcceptsMail } = vi.hoisted(() => ({ emailDomainAcceptsMail: vi.fn() }));
+vi.mock('@/lib/email-mx', () => ({ emailDomainAcceptsMail }));
+
 const { ResendError } = await import('@/lib/email/resend');
 const { POST } = await import('@/app/api/cron/warmup-campaign/route');
 
@@ -99,6 +103,8 @@ beforeEach(() => {
   persistentFrom.mockClear();
   sendEmail.mockReset();
   sendEmail.mockResolvedValue({ id: 're_1', skipped: false });
+  emailDomainAcceptsMail.mockReset();
+  emailDomainAcceptsMail.mockResolvedValue(true);
 });
 
 afterEach(() => {
@@ -187,6 +193,43 @@ describe('POST /api/cron/warmup-campaign — batch', () => {
 });
 
 describe('POST /api/cron/warmup-campaign — leaving the queue', () => {
+  it('skips typo domains, made-up addresses and domains without MX before sending (06.10: 5,6% bounce)', async () => {
+    state.settings = { enabled: true, dailyBatchSize: 25 };
+    emailDomainAcceptsMail.mockImplementation(async (e: string) => (e.endsWith('@dead-domain.ro') ? false : true));
+    state.candidates = [
+      contact('c1', 'ion@gamil.com'),
+      contact('c2', 'asdf@gmail.com'),
+      contact('c3', 'ana@dead-domain.ro'),
+      contact('c4', 'maria@dead-domain.ro'),
+      contact('c5', 'ok@gmail.com'),
+    ];
+
+    const body = await (await POST(makeReq())).json();
+
+    expect(sendEmail).toHaveBeenCalledTimes(1);
+    expect(sendEmail.mock.calls[0][0].to).toBe('ok@gmail.com');
+    const reasons = Object.fromEntries(
+      state.updates.filter((u) => 'warmup_skip_reason' in u.values).map((u) => [u.filters[0], u.values.warmup_skip_reason]),
+    );
+    expect(reasons).toEqual({
+      'eq:id,c1': 'domain typo',
+      'eq:id,c2': 'suspicious address',
+      'eq:id,c3': 'no mx',
+      'eq:id,c4': 'no mx',
+    });
+    // MX looked up once per domain per run.
+    expect(emailDomainAcceptsMail.mock.calls.filter(([e]) => String(e).endsWith('@dead-domain.ro'))).toHaveLength(1);
+    expect(body.data.skippedCount).toBe(4);
+  });
+
+  it('sends when the MX lookup is inconclusive (fail-open)', async () => {
+    state.settings = { enabled: true, dailyBatchSize: 25 };
+    emailDomainAcceptsMail.mockResolvedValue(null);
+    state.candidates = [contact('c1', 'ana@firma.ro')];
+    await POST(makeReq());
+    expect(sendEmail).toHaveBeenCalledTimes(1);
+  });
+
   it('skips undeliverable / test / empty addresses AND marks them so they stop clogging the FIFO head', async () => {
     state.settings = { enabled: true, dailyBatchSize: 25 };
     state.candidates = [

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { suggestEmailCorrection } from '@/lib/email-typo';
+import { suggestEmailCorrection, isLikelyProviderTypo } from '@/lib/email-typo';
 
 describe('suggestEmailCorrection', () => {
   it('corrects known hard typos', () => {
@@ -31,5 +31,18 @@ describe('suggestEmailCorrection', () => {
     expect(suggestEmailCorrection('no-at-sign')).toBeNull();
     expect(suggestEmailCorrection('a@')).toBeNull();
     expect(suggestEmailCorrection('a@nodot')).toBeNull();
+  });
+});
+
+describe('isLikelyProviderTypo (bulk-send filter)', () => {
+  it('flags misspellings of the big providers', () => {
+    for (const e of ['a@gamil.com', 'a@gmail.con', 'a@yahoo.comm', 'a@gmail.ro', 'a@iclud.com']) {
+      expect(isLikelyProviderTypo(e), e).toBe(true);
+    }
+  });
+  it('never flags real domains the fuzzy matcher would "correct"', () => {
+    for (const e of ['a@libero.it', 'a@gmx.net', 'a@uaic.ro', 'a@yahoo.com.sg', 'a@email.com', 'a@student.usv.ro', 'a@gmail.com', 'a@yahoo.ro']) {
+      expect(isLikelyProviderTypo(e), e).toBe(false);
+    }
   });
 });

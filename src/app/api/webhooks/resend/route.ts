@@ -10,7 +10,12 @@
  *   email.bounced / email.complained →
  *     1. mark the client's recent orders (email_bounced_at + reason,
  *        migration 111) — admin order page shows a red banner
- *     2. alert admin (email to contact@) with orders + client phone
+ *     2. alert admin (email to contact@) with orders + client phone —
+ *        ONLY when an order matches (2026-10-07: warm-up bounces and the
+ *        other domains on the shared Resend account were alerting with
+ *        „niciuna în ultimele 60 zile")
+ *     3. hard bounce / complaint → `contacts.marketing_status='suppressed'`,
+ *        so no campaign, warm-up or lifecycle email goes there again
  *
  * Setup (one-time, Resend dashboard → Webhooks):
  *   - endpoint: https://eghiseul.ro/api/webhooks/resend
@@ -188,21 +193,43 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // Hard bounce sau plângere = adresa iese din orice trimitere de marketing.
+  // Bounce-urile temporare (inbox plin) nu suprimă: pot trece la o reluare.
+  const hardBounce =
+    type === 'email.complained' || (type === 'email.bounced' && data.bounce?.type !== 'Transient');
+  if (bouncedEmail && hardBounce) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (createAdminClient() as any)
+        .from('contacts')
+        .update({ marketing_status: 'suppressed', updated_at: new Date().toISOString() })
+        .eq('email', bouncedEmail)
+        .neq('marketing_status', 'unsubscribed');
+      if (error) console.error('[webhooks/resend] contact suppression failed', error);
+    } catch (err) {
+      console.error('[webhooks/resend] contact suppression failed', err);
+    }
+  }
+
+  // Fără comandă nu e nimic de salvat pentru echipă (warm-up, lifecycle,
+  // celelalte domenii de pe același cont Resend) — doar log.
+  if (!orderNumber) return NextResponse.json({ received: true });
+
   // 1. Admin alert email.
   await sendEmail({
     to: ADMIN_ALERT_TO,
-    subject: `⚠️ Email ${type === 'email.complained' ? 'marcat SPAM' : 'BOUNCE'}: ${bouncedEmail}${orderNumber ? ` — ${orderNumber}` : ''}`,
+    subject: `⚠️ Email ${type === 'email.complained' ? 'marcat SPAM' : 'BOUNCE'}: ${bouncedEmail} — ${orderNumber}`,
     html: `
       <div style="font-family:sans-serif;max-width:560px">
         <h2 style="color:#b91c1c">Email ne-livrat către client</h2>
         <p><strong>Adresă:</strong> ${bouncedEmail}<br/>
         <strong>Subiect email:</strong> ${subject}<br/>
         <strong>Motiv:</strong> ${bounceInfo}<br/>
-        <strong>Comenzi găsite:</strong> ${orderInfo || 'niciuna în ultimele 60 zile'}<br/>
+        <strong>Comenzi găsite:</strong> ${orderInfo}<br/>
         <strong>Telefon client:</strong> ${clientPhone || 'necunoscut'}</p>
         <p>Clientul NU primește emailurile — probabil adresă greșită.
         Sună-l pentru adresa corectă, actualizeaz-o în admin și retrimite documentele.</p>
-        ${orderNumber ? `<p><a href="https://eghiseul.ro/admin/orders?search=${encodeURIComponent(orderNumber)}">Deschide în admin</a></p>` : ''}
+        <p><a href="https://eghiseul.ro/admin/orders?search=${encodeURIComponent(orderNumber)}">Deschide în admin</a></p>
       </div>`,
     idempotencyKey: `bounce-alert-${data.email_id ?? bouncedEmail}-${type}`,
   });

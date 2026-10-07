@@ -145,6 +145,43 @@ Cota e de circa 10 cereri pe zi pentru fiecare proprietate.
 
 **Verificare de seară (06.10, ~18:00)**, comenzi plătite din DB, săptămâni de luni: eghiseul 74 → 52 → 20 → 17 → 27 → 26 → 13 → 20 (de la 10.08 la 28.09), deci ~o treime din nivelul dinainte de update și stagnează; CJO 33 → 23 → 22 → 18, scade. eghiseul, 30 de zile: 41 plătite cu prima vizită din căutare (14.268 lei), 44 fără sursă (15.896 lei), **0 din reclame plătite**. documentero: 3 comenzi începute azi, 0 plătite. Google Ads: celibatul rămâne la 0 afișări (vezi A3).
 
+## Jurnal 07.10.2026 (verificare dimineață, ~07:45)
+
+**Search Console** (clicuri pe săptămână; datele ajung până pe 05.10, 06.10 e parțial):
+
+| Site | 14.09 | 21.09 | 28.09 | Luni 05.10 vs luni 28.09 |
+|---|---|---|---|---|
+| eghiseul | 4.741 | 4.310 | 4.013 | 633 vs 689 (−8%) |
+| CJO | — | 3.823 | 3.006 | 539 vs 697 (−23%) |
+| ecazier | 0 | 12 | 8 | 0 vs 1 |
+| documentero | 0 | 9 | 2 | 5 vs 0 |
+
+Expunerile eghiseul stau la ~31k pe săptămână de 6 săptămâni, deci nu se vede încă nicio revenire. Ce am schimbat pe 05–06.10 nu se poate măsura înainte de 12.10 și 19.10. CJO scade a doua săptămână la rând, pe lângă căderile de vineri–sâmbătă care se repetă (26.09: 127, 03.10: 92).
+
+**Vânzări:** săptămâna 41, de luni până miercuri dimineață: eghiseul 4 comenzi plătite (2.760 lei), CJO 4 (864 lei), ecazier 0, documentero 0. Pe documentero s-au început 6 comenzi de la lansare și niciuna nu e plătită. Pe eghiseul, ultimele 14 zile față de cele 14 dinainte: 79 de comenzi începute față de 116 și 30 plătite față de 47. Bing organic: 10 începute, 0 plătite.
+
+**CJO: pierderea e ÎN formular, nu înainte de el** (corectează premisa de la H2). În 21 de zile, 926 de oameni au lăsat email și telefon la pasul 1 și doar 58 au plătit (6%). Unde ies: pasul 2, date personale/CNP: 325 (35%); pasul 3, acte: 303 (33%); pașii 4–5: 187; pasul 6, plata: 111, din care 58 plătesc. Emailul de recuperare pleacă doar de la pasul 4 în sus, intenționat (pe pașii 2–3 a adus 0 conversii în iunie). Pe eghiseul e același tipar (memoria `abandonuri-pas-2-nu-emailurile`).
+
+**Email**
+- **B3 NU se mai poate face azi.** Pe 06.10, eghiseul a avut 13 emailuri întoarse din 331 (3,9%). Lotul de warm-up către lead-urile vechi din WP: 11 din 198 (5,6%). Pragul e 3%. Rămânem la 300 pe zi.
+- Warm-up cumulat: 1.600 trimise, 14 dezabonări (0,9%). În 30 de zile de la email au venit 14 comenzi începute și 6 plătite (1.150 lei), după potrivirea pe adresa de email. 837 de cupoane `FIDEL-` emise, niciunul folosit.
+- Breșă: un email întors NU marchează contactul ca suprimat în `contacts`. În plus, fiecare email întors trimite o alertă pe contact@, inclusiv cele din warm-up, unde nu există nicio comandă.
+- Lifecycle eghiseul, din 14.09 (comandă plătită în 30 de zile pe aceeași adresă): cross-sell 291 trimise → 7 plătite (863 lei); expirare 200 → 5 (585 lei); recenzie 81 → 1.
+- Recuperare eghiseul, 21 de zile: 73 de comenzi au primit email, 8 au plătit după (3.866 lei). Pasul 3, cel cu cupon: 51 trimise, 0 plătite. Cupoane `RECOVER`: 22 emise, 1 folosit.
+- CJO 06.10: 197 de emailuri lifecycle + recâștigare (cross-sell 105, recâștigare 58, expirare 22, recenzie 12). Încă nicio comandă, după o zi. 2 dezabonări, 6 emailuri întoarse (3%, adrese vechi).
+
+**Cont client:** 36 de conturi noi din 14.09. Din 31 de comenzi plătite în 14 zile, 4 sunt legate de un cont. Cupoane `BUNVENIT`: 34 emise, 0 folosite. Mașini salvate pentru remindere: 0.
+
+**GA4:** contul de serviciu vede o singură proprietate (530396087, ~85 de sesiuni pe săptămână, neidentificată). Proprietățile eghiseul și CJO nu sunt accesibile prin API. Măsurăm prin `orders.attribution` și GSC.
+
+| # | Ce | Stare |
+|---|---|---|
+| I1 | Webhook Resend: un email întors sau marcat spam pune contactul pe `suppressed`; alerta pe contact@ pleacă doar când există o comandă | ✅ 07.10 (`changelog/2026-10-07-email-bounce-uri.md`). Webhook-ul era **dezactivat din 14.07** (308 fără slash), reactivat cu slash. Warm-up-ul sare acum adresele cu greșeli de tipar, cele suspecte și domeniile fără MX. Backfill: 33 de adrese |
+| I2 | B3: warm-up 600/zi | ✅ 07.10, decizia lui Raul, după filtrele din I1. Verificare 08.10: dacă emailurile întoarse trec de 3% pe lotul de 07.10, revenim la 300 |
+| I3 | H2 refocalizat: pașii 2–3 din formularul CJO (de ce cerem CNP-ul și actul, prețul și ce primești înainte de CNP, actele încărcate după plată?) + apel la cei care ies la pasul 3 și au lăsat telefonul | ⬜ decizie Raul |
+| I4 | A3/A4: recontrol celibat în Google Ads (ziua 06.10 completă) | ⬜ azi |
+| I5 | Cereri de indexare amânate de ieri: CJO `/ploiesti`, `/cazier-fiscal-online`; eghiseul ghidul PAD | ⬜ azi |
+
 ## Următorii pași propuși (06.10)
 
 | # | Ce | De ce | Stare |
