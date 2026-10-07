@@ -61,7 +61,7 @@ Regulă: **nu umblăm de două ori la aceeași pagină în mai puțin de 14 zile
 
 | # | Decizie | De ce contează |
 |---|---|---|
-| A8 | O singură contestație pentru anunțul de celibat (acum Respins) | altfel documentero rămâne fără reclame |
+| A8 | Reclame pe documente după respingere: (1) raportăm cele 4 SRL-uri care rulează + tichetul Google, (2) o cerere de certificare pe ecazier pe calea „avocat în Tabloul UNBR” (Legea 290/2004 art. 31), (3) urmărim răspunsurile MAI. Analiza: `ads/2026-10-07-cine-ruleaza-si-ce-putem-face.md` | contestația simplă nu mai are sens: regula de la 05.10 cere un link guvernamental, nu un text mai bun |
 | H10 | Trimiterea drafturilor: cerere `rel=sponsored` la ProTV/Antena 3/infocons, comunicatul, articolul avocatei | P5 nu pornește fără ele |
 | G3 | Excepție în blocantul de reclame pentru ads.google.com | fără ea salvările din Google Ads se pierd |
 | — | Testul de boost pe Facebook (`marketing/video-social/`) | singurul canal plătit încă neîncercat pe clipuri |
