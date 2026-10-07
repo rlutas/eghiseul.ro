@@ -22,6 +22,79 @@ Legendă: ✅ făcut · 🔄 în lucru · ⬜ de făcut · ⏸ așteaptă ceva
 
 ---
 
+## ▶ Planul de urmat (refăcut 07.10.2026)
+
+**Ținta, în ordine:** mai mult trafic care începe o comandă, pe CJO și eghiseul. Formularele rămân cum sunt (Raul, 07.10): cine începe comanda pe CJO plătește, iar pe paginile de serviciu eghiseul conversia e bună. Problema e numărul de vizitatori.
+
+**Cele 5 pârghii, de la cea mai rapidă la cea mai lentă:**
+
+| # | Pârghie | De ce merge | Efect vizibil în | Cum știm că n-a mers |
+|---|---|---|---|---|
+| P1 | **Titlu și descriere** pe paginile cu multe afișări și CTR mic | Suntem deja pe pozițiile 4–8; un snippet mai bun aduce clicuri fără să urcăm în clasament | 7–14 zile | CTR-ul paginii nu crește cu cel puțin 30% față de baza din tabelul de mai jos, la poziție asemănătoare |
+| P2 | **Email** către lista de 72k și către clienți (warm-up, lifecycle, recuperare) | Singurul canal pe care îl controlăm 100% și care nu depinde de Google | zile | Sub 1 comandă plătită la 1.000 de emailuri warm-up, sau peste 3% emailuri întoarse |
+| P3 | **Cereri de indexare + IndexNow** după fiecare schimbare | Google și Bing recitesc pagina în zile, nu în săptămâni | 1–7 zile | Pagina schimbată nu apare recitită în Search Console după 7 zile |
+| P4 | **Conținut**: 1–2 pagini rescrise sau noi pe săptămână, cu fapte verificate | Spam update-ul a lovit paginile din șablon; recuperarea vine din pagini cu date proprii (`.claude/rules/content-and-seo.md`) | 3–8 săptămâni | Expunerile pe `/servicii/` (eghiseul) nu cresc după 3 săptămâni de la publicare |
+| P5 | **Linkuri și mențiuni din afară** (rețeaua proprie, presă, YouTube) | Autoritatea scăzută a domeniului ține eghiseul jos (D1) | 4–12 săptămâni | Zero linkuri noi primite în Bing Webmaster după 4 săptămâni |
+
+### Ritmul fix
+
+| Când | Ce | Unde se notează |
+|---|---|---|
+| **Zilnic, dimineața** | Emailurile întoarse din warm-up pe ziua precedentă (sub 3%?) + cererile de indexare din coadă (cota e ~10 pe proprietate și se reface la 24 de ore după ultimele cereri) | jurnalul zilei, mai jos |
+| **Luni** | Măsurarea săptămânală: clicuri și expuneri GSC pe 4 site-uri, comenzi plătite pe săptămână, comenzi pe canal, rezultatele emailurilor | tabelul „Scor săptămânal” de mai jos |
+| **Marți–joi** | Pagina (paginile) de conținut a săptămânii (P4), cel mult 2 | secțiunile D / E |
+| **Vineri** | Titluri și descrieri pentru paginile din coada P1 care au trecut testul de 14 zile | tabelul P1 de mai jos |
+
+Regulă: **nu umblăm de două ori la aceeași pagină în mai puțin de 14 zile.** Altfel nu se poate măsura nimic.
+
+### Calendarul pe săptămâni
+
+| Săptămâna | Ce facem | Decizii la final |
+|---|---|---|
+| **41 (05–11.10)** | ✅ CJO: pagini de oraș, homepage, fiscal; ✅ eghiseul: pagina de cazier judiciar (D2) + ghidul PAD (D6); ✅ documentero: 3 ghiduri; ✅ ecazier: linkuri + titluri cazier auto; ✅ 07.10 email reparat, warm-up 600/zi; ✅ 07.10 titluri noi pe 6 pagini CJO (P1). ⬜ cereri de indexare CJO după 13:00 (coada I5). ⬜ **09.10: warm-up 1.200/zi**, doar dacă 07–08.10 au sub 3% emailuri întoarse. YouTube: 10–11.10 clipul despre cazierul din străinătate | — |
+| **42 (12–18.10)** | **Luni 12.10: prima măsurare** (C4, E5, P2). Warm-up 2.000/zi dacă regula de 3% e respectată. P4: **D3 homepage eghiseul + D4 extras CF**. documentero: 1 ghid. YouTube: 13–14.10 cazierul fiscal | D1 (fiscal eghiseul): rescriem sau mai așteptăm |
+| **43 (19–25.10)** | **19.10:** F4 (ecazier), a doua măsurare C4. **21.10:** testul P1 pe cele 6 pagini CJO din 07.10 (14 zile). P4: D5, primele 2 pagini (naștere, auto). H11 (textul de pe CJO pentru diaspora) | F4: ecazier rămâne doar în mentenanță? |
+| **44 (26.10–01.11)** | P4: D5, următoarele 2 (căsătorie, celibat). P1: următoarea serie de titluri, din coada de mai jos | **26.10: C5**, consolidăm paginile de oraș CJO sub 200 de expuneri pe lună? |
+| **45 (02–08.11)** | P4: D5, ultimele (integritate, constatator). Bilanțul lunii octombrie față de septembrie (58k lei) | ce păstrăm în noiembrie |
+
+### Ce așteaptă o decizie de la Raul
+
+| # | Decizie | De ce contează |
+|---|---|---|
+| A8 | O singură contestație pentru anunțul de celibat (acum Respins) | altfel documentero rămâne fără reclame |
+| H10 | Trimiterea drafturilor: cerere `rel=sponsored` la ProTV/Antena 3/infocons, comunicatul, articolul avocatei | P5 nu pornește fără ele |
+| G3 | Excepție în blocantul de reclame pentru ads.google.com | fără ea salvările din Google Ads se pierd |
+| — | Testul de boost pe Facebook (`marketing/video-social/`) | singurul canal plătit încă neîncercat pe clipuri |
+
+### P1: titluri și descrieri, baza și coada
+
+Baza de comparație = 21.09–05.10 (14 zile, GSC). Comparăm pe aceeași lungime de interval, la 14 zile după schimbare.
+
+| Pagină | Schimbat | Afișări | Clicuri | CTR | Poziție | Verificare |
+|---|---|---|---|---|---|---|
+| CJO `/` | 05.10 (C2) | 34.194 | 220 | 0,6% | 7,4 | 19.10 |
+| CJO `/cazier-fiscal-online` | 05.10 (C6) | 6.140 | 45 | 0,7% | 6,5 | 19.10 |
+| CJO `/cazier-judiciar-online/bucuresti` | 05.10 (C1) | 12.619 | 131 | 1,0% | 7,6 | 19.10 |
+| CJO `/certificat-integritate-comportamentala` | 07.10 | 4.527 | 4 | 0,1% | 6,6 | 21.10 |
+| CJO `/cazier-judiciar-gratuit` | 07.10 | 13.724 | 126 | 0,9% | 6,0 | 21.10 |
+| CJO `/cazier-judiciar-persoane-fizice-ghid` | 07.10 | 8.646 | 52 | 0,6% | 8,7 | 21.10 |
+| CJO `/conditii-de-calatorie-cu-minori` | 07.10 | 8.319 | 73 | 0,9% | 6,7 | 21.10 |
+| CJO `/taxa-cazier-judiciar` | 07.10 | 4.753 | 78 | 1,6% | 4,4 | 21.10 |
+| CJO `/valabilitate-cazier-judiciar` | 07.10 | 3.734 | 41 | 1,1% | 4,3 | 21.10 |
+
+**Coada (vineri, în ordinea câștigului estimat):** CJO `/ghid-reabilitare-cazier` (4.780 afișări, 3,2%, poz. 3,9) · eghiseul `/calculator/tva/` (3.175, 2,7%, poz. 2,3) · eghiseul `/calculator/calculator-procente/` (1.488, 0,7%, poz. 3,5) · documentero `/certificat-de-celibat/` (249, 0,8%, poz. 7,5). Calculatoarele aduc trafic, nu comenzi: le luăm doar după paginile CJO.
+
+### Scor săptămânal (se completează în fiecare luni)
+
+| Săpt. | GSC clicuri eghiseul | GSC clicuri CJO | ecazier / documentero | Plătite eghiseul | Plătite CJO | Plătite ecazier / documentero | Din email (plătite) |
+|---|---|---|---|---|---|---|---|
+| 39 (21.09) | 4.310 | 3.823 | 12 / 9 | 13 | 22 | 0 / 0 | — |
+| 40 (28.09) | 4.013 | 3.006 | 8 / 2 | 20 | 17 | 1 / 0 | 3 (în 21 de zile) |
+| 41 (05.10) | | | | | | | |
+
+
+---
+
 ## A. Reclame (documentero, cont 809-020-5311)
 
 | # | Ce | Când | Stare |
@@ -180,7 +253,8 @@ Expunerile eghiseul stau la ~31k pe săptămână de 6 săptămâni, deci nu se 
 | I2 | B3: warm-up 600/zi | ✅ 07.10, decizia lui Raul, după filtrele din I1. Verificare 08.10: dacă emailurile întoarse trec de 3% pe lotul de 07.10, revenim la 300 |
 | I3 | Formularul CJO rămâne cum e (Raul, 07.10) | ⏸ Idee de reluat eventual: CNP-ul mutat de la pasul 2 pe pagina cu actele (pasul 3). Cost: la pasul 2 se pierde precompletarea județului de naștere din CNP, iar data nașterii pentru străini se mută și ea. Nu știm dacă CNP-ul e cauza abandonului de la pasul 2: sesiunile nu se salvează per câmp |
 | I4 | A3/A4: recontrol celibat în Google Ads (ziua 06.10 completă) | 🔴 07.10: anunțul e acum **Respins** („Documente guvernamentale și servicii oficiale”), campania e „Neeligibilă”. 05–06.10: 3 afișări, 0 clicuri, 0 lei. A4 nu mai are obiect. Rămâne A8 (o singură contestație), care ⏸ așteaptă decizia lui Raul |
-| I5 | Cereri de indexare amânate de ieri: CJO `/ploiesti`, `/cazier-fiscal-online`; eghiseul ghidul PAD | 🔄 eghiseul PAD ✅ solicitată (pagina nu era încă în Google). CJO: „Cotă depășită” la 08:30; `/ploiesti` e deja indexată. Reîncercare după ~13:00. CJO e proprietate URL-prefix pe contul u/0, nu `sc-domain` |
+| I6 | P1 pe CJO: titlu și descriere rescrise pe 6 pagini (integritate, gratuit, persoane fizice, călătorie cu minori, taxă, valabilitate). Titlurile vechi aveau 75–90 de caractere cu sufixul site-ului și erau tăiate. Acum sub 60, pe căutările reale din GSC; prețuri din config (198, integritatea 250); scos „441 recenzii” | ✅ 07.10 LIVE (CJO `17e6d15d`). Verificare 21.10, baza în tabelul P1 |
+| I5 | Cereri de indexare amânate de ieri: CJO `/ploiesti`, `/cazier-fiscal-online`; eghiseul ghidul PAD | 🔄 eghiseul PAD ✅ solicitată (pagina nu era încă în Google). CJO: „Cotă depășită” la 08:30; `/ploiesti` e deja indexată. Reîncercare după ~13:00, cu `/cazier-fiscal-online` + cele 6 pagini din I6. CJO e proprietate URL-prefix pe contul u/0, nu `sc-domain` |
 
 ## Următorii pași propuși (06.10)
 
