@@ -156,7 +156,7 @@ Cota e de circa 10 cereri pe zi pentru fiecare proprietate.
 | ecazier | 0 | 12 | 8 | 0 vs 1 |
 | documentero | 0 | 9 | 2 | 5 vs 0 |
 
-Expunerile eghiseul stau la ~31k pe săptămână de 6 săptămâni, deci nu se vede încă nicio revenire. Ce am schimbat pe 05–06.10 nu se poate măsura înainte de 12.10 și 19.10. CJO scade a doua săptămână la rând, pe lângă căderile de vineri–sâmbătă care se repetă (26.09: 127, 03.10: 92).
+Expunerile eghiseul stau la ~31k pe săptămână de 6 săptămâni, deci nu se vede încă nicio revenire. Ce am schimbat pe 05–06.10 nu se poate măsura înainte de 12.10 și 19.10. CJO scade a doua săptămână la rând. Căderile de vineri–sâmbătă (26.09: 127, 03.10: 92) sunt ciclul săptămânal normal: se văd pe toate cele 3 luni din proprietatea URL-prefix.
 
 **Vânzări:** săptămâna 41, de luni până miercuri dimineață: eghiseul 4 comenzi plătite (2.760 lei), CJO 4 (864 lei), ecazier 0, documentero 0. Pe documentero s-au început 6 comenzi de la lansare și niciuna nu e plătită. Pe eghiseul, ultimele 14 zile față de cele 14 dinainte: 79 de comenzi începute față de 116 și 30 plătite față de 47. Bing organic: 10 începute, 0 plătite.
 
@@ -178,9 +178,9 @@ Expunerile eghiseul stau la ~31k pe săptămână de 6 săptămâni, deci nu se 
 |---|---|---|
 | I1 | Webhook Resend: un email întors sau marcat spam pune contactul pe `suppressed`; alerta pe contact@ pleacă doar când există o comandă | ✅ 07.10 (`changelog/2026-10-07-email-bounce-uri.md`). Webhook-ul era **dezactivat din 14.07** (308 fără slash), reactivat cu slash. Warm-up-ul sare acum adresele cu greșeli de tipar, cele suspecte și domeniile fără MX. Backfill: 33 de adrese |
 | I2 | B3: warm-up 600/zi | ✅ 07.10, decizia lui Raul, după filtrele din I1. Verificare 08.10: dacă emailurile întoarse trec de 3% pe lotul de 07.10, revenim la 300 |
-| I3 | H2 refocalizat: pașii 2–3 din formularul CJO (de ce cerem CNP-ul și actul, prețul și ce primești înainte de CNP, actele încărcate după plată?) + apel la cei care ies la pasul 3 și au lăsat telefonul | ⬜ decizie Raul |
-| I4 | A3/A4: recontrol celibat în Google Ads (ziua 06.10 completă) | ⬜ azi |
-| I5 | Cereri de indexare amânate de ieri: CJO `/ploiesti`, `/cazier-fiscal-online`; eghiseul ghidul PAD | ⬜ azi |
+| I3 | H2 refocalizat pe pașii 2–3 din formularul CJO | ✖ Raul 07.10: nu facem varianta propusă. Întrebare deschisă: actele înaintea datelor personale, cu CNP-ul extras din act. Pe CJO, OCR-ul există doar în admin (`extract-ci`), nu în formular |
+| I4 | A3/A4: recontrol celibat în Google Ads (ziua 06.10 completă) | 🔴 07.10: anunțul e acum **Respins** („Documente guvernamentale și servicii oficiale”), campania e „Neeligibilă”. 05–06.10: 3 afișări, 0 clicuri, 0 lei. A4 nu mai are obiect. Rămâne A8 (o singură contestație), care ⏸ așteaptă decizia lui Raul |
+| I5 | Cereri de indexare amânate de ieri: CJO `/ploiesti`, `/cazier-fiscal-online`; eghiseul ghidul PAD | 🔄 eghiseul PAD ✅ solicitată (pagina nu era încă în Google). CJO: „Cotă depășită” la 08:30; `/ploiesti` e deja indexată. Reîncercare după ~13:00. CJO e proprietate URL-prefix pe contul u/0, nu `sc-domain` |
 
 ## Următorii pași propuși (06.10)
 
