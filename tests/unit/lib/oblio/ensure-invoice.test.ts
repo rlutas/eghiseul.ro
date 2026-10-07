@@ -23,6 +23,12 @@ vi.mock('@/lib/oblio/invoice', () => ({
   // Garda de totaluri e testată separat (invoice-totals-guard.test.ts); aici o
   // ținem permisivă ca să nu mascheze comportamentul lock-ului.
   findInvoiceTotalsMismatch: () => null,
+  paymentMethodForOrder: (pm: string | null | undefined) => {
+    const v = String(pm ?? '').toLowerCase();
+    if (v === 'cash') return 'Cash';
+    if (v === 'transfer' || v === 'bank_transfer') return 'Transfer bancar';
+    return 'Card';
+  },
 }));
 
 // ---------------------------------------------------------------------------
@@ -183,6 +189,21 @@ describe('ensureInvoiceForPaidOrder — lock claim', () => {
     expect(row.invoice_number).toBe('EGI2024-24097');
     // Lock must not be left dangling after success.
     expect(row.invoice_generating_at).toBeNull();
+  });
+
+  it('REGRESSION: a bank-transfer order is never invoiced as Card, whatever the caller passes (hourly cron)', async () => {
+    row = makeOrderRow({
+      payment_method: 'transfer',
+      payment_reference: '000ZEXA262801XWF',
+      paid_at: '2026-10-07T10:21:24.092Z',
+    });
+
+    await ensureInvoiceForPaidOrder('order-1', 'Card');
+
+    const [orderArg, methodArg] = createInvoiceMock.mock.calls[0];
+    expect(methodArg).toBe('Transfer bancar');
+    expect(orderArg.payment_reference).toBe('000ZEXA262801XWF');
+    expect(orderArg.paid_at).toBe('2026-10-07T10:21:24.092Z');
   });
 
   it('REGRESSION: two concurrent callers issue exactly ONE invoice (webhook vs confirm-payment race)', async () => {

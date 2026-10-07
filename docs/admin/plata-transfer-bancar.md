@@ -57,7 +57,10 @@ de apăsat când intră banii — atunci pleacă factura și emailul de confirma
 
 Din acel moment pornește **exact același lanț ca la plata cu cardul**:
 
-- factură Oblio cu colectare „Transfer bancar";
+- factură Oblio cu încasare „Ordin de plată", datată în ziua în care au intrat
+  banii, cu referința bancară ca număr de document; pe factură, la „Mențiuni",
+  scrie „Plată prin ordin de plată (transfer bancar)", referința, data încasării
+  și numărul comenzii (de la 07.10.2026);
 - contactul clientului salvat în registru;
 - emailul de confirmare a comenzii către client;
 - joburile ONRC/ANCPI, unde e cazul;

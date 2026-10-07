@@ -98,6 +98,10 @@ interface OrderForInvoice {
   /** Discount amount in RON. Rendered as a negative-price line so the
    *  invoice total matches the charged amount. */
   discount_amount?: number | null;
+  /** Bank transaction id / receipt number for a manually confirmed payment. */
+  payment_reference?: string | null;
+  /** When the money was collected (ISO). Defaults to today. */
+  paid_at?: string | null;
   customer_data?: {
     contact?: {
       firstName?: string;
@@ -156,7 +160,64 @@ interface OrderForInvoice {
   };
 }
 
-type PaymentMethodType = 'Card' | 'Transfer bancar' | 'Cash';
+export type PaymentMethodType = 'Card' | 'Transfer bancar' | 'Cash';
+
+/**
+ * How the order was actually paid, from `orders.payment_method`. Bank transfer
+ * and cash are confirmed by an operator; everything else is a Stripe card.
+ * Callers that don't know the method (hourly invoice cron, reissue) must use
+ * this instead of assuming 'Card' — the cron used to issue every bank-transfer
+ * invoice as a card collection (EGH-0647, 0703, 0731).
+ */
+export function paymentMethodForOrder(paymentMethod: string | null | undefined): PaymentMethodType {
+  const pm = String(paymentMethod ?? '').toLowerCase();
+  if (pm === 'cash') return 'Cash';
+  if (pm === 'transfer' || pm === 'bank_transfer') return 'Transfer bancar';
+  return 'Card';
+}
+
+/**
+ * Oblio accepts only its own collection names (400 "Metodele acceptate de
+ * incasare sunt: Chitanta, Bon fiscal, Alta incasare numerar, Ordin de plata,
+ * ... Card ..."). 'Transfer bancar' and 'Cash' are NOT on that list.
+ */
+export function oblioCollectType(method: PaymentMethodType): string {
+  if (method === 'Transfer bancar') return 'Ordin de plata';
+  if (method === 'Cash') return 'Alta incasare numerar';
+  return 'Card';
+}
+
+/**
+ * Printed note („Mențiuni”) for a manually confirmed payment, so the invoice
+ * itself says how and when the money came in and what it references.
+ * ASCII only: the text also travels to e-Factura.
+ */
+export function manualPaymentMentions(
+  method: PaymentMethodType,
+  opts: { reference?: string | null; paidAt?: string | null; orderNumber?: string | null }
+): string | undefined {
+  if (method === 'Card') return undefined;
+  const parts: string[] = [
+    method === 'Transfer bancar'
+      ? 'Plata prin ordin de plata (transfer bancar) in contul firmei.'
+      : 'Plata in numerar.',
+  ];
+  if (opts.reference) parts.push(`Referinta plata: ${opts.reference}.`);
+  if (opts.paidAt) {
+    const d = new Date(opts.paidAt);
+    if (!Number.isNaN(d.getTime())) {
+      const ro = d.toLocaleDateString('ro-RO', {
+        timeZone: 'Europe/Bucharest',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+      parts.push(`Data incasarii: ${ro}.`);
+    }
+  }
+  if (opts.orderNumber) parts.push(`Comanda: ${opts.orderNumber}.`);
+  return parts.join(' ');
+}
 
 type CustomerData = NonNullable<OrderForInvoice['customer_data']>;
 
@@ -458,14 +519,26 @@ export async function createInvoiceFromOrder(
   // Payment collection info.
   // `documentNumber` is REQUIRED by Oblio when a `collect` block is present —
   // omitting it returns 400 "Parametrul `documentNumber` lipseste" and the
-  // whole invoice fails to issue. We use the order number as the payment
-  // reference so the receipt ties back to the order.
+  // whole invoice fails to issue. Card: the order number ties the receipt back
+  // to the order. Bank transfer / cash: the bank reference (or receipt no.)
+  // the operator typed at „Confirmă plata", dated the day the money came in.
+  const orderRef = order.friendly_order_id || order.order_number || order.id;
+  const isManual = paymentMethod !== 'Card';
+  const collectDate =
+    isManual && order.paid_at && !Number.isNaN(new Date(order.paid_at).getTime())
+      ? new Date(order.paid_at).toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0];
   const collect: OblioCollect = {
-    type: paymentMethod,
-    documentNumber: order.friendly_order_id || order.order_number || order.id,
-    documentDate: new Date().toISOString().split('T')[0],
+    type: oblioCollectType(paymentMethod),
+    documentNumber: (isManual && order.payment_reference) || orderRef,
+    documentDate: collectDate,
     value: order.total_price,
   };
+  const mentions = manualPaymentMentions(paymentMethod, {
+    reference: order.payment_reference,
+    paidAt: order.paid_at,
+    orderNumber: orderRef,
+  });
 
   // Build invoice input
   const invoiceInput: OblioInvoiceInput = {
@@ -474,6 +547,7 @@ export async function createInvoiceFromOrder(
     products,
     seriesName: config.seriesName,
     collect,
+    ...(mentions ? { mentions } : {}),
     language: 'RO',
     currency: 'RON',
     useStock: 0,

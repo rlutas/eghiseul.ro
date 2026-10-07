@@ -465,18 +465,43 @@ describe('createInvoiceFromOrder — payment + return shape', () => {
     },
   };
 
-  it('passes payment method to Oblio collect block', async () => {
-    await createInvoiceFromOrder(baseOrder, 'Transfer bancar');
+  // Oblio rejects 'Transfer bancar' / 'Cash' with 400 "Metodele acceptate de
+  // incasare sunt: ... Ordin de plata ..." (E-261007-JWBHC).
+  it('sends a bank transfer as "Ordin de plata" with the bank reference and collection date', async () => {
+    await createInvoiceFromOrder(
+      {
+        ...baseOrder,
+        friendly_order_id: 'E-261007-JWBHC',
+        payment_reference: '000ZEXA262801XWF',
+        paid_at: '2026-10-07T10:21:24.092Z',
+      },
+      'Transfer bancar'
+    );
 
-    const collect = oblioRequest.mock.calls[0][0].body.collect;
-    expect(collect.type).toBe('Transfer bancar');
-    expect(collect.value).toBe(302.5);
+    const body = oblioRequest.mock.calls[0][0].body;
+    expect(body.collect.type).toBe('Ordin de plata');
+    expect(body.collect.documentNumber).toBe('000ZEXA262801XWF');
+    expect(body.collect.documentDate).toBe('2026-10-07');
+    expect(body.collect.value).toBe(302.5);
+    expect(body.mentions).toBe(
+      'Plata prin ordin de plata (transfer bancar) in contul firmei. Referinta plata: 000ZEXA262801XWF. ' +
+        'Data incasarii: 07.10.2026. Comanda: E-261007-JWBHC.'
+    );
   });
 
-  it('uses Card as default payment method', async () => {
-    await createInvoiceFromOrder(baseOrder); // no second arg
+  it('sends cash as "Alta incasare numerar"', async () => {
+    await createInvoiceFromOrder(baseOrder, 'Cash');
 
-    expect(oblioRequest.mock.calls[0][0].body.collect.type).toBe('Card');
+    expect(oblioRequest.mock.calls[0][0].body.collect.type).toBe('Alta incasare numerar');
+  });
+
+  it('uses Card as default payment method, keyed on the order number, without mentions', async () => {
+    await createInvoiceFromOrder({ ...baseOrder, payment_reference: 'ignored' }); // no second arg
+
+    const body = oblioRequest.mock.calls[0][0].body;
+    expect(body.collect.type).toBe('Card');
+    expect(body.collect.documentNumber).not.toBe('ignored');
+    expect(body.mentions).toBeUndefined();
   });
 
   it('returns StoredInvoice with combined invoiceNumber + PDF link', async () => {

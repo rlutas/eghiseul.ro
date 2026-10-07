@@ -88,6 +88,8 @@ export interface OblioInvoiceInput {
   issuerName?: string;
   issuerId?: string;
   noticeNumber?: string;
+  /** Printed on the invoice („Mențiuni”). */
+  mentions?: string;
   internalNote?: string;
   deputyName?: string;
   deputyIdentityCard?: string;

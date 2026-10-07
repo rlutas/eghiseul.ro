@@ -18,11 +18,14 @@
  */
 
 import { createAdminClient } from '@/lib/supabase/admin';
-import { createInvoiceFromOrder, findInvoiceTotalsMismatch } from './invoice';
+import {
+  createInvoiceFromOrder,
+  findInvoiceTotalsMismatch,
+  paymentMethodForOrder,
+  type PaymentMethodType,
+} from './invoice';
 import { isInvoicingEnabled } from './invoicing-enabled';
 import { checkEinvoiceExport } from './einvoice-check';
-
-type PaymentMethodType = 'Card' | 'Transfer bancar' | 'Cash';
 
 export type EnsureInvoiceResult =
   | { status: 'created'; invoiceNumber: string; invoiceUrl: string | null }
@@ -177,9 +180,16 @@ export async function ensureInvoiceForPaidOrder(
         delivery_price: o.delivery_price ?? undefined,
         coupon_code: o.coupon_code ?? null,
         discount_amount: o.discount_amount ?? null,
+        payment_reference: o.payment_reference ?? null,
+        paid_at: o.paid_at ?? null,
         customer_data: o.customer_data ?? undefined,
       },
-      paymentMethod
+      // The order knows how it was paid. A bank-transfer / cash order is never
+      // a card collection, whatever the caller assumed (the hourly cron passes
+      // 'Card' for everything).
+      paymentMethodForOrder(o.payment_method) === 'Card'
+        ? paymentMethod
+        : paymentMethodForOrder(o.payment_method)
     );
 
     await admin

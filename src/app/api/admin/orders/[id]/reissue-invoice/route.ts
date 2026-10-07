@@ -34,6 +34,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
 import { cancelInvoice, createInvoiceFromOrder, findInvoiceTotalsMismatch } from '@/lib/oblio';
 import { parseInvoiceNumber } from '@/lib/oblio/parse-number';
+import { paymentMethodForOrder } from '@/lib/oblio/invoice';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -224,9 +225,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         delivery_price: o.delivery_price ?? undefined,
         coupon_code: o.coupon_code ?? null,
         discount_amount: o.discount_amount ?? null,
+        payment_reference: o.payment_reference ?? null,
+        paid_at: o.paid_at ?? null,
         customer_data: o.customer_data ?? undefined,
       },
-      'Card'
+      paymentMethodForOrder(o.payment_method)
     );
     newInvoice = fetched;
   } catch (err) {
