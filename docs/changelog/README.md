@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-10-07 | 🔴 **Deploy-urile eghiseul ieșeau „Error”** — `ignoreCommand` făcea `git diff` față de un SHA care nu mai era în clona scurtă (10 commituri de docs) → `fatal: bad object`; acum build când SHA-ul lipsește | [2026-10-07-deploy-uri-blocate.md](2026-10-07-deploy-uri-blocate.md) |
 | 2026-10-07 | 🔴 **Factura la transfer bancar: Oblio refuza „Transfer bancar”** — collect mapat pe `Ordin de plata` / `Alta incasare numerar`, referința bancară + data încasării în collect și în mențiuni, metoda citită din comandă (cronul orar emitea transferurile ca Card: EGH-0647, 0703, 0731 de corectat în Oblio) | [2026-10-07-factura-transfer-bancar.md](2026-10-07-factura-transfer-bancar.md) |
 | 2026-10-07 | 🔴 **CJO: pagina de diaspora corectată** — împuternicire avocațială în loc de „procură electronică”, scan pe email + original, DHL 250 / Poșta 100 (fără FedEx, fără WhatsApp), apostilă 198, traducere 178,50, cetățean străin 317, toate din config | [2026-10-07-cjo-diaspora-corectat.md](2026-10-07-cjo-diaspora-corectat.md) |
 | 2026-10-07 | ✅ **CJO: titlu și descriere noi pe 6 pagini cu CTR mic** — `title.absolute` sub 60 de caractere, descrieri pe căutările reale din GSC, prețuri din config; verificare la 21.10 | [2026-10-07-titluri-cjo.md](2026-10-07-titluri-cjo.md) |
