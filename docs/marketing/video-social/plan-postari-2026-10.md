@@ -193,6 +193,19 @@ Scopul testului: aflăm dacă un Reel plătit aduce **comenzi**, nu doar vizuali
 - **Nu merge** dacă vin clicuri, dar zero comenzi. Atunci oprim și păstrăm doar postările neplătite.
 - Dacă Meta respinge reclama pentru politica de documente de stat, notăm aici motivul și nu insistăm cu alt text. Același risc l-a avut Google.
 
+## Jurnal postări și rezultate
+
+Se completează la fiecare postare și în fiecare luni. Cifrele vin doar din YouTube Studio, Meta Business Suite și admin (canalele „Social” și „Meta Ads”).
+
+| Data | Ce | Unde | Rezultat (vizualizări / clicuri / comenzi) |
+|---|---|---|---|
+| 06.10 | 5 clipuri programate în YouTube Studio (07–11.10) + 2 Reels programate în Meta Business Suite (08.10 și 11.10) | YouTube, Facebook | — |
+| 07.10 | Raul a făcut postări pe YouTube și Facebook. Tot azi devin publice trailerul (18:00) și clipul lung „Cât e valabil cazierul judiciar” (19:00) | YouTube, Facebook | prima citire: luni 12.10 |
+| 08.10 19:00 | Reel „Cât e valabil cazierul judiciar” | Facebook | |
+| 09.10 | Boost pe Reel-ul de mai sus, dacă Raul îl pornește (25–30 lei/zi, 5 zile) | Facebook (Meta Ads) | citire: 14.10 |
+| 10–11.10 | Clipul lung + Short „Cazierul din străinătate”, Reel pe 11.10 18:00 | YouTube, Facebook | |
+| 12.10 | Boost pe Reel-ul „străinătate”, dacă Raul îl pornește | Facebook (Meta Ads) | citire: 17.10 |
+
 ## Cum măsurăm
 
 **În fiecare luni**, o tabelă scurtă cu săptămâna trecută:

@@ -33,17 +33,21 @@ Legendă: ✅ făcut · 🔄 în lucru · ⬜ de făcut · ⏸ așteaptă ceva
 2. Warm-up: emailurile întoarse pe ziua precedentă (Resend). Rămâne la 300/zi; creștem doar după 3 zile la rând sub 3% și fără plângeri. 07.10: 4,8% și o plângere de spam.
 3. Webhook-ul Resend (reactivat 07.10): crește numărul de contacte `suppressed` (27 la 07.10, 09:40)?
 
+**Clipuri YouTube și Facebook** (Raul a postat pe 07.10; calendarul și jurnalul: `marketing/video-social/plan-postari-2026-10.md`)
+4. 07.10, 18:00 și 19:00: trailerul și clipul „Cât e valabil cazierul judiciar” devin publice pe YouTube. 08.10, 19:00: primul Reel pe Facebook.
+5. Boost-ul pe Facebook: Raul îl pornește din Meta Business Suite pe 09.10 și pe 12.10. Se citește la 5 zile: merge dacă ~150 lei aduc o comandă plătită (canalul „Meta Ads” în admin).
+
 **Luni 12.10**
-4. Măsurarea săptămânală: tabelul „Scor săptămânal” de mai jos + C4 (CJO) + E5 (documentero).
-5. Pagina săptămânii 42: **D4 extras CF** (ghidul de valabilitate CF a coborât de pe locul 1,8 pe 6,3), apoi D3 homepage.
+6. Măsurarea săptămânală: tabelul „Scor săptămânal” de mai jos + C4 (CJO) + E5 (documentero) + clipurile (YouTube Studio, Meta Business Suite, canalele „Social” și „Meta Ads” din admin), trecute în jurnalul din planul video.
+7. Pagina săptămânii 42: **D4 extras CF** (ghidul de valabilitate CF a coborât de pe locul 1,8 pe 6,3), apoi D3 homepage.
 
 **Date fixe**
-6. 14.10: campania ChatGPT pe caziere expiră singură (blocată de politică, 0 €).
-7. 19.10: F4 ecazier + a doua măsurare C4. 21.10: testul titlurilor CJO (tabelul P1). 26.10: C5, paginile de oraș CJO.
+8. 14.10: citim boost-ul pe primul Reel; campania ChatGPT pe caziere expiră singură (blocată de politică, 0 €).
+9. 19.10: F4 ecazier + a doua măsurare C4. 21.10: testul titlurilor CJO (tabelul P1). 26.10: C5, paginile de oraș CJO.
 
 **Așteaptă decizia lui Raul** (tabelul de mai jos): test Meta cu clipuri (celibat/diaspora, caziere), repornim constatator sau extras CF pe ChatGPT, drafturile pentru linkuri (H10), contestația Google pe calea „avocat în Tabloul UNBR” (A8), excepția din blocantul de reclame (G3).
 
-**Ce am închis pe 07.10:** email (webhook Resend reactivat, contacte suprimate, warm-up filtrat; înapoi la 300/zi), titluri noi pe 6 pagini CJO, H11 (pagina CJO de diaspora), analiza reclamelor (Google, Microsoft și ChatGPT închise pe caziere și stare civilă; doar Meta e deschis), cererea de indexare pentru ghidul PAD pe eghiseul, planul refăcut.
+**Ce am închis pe 07.10:** postări YouTube și Facebook (Raul); email (webhook Resend reactivat, contacte suprimate, warm-up filtrat; înapoi la 300/zi), titluri noi pe 6 pagini CJO, H11 (pagina CJO de diaspora), analiza reclamelor (Google, Microsoft și ChatGPT închise pe caziere și stare civilă; doar Meta e deschis), cererea de indexare pentru ghidul PAD pe eghiseul, planul refăcut.
 
 **Ținta, în ordine:** mai mult trafic care începe o comandă, pe CJO și eghiseul. Formularele rămân cum sunt (Raul, 07.10): cine începe comanda pe CJO plătește, iar pe paginile de serviciu eghiseul conversia e bună. Problema e numărul de vizitatori.
 
@@ -108,11 +112,11 @@ Baza de comparație = 21.09–05.10 (14 zile, GSC). Comparăm pe aceeași lungim
 
 ### Scor săptămânal (se completează în fiecare luni)
 
-| Săpt. | GSC clicuri eghiseul | GSC clicuri CJO | ecazier / documentero | Plătite eghiseul | Plătite CJO | Plătite ecazier / documentero | Din email (plătite) |
-|---|---|---|---|---|---|---|---|
-| 39 (21.09) | 4.310 | 3.823 | 12 / 9 | 13 | 22 | 0 / 0 | — |
-| 40 (28.09) | 4.013 | 3.006 | 8 / 2 | 20 | 17 | 1 / 0 | 3 (în 21 de zile) |
-| 41 (05.10) | | | | | | | |
+| Săpt. | GSC clicuri eghiseul | GSC clicuri CJO | ecazier / documentero | Plătite eghiseul | Plătite CJO | Plătite ecazier / documentero | Din email (plătite) | Din clipuri: Social / Meta Ads (plătite) |
+|---|---|---|---|---|---|---|---|---|
+| 39 (21.09) | 4.310 | 3.823 | 12 / 9 | 13 | 22 | 0 / 0 | — | — |
+| 40 (28.09) | 4.013 | 3.006 | 8 / 2 | 20 | 17 | 1 / 0 | 3 (în 21 de zile) | — (clipurile pornesc 07.10) |
+| 41 (05.10) | | | | | | | | |
 
 
 ---
