@@ -51,8 +51,8 @@ Regulă: **nu umblăm de două ori la aceeași pagină în mai puțin de 14 zile
 
 | Săptămâna | Ce facem | Decizii la final |
 |---|---|---|
-| **41 (05–11.10)** | ✅ CJO: pagini de oraș, homepage, fiscal; ✅ eghiseul: pagina de cazier judiciar (D2) + ghidul PAD (D6); ✅ documentero: 3 ghiduri; ✅ ecazier: linkuri + titluri cazier auto; ✅ 07.10 email reparat, warm-up 600/zi; ✅ 07.10 titluri noi pe 6 pagini CJO (P1). ⬜ cereri de indexare CJO după 13:00 (coada I5). ⬜ **09.10: warm-up 1.200/zi**, doar dacă 07–08.10 au sub 3% emailuri întoarse. YouTube: 10–11.10 clipul despre cazierul din străinătate | — |
-| **42 (12–18.10)** | **Luni 12.10: prima măsurare** (C4, E5, P2). Warm-up 2.000/zi dacă regula de 3% e respectată. P4: **D4 extras CF întâi** (ghidul de valabilitate CF a coborât de pe 1,8 pe 6,3 după 24.09, vezi `seo/2026-10-07-unde-stam-seo-ai-reclame.md`), apoi D3 homepage. documentero: 1 ghid. YouTube: 13–14.10 cazierul fiscal | D1 (fiscal eghiseul): rescriem sau mai așteptăm |
+| **41 (05–11.10)** | ✅ 07.10 ChatGPT Ads pe caziere (I7), până pe 14.10. ✅ CJO: pagini de oraș, homepage, fiscal; ✅ eghiseul: pagina de cazier judiciar (D2) + ghidul PAD (D6); ✅ documentero: 3 ghiduri; ✅ ecazier: linkuri + titluri cazier auto; ✅ 07.10 email reparat, warm-up 600/zi; ✅ 07.10 titluri noi pe 6 pagini CJO (P1). ⬜ cereri de indexare CJO după 13:00 (coada I5). ↩ warm-up înapoi la 300/zi (07.10: 4,8% emailuri întoarse); creștem doar după 3 zile la rând sub 3%. YouTube: 10–11.10 clipul despre cazierul din străinătate | — |
+| **42 (12–18.10)** | **Luni 12.10: prima măsurare** (C4, E5, P2). Warm-up: rămâne 300/zi până avem 3 zile sub 3%. **08.10: verdictul OpenAI pe cazier fiscal.** P4: **D4 extras CF întâi** (ghidul de valabilitate CF a coborât de pe 1,8 pe 6,3 după 24.09, vezi `seo/2026-10-07-unde-stam-seo-ai-reclame.md`), apoi D3 homepage. documentero: 1 ghid. YouTube: 13–14.10 cazierul fiscal | D1 (fiscal eghiseul): rescriem sau mai așteptăm |
 | **43 (19–25.10)** | **19.10:** F4 (ecazier), a doua măsurare C4. **21.10:** testul P1 pe cele 6 pagini CJO din 07.10 (14 zile). P4: D5, primele 2 pagini (naștere, auto). H11 (textul de pe CJO pentru diaspora) | F4: ecazier rămâne doar în mentenanță? |
 | **44 (26.10–01.11)** | P4: D5, următoarele 2 (căsătorie, celibat). P1: următoarea serie de titluri, din coada de mai jos | **26.10: C5**, consolidăm paginile de oraș CJO sub 200 de expuneri pe lună? |
 | **45 (02–08.11)** | P4: D5, ultimele (integritate, constatator). Bilanțul lunii octombrie față de septembrie (58k lei) | ce păstrăm în noiembrie |
@@ -65,7 +65,7 @@ Regulă: **nu umblăm de două ori la aceeași pagină în mai puțin de 14 zile
 | H10 | Trimiterea drafturilor: cerere `rel=sponsored` la ProTV/Antena 3/infocons, comunicatul, articolul avocatei | P5 nu pornește fără ele |
 | G3 | Excepție în blocantul de reclame pentru ads.google.com | fără ea salvările din Google Ads se pierd |
 | — | Meta: test mic pe celibat/diaspora cu clipuri (singurul canal plătit deschis pe stare civilă; cererea e mică: ~100 afișări Google în 2 săpt., 14 citări AI în 3 luni) + boostul pe Facebook din `marketing/video-social/` | Google, Microsoft și ChatGPT sunt închise pe cazier și stare civilă (`seo/2026-10-07-unde-stam-seo-ai-reclame.md`) |
-| — | ChatGPT Ads (constatator + extras CF): 0 comenzi în 14 zile. Cheltuiala din Ads Manager; peste CPA 25 lei pe constatator, oprim | bani fără rezultat |
+| — | ChatGPT Ads: constatator + extras CF sunt deja oprite (fără afișări din 24.09). Repornim vreuna? Testul pe caziere rulează separat (I7) | bani fără rezultat până acum |
 
 ### P1: titluri și descrieri, baza și coada
 
@@ -251,10 +251,11 @@ Expunerile eghiseul stau la ~31k pe săptămână de 6 săptămâni, deci nu se 
 | # | Ce | Stare |
 |---|---|---|
 | I1 | Webhook Resend: un email întors sau marcat spam pune contactul pe `suppressed`; alerta pe contact@ pleacă doar când există o comandă | ✅ 07.10 (`changelog/2026-10-07-email-bounce-uri.md`). Webhook-ul era **dezactivat din 14.07** (308 fără slash), reactivat cu slash. Warm-up-ul sare acum adresele cu greșeli de tipar, cele suspecte și domeniile fără MX. Backfill: 33 de adrese |
-| I2 | B3: warm-up 600/zi | ✅ 07.10, decizia lui Raul, după filtrele din I1. Verificare 08.10: dacă emailurile întoarse trec de 3% pe lotul de 07.10, revenim la 300 |
+| I2 | B3: warm-up 600/zi | ↩ 07.10, 09:10: lotul de dimineață (249) a avut **4,8% emailuri întoarse și o plângere de spam (0,4%, pragul e 0,1%)**, deci am revenit la **300/zi** conform regulii. Filtrele noi au prins puțin: adresele care pică sunt căsuțe moarte, nu greșeli de tipar. Webhook-ul merge: 11 contacte suprimate automat în prima oră. Următoarea creștere doar după 3 zile la rând sub 3% |
 | I3 | Formularul CJO rămâne cum e (Raul, 07.10) | ⏸ Idee de reluat eventual: CNP-ul mutat de la pasul 2 pe pagina cu actele (pasul 3). Cost: la pasul 2 se pierde precompletarea județului de naștere din CNP, iar data nașterii pentru străini se mută și ea. Nu știm dacă CNP-ul e cauza abandonului de la pasul 2: sesiunile nu se salvează per câmp |
 | I4 | A3/A4: recontrol celibat în Google Ads (ziua 06.10 completă) | 🔴 07.10: anunțul e acum **Respins** („Documente guvernamentale și servicii oficiale”), campania e „Neeligibilă”. 05–06.10: 3 afișări, 0 clicuri, 0 lei. A4 nu mai are obiect. Rămâne A8 (o singură contestație), care ⏸ așteaptă decizia lui Raul |
 | I6 | P1 pe CJO: titlu și descriere rescrise pe 6 pagini (integritate, gratuit, persoane fizice, călătorie cu minori, taxă, valabilitate). Titlurile vechi aveau 75–90 de caractere cu sufixul site-ului și erau tăiate. Acum sub 60, pe căutările reale din GSC; prețuri din config (198, integritatea 250); scos „441 recenzii” | ✅ 07.10 LIVE (CJO `17e6d15d`). Verificare 21.10, baza în tabelul P1 |
+| I7 | ChatGPT Ads pe caziere (Raul: „încercăm oricum”), varianta transparentă | 🔄 07.10: cazier judiciar blocat imediat ca „legal services”; cazier fiscal în review; 15 €/zi, se oprește singură pe 14.10. Tracking verificat. Detalii: `ads/chatgpt/11-campanie-caziere-2026-10.md` |
 | I5 | Cereri de indexare amânate de ieri: CJO `/ploiesti`, `/cazier-fiscal-online`; eghiseul ghidul PAD | 🔄 eghiseul PAD ✅ solicitată (pagina nu era încă în Google). CJO: „Cotă depășită” la 08:30; `/ploiesti` e deja indexată. Reîncercare după ~13:00, cu `/cazier-fiscal-online` + cele 6 pagini din I6. CJO e proprietate URL-prefix pe contul u/0, nu `sc-domain` |
 
 ## Următorii pași propuși (06.10)
