@@ -10,6 +10,11 @@
  * Prioritizare (cercetare telefon vs email, 2026-09-14): telefon străin +
  * serviciu de stare civilă (naștere/căsătorie) = tier maxim — diaspora, cu
  * termene reale (ambasadă, oficiu stare civilă).
+ *
+ * Email manual (07.10.2026, cerere echipă: „sunt prea mulți de sunat"): pe un
+ * rând sau pe toate bifate, fără cupon, semnat cu prenumele colegei. Pasul 3
+ * al secvenței automate nu mai trimite cupon — după 2 emailuri fără răspuns
+ * comanda apare aici marcată „2 emailuri fără răspuns".
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -24,7 +29,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Phone, RefreshCw, Ticket, ExternalLink, CheckCircle2, Globe } from 'lucide-react';
+import { Phone, RefreshCw, Ticket, ExternalLink, CheckCircle2, Globe, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface PriorityRow {
@@ -49,6 +54,10 @@ interface PriorityRow {
   phoneContactNotes: string | null;
   duplicateCount: number;
   freshness: 0 | 1 | 2;
+  recoveryEmailStep: number;
+  currentStep: string | null;
+  manualRecoveryEmailAt: string | null;
+  manualRecoveryEmailBy: string | null;
 }
 
 interface RecoveredRow {
@@ -88,6 +97,11 @@ function timeAgo(iso: string): string {
   return `${Math.floor(hours / 24)}z`;
 }
 
+const MANUAL_EMAIL_COOLDOWN_MS = 24 * 3_600_000;
+const emailedRecently = (r: PriorityRow) =>
+  !!r.manualRecoveryEmailAt && Date.now() - new Date(r.manualRecoveryEmailAt).getTime() < MANUAL_EMAIL_COOLDOWN_MS;
+const canEmail = (r: PriorityRow) => !!r.email && !emailedRecently(r);
+
 function tierBadge(tier: 0 | 1 | 2) {
   if (tier === 2) {
     return (
@@ -119,6 +133,10 @@ export default function RecuperareTelefonicaPage() {
   const [existingCoupon, setExistingCoupon] = useState('');
   const [sendFollowup, setSendFollowup] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [emailTargets, setEmailTargets] = useState<PriorityRow[] | null>(null);
+  const [emailMessage, setEmailMessage] = useState('');
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   const fetchRows = useCallback(async () => {
     setLoading(true);
@@ -129,6 +147,7 @@ export default function RecuperareTelefonicaPage() {
       const json = await res.json();
       if (json.success) {
         setRows(json.data.rows);
+        setSelected(new Set());
         setKpi(json.data.kpi ?? null);
         setRecovered(json.data.recovered ?? []);
       } else {
@@ -196,6 +215,51 @@ export default function RecuperareTelefonicaPage() {
     }
   };
 
+  const toggleSelected = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  const emailable = rows.filter(canEmail);
+  const allSelected = emailable.length > 0 && emailable.every((r) => selected.has(r.id));
+  const toggleAll = () => setSelected(allSelected ? new Set() : new Set(emailable.slice(0, 50).map((r) => r.id)));
+
+  const closeEmailDialog = () => {
+    setEmailTargets(null);
+    setEmailMessage('');
+  };
+
+  const submitEmail = async () => {
+    if (!emailTargets || emailTargets.length === 0) return;
+    setSendingEmail(true);
+    try {
+      const res = await fetch('/api/admin/orders/recovery-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderIds: emailTargets.map((r) => r.id), message: emailMessage }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        const d = json.data;
+        if (d.sent > 0) toast.success(`Email trimis la ${d.sent} ${d.sent === 1 ? 'client' : 'clienți'}`);
+        const notSent = (d.results as Array<{ status: string; reason?: string }>).filter((r) => r.status !== 'sent');
+        if (notSent.length > 0) {
+          const reasons = [...new Set(notSent.map((r) => r.reason).filter(Boolean))].join('; ');
+          toast.warning(`${notSent.length} netrimise: ${reasons}`, { duration: 10000 });
+        }
+        closeEmailDialog();
+        fetchRows();
+      } else {
+        toast.error(json.error || 'Eroare la trimitere');
+      }
+    } catch {
+      toast.error('Eroare de rețea');
+    } finally {
+      setSendingEmail(false);
+    }
+  };
 
   return (
     <div className="space-y-5">
@@ -252,13 +316,23 @@ export default function RecuperareTelefonicaPage() {
         </div>
       )}
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Button variant={view === 'open' ? 'default' : 'outline'} size="sm" onClick={() => setView('open')}>
           De sunat ({rows.length})
         </Button>
         <Button variant={view === 'recovered' ? 'default' : 'outline'} size="sm" onClick={() => setView('recovered')}>
           ✅ Recuperate ({recovered.length})
         </Button>
+        {view === 'open' && selected.size > 0 && (
+          <Button
+            size="sm"
+            className="ml-auto"
+            onClick={() => setEmailTargets(rows.filter((r) => selected.has(r.id)))}
+          >
+            <Mail className="mr-1 h-4 w-4" />
+            Trimite email la {selected.size} {selected.size === 1 ? 'client' : 'clienți'}
+          </Button>
+        )}
       </div>
 
       {view === 'recovered' && (
@@ -324,6 +398,16 @@ export default function RecuperareTelefonicaPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b text-left text-xs text-slate-500">
+              <th className="w-8 px-3 py-2">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4"
+                  checked={allSelected}
+                  onChange={toggleAll}
+                  disabled={emailable.length === 0}
+                  title="Bifează toți cărora li se poate scrie (cel mult 50)"
+                />
+              </th>
               <th className="px-3 py-2">Prioritate</th>
               <th className="px-3 py-2">Client</th>
               <th className="px-3 py-2">Serviciu</th>
@@ -337,20 +421,30 @@ export default function RecuperareTelefonicaPage() {
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className="border-b">
-                  {Array.from({ length: 7 }).map((_, j) => (
+                  {Array.from({ length: 8 }).map((_, j) => (
                     <td key={j} className="px-3 py-2"><Skeleton className="h-5 w-full" /></td>
                   ))}
                 </tr>
               ))
             ) : rows.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-3 py-10 text-center text-muted-foreground">
+                <td colSpan={8} className="px-3 py-10 text-center text-muted-foreground">
                   Nimic de sunat acum — coada e goală.
                 </td>
               </tr>
             ) : (
               rows.map((r) => (
                 <tr key={r.id} className="border-b last:border-0 hover:bg-slate-50">
+                  <td className="px-3 py-2">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4"
+                      checked={selected.has(r.id)}
+                      onChange={() => toggleSelected(r.id)}
+                      disabled={!canEmail(r)}
+                      title={!r.email ? 'Fără email' : emailedRecently(r) ? 'I s-a scris în ultimele 24 h' : 'Bifează pentru email'}
+                    />
+                  </td>
                   <td className="px-3 py-2">{tierBadge(r.tier)}</td>
                   <td className="px-3 py-2">
                     <div className="font-medium text-slate-900">
@@ -403,6 +497,15 @@ export default function RecuperareTelefonicaPage() {
                         {r.phoneContactNotes}
                       </div>
                     )}
+                    {r.manualRecoveryEmailAt ? (
+                      <div className="mt-0.5 inline-flex items-center gap-1 text-xs text-blue-700">
+                        <Mail className="h-3.5 w-3.5" />
+                        email {fmtDate(r.manualRecoveryEmailAt)}
+                        {r.manualRecoveryEmailBy ? ` · ${r.manualRecoveryEmailBy}` : ''}
+                      </div>
+                    ) : r.recoveryEmailStep >= 3 ? (
+                      <div className="mt-0.5 text-xs font-medium text-amber-700">2 emailuri fără răspuns</div>
+                    ) : null}
                   </td>
                   <td className="px-3 py-2">
                     <div className="flex items-center justify-end gap-1">
@@ -416,6 +519,16 @@ export default function RecuperareTelefonicaPage() {
                       >
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         {r.phoneContactedAt ? 'Actualizează' : 'Bifează sunat'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={!canEmail(r)}
+                        title={!r.email ? 'Fără email' : emailedRecently(r) ? 'I s-a scris în ultimele 24 h' : 'Trimite email fără cupon'}
+                        onClick={() => setEmailTargets([r])}
+                      >
+                        <Mail className="h-3.5 w-3.5" />
+                        Email
                       </Button>
                       {r.friendlyOrderId && (
                         <a
@@ -442,6 +555,38 @@ export default function RecuperareTelefonicaPage() {
           </tbody>
         </table>
       </div>
+
+      <Dialog open={!!emailTargets} onOpenChange={(o) => !o && closeEmailDialog()}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Trimite email de recuperare</DialogTitle>
+            <DialogDescription>
+              {emailTargets && emailTargets.length === 1
+                ? `${[emailTargets[0].firstName, emailTargets[0].lastName].filter(Boolean).join(' ') || 'Client'} · ${emailTargets[0].serviceName}`
+                : `${emailTargets?.length ?? 0} clienți`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="rounded-lg border bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">
+            Emailul pleacă semnat cu prenumele tău, fără cupon: îi spune clientului la ce pas s-a oprit, că datele lui sunt
+            păstrate și că poate răspunde direct (răspunsul vine pe contact@) sau pe WhatsApp. Are butonul „Reia comanda”.
+          </div>
+          <Textarea
+            value={emailMessage}
+            onChange={(e) => setEmailMessage(e.target.value)}
+            placeholder="Opțional: un rând de la tine (ex: „Dacă ai o întrebare despre termen sau livrare, răspunde-mi aici și revin azi.”)"
+            rows={3}
+            maxLength={1000}
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={closeEmailDialog} disabled={sendingEmail}>
+              Anulează
+            </Button>
+            <Button onClick={submitEmail} disabled={sendingEmail}>
+              {sendingEmail ? 'Se trimite...' : 'Trimite'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!contactTarget} onOpenChange={(o) => !o && closeDialog()}>
         <DialogContent className="sm:max-w-md">

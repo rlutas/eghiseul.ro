@@ -78,7 +78,7 @@ progres rămân ca analytics. Răspunsul cronului raportează `purgedDrafts`.
 |---|---|---|---|
 | **1** | ≥30 min de la creare (draft: ≥2 h idle) | „Am păstrat tot ce ai completat — reia de unde ai rămas". FĂRĂ cupon. | `abandoned-recovery-sequence.ts` → `buildRecoveryStep1` |
 | **2** | ≥24 h după pasul 1 | Încredere: cei 3 pași după plată, echipă reală (eDigitalizare SRL, Cluj), rating Google real din `SOCIAL_PROOF`, WhatsApp. FĂRĂ cupon. | `buildRecoveryStep2` |
-| **3** | ≥48 h după pasul 2 (~72 h) | Cupon `RECOVERY-XXXXXXXX` 10% / 48 h / unică folosință, `system_kind='recovery'`. | `abandoned-recovery.ts` (șablonul vechi) |
+| **3** | ≥48 h după pasul 2 (~72 h) | **Din 07.10.2026: niciun email, niciun cupon.** Comanda e marcată `recovery_email_step=3` și apare în Recuperare telefonică cu „2 emailuri fără răspuns” (cuponul adusese 0 plăți din 74). Echipa poate trimite manual un email fără cupon (`/api/admin/orders/recovery-email`). | `recovery-emails/route.ts` |
 
 Două pool-uri de candidați din ultimele 7 zile, cu email valid și `recovery_email_step < 3`:
 

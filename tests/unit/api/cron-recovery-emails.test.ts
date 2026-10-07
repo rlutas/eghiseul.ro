@@ -101,7 +101,7 @@ describe('secvența de recovery în 3 pași', () => {
     state.candidates = [order('a', 0, null)];
     const body = await (await POST(makeReq())).json();
 
-    expect(body.data.byStep).toEqual({ 1: 1, 2: 0, 3: 0 });
+    expect(body.data.byStep).toEqual({ 1: 1, 2: 0, handedToTeam: 0 });
     expect(couponInserts()).toHaveLength(0);
     const mail = sendEmail.mock.calls[0][0];
     expect(mail.subject).toMatch(/te așteaptă/);
@@ -118,7 +118,7 @@ describe('secvența de recovery în 3 pași', () => {
     state.candidates = [order('early', 1, 10), order('due', 1, 25)];
     const body = await (await POST(makeReq())).json();
 
-    expect(body.data.byStep).toEqual({ 1: 0, 2: 1, 3: 0 });
+    expect(body.data.byStep).toEqual({ 1: 0, 2: 1, handedToTeam: 0 });
     expect(body.data.results.find((r: Row) => r.orderId === 'early').reason).toBe('waiting for next step');
     expect(couponInserts()).toHaveLength(0);
     const mail = sendEmail.mock.calls[0][0];
@@ -128,22 +128,21 @@ describe('secvența de recovery în 3 pași', () => {
     expect(orderUpdates()[0].values!.recovery_email_sent_at).toBeUndefined(); // rămâne = primul email
   });
 
-  it('pasul 3 abia după 48 h de la pasul 2: cupon 10%/48h, link cu ?coupon, secvență terminată', async () => {
+  // 07.10.2026: cuponul de la pasul 3 adusese 0 plăți din 74; pasul 3 nu mai
+  // trimite nimic, comanda trece la echipă (Recuperare telefonică).
+  it('pasul 3 abia după 48 h de la pasul 2: fără email, fără cupon, secvența se închide și trece la echipă', async () => {
     state.candidates = [order('early', 2, 30), order('due', 2, 50, { status: 'draft' })];
     const body = await (await POST(makeReq())).json();
 
-    expect(body.data.byStep).toEqual({ 1: 0, 2: 0, 3: 1 });
-    expect(couponInserts()).toHaveLength(1);
-    const coupon = couponInserts()[0].values!;
-    expect(coupon.system_kind).toBe('recovery');
-    expect(coupon.discount_value).toBe(10);
-    expect(coupon.max_uses).toBe(1);
-    const mail = sendEmail.mock.calls[0][0];
-    expect(mail.subject).toMatch(/reducere 10% pe 48h/);
-    expect(mail.html).toContain(`coupon=${coupon.code}`);
-    // href-ul e escapat în HTML (& → &amp;); varianta text are URL-ul brut.
-    expect(mail.text).toContain(`/comanda/cazier-judiciar-persoana-fizica?order=E-due&email=due%40gmail.com&coupon=${coupon.code}`);
-    expect(orderUpdates()[0].values!.recovery_email_step).toBe(3);
+    expect(body.data.byStep).toEqual({ 1: 0, 2: 0, handedToTeam: 1 });
+    expect(body.data.results.find((r: Row) => r.orderId === 'early').reason).toBe('waiting for next step');
+    expect(sendEmail).not.toHaveBeenCalled();
+    expect(couponInserts()).toHaveLength(0);
+    expect(orderUpdates()).toHaveLength(1);
+    expect(orderUpdates()[0].values).toEqual({ recovery_email_step: 3 });
+    const hist = state.calls.find((c) => c.table === 'order_history' && c.op === 'insert')!;
+    expect(hist.values!.event_type).toBe('recovery_email_sent');
+    expect(String(hist.values!.notes)).toMatch(/de sunat/);
   });
 
   it('draft activ (<2h idle) sau doar cu contact → sărit, fără avans de pas', async () => {

@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-10-07 | 🟣 **Recuperare: email trimis de echipă, fără cupon; pasul 3 cu cupon scos** — buton „Email” + selecție multiplă în Recuperare telefonică (`/api/admin/orders/recovery-email`, migrarea 192); pasul 3 al cronului nu mai trimite cupon (0/74 plăți), comanda apare „2 emailuri fără răspuns” | [2026-10-07-recuperare-email-manual-fara-cupon.md](2026-10-07-recuperare-email-manual-fara-cupon.md) |
 | 2026-10-07 | 🔴 **Deploy-urile eghiseul ieșeau „Error”** — `ignoreCommand` făcea `git diff` față de un SHA care nu mai era în clona scurtă (10 commituri de docs) → `fatal: bad object`; acum build când SHA-ul lipsește | [2026-10-07-deploy-uri-blocate.md](2026-10-07-deploy-uri-blocate.md) |
 | 2026-10-07 | 🔴 **Factura la transfer bancar: Oblio refuza „Transfer bancar”** — collect mapat pe `Ordin de plata` / `Alta incasare numerar`, referința bancară + data încasării în collect și în mențiuni, metoda citită din comandă (cronul orar emitea transferurile ca Card: EGH-0647, 0703, 0731 de corectat în Oblio) | [2026-10-07-factura-transfer-bancar.md](2026-10-07-factura-transfer-bancar.md) |
 | 2026-10-07 | 🔴 **CJO: pagina de diaspora corectată** — împuternicire avocațială în loc de „procură electronică”, scan pe email + original, DHL 250 / Poșta 100 (fără FedEx, fără WhatsApp), apostilă 198, traducere 178,50, cetățean străin 317, toate din config | [2026-10-07-cjo-diaspora-corectat.md](2026-10-07-cjo-diaspora-corectat.md) |

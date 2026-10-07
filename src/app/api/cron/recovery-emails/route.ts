@@ -9,8 +9,11 @@
  *            rămas", FĂRĂ cupon
  *   pasul 2  la ≥24 h după pasul 1 — încredere: ce urmează după plată,
  *            echipă reală, recenzii, WhatsApp; FĂRĂ cupon
- *   pasul 3  la ≥48 h după pasul 2 — abia acum cuponul 10% / 48 h
- *            (RECOVERY-XXXXXXXX, max_uses 1, system_kind 'recovery')
+ *   pasul 3  la ≥48 h după pasul 2 — FĂRĂ email și fără cupon (din
+ *            07.10.2026): comanda e marcată „2 emailuri fără răspuns" și
+ *            echipa o sună / îi scrie din /admin/recuperare-telefonica.
+ *            Cuponul de 10% adusese 0 plăți din 74 de comenzi (14.09–07.10);
+ *            toate recuperările veneau din pașii 1–2.
  *
  * Două pool-uri de candidați, același tratament:
  *   1. `status='abandoned'` — trimisă, neplătită (auto-abandon). Link la checkout.
@@ -31,14 +34,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendEmail } from '@/lib/email/resend';
-import {
-  buildRecoverySubject,
-  buildRecoveryHtml,
-  buildRecoveryText,
-  type RecoveryEmailInput,
-} from '@/lib/email/templates/abandoned-recovery';
 import { buildRecoveryStep1, buildRecoveryStep2 } from '@/lib/email/templates/abandoned-recovery-sequence';
-import { generateRecoveryCouponCode } from '@/lib/coupons/recovery-code';
 import { hasProgressBeyondContact } from '@/lib/orders/abandoned-progress';
 import { TEST_EMAILS, isSuspiciousEmail, isUndeliverable } from '@/lib/email/deliverability';
 import { buildResumeUrl } from '@/lib/orders/resume-url';
@@ -57,8 +53,6 @@ export const STEP_DELAYS_MS: Record<1 | 2 | 3, number> = {
 };
 const FINAL_STEP = 3;
 
-const DISCOUNT_PERCENT = 10;
-const COUPON_VALIDITY_HOURS = 48;
 
 export async function POST(request: NextRequest) {
   const authHeader = request.headers.get('authorization');
@@ -102,7 +96,7 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const results: Array<{ orderId: string; step?: number; status: 'sent' | 'skipped' | 'error'; reason?: string }> = [];
+  const results: Array<{ orderId: string; step?: number; status: 'sent' | 'handed_to_team' | 'skipped' | 'error'; reason?: string }> = [];
 
   for (const order of candidates) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -150,36 +144,22 @@ export async function POST(request: NextRequest) {
     // The ORDER's brand (orders.platform): resume link, header and sender follow it.
     const brand = brandForOrder(order);
 
-    // Cuponul se alocă DOAR la pasul 3.
-    let couponCode: string | null = null;
+    // Pasul 3: nu mai trimitem email. Comanda rămâne în coada echipei
+    // (/admin/recuperare-telefonica), marcată „2 emailuri fără răspuns".
     if (step === FINAL_STEP) {
-      couponCode = generateRecoveryCouponCode();
-      const validUntilIso = new Date(now + COUPON_VALIDITY_HOURS * 3600 * 1000).toISOString();
-      let couponError: string | null = null;
-      for (let attempt = 0; attempt < 2; attempt++) {
-        const { error } = await supabase.from('coupons').insert({
-          code: couponCode,
-          description: `Recovery automat (pasul 3) pentru comanda ${orderNumber}`,
-          discount_type: 'percentage',
-          discount_value: DISCOUNT_PERCENT,
-          max_uses: 1,
-          valid_from: new Date(now).toISOString(),
-          valid_until: validUntilIso,
-          is_active: true,
-          system_kind: 'recovery',
-        });
-        if (!error) {
-          couponError = null;
-          break;
-        }
-        couponError = error.message;
-        if (!String(error.code ?? '').startsWith('23505')) break; // 23505 = unique_violation
-        couponCode = generateRecoveryCouponCode();
-      }
-      if (couponError) {
-        results.push({ orderId: order.id, step, status: 'error', reason: `coupon: ${couponError}` });
-        continue;
-      }
+      await supabase
+        .from('orders')
+        .update({ recovery_email_step: FINAL_STEP })
+        .eq('id', order.id);
+      await supabase.from('order_history').insert({
+        order_id: order.id,
+        event_type: 'recovery_email_sent',
+        changed_by: 'system-cron',
+        new_value: { step: FINAL_STEP, email: false },
+        notes: 'Secvența de emailuri s-a încheiat fără plată (2 emailuri) — comanda e de sunat în Recuperare telefonică',
+      });
+      results.push({ orderId: order.id, step, status: 'handed_to_team' });
+      continue;
     }
 
     const resumeUrl = withUtm(
@@ -189,31 +169,14 @@ export async function POST(request: NextRequest) {
         friendly_order_id: order.friendly_order_id ?? null,
         serviceSlug,
         email,
-        couponCode,
         platform: (order as { platform?: string | null }).platform ?? null,
       }),
       'recovery',
       `recovery-step${step}`
     );
 
-    let mail: { subject: string; html: string; text: string };
-    if (step === 1) {
-      mail = buildRecoveryStep1({ customerFirstName: firstName, serviceName, totalRon, resumeUrl, orderNumber, estimatedDaysDisplay, brand });
-    } else if (step === 2) {
-      mail = buildRecoveryStep2({ customerFirstName: firstName, serviceName, totalRon, resumeUrl, orderNumber, estimatedDaysDisplay, brand });
-    } else {
-      const payload: RecoveryEmailInput = {
-        customerFirstName: firstName,
-        serviceName,
-        totalRon,
-        couponCode: couponCode!,
-        discountPercent: DISCOUNT_PERCENT,
-        resumeUrl,
-        orderNumber,
-        brand,
-      };
-      mail = { subject: buildRecoverySubject(payload), html: buildRecoveryHtml(payload), text: buildRecoveryText(payload) };
-    }
+    const stepInput = { customerFirstName: firstName, serviceName, totalRon, resumeUrl, orderNumber, estimatedDaysDisplay, brand };
+    const mail = step === 1 ? buildRecoveryStep1(stepInput) : buildRecoveryStep2(stepInput);
 
     try {
       const sendRes = await sendEmail({
@@ -248,13 +211,11 @@ export async function POST(request: NextRequest) {
       order_id: order.id,
       event_type: 'recovery_email_sent',
       changed_by: 'system-cron',
-      new_value: { step, ...(couponCode ? { coupon_code: couponCode, discount_percent: DISCOUNT_PERCENT } : {}) },
+      new_value: { step },
       notes:
         step === 1
           ? 'Email recovery pasul 1 (reia comanda, fără cupon)'
-          : step === 2
-            ? 'Email recovery pasul 2 (încredere, fără cupon)'
-            : `Email recovery pasul 3 cu cupon ${couponCode} (-${DISCOUNT_PERCENT}%, 48h)`,
+          : 'Email recovery pasul 2 (încredere, fără cupon)',
     });
 
     results.push({ orderId: order.id, step, status: 'sent' });
@@ -269,7 +230,7 @@ export async function POST(request: NextRequest) {
       byStep: {
         1: results.filter((r) => r.status === 'sent' && r.step === 1).length,
         2: results.filter((r) => r.status === 'sent' && r.step === 2).length,
-        3: results.filter((r) => r.status === 'sent' && r.step === 3).length,
+        handedToTeam: results.filter((r) => r.status === 'handed_to_team').length,
       },
       processedAt: new Date().toISOString(),
       cleanedCoupons,

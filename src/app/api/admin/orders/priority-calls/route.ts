@@ -81,6 +81,12 @@ interface PriorityRow {
   duplicateCount: number;
   /** 0 = <24 h, 1 = <72 h, 2 = mai vechi. */
   freshness: 0 | 1 | 2;
+  /** Emailuri automate de recuperare primite (0–2); 3 = secvența s-a încheiat fără plată, de sunat. */
+  recoveryEmailStep: number;
+  /** Pasul din wizard unde s-a oprit (draft). */
+  currentStep: string | null;
+  manualRecoveryEmailAt: string | null;
+  manualRecoveryEmailBy: string | null;
 }
 
 interface RecoveredRow {
@@ -136,7 +142,7 @@ export async function GET(request: NextRequest) {
   const ordersTable = admin.from('orders') as any;
   let query = ordersTable
     .select(
-      'id, order_number, friendly_order_id, status, total_price, customer_data, created_at, updated_at, phone_contacted_at, phone_contacted_by, phone_contact_notes, services(name, slug)'
+      'id, order_number, friendly_order_id, status, total_price, customer_data, created_at, updated_at, phone_contacted_at, phone_contacted_by, phone_contact_notes, recovery_email_step, current_step, manual_recovery_email_at, manual_recovery_email_by, services(name, slug)'
     )
     .in('status', ['abandoned', 'draft'])
     .gte('created_at', minIso)
@@ -235,6 +241,10 @@ export async function GET(request: NextRequest) {
       phoneContactNotes: order.phone_contact_notes ?? null,
       duplicateCount: 1,
       freshness: freshnessOf(order.created_at, Date.now()),
+      recoveryEmailStep: Number(order.recovery_email_step ?? 0),
+      currentStep: order.current_step ?? null,
+      manualRecoveryEmailAt: order.manual_recovery_email_at ?? null,
+      manualRecoveryEmailBy: order.manual_recovery_email_by ?? null,
     });
   }
 
