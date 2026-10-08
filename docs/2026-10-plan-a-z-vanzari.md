@@ -244,6 +244,14 @@ Cota e de circa 10 cereri pe zi pentru fiecare proprietate.
 
 **Verificare de seară (06.10, ~18:00)**, comenzi plătite din DB, săptămâni de luni: eghiseul 74 → 52 → 20 → 17 → 27 → 26 → 13 → 20 (de la 10.08 la 28.09), deci ~o treime din nivelul dinainte de update și stagnează; CJO 33 → 23 → 22 → 18, scade. eghiseul, 30 de zile: 41 plătite cu prima vizită din căutare (14.268 lei), 44 fără sursă (15.896 lei), **0 din reclame plătite**. documentero: 3 comenzi începute azi, 0 plătite. Google Ads: celibatul rămâne la 0 afișări (vezi A3).
 
+## Jurnal 08.10.2026 (verificare dimineață)
+
+**🔴 CJO: formularele începute au scăzut de 3–4 ori din 06.10.** Pasul 1 (`abandoned_sessions`): 55–87 pe zi lucrătoare până pe 01.10 → luni 05.10: 40 → marți: 16 → miercuri: 17. Raportul formulare / clicuri GSC era 9–12%; luni 7,4%, marți–miercuri ~3% la trafic egal (GSC pentru 06–07.10 încă lipsește). Plătite luni–miercuri: 12 · 13 · 12 · 11 → **6**. Cauza: C1 (05.10) a pus „program ghișeu” în titlu și „gratuit la ghișeu” ca primă frază, iar formularul a coborât la 1,17 ecrane pe mobil; H14 (06.10) a pus blocul „Pe scurt” deasupra formularului pe prima pagină și pe fiscal. **Reparat 08.10** (CJO `4812265e`, `changelog/2026-10-08-cjo-formular-deasupra.md`): formularul sub titlu pe oraș/prima pagină/fiscal, titluri de oraș pe „online, fără drum la poliție”, fără „gratuit” sus (Raul). Verificare: 09.10 GSC pe 06.10; 13.10 raportul pe 09–12.10, ținta 9%+.
+
+**Restul:** eghiseul 12 plătite luni–miercuri (3.949 lei), cel mai bun început de săptămână din septembrie. GSC eghiseul −16% pe 2 săptămâni, dar pe calculatoarele de pensie (știrea a trecut), nu pe `/servicii/`; expunerile tot ~31k/săpt. CJO −22% clicuri săpt. 28.09 vs 21.09, cu pozițiile stabile (cererea, nu clasamentul). Warm-up: 1.900 trimise, 07.10 = 11 suprimate din 300 (3,7%), rămâne 300/zi. Email CJO pașii 2–3: 33 trimise, 0 conversii. documentero/ecazier: 0 plătite.
+
+**Lecție:** pe pagina de vânzare, răspunsul la „unde merg singur” stă SUB formular. Blocurile GEO/„Pe scurt” nu au voie să împingă formularul sub primul ecran pe mobil.
+
 ## Jurnal 07.10.2026 (verificare dimineață, ~07:45)
 
 **Search Console** (clicuri pe săptămână; datele ajung până pe 05.10, 06.10 e parțial):
