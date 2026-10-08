@@ -26,7 +26,9 @@ Legendă: ✅ făcut · 🔄 în lucru · ⬜ de făcut · ⏸ așteaptă ceva
 
 ### ⏭ Unde am rămas (08.10, ~10:00): de aici se reia
 
-**Decizia lui Raul, 08.10:** lăsăm totul cum e până mâine (09.10). Dacă formularele CJO nu revin, decidem ce facem. Emailul rămâne la fel: warm-up 300/zi; B6–B11 nu pornesc încă.
+**Decizia lui Raul, 08.10 (după-amiază):** paginile CJO rămân cu reparația de azi până **luni 12.10**. Atunci comparăm formularele începute pe 09–12.10 cu 55–87/zi lucrătoare. Dacă nu revin peste ~40/zi lucrătoare, readucem paginile de oraș, prima pagină și fiscal exact la versiunea dinainte de 05.10 (înainte de C1/H14). Între timp: B9 LIVE (emailul „Mai aveți nevoie?”, CJO `58368ae5`), B10 așteaptă răspunsul lui Raul.
+
+**Decizia lui Raul, 08.10 (dimineață):** lăsăm totul cum e până mâine (09.10). Dacă formularele CJO nu revin, decidem ce facem. Emailul rămâne la fel: warm-up 300/zi; B6–B11 nu pornesc încă.
 
 **Mâine, 09.10, dimineața**
 1. **CJO, formularele începute** după reparația din 08.10 (CJO `4812265e`): `abandoned_sessions` pe 08.10 și 09.10 (sursa `cazierjudiciaronline`). Normal: 55–87 pe zi lucrătoare; 06–07.10: 16–17. Interogarea și tabelul: jurnalul din 08.10, mai jos.
