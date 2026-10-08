@@ -30,7 +30,7 @@ Legendă: ✅ făcut · 🔄 în lucru · ⬜ de făcut · ⏸ așteaptă ceva
 1. Cereri de indexare pe CJO (proprietatea URL-prefix `https://cazierjudiciaronline.com/`, contul u/0): `/cazier-judiciar-online/ploiesti`, `/cazier-fiscal-online`, `/cazier-judiciar-diaspora`, plus cele 6 pagini cu titluri noi (integritate, gratuit, persoane fizice, călătorie cu minori, taxă, valabilitate). Cota e ~10 pe zi; ce nu intră, mâine.
 
 **În fiecare dimineață**
-2. Warm-up: emailurile întoarse pe ziua precedentă (Resend). Rămâne la 300/zi; creștem doar după 3 zile la rând sub 3% și fără plângeri. 07.10: 4,8% și o plângere de spam.
+2. Warm-up: suprimate pe ziua precedentă (`contacts.marketing_status`). Rămâne la **300/zi**; NU creștem până la subdomeniul separat (B7), pentru că lead-urile WP au adus 0 comenzi din 1.716 și pleacă de pe același domeniu ca confirmările de comandă. Planul complet de email: secțiunea B.
 3. Webhook-ul Resend (reactivat 07.10): crește numărul de contacte `suppressed` (27 la 07.10, 09:40)?
 
 **Clipuri YouTube și Facebook** (Raul a postat pe 07.10; calendarul și jurnalul: `marketing/video-social/plan-postari-2026-10.md`)
@@ -87,6 +87,7 @@ Regulă: **nu umblăm de două ori la aceeași pagină în mai puțin de 14 zile
 | # | Decizie | De ce contează |
 |---|---|---|
 | A8 | Reclame pe documente după respingere: (1) raportăm cele 4 SRL-uri care rulează + tichetul Google, (2) o cerere de certificare pe ecazier pe calea „avocat în Tabloul UNBR” (Legea 290/2004 art. 31), (3) urmărim răspunsurile MAI. Analiza: `ads/2026-10-07-cine-ruleaza-si-ce-putem-face.md` | contestația simplă nu mai are sens: regula de la 05.10 cere un link guvernamental, nu un text mai bun |
+| B7/B9/B10/B11 | Email: subdomeniu separat pentru marketing; un email „Mai ai nevoie?” către cei din formular neplătiți de 2–60 de zile (CJO 2.877, eghiseul 339); verificarea listei de 70k (150–400 $). Detalii: secțiunea B | singurul volum de email cu intenție de cumpărare; fără subdomeniu, warm-up-ul riscă livrarea confirmărilor de comandă |
 | H10 | Trimiterea drafturilor: cerere `rel=sponsored` la ProTV/Antena 3/infocons, comunicatul, articolul avocatei | P5 nu pornește fără ele |
 | G3 | Excepție în blocantul de reclame pentru ads.google.com | fără ea salvările din Google Ads se pierd |
 | — | Meta: test mic pe celibat/diaspora cu clipuri (singurul canal plătit deschis pe stare civilă; cererea e mică: ~100 afișări Google în 2 săpt., 14 citări AI în 3 luni) + boostul pe Facebook din `marketing/video-social/` | Google, Microsoft și ChatGPT sunt închise pe cazier și stare civilă (`seo/2026-10-07-unde-stam-seo-ai-reclame.md`) |
@@ -136,15 +137,47 @@ Baza de comparație = 21.09–05.10 (14 zile, GSC). Comparăm pe aceeași lungim
 
 Planul complet: `ads/2026-10-05-documentero-lansare-ads.md`, `ads/2026-10-05-documentero-campanii.md`, `ads/2026-10-05-lectii-cont-vechi-pentru-documentero.md`.
 
-## B. Email (lista de 72k contacte)
+## B. Email: ce trimitem, cât și cum creștem (refăcut 08.10)
 
-| # | Ce | Când | Stare |
+**Fotografia la 08.10** (DB, comandă plătită pe aceeași adresă în 30 de zile de la email):
+
+| Flux | Site | Cât trimite acum | Unde se schimbă | Rezultat | Concluzie |
+|---|---|---|---|---|---|
+| Warm-up, **clienți vechi** (`is_customer`) | eghiseul | gata: 434 din 438 trimiși | — | **8 plătite, 1.487 lei**; 11 dezabonări | merge, dar segmentul s-a terminat |
+| Warm-up, **lead-uri WP** (formulare vechi, fără comandă) | eghiseul | 300/zi, din oră în oră | `/admin/marketing` → „câți pe zi” (max 5.000) | 1.716 trimise → **0 plătite**; 35 suprimate (2%); domeniile din afara Gmail/Yahoo/Microsoft: **10,5%** întoarse | mai mult volum aici nu aduce vânzări azi |
+| Lifecycle (expirare, recenzie, cross-sell) | eghiseul | 5–10/zi, tot ce e eligibil | crește doar cu comenzile | cross-sell 291 → 7 plătite (863 lei), expirare 200 → 5 (585 lei) | nu are ce crește |
+| Recuperare abandon (automat pașii 1–2 + email de echipă) | eghiseul | după abandon | `/admin/recuperare-telefonica` | 73 → 8 plătite (3.866 lei) în 21 de zile | cel mai bun canal de email |
+| Lifecycle + recâștigare (`winback`) | CJO | 06.10: 197 (coada veche golită); apoi 0–5/zi | 150/rulare, recâștigare 100/rulare (`src/lib/lifecycle/rules.ts`) | 0 plătite după 2 zile | prea devreme; plafonul nu e atins |
+| Email fără cupon pe pașii 2–3 (test) | CJO | max 20 la 15 min, doar sub 48 h | `src/app/api/cron/abandonment/route.ts` | 33 → 0 plătite | oprim la ~300 fără vânzare |
+| Recuperare pasul 4+, cupon 15% | CJO | după abandon | același cron | — | rămâne |
+
+**Ce rămâne în coada de warm-up:** 70.164 de adrese, toate lead-uri WP: Gmail 34.266 · Yahoo 28.761 · alte domenii 6.562 · Microsoft 575. Clienții s-au terminat.
+
+**De ce NU urcăm acum warm-up-ul peste 300/zi:**
+1. Lead-urile WP n-au cumpărat nimic din 1.716 emailuri. Volumul în plus nu aduce bani.
+2. Warm-up-ul pleacă de pe `comenzi@eghiseul.ro`, aceeași adresă și același domeniu ca **confirmările de comandă, facturile și linkurile de plată**. Fiecare email întors sau marcat spam din lista rece strică livrarea emailurilor de care depind comenzile plătite. Contul Resend e comun și cu MomenteQR/CheckID.
+3. Pe 07.10 am avut 4,8% emailuri întoarse și o plângere de spam la 600/zi.
+
+**Unde există volum cu intenție de cumpărare:** oameni care au lăsat emailul în formular și n-au plătit niciodată.
+
+| Site | 2–14 zile | 14–60 zile | peste 60 de zile |
 |---|---|---|---|
-| B1 | Warm-up din oră în oră, plafon zilnic setabil până la 5.000 | 05.10 | ✅ |
-| B2 | Plafon 300/zi | 05.10 | ✅ |
-| B3 | Urcăm la 600/zi dacă emailurile întoarse < 3% și plângerile < 0,1% (Resend) | 07.10 | ⬜ Verificat 06.10: 05.10 = 340 livrate, 3 întoarse (0,9%), 0 plângeri; dezabonări din 26.09 încoace: 1 la ~1.050 trimise (0,1%). Condițiile sunt îndeplinite |
-| B4 | 1.200/zi, apoi 2.000/zi, cu aceeași regulă | 09.10, 12.10 | ⬜ |
-| B5 | Câte comenzi vin din warm-up (cuponul `FIDEL-`, `utm_campaign=warmup`) | săptămânal | ⬜ |
+| CJO | 463 | 2.414 | 9.403 |
+| eghiseul | 36 (0–14) | 339 | 370 |
+
+### Pașii, în ordine
+
+| # | Ce | Cine | Când | Cum știm că merge | Stare |
+|---|---|---|---|---|---|
+| B6 | Warm-up: sărim domeniile din afara Gmail/Yahoo/Microsoft (6.562 de adrese, 10,5% întoarse). Rămâne la **300/zi** | cod (eu) | 09.10 | sub 2% suprimate pe zi | ⬜ |
+| B7 | **Subdomeniu separat pentru emailurile de marketing** (de ex. `info.eghiseul.ro`) în Resend, cu SPF, DKIM și DMARC. Warm-up și campaniile pleacă de acolo; confirmările, facturile și plățile rămân pe `eghiseul.ro` | Raul (DNS în Vercel) + cod | săpt. 42 | domeniul apare „Verified” în Resend; testul de livrare ajunge în Inbox, nu în Spam | ⏸ decizie Raul |
+| B8 | Abia după B7: warm-up 300 → 600 → 1.000 → 2.000 pe zi. Fiecare treaptă după **3 zile la rând sub 2% suprimate și 0 plângeri** | eu, din `/admin/marketing` | după B7 | regula din coloana „Ce” | ⬜ |
+| B9 | **CJO: un singur email „Mai ai nevoie de cazier?”**, fără cupon, către cei din formular 2–60 de zile, neplătiți (2.877 de adrese), 100/zi, de pe cazierjudiciaronline.com, cu link de dezabonare. Peste 60 de zile nu trimitem (adrese vechi, interes legitim slab) | cod (eu) | după măsurarea din 12.10 | test pe primele 500: oprim dacă 0 plătite în 7 zile; continuăm la ≥2 plătite | ⏸ decizie Raul |
+| B10 | **eghiseul: același email** pentru cei 339 neplătiți de 14–60 de zile (secvența de recuperare s-a încheiat pentru ei) | cod (eu) | împreună cu B9 | aceeași regulă | ⏸ decizie Raul |
+| B11 | Opțional: verificarea listei de 70k la un serviciu extern (ZeroBounce, NeverBounce), circa 150–400 $. Scoate căsuțele moarte înainte de trimitere | Raul (cost) | doar dacă vrem warm-up peste 1.000/zi | sub 1% întoarse după curățare | ⏸ decizie Raul |
+| B12 | Măsurare în fiecare luni: comenzi plătite pe flux (tabelul de mai sus) + suprimate/dezabonări pe zi | eu | 12.10, 19.10 | rândul din „Scor săptămânal” | ⬜ |
+
+Istoric: B1 (warm-up din oră în oră, plafon până la 5.000) și B2 (300/zi) ✅ 05.10; B3 (600/zi) ↩ 07.10, întors la 300 din cauza emailurilor întoarse; B4 (1.200, apoi 2.000) e înlocuit de B8; B5 (măsurarea) e acum B12.
 
 ## C. cazierjudiciaronline.com (vinde cel mai bine din organic)
 
