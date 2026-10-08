@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-10-08 | 🟣 **CJO: emailul „Mai aveți nevoie de cazier?” pentru formularele de 2–60 de zile** — o dată pe adresă, fără cupon, 10/oră, 100/zi, oprire la 500 (test B9); migrarea CJO 040; plus linkul de cazier judiciar din lifecycle ducea pe 404 (CJO `58368ae5`) | [2026-10-08-cjo-email-mai-aveti-nevoie.md](2026-10-08-cjo-email-mai-aveti-nevoie.md) |
 | 2026-10-08 | 🔴 **CJO: formularul înapoi deasupra pliului (oraș, prima pagină, fiscal)** — din 05–06.10 formularele începute pe clic au scăzut de la ~10% la ~3% (titlu „program ghișeu”, „gratuit la ghișeu” și blocul „Pe scurt” deasupra formularului); titlu online pe orașe, ordinea hero: titlu+preț → formular → răspuns/ghișeu; fără „gratuit” sus (CJO `4812265e`) | [2026-10-08-cjo-formular-deasupra.md](2026-10-08-cjo-formular-deasupra.md) |
 | 2026-10-07 | 🟣 **CJO: un email fără cupon la abandon pe pașii 2–3 (test)** — o dată pe adresă, după 2 h inactiv, sub 48 h, max 20/rulare, fără ecazier/suprimați; oprire după ~300 fără vânzare; migrarea CJO 039 | [2026-10-07-cjo-email-pasii-2-3.md](2026-10-07-cjo-email-pasii-2-3.md) |
 | 2026-10-07 | 🟣 **Recuperare: email trimis de echipă, fără cupon; pasul 3 cu cupon scos** — buton „Email” + selecție multiplă în Recuperare telefonică (`/api/admin/orders/recovery-email`, migrarea 192); pasul 3 al cronului nu mai trimite cupon (0/74 plăți), comanda apare „2 emailuri fără răspuns” | [2026-10-07-recuperare-email-manual-fara-cupon.md](2026-10-07-recuperare-email-manual-fara-cupon.md) |
