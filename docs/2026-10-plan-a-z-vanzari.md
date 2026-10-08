@@ -24,10 +24,17 @@ Legendă: ✅ făcut · 🔄 în lucru · ⬜ de făcut · ⏸ așteaptă ceva
 
 ## ▶ Planul de urmat (refăcut 07.10.2026)
 
-### ⏭ Unde am rămas (07.10, ~10:30): de aici se reia
+### ⏭ Unde am rămas (08.10, ~10:00): de aici se reia
 
-**Azi, după 13:00**
-1. Cereri de indexare pe CJO (proprietatea URL-prefix `https://cazierjudiciaronline.com/`, contul u/0): `/cazier-judiciar-online/ploiesti`, `/cazier-fiscal-online`, `/cazier-judiciar-diaspora`, plus cele 6 pagini cu titluri noi (integritate, gratuit, persoane fizice, călătorie cu minori, taxă, valabilitate). Cota e ~10 pe zi; ce nu intră, mâine.
+**Decizia lui Raul, 08.10:** lăsăm totul cum e până mâine (09.10). Dacă formularele CJO nu revin, decidem ce facem. Emailul rămâne la fel: warm-up 300/zi; B6–B11 nu pornesc încă.
+
+**Mâine, 09.10, dimineața**
+1. **CJO, formularele începute** după reparația din 08.10 (CJO `4812265e`): `abandoned_sessions` pe 08.10 și 09.10 (sursa `cazierjudiciaronline`). Normal: 55–87 pe zi lucrătoare; 06–07.10: 16–17. Interogarea și tabelul: jurnalul din 08.10, mai jos.
+2. **GSC CJO pe 06.10** (date noi): clicurile au rămas ~550–700? Dacă da, căderea a venit din pagină, nu din trafic, iar reparația e direcția bună. Dacă și clicurile au scăzut puternic, problema e (și) în Google.
+3. Decizii de luat după 1–2: dacă formularele revin spre 50/zi, nu mai umblăm (regula de 14 zile; măsurăm 13.10). Dacă nu revin: verificăm formularul pe telefon (pasul 1 pornește sesiunea?) și traficul pe paginile de oraș.
+4. Email: suprimate pe 08.10 sub 3%? Apoi răspunsul lui Raul pe B7 (subdomeniu), B9/B10 (emailul „Mai ai nevoie?”), B11 (verificarea listei).
+
+**Rămase din 07.10:** cererile de indexare pe CJO (`/cazier-judiciar-online/ploiesti`, `/cazier-fiscal-online`, `/cazier-judiciar-diaspora` + cele 6 pagini cu titluri noi). Acum se adaugă paginile de oraș, prima pagină și fiscal, schimbate pe 08.10. Cota e ~10 pe zi.
 
 **În fiecare dimineață**
 2. Warm-up: suprimate pe ziua precedentă (`contacts.marketing_status`). Rămâne la **300/zi**; NU creștem până la subdomeniul separat (B7), pentru că lead-urile WP au adus 0 comenzi din 1.716 și pleacă de pe același domeniu ca confirmările de comandă. Planul complet de email: secțiunea B.
@@ -169,7 +176,7 @@ Planul complet: `ads/2026-10-05-documentero-lansare-ads.md`, `ads/2026-10-05-doc
 
 | # | Ce | Cine | Când | Cum știm că merge | Stare |
 |---|---|---|---|---|---|
-| B6 | Warm-up: sărim domeniile din afara Gmail/Yahoo/Microsoft (6.562 de adrese, 10,5% întoarse). Rămâne la **300/zi** | cod (eu) | 09.10 | sub 2% suprimate pe zi | ⬜ |
+| B6 | Warm-up: sărim domeniile din afara Gmail/Yahoo/Microsoft (6.562 de adrese, 10,5% întoarse). Rămâne la **300/zi** | cod (eu) | 09.10 | sub 2% suprimate pe zi | ⏸ Raul 08.10: așteptăm până pe 09.10 |
 | B7 | **Subdomeniu separat pentru emailurile de marketing** (de ex. `info.eghiseul.ro`) în Resend, cu SPF, DKIM și DMARC. Warm-up și campaniile pleacă de acolo; confirmările, facturile și plățile rămân pe `eghiseul.ro` | Raul (DNS în Vercel) + cod | săpt. 42 | domeniul apare „Verified” în Resend; testul de livrare ajunge în Inbox, nu în Spam | ⏸ decizie Raul |
 | B8 | Abia după B7: warm-up 300 → 600 → 1.000 → 2.000 pe zi. Fiecare treaptă după **3 zile la rând sub 2% suprimate și 0 plângeri** | eu, din `/admin/marketing` | după B7 | regula din coloana „Ce” | ⬜ |
 | B9 | **CJO: un singur email „Mai ai nevoie de cazier?”**, fără cupon, către cei din formular 2–60 de zile, neplătiți (2.877 de adrese), 100/zi, de pe cazierjudiciaronline.com, cu link de dezabonare. Peste 60 de zile nu trimitem (adrese vechi, interes legitim slab) | cod (eu) | după măsurarea din 12.10 | test pe primele 500: oprim dacă 0 plătite în 7 zile; continuăm la ≥2 plătite | ⏸ decizie Raul |
