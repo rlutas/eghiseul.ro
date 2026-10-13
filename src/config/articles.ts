@@ -101,8 +101,8 @@ export const ARTICLES: ArticleMeta[] = [
   },
   {
     slug: 'amenda-rovinieta-2025-tarife-plata-online-ghid-complet',
-    title: 'Amendă Rovinietă 2026: Tarife, Plată Online și Contestație',
-    excerpt: 'Cuantumul pe categorii, de când curg cele 15 zile pentru jumătate din minim, cine răspunde la mașina vândută sau în leasing și ce se schimbă de la 1 octombrie 2026.',
+    title: 'Amendă Rovinietă 2026: Sume, Plată și Contestație',
+    excerpt: 'Amenda pe categoriile A–D după 1 octombrie 2026, de când curg cele 15 zile pentru jumătate din minim, unde contești și ce se aplică la camioane (TollRo).',
     category: 'Auto',
   },
   {
