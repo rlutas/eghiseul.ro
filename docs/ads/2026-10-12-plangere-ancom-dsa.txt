@@ -1,0 +1,48 @@
+G6 — Plângere DSA la ANCOM (coordonatorul serviciilor digitale)
+Unde: https://infocentru.ancom.ro/formular-dsa/  (formular online; nu se trimite pe email)
+Anexa (un singur fișier .zip): Desktop/plangeri-google/anexe-google-ads.zip
+Ordinea: trimite G6 și G7 ÎNAINTE de G3 (G3 spune că am sesizat deja ANCOM și Consiliul Concurenței).
+
+=== Câmpurile formularului ===
+
+Sunt: Persoană juridică
+Împuternicire/procură: În nume propriu
+Nume și prenume: EDIGITALIZARE SRL, prin administrator Raul Luțaș
+Adresă de domiciliu/reședință/sediu: Str. Salcâmilor nr. 2, com. Odoreu, jud. Satu Mare (CUI RO49278701, J2023001097301)
+Adresă poștă electronică: serviciiseonethut@gmail.com
+Telefon contact: +40 745 850 700
+Furnizorul de servicii intermediare reclamat: Google Ireland Limited (Google Ads / Google Search)
+Adresă/sediu: Gordon House, Barrow Street, Dublin 4, Irlanda
+URL/link date furnizor / cont afectat: https://ads.google.com — cont Google Ads 677-995-5005 (EDIGITALIZARE SRL, domeniul eghiseul.ro); tichete 1-6533000041865 și 6-4960000040774
+Te-ai adresat furnizorului?: DA
+Te-ai adresat unui organism de soluționare extrajudiciară și/sau instanței?: NU
+Tip încălcare: (Art. 14) - Condiții generale utilizare
+   (dacă formularul permite o singură opțiune, alege Art. 14; Art. 17 și Art. 20 sunt menționate în text)
+Adresă e-mail pentru răspuns: serviciiseonethut@gmail.com
+Bifezi: „Îmi asum răspunderea…” și „Am luat la cunoștință”.
+
+=== Obiectul plângerii (de copiat în câmp) ===
+
+EDIGITALIZARE SRL (eghiseul.ro) oferă servicii private de asistență pentru obținerea unor documente (cazier judiciar, certificate de stare civilă, certificat constatator). Cererile clienților sunt depuse de un avocat colaborator în baza împuternicirii avocațiale, singura cale prin care legea română permite unui terț să solicite cazierul judiciar pentru o persoană fizică (art. 31 din Legea nr. 290/2004), lucru confirmat în scris de Inspectoratul General al Poliției Române (răspunsul nr. 407.976 din 12.10.2026, anexat).
+
+Google respinge toate anunțurile noastre pentru aceste servicii, pe politica „Documente guvernamentale și servicii oficiale”. Criteriul invocat este ca domeniul nostru să aibă un link de pe un site guvernamental oficial care să ne numească furnizor autorizat. În România nu există un astfel de regim de autorizare pentru firme private, iar nicio instituție nu publică astfel de linkuri. Google a recunoscut acest lucru în scris pe 30.09.2026 („guvernul român nu oferă, de regulă, astfel de linkuri către furnizorii privați”), dar a menținut decizia ca finală.
+
+În același timp, Google permite altor intermediari privați din România, aflați în exact aceeași situație juridică, să difuzeze anunțuri pentru aceleași documente. Potrivit Google Ads Transparency Center (12.10.2026, regiunea România):
+- Servicii Complete Online SRL (caziere.ro): anunț pentru cazier judiciar, prima afișare 05.10.2026, ultima 11.10.2026;
+- FlowDocs S.R.L. (obtinecazier.ro): cazier judiciar, ultima afișare 11.10.2026, 1–1,25 milioane de afișări;
+- Centrul de Soluții Administrative S.R.L. (roghiseul.ro): cazier judiciar, ultima afișare 09.10.2026;
+- OpenCode SRL (constatator-online.ro): certificat constatator ONRC, ultima afișare 11.10.2026, 1–1,25 milioane de afișări.
+Niciuna dintre aceste firme nu figurează pe un site guvernamental ca furnizor autorizat.
+
+Situația durează de peste un an. În tot acest timp am folosit toate căile interne ale Google: contestații ale anunțurilor (inclusiv contestația 58971307 din 01.09.2026), tichetele de suport 1-6533000041865 și 6-4960000040774, două scrisori motivate (07.09 și 30.09.2026) și raportarea anunțurilor concurenților (12.10.2026). Am primit răspunsuri automate, trimiteri către o certificare care în România nu poate fi obținută de nimeni și, în final, confirmarea deciziei, fără niciun răspuns la întrebarea esențială. Nu avem altă cale amiabilă.
+
+Considerăm că Google nu își respectă obligațiile din Regulamentul (UE) 2022/2065:
+1. art. 14 alin. (4): restricțiile din condițiile generale trebuie aplicate „cu diligență, obiectivitate și proporționalitate”. Google aplică criteriul doar unor advertiseri, nu tuturor celor aflați în aceeași situație, și refuză să explice diferența;
+2. art. 17: expunerea de motive nu explică de ce aceeași regulă nu se aplică și celorlalți advertiseri care furnizează exact același serviciu;
+3. art. 20: plângerile noastre interne (tichetele de mai sus, din 07.09 și 30.09.2026) nu au primit niciun răspuns la întrebarea esențială (linkul guvernamental al concurenților care rulează sau confirmarea că nu există), deși am cerut-o în ambele scrisori. Decizia a fost declarată finală fără motivare pe acest punct.
+
+Efectul: contul nostru (2,09 milioane de lei investiți în reclame în 2024–2026) este blocat pe aceste servicii, în timp ce concurenții continuă să ruleze. Vânzările noastre au scăzut cu 59% în 1–12 octombrie 2026 față de 1–12 septembrie.
+
+Vă rugăm să transmiteți plângerea coordonatorului serviciilor digitale din Irlanda (Coimisiún na Meán), unde este stabilit furnizorul, și să solicitați verificarea modului în care Google aplică această politică advertiserilor din România.
+
+Anexe (arhiva anexe-google-ads.zip): răspunsul IGPR nr. 407.976/12.10.2026; anexa cu anunțurile concurenților (Ads Transparency Center, 12.10.2026); corespondența cu Google (07.09, 30.09 și răspunsul Google din 30.09.2026).

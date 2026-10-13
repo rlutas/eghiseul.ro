@@ -1,0 +1,42 @@
+G7 — Sesizare la Consiliul Concurenței
+Către: office@consiliulconcurentei.ro (adresa de pe pagina de contact a Consiliului, verificată 12.10.2026)
+De pe: emailul firmei sau serviciiseonethut@gmail.com
+Anexa: Desktop/plangeri-google/anexe-google-ads.zip
+Notă: e o SESIZARE (Consiliul poate deschide investigație din oficiu). O PLÂNGERE formală (art. 41 din Legea 21/1996) cere formularul tipizat din Regulamentul aprobat prin Ordinul 1064/2025; dacă vrem acea cale, o pregătește avocata, pe formular.
+
+---------------------------------------------------------------------------
+
+Subiect: Sesizare – aplicarea discriminatorie a politicii Google Ads față de intermediarii de documente din România (EDIGITALIZARE SRL)
+
+Către Consiliul Concurenței,
+
+Subscrisa EDIGITALIZARE SRL, CUI RO49278701, J2023001097301, cu sediul în Str. Salcâmilor nr. 2, com. Odoreu, jud. Satu Mare, reprezentată de administrator Raul Luțaș, vă sesizăm cu privire la un posibil abuz de poziție dominantă al Google (Google Ireland Limited / Alphabet Inc.) pe piața serviciilor de publicitate în motoarele de căutare din România. Google este desemnat operator de tip „gatekeeper” pentru căutare și publicitate online în temeiul Regulamentului (UE) 2022/1925 (DMA).
+
+Situația de fapt
+
+1. Oferim servicii private de asistență pentru obținerea unor documente (cazier judiciar, certificate de stare civilă, certificat constatator). Cererile clienților sunt depuse de un avocat colaborator în baza împuternicirii avocațiale, calea legală confirmată în scris de Inspectoratul General al Poliției Române (răspunsul nr. 407.976 din 12.10.2026, anexat).
+
+2. Google respinge toate anunțurile noastre pentru aceste servicii. Motivul invocat: domeniul nostru nu are un link de pe un site guvernamental care să ne numească furnizor autorizat. În România nu există un astfel de regim de autorizare pentru firme private, lucru recunoscut de Google în scris pe 30.09.2026. Decizia a fost declarată finală.
+
+3. În aceeași perioadă, Google permite altor intermediari privați, aflați în exact aceeași situație juridică și fără niciun link guvernamental, să difuzeze anunțuri pentru aceleași documente (Google Ads Transparency Center, 12.10.2026):
+   - Servicii Complete Online SRL (caziere.ro): anunț nou pentru cazier judiciar, afișat între 05.10 și 11.10.2026;
+   - FlowDocs S.R.L. (obtinecazier.ro): cazier judiciar, ultima afișare 11.10.2026, 1–1,25 milioane de afișări;
+   - Centrul de Soluții Administrative S.R.L. (roghiseul.ro): cazier judiciar, ultima afișare 09.10.2026;
+   - OpenCode SRL (constatator-online.ro): certificat constatator, ultima afișare 11.10.2026, 1–1,25 milioane de afișări.
+
+4. Am cerut Google, în scris, pe 07.09 și pe 30.09.2026, fie linkul guvernamental al acestor advertiseri, fie aplicarea uniformă a regulii. Google nu a răspuns pe fond.
+
+De ce credem că e o problemă de concurență
+
+Google controlează accesul la publicitatea în căutare în România. Când aplică același criteriu doar unora dintre firmele aflate în situație identică, decide în practică cine din această piață își poate face publicitate și cine nu. Efectul asupra noastră: conturile de reclamă (2,09 milioane de lei investiți în 2024–2026) sunt blocate pe aceste servicii, iar vânzările au scăzut cu 59% în 1–12 octombrie 2026 față de 1–12 septembrie, în timp ce concurenții continuă să-și cumpere vizibilitate. Considerăm că poate fi vorba de aplicarea unor condiții inegale la prestații echivalente, interzisă de art. 6 alin. (1) lit. c) din Legea nr. 21/1996 și de art. 102 lit. c) TFUE.
+
+Ce vă solicităm
+
+Să analizați situația și, dacă apreciați că este cazul, să deschideți o investigație sau să sesizați Comisia Europeană, autoritatea care aplică Regulamentul DMA. Suntem disponibili pentru orice informații suplimentare și putem completa, la cerere, formularul de plângere prevăzut de Regulament.
+
+Anexe (arhiva anexe-google-ads.zip): răspunsul IGPR nr. 407.976/12.10.2026; anexa cu anunțurile concurenților (Google Ads Transparency Center, 12.10.2026); corespondența cu Google (07.09, 30.09 și răspunsul Google din 30.09.2026).
+
+Cu stimă,
+Raul Luțaș
+Administrator, EDIGITALIZARE SRL – eghiseul.ro
+Telefon: +40 745 850 700

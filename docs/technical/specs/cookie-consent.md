@@ -67,6 +67,8 @@ Pixeli de retargetare (Facebook/TikTok): **NU există pe site** — dacă se ada
 3. „Setări cookie-uri" din footer → redeschide; „Accept toate" → `gtag.js` se încarcă, apar `_ga*`, iar în `cookie_consent_log` apare rândul cu `consent_id`-ul din cookie.
 4. Redeschide setările → debifează Analiză → Salvează → `_ga*` șterse.
 
-## Extindere pe platformele soră (DE FĂCUT)
+## Extindere pe platformele soră
 
-CJO + cfunciara au aceeași expunere (GA fără consimțământ). Componentele sunt copiabile aproape 1:1: `consent.ts` + `cookie-consent.tsx` + `cookie-settings-link.tsx` + ruta `/api/consent-log` + migrarea 118 (pe DB-ul fiecărei platforme) + scos GA din layout + link în footer. Atenție la numele cookie-ului (poate rămâne `eg_cookie_consent` sau per-brand) și la `CONSENT_BANNER_VERSION` separat per site.
+**CJO + ecazier: LIVE din 12.10.2026** (CJO `02ee98f5`, migrarea CJO 041, cookie `cjo_cookie_consent`, GTM scos pe CJO). Detalii: [`../../changelog/2026-10-12-cjo-ecazier-banner-cookie.md`](../../changelog/2026-10-12-cjo-ecazier-banner-cookie.md).
+
+Rămâne neclară o zonă gri, pe ambele repo-uri: atribuirea first-party fără acord (`eg_attribution` în localStorage pe eghiseul, `cjo_attr` cookie pe CJO; ambele conțin și click id-ul). Stocarea pe terminal intră sub art. 4 alin. (5) chiar dacă e first-party (EDPB 2/2023). Variante: o declarăm ca acum sau o legăm de consimțământul de analiză/marketing. Decizie Raul.

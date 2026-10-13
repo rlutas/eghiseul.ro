@@ -1,0 +1,55 @@
+{
+  "site": "https://cfunciara.ro/",
+  "testStartUtc": "2026-10-12T09:21:13.495Z",
+  "method": "Chromium, context nou fără cookie-uri (echivalent incognito), nicio interacțiune cu bannerul, 8 secunde după încărcare",
+  "trackerRequests": [
+    {
+      "t": "2026-10-12T09:21:13.769Z",
+      "url": "https://www.googletagmanager.com/gtag/js?id=G-ZN7CXJ62T0"
+    },
+    {
+      "t": "2026-10-12T09:21:14.225Z",
+      "url": "https://region1.google-analytics.com/g/collect?v=2&tid=G-ZN7CXJ62T0&gtm=45je6a72v879530342za208zd879530342xf1&_p=1791796873815&gcs=G100&gcd=13p3p3p2p5l1&npa=1&dma_cps=-&dma=1&_eu=AAAAACAC&are=1&cid=1375174614.1791796874&frm=0&ibt=1&ngs=1&pscdl=denied&rcb=11&sr=1280x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B143.0.7499.4%7CChromium%3B143.0.7499.4%7CNot%2520A(Brand%3B24.0.0.0&uam=&uamb=0&uap=macOS&ua"
+    },
+    {
+      "t": "2026-10-12T09:21:14.225Z",
+      "url": "https://www.googletagmanager.com/gtag/js?id=AW-606102850&cx=c&gtm=4e6a72"
+    },
+    {
+      "t": "2026-10-12T09:21:14.382Z",
+      "url": "https://pagead2.googlesyndication.com/ccm/collect?rcb=10&frm=0&apvc=1&tid=AW-606102850&en=page_view&dl=https%3A%2F%2Fwww.cfunciara.ro%2F&scrsrc=www.googletagmanager.com&rnd=1116435278.1791796874&navt=n&npa=1&gtm=45be6a72v9136189855za208zb879530342zd879530342xecxf1&gcs=G100&gcd=13p3p3p2p5l1&dma_cps=-&dma=1&tag_exp=115938466~115938469~118897920~118897930~120213116~120385423~120469145~120469153~12104"
+    }
+  ],
+  "cookies": [
+    {
+      "name": "__lc_cid",
+      "domain": ".accounts.livechatinc.com",
+      "expires": "2027-11-16T09:21:15.171Z"
+    },
+    {
+      "name": "__lc_cst",
+      "domain": ".accounts.livechatinc.com",
+      "expires": "2027-11-16T09:21:15.171Z"
+    },
+    {
+      "name": "__lc_cid",
+      "domain": ".accounts.livechatinc.com",
+      "expires": "2027-11-16T09:21:15.171Z"
+    },
+    {
+      "name": "__lc_cst",
+      "domain": ".accounts.livechatinc.com",
+      "expires": "2027-11-16T09:21:15.171Z"
+    },
+    {
+      "name": "PHPSESSID",
+      "domain": "www.cfunciara.ro",
+      "expires": "session"
+    },
+    {
+      "name": "__oauth_redirect_detector",
+      "domain": "accounts.livechatinc.com",
+      "expires": "2026-10-12T09:21:45.171Z"
+    }
+  ]
+}

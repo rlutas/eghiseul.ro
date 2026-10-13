@@ -202,7 +202,9 @@ Se completează la fiecare postare și în fiecare luni. Cifrele vin doar din Yo
 | 06.10 | 5 clipuri programate în YouTube Studio (07–11.10) + 2 Reels programate în Meta Business Suite (08.10 și 11.10) | YouTube, Facebook | — |
 | 07.10 | Raul a făcut postări pe YouTube și Facebook. Tot azi devin publice trailerul (18:00) și clipul lung „Cât e valabil cazierul judiciar” (19:00) | YouTube, Facebook | prima citire: luni 12.10 |
 | 08.10 19:00 | Reel „Cât e valabil cazierul judiciar” | Facebook | |
-| 09.10 | Boost pe Reel-ul de mai sus, dacă Raul îl pornește (25–30 lei/zi, 5 zile) | Facebook (Meta Ads) | citire: 14.10 |
+| 07.10 09:30 | Reel „Cât e valabil cazierul judiciar” publicat (nu 08.10) | Facebook | 09.10: 208 reach, 337 vizualizări (neplătit) |
+| 09.10 ~11:00 | **Boost pornit** (Raul a cerut 30 lei/zi): reclamă nouă din Reel-ul de mai sus, obiectiv „vizitatori pe site”, buton „Learn more”, link `utm_source=facebook&utm_medium=paid&utm_campaign=boost-cazier-valabilitate`, România 22–55 (Advantage+), doar Facebook (fără Instagram/Messenger/Audience Network), fără categoria specială „angajare”. 30 lei/zi × 5 zile = 150 lei, 09–14.10, Visa ••0827. Status: în revizuire la Meta | Facebook (Meta Ads, cont eGhiseul.ro Ads) | citire: 14.10, canalul „Meta Ads” în admin |
+| 09.10 | Reels mutate pe **câte unul pe zi**, 11–18.10 (Raul: „zilnic, să încercăm maxim”): 11 străinătate 18:00 · 12 ce apare 19:00 · 13 apostilă 18:00 · 14 fiscal 12:30 · 15 fiscal vs atestare 12:30 · 16 cine îți cere cazierul 18:00 · 17 întreabă înainte 19:00 · 18 fiscal pe firmă 18:00 | Facebook | |
 | 10–11.10 | Clipul lung + Short „Cazierul din străinătate”, Reel pe 11.10 18:00 | YouTube, Facebook | |
 | 12.10 | Boost pe Reel-ul „străinătate”, dacă Raul îl pornește | Facebook (Meta Ads) | citire: 17.10 |
 

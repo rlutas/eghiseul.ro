@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>Situația vânzărilor și ce facem de azi</title>
+<style>
+  @page { size: A4; margin: 16mm 16mm 18mm 16mm; }
+  :root { --ink:#1b1f24; --muted:#5b6470; --line:#dfe3e8; --red:#b42318; --redbg:#fef3f2; --blue:#1d4ed8; --bluebg:#eff4ff; --green:#067647; --greenbg:#ecfdf3; }
+  * { box-sizing: border-box; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; color: var(--ink); font-size: 10.6pt; line-height: 1.45; margin: 0; }
+  h1 { font-size: 21pt; margin: 0 0 2mm; letter-spacing: -0.2px; }
+  h2 { font-size: 13.5pt; margin: 7mm 0 2.5mm; padding-bottom: 1.5mm; border-bottom: 2px solid var(--ink); }
+  h2, h3 { break-after: avoid; }
+  h3 { font-size: 11pt; margin: 4mm 0 1.5mm; }
+  p { margin: 0 0 2.5mm; }
+  .sub { color: var(--muted); font-size: 10pt; margin-bottom: 6mm; }
+  .alert { background: var(--redbg); border-left: 4px solid var(--red); padding: 3.5mm 4.5mm; margin: 4mm 0; }
+  .note { background: var(--bluebg); border-left: 4px solid var(--blue); padding: 3.5mm 4.5mm; margin: 4mm 0; }
+  .good { background: var(--greenbg); border-left: 4px solid var(--green); padding: 3.5mm 4.5mm; margin: 4mm 0; }
+  .kpis { display: flex; gap: 4mm; margin: 4mm 0 2mm; }
+  .kpi { flex: 1; border: 1px solid var(--line); border-radius: 2mm; padding: 3mm 4mm; }
+  .kpi .v { font-size: 18pt; font-weight: 700; }
+  .kpi .l { color: var(--muted); font-size: 9pt; }
+  .kpi.bad .v { color: var(--red); }
+  table { break-inside: avoid; width: 100%; border-collapse: collapse; margin: 2mm 0 3mm; font-size: 10pt; }
+  th, td { text-align: left; padding: 2mm 2.5mm; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 9pt; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .3px; }
+  td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.neg { color: var(--red); font-weight: 600; }
+  ol, ul { margin: 0 0 3mm; padding-left: 5.5mm; }
+  li { margin-bottom: 1.6mm; }
+  .box { border: 1px solid var(--line); border-radius: 2mm; padding: 3.5mm 4.5mm; margin: 3mm 0; break-inside: avoid; }
+  .script { background: #f6f7f9; border-radius: 2mm; padding: 3mm 4mm; font-size: 10pt; margin: 2mm 0 3mm; break-inside: avoid; }
+  .check li { list-style: none; margin-left: -5.5mm; }
+  .check li::before { content: "☐  "; font-size: 11pt; }
+  .fill { display: inline-block; min-width: 32mm; border-bottom: 1px solid var(--ink); }
+  .page-break { break-before: page; }
+  .foot { color: var(--muted); font-size: 8.5pt; margin-top: 6mm; border-top: 1px solid var(--line); padding-top: 2mm; }
+  b.r { color: var(--red); }
+</style>
+</head>
+<body>
+
+<h1>Unde suntem și ce facem de azi</h1>
+<div class="sub">Pentru toată echipa · 12 octombrie 2026 · de la Raul</div>
+
+<p>Vă scriu direct, pentru că situația e serioasă. Toți am muncit mult pentru ce avem, iar acum trebuie să luptăm împreună pentru fiecare client. Mai jos aveți cifrele reale, cauza și, cel mai important, ce face fiecare dintre noi în fiecare zi, începând de azi.</p>
+
+<h2>1. Cifrele</h2>
+
+<div class="kpis">
+  <div class="kpi"><div class="v">24.800 lei</div><div class="l">încasați 1–12 septembrie</div></div>
+  <div class="kpi bad"><div class="v">10.100 lei</div><div class="l">încasați 1–12 octombrie</div></div>
+  <div class="kpi bad"><div class="v">−59%</div><div class="l">față de aceeași perioadă din septembrie</div></div>
+</div>
+
+<table>
+  <tr><th>Site</th><th class="n">1–12 sept.</th><th class="n">1–12 oct.</th><th class="n">Diferență</th></tr>
+  <tr><td>eGhiseul</td><td class="n">11.260 lei · 38 comenzi</td><td class="n">6.740 lei · 23 comenzi</td><td class="n neg">−40%</td></tr>
+  <tr><td>CazierJudiciarOnline</td><td class="n">13.560 lei · 52 comenzi</td><td class="n">3.190 lei · 14 comenzi</td><td class="n neg">−76%</td></tr>
+  <tr><td>ecazier + documentero</td><td class="n">0</td><td class="n">200 lei · 1 comandă</td><td class="n">—</td></tr>
+</table>
+
+<div class="alert"><b>Septembrie a fost deja o lună grea:</b> abia am acoperit plățile. În ritmul de acum, octombrie iese la mai puțin de jumătate din septembrie. <b>Nu ne permitem să coborâm sub septembrie.</b> Dacă nu ne revenim, nu putem duce firma mai departe.</div>
+
+<p>Ca să fim din nou la nivelul din septembrie, ne lipsesc în jur de <b>1.200 de lei pe zi</b>. Asta înseamnă cam <b>5 comenzi plătite în plus în fiecare zi</b>. Se poate. Mai jos e de unde le luăm.</p>
+
+<h2>2. De ce s-a întâmplat</h2>
+<ul>
+  <li><b>Google ne-a retrogradat.</b> După actualizările din august și septembrie, eGhiseul și CazierJudiciarOnline apar mai jos în căutări. Vin mai puțini oameni pe site.</li>
+  <li><b>Reclamele pe cazier și acte de stare civilă sunt blocate</b> pe Google, Microsoft și ChatGPT, pentru toate firmele ca noi. Momentan nu putem cumpăra trafic.</li>
+  <li><b>Pe CazierJudiciarOnline</b>, o schimbare de pagină din 05.10 a împins formularul mai jos. Am reparat-o pe 08.10, iar oamenii încep din nou comanda normal. Acum lipsesc vizitatorii veniți din Google.</li>
+</ul>
+<div class="good"><b>Ce merge:</b> site-urile funcționează, plata funcționează (am verificat în Stripe: nu s-a pierdut nicio plată), iar cine ajunge la plată plătește. Problema e că vin mai puțini oameni. Deci <b>fiecare om care a început deja o comandă e foarte prețios.</b></div>
+
+<h2>3. Unde sunt banii pe care îi putem recupera chiar acum</h2>
+
+<table>
+  <tr><th>Ce</th><th class="n">Câți</th><th>Unde îi găsiți</th></tr>
+  <tr><td><b>CazierJudiciarOnline:</b> oameni care și-au lăsat datele și telefonul, dar n-au plătit (ultimele 14 zile)</td><td class="n"><b>277</b></td><td>meniul <b>Abandonuri</b></td></tr>
+  <tr><td>… dintre ei, ajunși la <b>Contract</b> sau <b>Plată</b>, adică la un pas de comandă</td><td class="n"><b class="r">115</b></td><td>Abandonuri, coloana „Ultimul pas” = 5 sau 6</td></tr>
+  <tr><td><b>CazierJudiciarOnline:</b> au intrat în pagina de plată și n-au terminat</td><td class="n">câțiva pe zi</td><td>meniul <b>Recuperare telefonică</b></td></tr>
+  <tr><td><b>eGhiseul:</b> comenzi neplătite în ultimele 14 zile</td><td class="n">65</td><td>meniul <b>Recuperare telefonică</b></td></tr>
+  <tr><td>… dintre ele, <b>încă nesunate</b></td><td class="n"><b class="r">50</b></td><td>tabul „De sunat”</td></tr>
+</table>
+
+<div class="alert"><b>Pe CazierJudiciarOnline nu a fost marcat încă niciun apel</b> în Recuperare telefonică, de când există (06.10). Acolo e cea mai mare pierdere și acolo începem. Pe eGhiseul, din 48 de clienți sunați, 2 au plătit după apel: <b>1.540 de lei</b>, adică exact tipul de bani care ne lipsește.</div>
+
+<p>Dacă recuperăm doar <b>1 din 10</b> din cei 277 de pe CazierJudiciarOnline, înseamnă aproape 30 de comenzi, cam <b>6.500 de lei</b>. Doar din apeluri.</p>
+
+
+<h2>4. Ce face fiecare, în fiecare zi</h2>
+
+<div class="box">
+<p><b>Responsabili:</b> eGhiseul: <span class="fill">&nbsp;</span> &nbsp;&nbsp; CazierJudiciarOnline: <span class="fill">&nbsp;</span></p>
+<p style="margin:0">Fiecare site are un responsabil, ca să nu sune doi colegi același client. Când responsabilul lipsește, preia celălalt.</p>
+</div>
+
+<h3>Dimineața (până la 10:00) și după-amiaza (15:00)</h3>
+<ul class="check">
+  <li><b>CazierJudiciarOnline → Abandonuri.</b> Sunați întâi oamenii de la pasul <b>6 (Plată)</b> și <b>5 (Contract)</b> din ultimele 3 zile, apoi pasul 4 și pasul 3. Cei de ieri și de azi au prioritate, pentru că își amintesc de noi.</li>
+  <li><b>CazierJudiciarOnline → Recuperare telefonică.</b> Toată lista „De sunat”. Apăsați <b>„Marchează sunat”</b> și scrieți o notă după fiecare apel.</li>
+  <li><b>eGhiseul → Recuperare telefonică.</b> Toată lista „De sunat”. Când sunt prea mulți: butonul <b>Email</b> pentru cei la care nu ajungeți.</li>
+  <li>Ținta de seară: <b>zero nesunați în ultimele 7 zile</b>, pe ambele site-uri.</li>
+</ul>
+
+<h3>Toată ziua</h3>
+<ul class="check">
+  <li><b>Răspundeți în maximum o oră</b> la telefon, WhatsApp și email (contact@), în program. Omul care întreabă e gata să cumpere; dacă îl lăsăm să aștepte, comandă de la altcineva.</li>
+  <li><b>Clientul blocat în formular</b> (nu-i merge poza, plata, semnătura) se ajută pe loc, cu ghidul „Ajutare client blocat” din Ghid. Dacă nu se rezolvă, îi spuneți lui Raul imediat, cu numărul comenzii.</li>
+  <li><b>La fiecare apel cu un client mulțumit</b>, întrebați-l dacă mai are nevoie de ceva: cazier fiscal, certificat de integritate, apostilă, traducere, pentru el sau pentru cineva din familie. Doar ce îi folosește cu adevărat.</li>
+  <li><b>La fiecare comandă livrată</b>, rugați clientul să ne lase o recenzie pe Google. Recenziile ne ajută să urcăm în căutări.</li>
+  <li><b>Distribuiți postările și clipurile noastre</b> de pe Facebook (din 11 până pe 18 octombrie apare câte unul pe zi). Fiecare distribuire aduce oameni pe care Google nu ni-i mai trimite.</li>
+</ul>
+
+<h3>O dată pe săptămână (fiecare)</h3>
+<ul class="check">
+  <li>Gândiți-vă la <b>3 firme sau persoane</b> care au nevoie des de caziere sau acte: contabili, firme de recrutare, agenții de muncă în străinătate, HR. Trimiteți-i lui Raul numele lor. Un client firmă aduce zeci de comenzi pe an.</li>
+</ul>
+
+<h2>5. Cum sunăm</h2>
+
+<div class="script">
+<b>Apel (30–60 de secunde):</b><br>
+„Bună ziua, sunt <i>[prenume]</i> de la <i>[CazierJudiciarOnline / eGhiseul]</i>. Am văzut că ați început o comandă pentru <i>[cazier judiciar]</i> și nu ați terminat-o. V-ați blocat undeva sau aveți o întrebare? Vă pot ajuta acum, durează două minute.”<br><br>
+Ascultați motivul. Cele mai dese: <b>nu avea actul la el</b> (poate relua din linkul primit pe email); <b>nu știa dacă e ce-i trebuie</b> (explicați); <b>prețul</b> (spuneți ce include: avocatul, depunerea, livrarea); <b>l-a făcut deja</b> (mulțumiți și închideți).
+</div>
+
+<div class="script">
+<b>WhatsApp, dacă nu răspunde:</b><br>
+„Bună ziua! Sunt <i>[prenume]</i> de la <i>[site]</i>. Am văzut că ați început comanda pentru <i>[serviciu]</i> și nu ați finalizat-o. Datele sunt salvate și puteți continua din linkul primit pe email. Dacă vă pot ajuta cu ceva, îmi scrieți aici. O zi bună!”
+</div>
+
+<h3>Ce NU facem</h3>
+<ul>
+  <li>Nu dăm reduceri pe CazierJudiciarOnline: clientul primește deja una automat. Pe eGhiseul, reducerea se dă doar din butonul de la „Marchează sunat”.</li>
+  <li>Nu sunăm același client de mai multe ori pe zi și nu insistăm. Un apel și un mesaj sunt de ajuns.</li>
+  <li>Nu promitem termene mai scurte decât cele de pe site.</li>
+  <li>Nu spunem că suntem instituție sau că emitem noi actul: noi <b>obținem</b> documentul, instituția îl <b>eliberează</b>.</li>
+  <li>Nu sunăm clienții ecazier (sunt clienții cabinetului de avocatură).</li>
+</ul>
+
+<h2>6. Ce face Raul în paralel</h2>
+<ul>
+  <li>Reparăm paginile și formularele ca să convertească mai bine, pe toate site-urile.</li>
+  <li>Muncim zilnic pentru întoarcerea în Google: conținut nou, verificat, câte o pagină pe săptămână, plus cereri de reindexare.</li>
+  <li>Emailuri către clienții vechi și către cei care n-au terminat comanda (comanda de azi-dimineață a venit dintr-un email).</li>
+  <li>Clipuri pe YouTube și Facebook și contestații pentru reclame.</li>
+</ul>
+
+<h2>7. Cum ne măsurăm</h2>
+<p>În fiecare <b>luni</b> ne uităm împreună la trei cifre:</p>
+<ol>
+  <li><b>Nesunați în ultimele 7 zile</b>, pe ambele site-uri (ținta: zero);</li>
+  <li><b>Recuperați</b>: tabul „✅ Recuperate” din Recuperare telefonică (câți au plătit după apel și ce sumă);</li>
+  <li><b>Încasările săptămânii</b>, față de aceeași săptămână din septembrie.</li>
+</ol>
+<p>Fără notă la apel nu putem vedea ce merge. De aceea, <b>fiecare apel se marchează</b>.</p>
+
+<div class="note" style="margin-top:6mm">Nu e vina nimănui că Google a schimbat regulile. Dar acum fiecare client contează. Dacă fiecare dintre noi face lucrurile de mai sus în fiecare zi, avem o șansă reală să trecem de luna asta și să ne revenim. Mulțumesc că sunteți aici. <b>— Raul</b></div>
+
+<div class="foot">Cifrele sunt din sistemul de comenzi, 12.10.2026, ora 10:45. Procedura completă de apel: Ghid → „Recuperare telefonică: cum sunăm clienții care n-au terminat comanda”.</div>
+
+</body>
+</html>

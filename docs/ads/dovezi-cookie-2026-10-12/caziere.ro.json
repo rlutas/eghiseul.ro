@@ -1,0 +1,69 @@
+{
+  "site": "https://caziere.ro/",
+  "testStartUtc": "2026-10-12T10:21:16.065Z",
+  "method": "Chromium, context nou fără cookie-uri (echivalent incognito), nicio interacțiune cu bannerul, 8 secunde după încărcare",
+  "trackerRequests": [
+    {
+      "t": "2026-10-12T10:21:16.679Z",
+      "url": "https://www.googletagmanager.com/gtag/js?id=AW-840657989"
+    },
+    {
+      "t": "2026-10-12T10:21:16.680Z",
+      "url": "https://www.clarity.ms/tag/veqh6w66b0"
+    },
+    {
+      "t": "2026-10-12T10:21:17.123Z",
+      "url": "https://scripts.clarity.ms/0.8.72-beta/clarity.js"
+    },
+    {
+      "t": "2026-10-12T10:21:17.164Z",
+      "url": "https://www.googletagmanager.com/gtag/js?id=G-2PGH8RBNKV&cx=c&gtm=4e6a72h1"
+    },
+    {
+      "t": "2026-10-12T10:21:17.164Z",
+      "url": "https://www.google.com/ccm/collect?rcb=7&frm=0&apvc=1&auid=1809718674.1791800477&dt=Cazier%20judiciar%20online%20-%20Eliberare%20cazier%20rapid%20%C8%99i%20f%C4%83r%C4%83%20deplas%C4%83ri&tid=AW-840657989&en=page_view&dl=https%3A%2F%2Fcaziere.ro%2F&scrsrc=www.googletagmanager.com&rnd=979123139.1791800477&navt=n&npa=1&us_privacy=1---&gtm=45be6a72h1v9179207286za208zd9179207286xecxf1&gcd=13l3l3l2l1l1"
+    },
+    {
+      "t": "2026-10-12T10:21:17.164Z",
+      "url": "https://ad.doubleclick.net/ccm/s/collect?auid=1809718674.1791800477&gtm=45be6a72h1v9179207286za208zd9179207286xecxf1&fmt=8"
+    },
+    {
+      "t": "2026-10-12T10:21:17.353Z",
+      "url": "https://region1.analytics.google.com/g/collect?v=2&tid=G-2PGH8RBNKV&gtm=45je6a72h1v9181225837za208zb9179207286zd9179207286xf1&_p=1791800476679&_gaz=1&gcd=13l3l3l2l1l1&npa=1&dma_cps=a&dma=1&ecid=1601216440&_eu=AAAAAGAC&are=1&cid=329030844.1791800477&ec_mode=a&frm=0&pscdl=noapi&rcb=2&sr=1280x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B143.0.7499.4%7CChromium%3B143.0.7499.4%7CNot%2520A(Brand%3B24.0.0.0"
+    },
+    {
+      "t": "2026-10-12T10:21:17.353Z",
+      "url": "https://stats.g.doubleclick.net/g/collect?v=2&tid=G-2PGH8RBNKV&cid=329030844.1791800477&gtm=45je6a72h1v9181225837za208zb9179207286zd9179207286xf1&rcb=2&aip=1&dma=1&dma_cps=a&gcd=13l3l3l2l1l1&npa=1&frm=0&tag_exp=115938466~115938469~118897920~118897930~120213116~120385422~120469145~120469153~121046263~121046271~121246026~121246034"
+    },
+    {
+      "t": "2026-10-12T10:21:17.487Z",
+      "url": "https://j.clarity.ms/collect"
+    },
+    {
+      "t": "2026-10-12T10:21:18.520Z",
+      "url": "https://j.clarity.ms/collect"
+    }
+  ],
+  "cookies": [
+    {
+      "name": "_gcl_au",
+      "domain": ".caziere.ro",
+      "expires": "2027-01-10T10:21:17.000Z"
+    },
+    {
+      "name": "CookieConsent",
+      "domain": "caziere.ro",
+      "expires": "session"
+    },
+    {
+      "name": "_ga_2PGH8RBNKV",
+      "domain": ".caziere.ro",
+      "expires": "2027-11-16T10:21:17.336Z"
+    },
+    {
+      "name": "_ga",
+      "domain": ".caziere.ro",
+      "expires": "2027-11-16T10:21:17.336Z"
+    }
+  ]
+}

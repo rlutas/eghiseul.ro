@@ -1,0 +1,13 @@
+{
+  "site": "https://cazierjudiciaronline.com/",
+  "testStartUtc": "2026-10-12T09:23:17.449Z",
+  "method": "Chromium, context nou fără cookie-uri (echivalent incognito), nicio interacțiune cu bannerul, 8 secunde după încărcare",
+  "trackerRequests": [],
+  "cookies": [
+    {
+      "name": "cjo_attr",
+      "domain": "cazierjudiciaronline.com",
+      "expires": "2027-01-10T09:23:18.172Z"
+    }
+  ]
+}

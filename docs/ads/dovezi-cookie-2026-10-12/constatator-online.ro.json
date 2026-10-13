@@ -1,0 +1,7 @@
+{
+  "site": "https://constatator-online.ro/",
+  "testStartUtc": "2026-10-12T09:21:23.019Z",
+  "method": "Chromium, context nou fără cookie-uri (echivalent incognito), nicio interacțiune cu bannerul, 8 secunde după încărcare",
+  "trackerRequests": [],
+  "cookies": []
+}

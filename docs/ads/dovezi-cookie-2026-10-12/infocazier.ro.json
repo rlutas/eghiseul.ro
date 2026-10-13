@@ -1,0 +1,46 @@
+{
+  "site": "https://infocazier.ro/",
+  "testStartUtc": "2026-10-12T09:21:04.599Z",
+  "method": "Chromium, context nou fără cookie-uri (echivalent incognito), nicio interacțiune cu bannerul, 8 secunde după încărcare",
+  "trackerRequests": [
+    {
+      "t": "2026-10-12T09:21:04.762Z",
+      "url": "https://www.googletagmanager.com/gtag/js?id=AW-17463009750"
+    },
+    {
+      "t": "2026-10-12T09:21:04.995Z",
+      "url": "https://www.clarity.ms/tag/tjjdo3obg0"
+    },
+    {
+      "t": "2026-10-12T09:21:05.151Z",
+      "url": "https://scripts.clarity.ms/0.8.72-beta/clarity.js"
+    },
+    {
+      "t": "2026-10-12T09:21:05.262Z",
+      "url": "https://region1.google-analytics.com/g/collect?v=2&tid=G-FMS30RTKVC&gtm=45be6a72v9227078946za208zd9227078946xf1&_p=1791796864993&gcs=G100&gcd=13q3q3q2q5G6&npa=1&dma_cps=-&dma=1&_eu=AAAAACAC&are=1&cid=40478928.1791796865&frm=0&ibt=1&ngs=1&pscdl=denied&rcb=5&sr=1280x900&uaa=arm&uab=64&uafvl=HeadlessChrome%3B143.0.7499.4%7CChromium%3B143.0.7499.4%7CNot%2520A(Brand%3B24.0.0.0&uam=&uamb=0&uap=macOS&uap"
+    },
+    {
+      "t": "2026-10-12T09:21:05.262Z",
+      "url": "https://pagead2.googlesyndication.com/ccm/collect?rcb=5&frm=0&apvc=1&tid=AW-17463009750&en=page_view&dl=https%3A%2F%2Finfocazier.ro%2F&scrsrc=www.googletagmanager.com&rnd=1189007639.1791796865&navt=n&npa=1&gtm=45be6a72v9227078946za208zd9227078946xecxf1&gcs=G100&gcd=13q3q3q2q5G6&dma_cps=-&dma=1&tag_exp=115938466~115938468~118897920~118897930~120213116~120385423~120469145~120469153~121046263~1210462"
+    },
+    {
+      "t": "2026-10-12T09:21:05.521Z",
+      "url": "https://o.clarity.ms/collect"
+    },
+    {
+      "t": "2026-10-12T09:21:09.053Z",
+      "url": "https://o.clarity.ms/collect"
+    },
+    {
+      "t": "2026-10-12T09:21:13.056Z",
+      "url": "https://o.clarity.ms/collect"
+    }
+  ],
+  "cookies": [
+    {
+      "name": "__cf_bm",
+      "domain": ".infocazier.ro",
+      "expires": "2026-10-12T09:51:04.760Z"
+    }
+  ]
+}

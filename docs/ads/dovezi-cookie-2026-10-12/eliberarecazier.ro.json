@@ -1,0 +1,42 @@
+{
+  "site": "https://eliberarecazier.ro/",
+  "testStartUtc": "2026-10-12T10:21:33.842Z",
+  "method": "Chromium, context nou fără cookie-uri (echivalent incognito), nicio interacțiune cu bannerul, 8 secunde după încărcare",
+  "trackerRequests": [
+    {
+      "t": "2026-10-12T10:21:34.348Z",
+      "url": "https://www.googletagmanager.com/gtm.js?id=GTM-56HVRR9S"
+    },
+    {
+      "t": "2026-10-12T10:21:34.723Z",
+      "url": "https://www.clarity.ms/tag/kmp18jdcbo?ref=gtm2"
+    },
+    {
+      "t": "2026-10-12T10:21:34.723Z",
+      "url": "https://www.google.com/ccm/collect?rcb=15&frm=0&apvc=1&ae=g&auid=886983678.1791800495&dt=Eliberare%20Cazier%20Judiciar%20Online%20%7C%20EliberareCazier.ro&en=page_view&dl=https%3A%2F%2Feliberarecazier.ro%2F&scrsrc=www.googletagmanager.com&rnd=1610082834.1791800495&navt=n&npa=1&ep.ads_data_redaction=0&gtm=45He6a72v9169949369za200zd9169949369xeaxf1&gcd=13l3l3l2l1l1&dma_cps=a&dma=1&tag_exp=115616985~"
+    },
+    {
+      "t": "2026-10-12T10:21:34.723Z",
+      "url": "https://ad.doubleclick.net/ccm/s/collect?auid=886983678.1791800495&gtm=45He6a72v9169949369za200zd9169949369xeaxf1&fmt=8"
+    },
+    {
+      "t": "2026-10-12T10:21:34.942Z",
+      "url": "https://scripts.clarity.ms/0.8.72-beta/clarity.js"
+    },
+    {
+      "t": "2026-10-12T10:21:35.326Z",
+      "url": "https://o.clarity.ms/collect"
+    },
+    {
+      "t": "2026-10-12T10:21:40.204Z",
+      "url": "https://o.clarity.ms/collect"
+    }
+  ],
+  "cookies": [
+    {
+      "name": "_gcl_au",
+      "domain": ".eliberarecazier.ro",
+      "expires": "2027-01-10T10:21:34.000Z"
+    }
+  ]
+}

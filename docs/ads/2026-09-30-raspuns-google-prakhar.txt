@@ -1,0 +1,25 @@
+Răspunsul Google Ads (Prakhar), tichet 6-4960000040774, primit după al doilea mesaj al nostru (30.09.2026). Copiat de Raul în conversație pe 12.10.2026.
+
+---------------------------------------------------------------------------
+
+Bună ziua Raul,
+Vă mulțumim pentru răbdare în timp ce am investigat această situație împreună cu specialiștii noștri în politici.
+
+Am reevaluat cu atenție contul dumneavoastră și argumentele prezentate cu privire la modul în care funcționează autorizațiile pe piața din România. Cu toate acestea, ar trebui să vă informez că decizia inițială rămâne în vigoare: anunțurile dumneavoastră sunt etichetate corect și vor rămâne respinse deoarece nu îndeplinesc cerințele stricte ale politicii privind „Documentele guvernamentale și serviciile oficiale” (GoDOS).
+
+Explicația politicii și decizia:
+
+Pentru a proteja utilizatorii împotriva potențialelor exploatări sau abuzuri, politica noastră permite doar guvernelor și furnizorilor autorizați să difuzeze anunțuri care promovează obținerea de documente guvernamentale.
+
+Pentru ca o entitate privată să fie recunoscută de Google drept „furnizor autorizat”, politica impune o cerință tehnică obligatorie și globală: domeniul dumneavoastră web (eghiseul.ro) ar trebui să fie conectat direct de pe un site web oficial al guvernului, care să precizeze în mod explicit că sunteți autorizat să furnizați acel serviciu.
+
+Înțelegem pe deplin argumentul dumneavoastră conform căruia guvernul român nu oferă, de regulă, astfel de linkuri către furnizorii privați în cadrul infrastructurii sale actuale. Totuși, politicile Google Ads sunt aplicate la nivel global și nu acordăm excepții regionale de la acest standard de verificare. Dacă un furnizor nu poate prezenta acest link direct de pe un site web guvernamental, sistemul nostru nu îl poate certifica drept furnizor autorizat.
+
+Prin urmare, sistemul a aplicat corect politica activă, iar anunțurile care promovează aceste servicii nu ar trebui să fie eligibile pentru a fi difuzate pe platforma noastră.
+
+Îmi pare rău că nu vă pot oferi un rezultat mai favorabil, însă sper că aceasta explică exact motivul pentru care anunțurile nu pot fi aprobai un partener apreciat.
+
+Cu stimă,
+Prakhar
+
+NB: Dacă ar trebui să faceți referire la acest tichet de asistență pe viitor, numărul de identificare este 6-4960000040774

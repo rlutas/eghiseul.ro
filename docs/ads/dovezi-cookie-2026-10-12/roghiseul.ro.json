@@ -1,0 +1,36 @@
+{
+  "site": "https://roghiseul.ro/",
+  "testStartUtc": "2026-10-12T10:21:42.542Z",
+  "method": "Chromium, context nou fără cookie-uri (echivalent incognito), nicio interacțiune cu bannerul, 8 secunde după încărcare",
+  "trackerRequests": [
+    {
+      "t": "2026-10-12T10:21:43.809Z",
+      "url": "https://www.googletagmanager.com/gtag/js?id=AW-11550071415"
+    },
+    {
+      "t": "2026-10-12T10:21:44.264Z",
+      "url": "https://www.google.com/ccm/collect?rcb=17&frm=0&apvc=1&auid=141288523.1791800504&dt=roGHI%C8%98EUL%20-%20Cazier%20Fiscal%20%C8%99i%20Cazier%20Judiciar%2C%20Certificat%20Constator&tid=AW-11550071415&en=page_view&dl=https%3A%2F%2Fwww.roghiseul.ro%2Fro%2Fcomanda&scrsrc=www.googletagmanager.com&rnd=1899430928.1791800504&navt=n&npa=1&gtm=45be6a72v9204019572za208zd9204019572xecxf1&gcd=13l3l3l2l1l1&dma_c"
+    },
+    {
+      "t": "2026-10-12T10:21:44.264Z",
+      "url": "https://ad.doubleclick.net/ccm/s/collect?auid=141288523.1791800504&gtm=45be6a72v9204019572za208zd9204019572xecxf1&fmt=8"
+    }
+  ],
+  "cookies": [
+    {
+      "name": "_gcl_au",
+      "domain": ".roghiseul.ro",
+      "expires": "2027-01-10T10:21:44.000Z"
+    },
+    {
+      "name": "PHPSESSID",
+      "domain": ".unitedwebsite.com",
+      "expires": "2026-10-12T11:21:44.299Z"
+    },
+    {
+      "name": "uws_last_fetched_device_id",
+      "domain": "www.roghiseul.ro",
+      "expires": "2027-10-12T10:21:44.629Z"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "site": "https://obtinecazier.ro/",
+  "testStartUtc": "2026-10-12T10:21:24.913Z",
+  "method": "Chromium, context nou fără cookie-uri (echivalent incognito), nicio interacțiune cu bannerul, 8 secunde după încărcare",
+  "trackerRequests": [
+    {
+      "t": "2026-10-12T10:21:25.108Z",
+      "url": "https://www.googletagmanager.com/gtag/js?id=AW-17507123346"
+    },
+    {
+      "t": "2026-10-12T10:21:25.275Z",
+      "url": "https://cdn.inspectlet.com/inspectlet.js?wid=2041275290&r=497722"
+    },
+    {
+      "t": "2026-10-12T10:21:25.451Z",
+      "url": "https://hn.inspectlet.com/ginit/2041275290"
+    },
+    {
+      "t": "2026-10-12T10:21:25.612Z",
+      "url": "https://www.google.com/ccm/collect?rcb=6&frm=0&apvc=1&auid=1609978567.1791800486&dt=Obtine%20Cazier%20%E2%80%93%20serviciu%20privat%20de%20intermediere&tid=AW-17507123346&en=page_view&dl=https%3A%2F%2Fobtinecazier.ro%2F&scrsrc=www.googletagmanager.com&rnd=199372518.1791800486&navt=n&npa=1&gtm=45be6a72z8f_AW-17507123346za208xecxf1&gcd=13l3l3l2l1l1&dma_cps=a&dma=1&tag_exp=115616985~115938465~1159384"
+    },
+    {
+      "t": "2026-10-12T10:21:25.612Z",
+      "url": "https://ad.doubleclick.net/ccm/s/collect?auid=1609978567.1791800486&gtm=45be6a72z8f_AW-17507123346za208xecxf1&fmt=8"
+    }
+  ],
+  "cookies": [
+    {
+      "name": "__insp_wid",
+      "domain": ".obtinecazier.ro",
+      "expires": "2027-10-12T10:21:25.450Z"
+    },
+    {
+      "name": "__insp_slim",
+      "domain": ".obtinecazier.ro",
+      "expires": "2027-10-12T10:21:25.450Z"
+    },
+    {
+      "name": "__insp_nv",
+      "domain": ".obtinecazier.ro",
+      "expires": "2027-10-12T10:21:25.450Z"
+    },
+    {
+      "name": "__insp_targlpu",
+      "domain": ".obtinecazier.ro",
+      "expires": "2027-10-12T10:21:25.450Z"
+    },
+    {
+      "name": "__insp_targlpt",
+      "domain": ".obtinecazier.ro",
+      "expires": "2027-10-12T10:21:25.450Z"
+    },
+    {
+      "name": "_gcl_au",
+      "domain": ".obtinecazier.ro",
+      "expires": "2027-01-10T10:21:25.000Z"
+    },
+    {
+      "name": "__insp_norec_sess",
+      "domain": ".obtinecazier.ro",
+      "expires": "2027-10-12T10:21:25.637Z"
+    }
+  ]
+}
