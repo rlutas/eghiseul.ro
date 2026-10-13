@@ -54,6 +54,7 @@ import { getCustomerName } from '@/lib/admin/customer-name';
 // Single source for status pills (shared with the dashboard) — the dashboard
 // used to carry a stale 9-entry copy that showed newer statuses as raw slugs.
 import { STATUS_BADGES as STATUS_CONFIG } from '@/lib/admin/status-badges';
+import { MarkCalledDialog } from '@/components/admin/mark-called-dialog';
 
 interface OrderRow {
   id: string;
@@ -164,6 +165,7 @@ export default function AdminOrdersPage() {
   }, [searchInput]);
   // Order previewed in the quick-view "Detalii" dialog (parity with sister).
   const [detailOrder, setDetailOrder] = useState<OrderRow | null>(null);
+  const [callOrder, setCallOrder] = useState<OrderRow | null>(null);
 
   const updateParams = useCallback(
     (patch: Record<string, string | null>) => {
@@ -773,6 +775,22 @@ export default function AdminOrdersPage() {
                     })()}
                   </TableCell>
                   <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                    {!order.paid_at && ['draft', 'pending', 'abandoned'].includes(order.status || '') && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 px-2 text-xs"
+                        title="Marchează sunat"
+                        aria-label="Marchează sunat"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCallOrder(order);
+                        }}
+                      >
+                        <Phone className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"
@@ -785,6 +803,7 @@ export default function AdminOrdersPage() {
                       <Eye className="mr-1 h-3.5 w-3.5" />
                       Detalii
                     </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -792,6 +811,16 @@ export default function AdminOrdersPage() {
           </TableBody>
         </Table>
       </div>
+
+      <MarkCalledDialog
+        orderId={callOrder?.id ?? null}
+        description={callOrder ? `${getCustomerName(callOrder.customer_data) || 'Client'} · ${callOrder.friendly_order_id || callOrder.order_number || ''}` : undefined}
+        onClose={() => setCallOrder(null)}
+        onSaved={() => {
+          setCallOrder(null);
+          fetchOrders();
+        }}
+      />
 
       {/* Pagination */}
       {totalPages > 1 && (

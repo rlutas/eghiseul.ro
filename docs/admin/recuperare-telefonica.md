@@ -25,7 +25,7 @@ Când un client a fost sunat, apare o etichetă albastră **„Sunat 12.10 · Ma
 
 **Dacă vedeți eticheta, nu mai sunați clientul din Abandonuri.** Citiți nota și treceți la următorul.
 
-Pe CazierJudiciarOnline puteți marca apelul și **direct din Abandonuri**, cu butonul cu telefon de pe rând. Asta contează pentru clienții care s-au oprit înainte de plată: ei nu apar în Recuperare telefonică. Apelul marcat din Abandonuri apare și în Recuperare telefonică, iar clientul nu mai e în lista „De sunat”.
+Puteți marca apelul și **direct din listă**, cu butonul cu telefon de pe rând: pe eGhiseul în Comenzi → Neplătite, pe CazierJudiciarOnline în Abandonuri. Pe CazierJudiciarOnline eticheta apare și în Comenzi, la Status. Asta contează pentru clienții care s-au oprit înainte de plată: ei nu apar în Recuperare telefonică. Apelul marcat din Abandonuri apare și în Recuperare telefonică, iar clientul nu mai e în lista „De sunat”.
 
 Apelurile marcate înainte de 13.10 arată emailul contului comun în loc de nume.
 

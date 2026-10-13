@@ -5,7 +5,8 @@
 
 - La **„Marchează sunat”** alegeți acum **cine a sunat: Maria sau Carla**. Fără nume, apelul nu se salvează.
 - În lista de abandonuri (eGhiseul: **Comenzi → Neplătite**; CazierJudiciarOnline: **Abandonuri**) apare eticheta **„📞 Sunat 12.10 · Maria”** la clienții sunați deja, pe toate comenzile lor. Dacă o vedeți, nu-l mai sunați încă o dată.
-- Pe CazierJudiciarOnline puteți marca apelul **direct din Abandonuri**, cu butonul cu telefon. Asta e pentru clienții opriți înainte de plată. Apelul apare și în Recuperare telefonică.
+- Puteți marca apelul **direct din listă**, cu butonul cu telefon: pe eGhiseul în **Comenzi → Neplătite**, pe CazierJudiciarOnline în **Abandonuri**. Apelul apare și în Recuperare telefonică. Reducerile la telefon se dau tot din Recuperare telefonică.
+- Pe CazierJudiciarOnline eticheta „Sunat” apare și în **Comenzi**, în coloana Status, la comenzile neplătite.
 - **eGhiseul:** clienții cu o comandă neplătită de 7–60 de zile primesc **un singur email** „Mai ai nevoie de …?”, fără cupon, cu butonul „Reia comanda”. Pleacă cel mult 90 pe zi, între 10:00 și 18:00. Nu îl primesc cei sunați sau cărora le-ați scris în ultima săptămână, nici cei care au plătit. Dacă clientul răspunde, răspunsul vine pe contact@.
 
 Procedura completă: [Recuperare telefonică](../admin/recuperare-telefonica.md).
@@ -48,3 +49,8 @@ Pe 12.10 echipa a sunat din Recuperare telefonică, apoi din Abandonuri, și a a
 - `src/lib/phone-recovery.ts`: `PHONE_CALLERS`, `buildCallIndex` peste comenzi și sesiuni, `findCall`, `applyCalls`. Un apel marcat din Abandonuri ascunde clientul din coada „De sunat” și contează la KPI și la „Recuperate”.
 - `MarkCalledDialog` comun pentru Recuperare telefonică, lista Abandonuri și detaliul sesiunii.
 - Verificat: 527 de teste trec, deploy Vercel reușit. **Nu s-a verificat vizual în browser.**
+
+## Completare, 13.10 după-amiaza
+
+- eGhiseul: buton „Marchează sunat” pe rândurile neplătite din `/admin/orders` (`src/components/admin/mark-called-dialog.tsx`), același endpoint, fără cupon; ultimul nume ales e comun cu Recuperare telefonică.
+- CJO (`e9f40a6d`): eticheta „Sunat” în coloana Status din Comenzi pentru comenzile neplătite. Indexul de apeluri e comun pentru Comenzi și Abandonuri (`src/lib/phone-recovery-calls.ts`).
