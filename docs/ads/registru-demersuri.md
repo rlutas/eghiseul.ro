@@ -73,6 +73,7 @@ Dovezile din ziua trimiterii: `dovezi-cookie-2026-10-12/` (rapoartele PDF atașa
 
 | Data | Ce s-a întâmplat |
 |---|---|
+| 13.10.2026, ~09:30 | **G4 reverificat**: toate cele 4 anunțuri raportate (caziere.ro, obtinecazier.ro, roghiseul.ro, constatator-online.ro) au „Ultima afișare: 12 oct. 2026”, deci au rulat și în ziua raportării. Ads Transparency arată cu ~1 zi întârziere. Reverificăm pe 19.10. |
 | 13.10.2026, după-amiaza | **Google răspunde la G3** (Prakhar, tichet 6-1184000041236): respingerea rămâne pe regula „link de pe un site guvernamental”; confirmă calea legală prin avocat și lipsa unei liste publice; dă numerele P2B (6-4960000040774, 6-1184000041236); **cererea de mediere CEDR a ajuns la echipa juridică**. Util pentru ANCOM/Consiliu: Google recunoaște în scris că în România nu există o listă publică, deci cerința lor nu poate fi îndeplinită de nimeni, iar concurenții rulează în continuare. |
 | 13.10.2026 | Verificare Gmail serviciiseonethut: **Consiliul Concurenței a înregistrat G7 cu RG/16763/12.10.2026** (răspuns din 12.10, 14:36, scăpat ieri). ANSPDCP: C1 = 33236, C2 = 33237, C3 = 33239, C4 = 33233 (toate 12.10). Google a confirmat cele 4 rapoarte G4. Răspunsul la G3 se verifică în eghiseul@gmail.com (alt cont, nu e conectat). |
 | 07.09.2026 | G1 trimis. Prakhar (om, nu robot): „certificare posibilă, criteriul = link de pe un site guvernamental”. |
