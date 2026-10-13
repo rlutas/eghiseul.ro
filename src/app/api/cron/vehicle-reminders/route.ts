@@ -53,7 +53,7 @@ interface ProfileRow {
 function rovinietaUrl(plate: string): string {
   const params = new URLSearchParams({
     plate: plate.replace(/\s+/g, '').toUpperCase(),
-    utm_source: 'eghiseul',
+    utm_source: 'eghiseul.ro',
     utm_medium: 'email',
     utm_campaign: 'rovinieta-expiry',
   });

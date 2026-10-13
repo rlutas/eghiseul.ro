@@ -449,22 +449,22 @@ export default function Page() {
 
       <h2>Se schimbă tarifele? Ce se știe despre normele EURO</h2>
       <p>
-        La 09.09.2026, diferențierea tarifului după norma de poluare <strong>nu se aplică</strong>.
-        Tarifele sunt cele plate din tabelul de mai sus, identice pentru un Euro 3 și pentru un Euro 6.
+        Da. De la 1 octombrie 2026 se aplică Ordinul MTI nr. 888/2026: tariful depinde de norma de
+        poluare, iar valorile sunt direct în lei. Tabelul de mai sus arată tarifele plate de dinainte de
+        1 octombrie.
       </p>
       <p>
-        Ce există e un proiect de ordin al Ministerului Transporturilor, pus în consultare publică în
-        mai 2026, care ar împărți vehiculele în trei clase pe principiul „poluatorul plătește”: Euro
-        VI la tariful de bază, cu electricele încadrate tot acolo, Euro V–IV cu 15% peste, iar Euro
-        III și mai vechi cu 30% peste. Tarifele propuse ar fi exprimate direct în lei, nu în euro, cu
-        actualizare anuală după indicele prețurilor de consum. Pentru un autoturism, rovinieta de 12
-        luni ar ajunge la 254, 292,10 sau 330,20 de lei, în funcție de clasă.
+        Pentru un autoturism (categoria A), rovinieta de 12 luni costă acum 228 de lei pentru electric,
+        254 de lei pentru Euro 6, 292 de lei pentru Euro 4–5 și 330 de lei pentru Euro 0–3. Dacă norma
+        nu se poate stabili, mașina e încadrată la Euro 0. Tot de la 1 octombrie, vehiculele de marfă
+        peste 3,5 tone nu mai plătesc rovinietă: trec pe taxa pe kilometru (TollRo).
       </p>
       <p>
-        Proiectul nu are număr de ordin și nu a fost publicat în Monitorul Oficial. Titlurile din
-        presă care anunțau majorarea „de la 1 iulie 2026” sunt depășite: data a alunecat la 1
-        octombrie odată cu tot pachetul legislativ, iar aplicarea depinde oricum de adoptarea
-        ordinului. Actualizăm secțiunea când apare în Monitor.
+        Prețul exact pentru mașina ta, după normă, îl vezi pe{' '}
+        <a href="https://erovinieta.net/preturi?utm_source=eghiseul.ro&utm_medium=referral&utm_campaign=articol-amenda">
+          erovinieta.net/preturi
+        </a>
+        .
       </p>
 
       <h2>Verifică-ți rovinieta înainte de a pleca la drum</h2>

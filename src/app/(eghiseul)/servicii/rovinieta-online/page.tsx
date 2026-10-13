@@ -54,33 +54,30 @@ const BADGES = [
   { icon: Mail, label: 'Confirmare pe email' },
 ];
 
-// Categorii oficiale CNAIR A-H (motocicletele sunt scutite).
+// Categorii de la 1.10.2026 (Ordinul MTI nr. 888/2026). Marfa peste 3,5 t nu mai
+// plătește rovinietă (taxă pe km, TollRo); motocicletele sunt scutite.
 const CATEGORII = [
-  { cod: 'A', desc: 'Autoturisme și vehicule de marfă cu masa ≤ 3,5 tone — categoria celor mai mulți șoferi.' },
+  { cod: 'A', desc: 'Autoturisme: transport persoane cu cel mult 8 locuri plus șoferul — categoria celor mai mulți șoferi.' },
   { cod: 'B', desc: 'Vehicule de transport marfă cu masa totală maximă autorizată ≤ 3,5 tone.' },
-  { cod: 'C', desc: 'Vehicule de transport marfă între 3,5 și 7,5 tone.' },
-  { cod: 'D', desc: 'Vehicule de transport marfă între 7,5 și 12 tone.' },
-  { cod: 'E', desc: 'Vehicule de marfă peste 12 tone, cu maximum 3 axe.' },
-  { cod: 'F', desc: 'Vehicule de marfă peste 12 tone, cu minimum 4 axe.' },
-  { cod: 'G', desc: 'Vehicule de transport persoane cu 9-23 de locuri (microbuze).' },
-  { cod: 'H', desc: 'Vehicule de transport persoane cu peste 23 de locuri (autocare).' },
+  { cod: 'C', desc: 'Microbuze și autocare cu 10-23 de locuri (inclusiv șoferul).' },
+  { cod: 'D', desc: 'Autobuze și autocare cu peste 23 de locuri.' },
 ];
 
-// Tarife CNAIR autoturisme (categoria A), ianuarie 2026. EUR fix prin lege; lei la
-// cursul de referință (ian. 2026: 1 EUR = 5,0963 RON). Se actualizează lunar.
+// Tarife CNAIR autoturisme (categoria A) de la 1.10.2026, lei cu TVA, după norma de
+// poluare (Ordinul MTI nr. 888/2026). Fără comisionul de serviciu.
 const TARIFE_A = [
-  { perioada: '1 zi', eur: '3,5 €', ron: '≈ 18 lei' },
-  { perioada: '10 zile', eur: '6 €', ron: '≈ 31 lei' },
-  { perioada: '30 zile', eur: '9,5 €', ron: '≈ 48 lei' },
-  { perioada: '60 zile', eur: '15 €', ron: '≈ 76 lei' },
-  { perioada: '12 luni', eur: '50 €', ron: '≈ 255 lei' },
+  { perioada: '1 zi', min: '20 lei', e6: '22 lei', max: '29 lei' },
+  { perioada: '10 zile', min: '27 lei', e6: '30 lei', max: '39 lei' },
+  { perioada: '30 zile', min: '43 lei', e6: '48 lei', max: '62 lei' },
+  { perioada: '60 zile', min: '68 lei', e6: '76 lei', max: '99 lei' },
+  { perioada: '12 luni', min: '228 lei', e6: '254 lei', max: '330 lei' },
 ];
 
 const FAQS = [
   { q: 'Cum cumpăr rovinieta online?', a: 'Alegi categoria vehiculului și perioada de valabilitate, introduci numărul de înmatriculare și continui către plata securizată. Rovinieta se activează imediat după plată și primești confirmarea pe email.' },
   { q: 'Plata rovinietei online este sigură?', a: 'Da. Plata se face securizat, cu cardul, pe platforma de checkout. Rovinieta cumpărată este înregistrată oficial în sistemul CNAIR.' },
   { q: 'Cât durează până se activează rovinieta?', a: 'Activarea este imediată după confirmarea plății. Poți alege și o dată de început în viitor, în funcție de când ai nevoie de ea.' },
-  { q: 'Ce categorie de rovinietă îmi trebuie?', a: 'Pentru un autoturism obișnuit (sub 3,5 tone) alegi categoria A. Pentru vehicule de marfă, categoria depinde de masa totală și de numărul de axe (B-E).' },
+  { q: 'Ce categorie de rovinietă îmi trebuie?', a: 'Pentru un autoturism obișnuit (sub 3,5 tone) alegi categoria A. Pentru marfă până la 3,5 tone alegi categoria B, iar pentru microbuze și autocare C sau D. Din 1 octombrie 2026 prețul depinde și de norma Euro a mașinii.' },
   { q: 'Pot verifica dacă rovinieta este validă?', a: 'Da. Poți verifica gratuit valabilitatea rovinietei după numărul de înmatriculare cu instrumentul nostru de verificare rovinietă.' },
   { q: 'Ce risc dacă circul fără rovinietă validă?', a: 'Circulația pe drumurile naționale fără rovinietă validă se sancționează cu amendă. De aceea e important să o cumperi din timp și să verifici data de expirare.' },
 ];
@@ -173,7 +170,7 @@ export default function RovinietaOnlinePage() {
                 {[
                   'Document electronic din 2010 — nu mai există autocolant pe parbriz.',
                   'Verificarea se face automat, prin camerele CNAIR de pe drumuri.',
-                  'Fără rovinietă validă, amenda este între 250 și 1.500 lei (în funcție de categorie).',
+                  'Fără rovinietă validă, amenda pornește de la 500 lei pentru autoturisme (250 lei dacă o plătești în 15 zile).',
                   'O cumperi online în 2 minute, cu activare imediată.',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2">
@@ -204,40 +201,42 @@ export default function RovinietaOnlinePage() {
               </table>
             </div>
             <p className="text-sm text-neutral-500 mt-3">
-              Motocicletele sunt <strong>scutite</strong> de rovinietă. Pentru autoturisme (categoria A),
-              perioadele disponibile sunt 1 zi, 10 zile, 30 zile, 60 zile și 12 luni.
+              Motocicletele sunt <strong>scutite</strong> de rovinietă. Vehiculele de marfă peste 3,5 tone nu mai
+              plătesc rovinietă din 1 octombrie 2026 (taxă pe kilometru, TollRo). Perioadele disponibile sunt
+              1 zi, 10 zile, 30 zile, 60 zile și 12 luni.
             </p>
 
             <h2 className="text-2xl font-bold text-secondary-900 mt-10 mb-2">Cât costă rovinieta în 2026 (autoturisme)</h2>
             <p className="text-neutral-700 mb-5">
-              Tarifele pentru categoria A (autoturisme) sunt stabilite în euro prin lege și se plătesc în lei la
-              cursul de referință. Valorile în lei de mai jos sunt pentru ianuarie 2026 (1 EUR = 5,0963 lei) și se
-              actualizează lunar.
+              De la 1 octombrie 2026 (Ordinul MTI nr. 888/2026) tarifele sunt în lei și depind de norma de poluare
+              a mașinii: electric (cel mai mic), Euro 6, Euro 4-5 și Euro 0-3 (cel mai mare). Dacă norma nu se
+              poate stabili, vehiculul e încadrat la Euro 0. Tarifele CNAIR pentru categoria A:
             </p>
             <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-neutral-100 text-secondary-900">
                     <th className="text-left px-4 py-2.5 font-semibold">Perioadă</th>
-                    <th className="text-left px-4 py-2.5 font-semibold">Preț (euro)</th>
-                    <th className="text-left px-4 py-2.5 font-semibold">Preț (lei, ian. 2026)</th>
+                    <th className="text-left px-4 py-2.5 font-semibold">Electric</th>
+                    <th className="text-left px-4 py-2.5 font-semibold">Euro 6</th>
+                    <th className="text-left px-4 py-2.5 font-semibold">Euro 0-3</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100">
                   {TARIFE_A.map((t) => (
                     <tr key={t.perioada}>
                       <td className="px-4 py-2.5 font-medium text-secondary-900">{t.perioada}</td>
-                      <td className="px-4 py-2.5 text-neutral-700">{t.eur}</td>
-                      <td className="px-4 py-2.5 text-neutral-700">{t.ron}</td>
+                      <td className="px-4 py-2.5 text-neutral-700">{t.min}</td>
+                      <td className="px-4 py-2.5 text-neutral-700">{t.e6}</td>
+                      <td className="px-4 py-2.5 text-neutral-700">{t.max}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             <p className="text-sm text-neutral-500 mt-3">
-              <strong>Atenție:</strong> de la 1 iulie 2026 tarifele rovinietei se schimbă, urmând să fie
-              diferențiate în funcție de norma de poluare (Euro) a vehiculului. Verifică prețul actualizat la
-              finalizarea comenzii.
+              Euro 4-5 e între Euro 6 și Euro 0-3 (de exemplu 292 lei pe 12 luni). Prețul exact, după norma
+              mașinii tale, îl vezi la finalizarea comenzii.
             </p>
 
             <h2 className="text-2xl font-bold text-secondary-900 mt-10 mb-4">Când începe valabilitatea</h2>
