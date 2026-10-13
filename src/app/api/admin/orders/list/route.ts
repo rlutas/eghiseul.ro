@@ -7,6 +7,11 @@ import { applyStatusFilter, parseTestFilter, resolveStatusFilter } from '@/lib/a
 import { LAWYER_SERVICE_SLUGS } from '@/lib/documents/no-lawyer-services';
 import { applyQuickOrStage } from '@/lib/admin/order-quick-filters';
 import { getOpenOutages } from '@/lib/services/platform-services';
+import { buildCallIndex, findCall, type CalledOrderRef } from '@/lib/orders/phone-recovery-wins';
+
+// Calls logged in „Recuperare telefonică" within this window are shown on the
+// unpaid orders, matched by email or phone across all the client's orders.
+const CALL_MARK_DAYS = 60;
 
 /**
  * GET /api/admin/orders/list - List all orders (for admin)
@@ -245,6 +250,40 @@ export async function GET(request: NextRequest) {
     // Open ANCPI/ONRC outage windows — the list UI shows instant services
     // (extras CF / plan cadastral / constatator) as "on hold" instead of a
     // deadline while the backing platform is down.
+    // „Sunat" marker on unpaid orders: a call logged on ANY order of the same
+    // client (email or phone) counts, so the team sees in „Neplătite" who was
+    // already called from „Recuperare telefonică" and does not call twice.
+    const callByOrder: Record<string, ReturnType<typeof findCall>> = {};
+    const unpaidRows = orderRows.filter((o) => !o.paid_at);
+    if (unpaidRows.length) {
+      const callSince = new Date(Date.now() - CALL_MARK_DAYS * 86_400_000).toISOString();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: calledRows, error: calledError } = await (adminClient as any)
+        .from('orders')
+        .select('id, friendly_order_id, order_number, customer_data, phone_contacted_at, phone_contacted_by, phone_contact_notes')
+        .not('phone_contacted_at', 'is', null)
+        .gte('phone_contacted_at', callSince)
+        .limit(2000);
+      if (calledError) console.error('List orders: called orders fetch failed:', calledError.message);
+      const contactOf = (cd: unknown) =>
+        ((cd as { contact?: { email?: string | null; phone?: string | null } } | null)?.contact) ?? {};
+      const callIndex = buildCallIndex(
+        ((calledRows ?? []) as Array<Record<string, unknown>>).map((o): CalledOrderRef => ({
+          email: contactOf(o.customer_data).email ?? null,
+          phone: contactOf(o.customer_data).phone ?? null,
+          at: o.phone_contacted_at as string,
+          by: (o.phone_contacted_by as string | null) ?? null,
+          notes: (o.phone_contact_notes as string | null) ?? null,
+          ref: ((o.friendly_order_id || o.order_number) as string) ?? '',
+          orderId: o.id as string,
+        })),
+      );
+      for (const o of unpaidRows) {
+        const contact = contactOf(o.customer_data);
+        callByOrder[o.id] = findCall(callIndex, contact.email, contact.phone);
+      }
+    }
+
     const openOutages = await getOpenOutages(adminClient);
     const unreadMessages = await unreadClientMessageCounts(orderRows.map((o) => o.id));
 
@@ -256,6 +295,7 @@ export async function GET(request: NextRequest) {
         barou: barouByOrder[o.id] ?? null,
         onrc: onrcByOrder[o.id] ?? null,
         unread_messages: unreadMessages[o.id] ?? 0,
+        phone_call: callByOrder[o.id] ?? null,
       })),
       total: count || 0,
       openOutages,

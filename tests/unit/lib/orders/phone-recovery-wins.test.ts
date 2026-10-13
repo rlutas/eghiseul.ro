@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import {
+  buildCallIndex,
   buildPaidIndex,
+  findCall,
+  isPhoneCaller,
+  phoneKey,
   findPaymentAfter,
   normalizeEmail,
   summarizeCalls,
@@ -62,5 +66,36 @@ describe('summarizeCalls', () => {
       now
     );
     expect(stats).toEqual({ calls7: 2, calls30: 3, recovered: 1, recoveredLei: 998 });
+  });
+});
+
+describe('buildCallIndex / findCall', () => {
+  const idx = buildCallIndex([
+    { email: 'Ana@x.ro', phone: '+40 722 123 456', at: '2026-10-12T09:00:00Z', by: 'op@x.ro', notes: 'revine', ref: 'E-1', orderId: '1' },
+    { email: 'ana@x.ro', phone: null, at: '2026-10-11T09:00:00Z', by: null, notes: null, ref: 'E-2', orderId: '2' },
+  ]);
+
+  it('matches the same phone written differently', () => {
+    expect(phoneKey('0722123456')).toBe(phoneKey('+40 722 123 456'));
+    expect(findCall(idx, 'alt@x.ro', '0722-123-456')?.ref).toBe('E-1');
+  });
+
+  it('matches by email, newest call wins', () => {
+    expect(findCall(idx, ' ANA@x.ro ', null)?.notes).toBe('revine');
+  });
+
+  it('returns null when nobody was called', () => {
+    expect(findCall(idx, 'bob@x.ro', '0733000111')).toBeNull();
+    expect(findCall(idx, null, null)).toBeNull();
+  });
+});
+
+describe('isPhoneCaller', () => {
+  it('accepts only the team callers', () => {
+    expect(isPhoneCaller('Maria')).toBe(true);
+    expect(isPhoneCaller('Carla')).toBe(true);
+    expect(isPhoneCaller('maria')).toBe(false);
+    expect(isPhoneCaller('serviciiseonethut@gmail.com')).toBe(false);
+    expect(isPhoneCaller(undefined)).toBe(false);
   });
 });

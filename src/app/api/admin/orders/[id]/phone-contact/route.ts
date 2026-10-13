@@ -14,7 +14,9 @@
  * `?coupon=` în link — se aplică automat la aterizare.
  *
  * Authentication: requires `orders.manage` permission.
- * Body: `{ notes?, discountPercent?: 1–50, couponCode?, sendEmail?: boolean, couponValidDays?: 1–30 }`.
+ * Body: `{ caller: 'Maria' | 'Carla', notes?, discountPercent?: 1–50, couponCode?, sendEmail?: boolean, couponValidDays?: 1–30 }`.
+ * `caller` = who made the call (the team shares one login); stored in
+ * `phone_contacted_by` and used as the agent name in the follow-up email.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -28,6 +30,7 @@ import { buildResumeUrl } from '@/lib/orders/resume-url';
 import { TEST_EMAILS, isUndeliverable } from '@/lib/email/deliverability';
 import { withUtm } from '@/lib/email/utm';
 import { brandForOrder } from '@/lib/brand/for-order';
+import { isPhoneCaller, PHONE_CALLERS } from '@/lib/orders/phone-recovery-wins';
 
 const MAX_NOTES_LENGTH = 2000;
 const DEFAULT_COUPON_VALID_DAYS = 7;
@@ -37,6 +40,7 @@ interface RouteParams {
 }
 
 interface Body {
+  caller?: string;
   notes?: string;
   discountPercent?: number;
   couponCode?: string;
@@ -74,6 +78,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // body optional — bifă fără notă e validă
   }
 
+  if (!isPhoneCaller(body.caller)) {
+    return NextResponse.json(
+      { success: false, error: { code: 'INVALID', message: `Alege cine a sunat: ${PHONE_CALLERS.join(' sau ')}` } },
+      { status: 400 }
+    );
+  }
+  const caller = body.caller;
+
   const rawNotes = typeof body.notes === 'string' ? body.notes : '';
   const notes = rawNotes.trim().slice(0, MAX_NOTES_LENGTH) || null;
   const discountPercent = typeof body.discountPercent === 'number' && Number.isFinite(body.discountPercent) ? Math.round(body.discountPercent) : null;
@@ -91,14 +103,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
   const { data: profile } = await admin.from('profiles').select('email, first_name').eq('id', user.id).single();
   const changedBy = profile?.email ?? user.email ?? 'admin';
-  const agentName = (profile?.first_name ?? '').trim() || 'echipa';
+  const agentName = caller;
   const now = new Date();
 
   const { data: order, error: updateError } = await admin
     .from('orders')
     .update({
       phone_contacted_at: now.toISOString(),
-      phone_contacted_by: changedBy,
+      phone_contacted_by: caller,
       phone_contact_notes: notes,
     })
     .eq('id', id)
@@ -213,7 +225,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   }
 
   const historyNotes = [
-    notes ? `Contactat telefonic: ${notes}` : 'Contactat telefonic',
+    notes ? `Contactat telefonic de ${caller}: ${notes}` : `Contactat telefonic de ${caller}`,
     coupon ? `Cupon ${coupon.code} (${coupon.discountLabel})` : null,
     emailStatus === 'sent' ? 'email de follow-up trimis' : null,
   ]

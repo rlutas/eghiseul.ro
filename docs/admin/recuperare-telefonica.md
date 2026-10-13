@@ -16,8 +16,18 @@ Clienții care încep o comandă și nu plătesc ajung într-o coadă. Un apel s
    - **nu știa dacă merge pentru ce are nevoie**: explicați serviciul (fișele din Ghid, la „Serviciile noastre A→Z”);
    - **prețul**: spuneți ce include (avocatul, depunerea, livrarea) și că la ghișeu e gratuit dacă poate merge personal;
    - **l-a obținut deja singur**: mulțumiți și închideți.
-3. Apăsați **„Marchează sunat”** și scrieți nota pe scurt, cu ce a spus clientul. Următorul coleg care deschide comanda vede nota.
+3. Apăsați **„Marchează sunat”**, alegeți **cine a sunat (Maria sau Carla)** și scrieți nota pe scurt, cu ce a spus clientul. Fără nume, apelul nu se salvează. Toate intrați pe același cont, deci numele ales e singurul mod în care știm cine a vorbit cu clientul. Fereastra ține minte ultimul nume ales pe calculatorul vostru: verificați-l înainte să salvați.
 4. **Doar pe eGhiseul**: dacă e cazul, la marcare puteți da o reducere. Clientul primește un email cu reducerea deja aplicată și linkul de continuare. Pe CazierJudiciarOnline clientul primește deja automat un email cu reducere după abandon, deci nu dăm alta.
+
+## Eticheta „📞 Sunat” în lista de abandonuri (din 13.10.2026)
+
+Când un client a fost sunat, apare o etichetă albastră **„Sunat 12.10 · Maria”** și în lista de abandonuri: pe eGhiseul în **Comenzi → Neplătite**, pe CazierJudiciarOnline în **Abandonuri**. Clientul e recunoscut după **email sau telefon**, deci eticheta apare pe toate comenzile lui, nu doar pe cea pe care s-a marcat apelul. Pe eGhiseul scrie „· altă comandă” când apelul s-a marcat pe o altă comandă a aceluiași client. Țineți mouse-ul pe etichetă ca să vedeți nota.
+
+**Dacă vedeți eticheta, nu mai sunați clientul din Abandonuri.** Citiți nota și treceți la următorul.
+
+Pe CazierJudiciarOnline puteți marca apelul și **direct din Abandonuri**, cu butonul cu telefon de pe rând. Asta contează pentru clienții care s-au oprit înainte de plată: ei nu apar în Recuperare telefonică. Apelul marcat din Abandonuri apare și în Recuperare telefonică, iar clientul nu mai e în lista „De sunat”.
+
+Apelurile marcate înainte de 13.10 arată emailul contului comun în loc de nume.
 
 ## Email în loc de apel (doar pe eGhiseul, din 07.10.2026)
 

@@ -24,7 +24,22 @@ Legendă: ✅ făcut · 🔄 în lucru · ⬜ de făcut · ⏸ așteaptă ceva
 
 ## ▶ Planul de urmat (refăcut 07.10.2026)
 
-### ⏭ Unde am rămas (08.10, ~10:00): de aici se reia
+### ⏭ Unde am rămas (09.10, ~12:00): de aici se reia
+
+**09.10, făcut** (detalii: jurnalul 09.10 mai jos + `changelog/2026-10-09-cjo-cadere-gsc-reindexare-linkuri.md`):
+- ✅ Diagnostic: 1–9 oct. −42% față de 1–9 sept., aproape tot pe CJO; plata e normală, problema e câți încep comanda. În GSC pozițiile de oraș nu au căzut; au căzut CTR-ul (titlurile din 05.10) și afișările.
+- ✅ 1. Cereri de indexare GSC CJO (proprietatea URL-prefix, cont u/0): Constanța, Brașov, Sibiu, Târgu Mureș, Oradea, Buzău, Arad, Baia Mare, Bacău, `/`. IndexNow: 22 de URL-uri (200).
+- ✅ 2. Canibalizarea pe „cazier judiciar”: CTA-urile din ghiduri și cross-sell-ul duc la `/` în loc de București (CJO `c82e599c`).
+- ⏸ 3. Linkuri din afară (H10): drafturile sunt gata în `seo/2026-10-06-cjo-linkuri-drafturi.md`. Lipsesc adresa de expeditor, acordul avocatei pentru citat și persoana de contact.
+- ✅ Lista de sunat: 51 de clienți CJO de la pașii 5–6 din oct. (16 au ajuns la plată), CSV local, nu în repo.
+- Clipuri: Facebook are toate cele 8 Reels programate până pe 01.11 (primul Reel publicat: 208 reach, 337 vizualizări). YouTube are publice trailerul, clipul „Cât e valabil” și cazierul fiscal (lung + Short); clipurile despre străinătate sunt programate pe 10–11.10.
+
+- ✅ Boost Facebook pornit 09.10: Reel-ul „Cât e valabil cazierul”, 30 lei/zi × 5 zile = 150 lei (09–14.10), vizite pe site, România 22–55, doar Facebook; citire 14.10 în admin, canalul „Meta Ads”. Merge dacă aduce ≥1 comandă plătită.
+- ✅ Reels Facebook: câte unul pe zi, 11–18.10 (înainte: până pe 01.11). Detalii: `marketing/video-social/plan-postari-2026-10.md`.
+
+**Mâine, 10.10:** cereri de indexare pe următoarele: Zalău, București, Cluj, Craiova, Iași, Timișoara, Ploiești, Galați, Satu Mare, `/cazier-fiscal-online`.
+
+### Unde am rămas (08.10, ~10:00)
 
 **Decizia lui Raul, 08.10 (după-amiază):** paginile CJO rămân cu reparația de azi până **luni 12.10**. Atunci comparăm formularele începute pe 09–12.10 cu 55–87/zi lucrătoare. Dacă nu revin peste ~40/zi lucrătoare, readucem paginile de oraș, prima pagină și fiscal exact la versiunea dinainte de 05.10 (înainte de C1/H14). Între timp: B9 LIVE (emailul „Mai aveți nevoie?”, CJO `58368ae5`), B10 așteaptă răspunsul lui Raul.
 
@@ -95,7 +110,7 @@ Regulă: **nu umblăm de două ori la aceeași pagină în mai puțin de 14 zile
 
 | # | Decizie | De ce contează |
 |---|---|---|
-| A8 | Reclame pe documente după respingere: (1) raportăm cele 4 SRL-uri care rulează + tichetul Google, (2) o cerere de certificare pe ecazier pe calea „avocat în Tabloul UNBR” (Legea 290/2004 art. 31), (3) urmărim răspunsurile MAI. Analiza: `ads/2026-10-07-cine-ruleaza-si-ce-putem-face.md` | contestația simplă nu mai are sens: regula de la 05.10 cere un link guvernamental, nu un text mai bun |
+| A8 | ➡ **Urmărit acum în `ads/registru-demersuri.md`** (12.10). Reclame pe documente după respingere: (1) raportăm cele 4 SRL-uri care rulează + tichetul Google, (2) o cerere de certificare pe ecazier pe calea „avocat în Tabloul UNBR” (Legea 290/2004 art. 31), (3) urmărim răspunsurile MAI. Analiza: `ads/2026-10-07-cine-ruleaza-si-ce-putem-face.md` | contestația simplă nu mai are sens: regula de la 05.10 cere un link guvernamental, nu un text mai bun |
 | B7/B9/B10/B11 | Email: subdomeniu separat pentru marketing; un email „Mai ai nevoie?” către cei din formular neplătiți de 2–60 de zile (CJO 2.877, eghiseul 339); verificarea listei de 70k (150–400 $). Detalii: secțiunea B | singurul volum de email cu intenție de cumpărare; fără subdomeniu, warm-up-ul riscă livrarea confirmărilor de comandă |
 | H10 | Trimiterea drafturilor: cerere `rel=sponsored` la ProTV/Antena 3/infocons, comunicatul, articolul avocatei | P5 nu pornește fără ele |
 | G3 | Excepție în blocantul de reclame pentru ads.google.com | fără ea salvările din Google Ads se pierd |
@@ -126,7 +141,7 @@ Baza de comparație = 21.09–05.10 (14 zile, GSC). Comparăm pe aceeași lungim
 |---|---|---|---|---|---|---|---|---|
 | 39 (21.09) | 4.310 | 3.823 | 12 / 9 | 13 | 22 | 0 / 0 | — | — |
 | 40 (28.09) | 4.013 | 3.006 | 8 / 2 | 20 | 17 | 1 / 0 | 3 (în 21 de zile) | — (clipurile pornesc 07.10) |
-| 41 (05.10) | | | | | | | | |
+| 41 (05.10) | 3.755 (6 zile, fără 11.10) | 2.537 (6 zile) | 8 / 16 | 16 | 7 | 0 / 0 | 4 (eghiseul 2, CJO 2; din 06.10) | 0 / 0 (boost: 319 vizite, 0 comenzi începute) |
 
 
 ---
@@ -208,8 +223,8 @@ Regulă: maximum 1–2 pagini rescrise pe săptămână (`.claude/rules/content-
 |---|---|---|---|
 | D1 | `/servicii/cazier-fiscal-online` | pagina e indexată, dar invizibilă din 21.08 (de la ~2.000 la ~20 de expuneri pe săptămână): retrogradare la nivel de domeniu. Cererea s-a mutat pe CJO (C6). Rescrierea se amână până apar semne de revenire | ⏸ săpt. 42 |
 | D2 | `/servicii/cazier-judiciar-online` | cel mai prost scor AI (21,3), pagina comercială nr. 1 | ✅ 06.10 (`changelog/2026-10-06-pagina-cazier-judiciar-rescrisa.md`) |
-| D3 | `/` (homepage) | poziția a scăzut de la 9,3 la 23,9 | ⬜ săpt. 42 |
-| D4 | `/servicii/extras-de-carte-funciara` | poziția 7,8 → 22,3; are backlink de la money.ro | ⬜ săpt. 42 |
+| D3 | `/` (homepage) | poziția a scăzut de la 9,3 la 23,9 | ⏸ 20.10: dacă D2 (rescrisă 06.10) tot n-a urcat după 14 zile, nu rescriem nici D3; efortul pe cazier merge pe CJO și pe linkuri din afară (P5) |
+| D4 | `/servicii/extras-de-carte-funciara` | poziția 7,8 → 22,3; are backlink de la money.ro | ✅ 13.10 doar corecturi: termenul real (de regulă 24 h, nu „aceeași zi”), meta reparată. Rescrierea nu are rost cât timp D2 nu se mișcă (retrogradare la nivel de domeniu). Cerere de indexare după deploy; măsurăm 27.10 |
 | D5 | naștere, auto, căsătorie, celibat, integritate, constatator | lotul 4 | ⬜ săpt. 43–45 |
 | D7 | Header și prima pagină: scoase „Peste 200.000 documente procesate”, „150k/200k clienți”, „Livrare 24-48h” ca termen; acum ratingul real din `SOCIAL_PROOF` | regula 3 din `content-and-seo.md` (aceeași curățenie ca C3 pe CJO) | ✅ 06.10 |
 | D6 | Ghid nou „Plan de amplasament și delimitare: copie din arhivă sau plan nou” (`/plan-de-amplasament-si-delimitare-copie-sau-intocmire/`) | concurenții fac reclamă pe PAD nou (măsurătoare); noi vindem copia, iar ghidul lămurește diferența și trimite cumpărătorul de copie la serviciu | ✅ 06.10 |
@@ -285,6 +300,68 @@ Cota e de circa 10 cereri pe zi pentru fiecare proprietate.
 - Decont topograf: extras lunar (luna trecută implicit), plata pe lună, factura de comision, comenzile pe servicii, taxele OCPI care urmează; septembrie plătit (414,48 fiecare). Reclama de test pe imobiliare (570 lei) e trecută pe septembrie și oprită.
 
 **Verificare de seară (06.10, ~18:00)**, comenzi plătite din DB, săptămâni de luni: eghiseul 74 → 52 → 20 → 17 → 27 → 26 → 13 → 20 (de la 10.08 la 28.09), deci ~o treime din nivelul dinainte de update și stagnează; CJO 33 → 23 → 22 → 18, scade. eghiseul, 30 de zile: 41 plătite cu prima vizită din căutare (14.268 lei), 44 fără sursă (15.896 lei), **0 din reclame plătite**. documentero: 3 comenzi începute azi, 0 plătite. Google Ads: celibatul rămâne la 0 afișări (vezi A3).
+
+## Jurnal 13.10.2026, după-amiaza: ce s-a decis și livrat
+
+Decizii Raul: 1–4 da.
+- **Recuperare telefonică.** Cine a sunat se alege acum la marcare (Maria/Carla). Eticheta „Sunat” apare în lista de abandonuri pe ambele platforme. Pe CJO se poate marca apelul și din Abandonuri. Detalii: `changelog/2026-10-13-recuperare-cine-a-sunat-si-b10.md`.
+- **B10 LIVE pe eghiseul**: emailul „Mai ai nevoie de …?” la comenzile neplătite de 7–60 de zile. 197 de adrese eligibile, 90 pe zi, oprire la 500. **Măsurăm pe 20.10.**
+- **Email, concluzia analizei pe 30 de zile.** Vând recuperarea (12 plătite din 135 de emailuri), lifecycle și warm-up-ul către foștii clienți. Warm-up-ul către lead-urile WP a dat **0 vânzări din 2.963 de emailuri**, deci NU îl creștem. Volum mai mare pe lista rece abia după B7 (subdomeniu) + B6 (curățarea domeniilor), în trepte 300 → 600 → 1.000, cu 3 zile la rând sub 2% emailuri întoarse. B9 pe CJO: 430 trimise, 0 comenzi; decidem pe 15.10.
+- **D4** corectat (termenul real), **D3** amânat până pe 20.10. Vezi secțiunea D.
+
+## Jurnal 13.10.2026 (organic, Bing, YouTube, Facebook, ~09:00)
+
+**Google (GSC prin API; ultima zi cu date: 10.10).**
+- eghiseul: ~4.000 de clicuri pe săptămână, stabil din septembrie (+6% în săpt. 41 față de 40, pe aceleași 6 zile). Aproape tot vine din calculatoare. `/servicii/` stă la ~750–1.000 de afișări pe 6 zile, fără semn de revenire. Prima pagină e pe poziția ~18.
+- CJO: −7% față de săpt. 40 (aceleași 6 zile). Față de 21–26.09, paginile de oraș au pierdut 40–50% din clicuri **la aceeași poziție** (Constanța 171 → 88, poz. 5,1; Brașov 151 → 91, poz. 4,6; București 72 → 34). CTR-ul a scăzut după titlurile din 05.10: Constanța 4,7% → 3,6%, Brașov 6,7% → 5,0%. Decizia rămâne la 19.10 (regula de 14 zile).
+- ecazier 8 și documentero 16 clicuri pe săptămână.
+
+**Bing (până pe 11.10).** eghiseul ~480–530 de clicuri pe săptămână, stabil (curs BNR, rovinietă, calculatoare; „cazier judiciar online” 41 de clicuri în 3 luni). CJO ~15 pe săptămână. ecazier și documentero: 2–3 afișări, abia au intrat în index.
+
+**Comenzi.** Săpt. 41: eghiseul 16 plătite (4.683 lei), CJO 7 (1.602 lei). Săpt. 42, după luni: eghiseul 4 (3.560 lei), CJO 4 (966 lei). Formulare CJO: luni 12.10 = 32 (luni 05.10 = 40, luni 28.09 = 85). Canal din 06.10: eghiseul direct 11 plătite, organic 3, email 2; CJO organic 7, email 2; social și Meta 0.
+
+**YouTube.** 5 Shorts = 126 de vizionări (cel mai bun: „Ce apare pe cazier”, 68); 4 clipuri lungi = 11 vizionări. Canalul e încă neverificat, deci linkurile din descriere nu se pot apăsa.
+
+**Facebook.** Reels organice: 415, 299 și 224 de vizualizări, câte 1 click pe link. Boost-ul (09–14.10): 119 lei cheltuiți, 13.491 de oameni atinși, 399 de clicuri, 319 vizite pe pagina de cazier și **0 comenzi începute**. Regula din 09.10 („merge dacă aduce ≥1 comandă plătită”) nu e îndeplinită. Nu îl prelungim.
+
+## Jurnal 12.10.2026 (verificare toate platformele, ~10:45)
+
+**Vânzări 1–12 oct. (plătite):** eghiseul ~6.700 lei · CJO ~3.200 · ecazier 198 · documentero 0. Total ~10.100 lei în 12 zile, adică un ritm de ~25k pe lună față de 58k în septembrie.
+
+**Săptămâna 41 (05–11.10):** eghiseul 16 plătite (4.683 lei), în banda 13–27 din septembrie. CJO 7 plătite (1.602 lei), față de 17–33 pe săptămână în aug.–sept. Formulare CJO începute: 153, față de 324–470.
+
+**CJO: plata NU e stricată.** Între 08.10 seara și 12.10 dimineața, 0 comenzi de cazier judiciar plătite. În Stripe (EDIGITALIZARE), cele 4 comenzi abandonate nu au nicio încercare de plată, deci nu s-au pierdut bani. Azi la 10:44 a intrat o plată CJO de 300 lei, iar webhook-ul a marcat comanda `paid` (canal: email).
+
+**CJO: reparația din 08.10 a mers, traficul a scăzut.** Raportul formulare / clicuri GSC: 07.10 = 17/615 (2,8%) · 08.10 = 30/490 (6,1%) · 09.10 = 30/282 (10,6%, la nivelul normal de 9–12%). Pe 09.10 însă GSC dă 282 de clicuri și 9.005 afișări, față de ~550 și ~15.000 în zilele lucrătoare dinainte. Ziua poate fi încă incompletă în GSC. Azi până la 10:45: 7 formulare, față de 13–22 în lunile anterioare la aceeași oră.
+
+**Concluzia pentru decizia de azi:** NU readucem paginile dinainte de 05.10. Pagina convertește iar normal, iar conținutul vechi de oraș are Jaccard mascat 0,76–0,92 (tiparul lovit de spam update). Pierderea de acum vine din Google (afișări), nu din pagină.
+
+**Pierderea mare din pâlnia CJO e la pasul 5 (Contract).** Constant 2 din 3 oameni ajunși la contract nu ajung la Stripe (săpt. 41: 42 la pasul 5, 14 la Stripe). Toți au lăsat telefonul. Din 08.10 sunt încă ~20 de astfel de sesiuni, peste lista de 51.
+
+**Google Ads, Poliție, ANSPDCP (12.10, după-amiaza).** Toate demersurile au acum un registru: `ads/registru-demersuri.md`.
+- Răspunsul Poliției nr. 407.976: calea prin avocat e confirmată, dar fără un „nu există autorizare pentru firme” explicit. Ciornele pentru precizarea către Poliție (avocata) și pentru al treilea răspuns către Google (termen 26.10) sunt gata.
+- CJO și ecazier încărcau Google fără banner de cookie-uri. Reparat (CJO `02ee98f5`), verificat live: toate 4 site-urile noastre sunt curate.
+- **4 plângeri ANSPDCP trimise de Raul** (caziere.ro, obtinecazier.ro, eliberarecazier.ro, roghiseul.ro).
+- După 26.10, dacă Google nu răspunde util: mediere P2B prin CEDR, plângere la ANCOM (DSA), sesizare la Consiliul Concurenței.
+
+**Recuperarea telefonică (verificat ~11:00):** pe CJO, 0 apeluri marcate de la lansarea cozii (06.10). Coada CJO arată doar comenzile ajunse la Stripe, nu sesiunile de la pașii 3–6; acelea stau doar în „Abandonuri” (277 cu telefon în 14 zile, 115 la pașii 5–6). Pe eghiseul: 48 de apeluri marcate în total, toate de pe un singur cont, iar 2 au plătit după apel (1.542 lei). Sunt 65 de comenzi neplătite în 14 zile, dintre care 50 nesunate. Prima comparație corectă 1–12: sept. 24.824 lei (90 de comenzi), oct. 10.130 lei (38), adică −59%. Documentul pentru echipă: `admin/2026-10-12-situatia-vanzari-echipa.pdf`.
+
+## Jurnal 09.10.2026 (verificare dimineață, ~10:10)
+
+**Vânzări 1–9 oct. vs 1–9 sept. (plătite, după `paid_at`):** eghiseul 6.462 vs 7.191 lei (−10%); CJO 2.892 vs 9.034 (−68%); ecazier 198 vs 0; documentero 0. Total ~9.550 vs ~16.200. **92% din pierdere e pe CJO.**
+
+**Plata NU e problema.** CJO: din formularele începute plătesc 6% în oct. și 5,4% în sept.; din cei ajunși la pasul de plată plătesc 47% vs 57%. Fără erori de checkout în logurile Vercel (48 h). eghiseul: 33% vs 39% din comenzile începute.
+
+**Problema e numărul de formulare CJO, la trafic egal.** GSC CJO: 05.10 = 541 clicuri, 06.10 = 526 (normal ~550), dar formulare 40 · 16 · 17. Deci căderea vine din pagină (C1/H14), nu din Google. După reparația din 08.10: joi 30 (joi normale 58–72), vineri 6 până la 10:00 (vineri normale 10–13). Reparația a recuperat cam jumătate. (Excepție: 02–03.10 GSC CJO a avut o gaură, 246 și 92 clicuri.)
+
+**GSC CJO, analiza „cădere liberă” (09.10).** Pozițiile NU au căzut: paginile de oraș stau pe 4,4–4,8 în medie, iar pe „cazier <oraș>” pe locul ~2,0, la fel ca înainte. Au căzut trei lucruri:
+1. **CTR-ul pe orașe, la poziție egală:** 6,0% până pe 01.10, apoi 5,1–5,3% după titlurile C1 din 05.10. SERP-ul live pentru „cazier oradea” (`&pws=0`) arată încă titlul „program ghișeu și varianta online”, iar descrierea dă adresa ghișeului direct în Google, deci omul nu mai are de ce să intre (CJO e pe 1, cu −57% clicuri). Titlurile din 08.10 („online, fără drum la poliție”, fără adresă în descriere) încă nu sunt recitite.
+2. **02–03.10 o gaură în Google:** 246 și 92 de clicuri, CTR pe orașe 4,4% și 3,9%, poziția 5,2–6,7. Revenit pe 04–06.10.
+3. **Afișările pe orașe:** −23% în 2 săptămâni (luni 21.09: 10.000 → luni 05.10: 7.733), la poziție egală. Interogările principale de oraș sunt aproape stabile, deci pierderea e în coada lungă.
+Termenii mari: „cazier judiciar online” stă pe ~7 (CTR ~0,5%, cu 4 reclame ale concurenților + AI Overview care avertizează de „site-uri terțe ~198 RON”); „cazier judiciar” alunecă de pe 7,4 pe 9,0, cu 3 pagini CJO care concurează între ele (`/`, `/bucuresti`, `/cazier-judiciar-persoane-fizice-ghid`).
+Concluzie: NU readucem conținutul de oraș dinainte de 05.10 (Jaccard mascat 0,76–0,92 = exact tiparul lovit de spam update). Pârghia e recitirea titlurilor din 08.10: cereri de indexare pe orașele care au pierdut cele mai multe clicuri.
+
+**De sunat:** 51 de clienți CJO au ajuns în oct. la pașii 5–6 și n-au plătit, toți cu telefon (`abandoned_sessions`, `last_step >= 5`, `converted = false`).
 
 ## Jurnal 08.10.2026 (verificare dimineață)
 

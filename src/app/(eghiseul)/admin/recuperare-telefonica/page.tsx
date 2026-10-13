@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/dialog';
 import { Phone, RefreshCw, Ticket, ExternalLink, CheckCircle2, Globe, Mail } from 'lucide-react';
 import { toast } from 'sonner';
+import { isPhoneCaller, PHONE_CALLERS, type PhoneCaller } from '@/lib/orders/phone-recovery-wins';
 
 interface PriorityRow {
   id: string;
@@ -98,6 +99,7 @@ function timeAgo(iso: string): string {
 }
 
 const MANUAL_EMAIL_COOLDOWN_MS = 24 * 3_600_000;
+const CALLER_STORAGE_KEY = 'phone-recovery-caller';
 const emailedRecently = (r: PriorityRow) =>
   !!r.manualRecoveryEmailAt && Date.now() - new Date(r.manualRecoveryEmailAt).getTime() < MANUAL_EMAIL_COOLDOWN_MS;
 const canEmail = (r: PriorityRow) => !!r.email && !emailedRecently(r);
@@ -129,6 +131,7 @@ export default function RecuperareTelefonicaPage() {
   const [view, setView] = useState<'open' | 'recovered'>('open');
   const [contactTarget, setContactTarget] = useState<PriorityRow | null>(null);
   const [notes, setNotes] = useState('');
+  const [caller, setCaller] = useState<PhoneCaller | null>(null);
   const [discountPercent, setDiscountPercent] = useState('');
   const [existingCoupon, setExistingCoupon] = useState('');
   const [sendFollowup, setSendFollowup] = useState(true);
@@ -164,6 +167,16 @@ export default function RecuperareTelefonicaPage() {
     fetchRows();
   }, [fetchRows]);
 
+  // Last caller picked on this computer (per-device convenience only).
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(CALLER_STORAGE_KEY);
+      if (isPhoneCaller(saved)) setCaller(saved);
+    } catch {
+      // storage blocked: the operator picks every time
+    }
+  }, []);
+
   const closeDialog = () => {
     setContactTarget(null);
     setNotes('');
@@ -174,6 +187,15 @@ export default function RecuperareTelefonicaPage() {
 
   const submitContact = async () => {
     if (!contactTarget) return;
+    if (!caller) {
+      toast.error('Alege cine a sunat');
+      return;
+    }
+    try {
+      localStorage.setItem(CALLER_STORAGE_KEY, caller);
+    } catch {
+      // ignore
+    }
     const pct = discountPercent.trim() ? Number(discountPercent) : null;
     if (pct !== null && (!Number.isInteger(pct) || pct < 1 || pct > 50)) {
       toast.error('Reducerea trebuie să fie un număr întreg între 1 și 50');
@@ -185,6 +207,7 @@ export default function RecuperareTelefonicaPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          caller,
           notes,
           ...(pct ? { discountPercent: pct } : {}),
           ...(existingCoupon.trim() ? { couponCode: existingCoupon.trim() } : {}),
@@ -601,6 +624,23 @@ export default function RecuperareTelefonicaPage() {
               )}
             </DialogDescription>
           </DialogHeader>
+          <div className="space-y-1.5">
+            <div className="text-xs font-medium text-slate-700">Cine a sunat?</div>
+            <div className="flex gap-2">
+              {PHONE_CALLERS.map((name) => (
+                <Button
+                  key={name}
+                  type="button"
+                  size="sm"
+                  variant={caller === name ? 'default' : 'outline'}
+                  aria-pressed={caller === name}
+                  onClick={() => setCaller(name)}
+                >
+                  {name}
+                </Button>
+              ))}
+            </div>
+          </div>
           <Textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -649,7 +689,7 @@ export default function RecuperareTelefonicaPage() {
             <Button variant="outline" onClick={closeDialog} disabled={saving}>
               Anulează
             </Button>
-            <Button onClick={submitContact} disabled={saving}>
+            <Button onClick={submitContact} disabled={saving || !caller}>
               {saving ? 'Se salvează...' : 'Salvează'}
             </Button>
           </DialogFooter>

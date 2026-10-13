@@ -12,6 +12,18 @@
 
 const DAY_MS = 86_400_000;
 
+/**
+ * Who makes the recovery calls. The team shares one admin account, so the
+ * caller is picked in the dialog (Raul, 13.10.2026) and stored in
+ * `orders.phone_contacted_by` instead of the login email.
+ */
+export const PHONE_CALLERS = ['Maria', 'Carla'] as const;
+export type PhoneCaller = (typeof PHONE_CALLERS)[number];
+
+export function isPhoneCaller(value: unknown): value is PhoneCaller {
+  return typeof value === 'string' && (PHONE_CALLERS as readonly string[]).includes(value);
+}
+
 export interface PaidOrderRef {
   email: string;
   paidAt: string;
@@ -86,4 +98,65 @@ export function summarizeCalls(
   }
   const recoveredLei = [...recoveredOrders.values()].reduce((s, v) => s + v, 0);
   return { calls7, calls30, recovered: recoveredOrders.size, recoveredLei: Math.round(recoveredLei * 100) / 100 };
+}
+
+/**
+ * Last 9 digits of a phone number, so "+40 712 345 678", "0712345678" and
+ * "40712345678" match. Null when fewer than 9 digits.
+ */
+export function phoneKey(phone: string | null | undefined): string | null {
+  const digits = (phone ?? '').replace(/\D/g, '');
+  return digits.length >= 9 ? digits.slice(-9) : null;
+}
+
+/** A call logged from „Recuperare telefonică", shown on the orders list. */
+export interface CallMark {
+  at: string;
+  by: string | null;
+  notes: string | null;
+  /** friendly_order_id or order_number of the order the call was logged on. */
+  ref: string;
+  orderId: string;
+}
+
+export interface CalledOrderRef extends CallMark {
+  email: string | null;
+  phone: string | null;
+}
+
+/**
+ * Calls indexed by email and by phone (newest call wins). A client often has
+ * several unpaid orders; the call is logged on one of them, and the
+ * „Neplătite" list must show it on all, so nobody calls the same person twice.
+ */
+export function buildCallIndex(called: CalledOrderRef[]): Map<string, CallMark> {
+  const idx = new Map<string, CallMark>();
+  for (const c of called) {
+    if (!c.at) continue;
+    const mark: CallMark = { at: c.at, by: c.by, notes: c.notes, ref: c.ref, orderId: c.orderId };
+    const email = normalizeEmail(c.email);
+    const phone = phoneKey(c.phone);
+    for (const key of [email && `e:${email}`, phone && `p:${phone}`]) {
+      if (!key) continue;
+      const prev = idx.get(key);
+      if (!prev || new Date(prev.at).getTime() < new Date(mark.at).getTime()) idx.set(key, mark);
+    }
+  }
+  return idx;
+}
+
+/** Newest call matching the email or the phone, or null. */
+export function findCall(
+  index: Map<string, CallMark>,
+  email: string | null | undefined,
+  phone: string | null | undefined,
+): CallMark | null {
+  const e = normalizeEmail(email);
+  const p = phoneKey(phone);
+  const byEmail = e ? index.get(`e:${e}`) ?? null : null;
+  const byPhone = p ? index.get(`p:${p}`) ?? null : null;
+  if (byEmail && byPhone) {
+    return new Date(byEmail.at).getTime() >= new Date(byPhone.at).getTime() ? byEmail : byPhone;
+  }
+  return byEmail ?? byPhone;
 }

@@ -39,6 +39,7 @@ import {
   Eye,
   ExternalLink,
   FileText,
+  Phone,
 } from 'lucide-react';
 import { STATUS_TABS, type OrdersCounts } from '@/lib/admin/orders-tabs';
 import { paymentMethodShortLabel } from '@/lib/admin/payment-method';
@@ -115,6 +116,8 @@ interface OrderRow {
   note_count?: number;
   /** Răspunsuri de la client necitite de echipă (firul de mesaje). */
   unread_messages?: number;
+  /** Call logged in „Recuperare telefonică” for this client (any of their orders). */
+  phone_call?: { at: string; by: string | null; notes: string | null; ref: string; orderId: string } | null;
   services: { name: string; slug: string } | null;
 }
 
@@ -697,6 +700,22 @@ export default function AdminOrdersPage() {
                     {['draft', 'pending', 'abandoned', 'awaiting_payment'].includes(order.status || '') && order.current_step && (
                       <div className="mt-0.5 text-[10px] text-muted-foreground whitespace-nowrap">
                         pas: {stepLabel(order.current_step)}
+                      </div>
+                    )}
+                    {order.phone_call && (
+                      <div
+                        className="mt-1 inline-flex items-center gap-1 whitespace-nowrap rounded bg-sky-50 px-1.5 py-0.5 text-[11px] font-medium text-sky-800"
+                        title={[
+                          order.phone_call.orderId === order.id
+                            ? 'Sunat din Recuperare telefonică'
+                            : `Sunat din Recuperare telefonică, pe comanda ${order.phone_call.ref}`,
+                          order.phone_call.by ? `de ${order.phone_call.by}` : null,
+                          order.phone_call.notes ? `Notă: ${order.phone_call.notes}` : null,
+                        ].filter(Boolean).join('\n')}
+                      >
+                        <Phone className="h-3 w-3" />
+                        Sunat {new Date(order.phone_call.at).toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', timeZone: 'Europe/Bucharest' })}
+                        {order.phone_call.orderId !== order.id && <span className="text-sky-600">· altă comandă</span>}
                       </div>
                     )}
                   </TableCell>
