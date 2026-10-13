@@ -80,12 +80,14 @@ const INFO_CARDS = [
   { icon: ShieldCheck, title: 'Date oficiale CNAIR', desc: 'Rezultatul se bazează pe evidența oficială a rovinietelor din România.' },
 ];
 
+// Tarife CNAIR de la 1.10.2026 (Ordinul MTI nr. 888/2026, MO 818/25.09.2026), lei cu TVA,
+// fără comisionul de serviciu: de la (electric) până la (Euro 0-3).
 const TARIFE_AB = [
-  { p: '1 zi', a: '3,5 € (≈18 lei)', b: '8,6 € (≈44 lei)' },
-  { p: '10 zile', a: '6 € (≈31 lei)', b: '11,5 € (≈58 lei)' },
-  { p: '30 zile', a: '9,5 € (≈48 lei)', b: '18,2 € (≈92 lei)' },
-  { p: '60 zile', a: '15 € (≈76 lei)', b: '28,8 € (≈146 lei)' },
-  { p: '12 luni', a: '50 € (≈255 lei)', b: '96 € (≈486 lei)' },
+  { p: '1 zi', a: '20-29 lei', b: '46-67 lei' },
+  { p: '10 zile', a: '27-39 lei', b: '62-90 lei' },
+  { p: '30 zile', a: '43-62 lei', b: '98-142 lei' },
+  { p: '60 zile', a: '68-99 lei', b: '156-225 lei' },
+  { p: '12 luni', a: '228-330 lei', b: '521-752 lei' },
 ];
 
 const FAQS = [
@@ -263,9 +265,9 @@ export default function VerificareRovinietaPage() {
 
               <h2>Cât costă rovinieta în 2026 (autoturisme și marfă ușoară)</h2>
               <p>
-                Rovinieta se plătește în funcție de categoria vehiculului (A-H). Tarifele sunt stabilite în euro prin
-                lege și se achită în lei, la cursul de referință (ianuarie 2026: 1 EUR ≈ 5,10 lei). Cele mai folosite
-                sunt categoriile A (autoturisme) și B (marfă ≤ 3,5 t):
+                De la 1 octombrie 2026 (Ordinul MTI nr. 888/2026) rovinieta are 4 categorii (A-D), iar prețul depinde
+                și de norma de poluare: electric, Euro 6, Euro 4-5 sau Euro 0-3. Dacă norma nu se poate stabili,
+                vehiculul este încadrat la Euro 0. Cele mai folosite sunt categoriile A (autoturisme) și B (marfă ≤ 3,5 t):
               </p>
               <table>
                 <thead>
@@ -286,9 +288,9 @@ export default function VerificareRovinietaPage() {
                 </tbody>
               </table>
               <p className="text-sm text-neutral-500">
-                Pentru categoriile de marfă și transport persoane peste 3,5 t (C-H), tariful crește în funcție de masă
-                și numărul de axe. <strong>Atenție:</strong> un ordin MTI aflat în consultare publică propune
-                tarife diferențiate pe norma de poluare (Euro), fără dată de intrare în vigoare stabilită. Vezi prețul exact la finalizarea comenzii.
+                Intervalul merge de la electric (cel mai mic; Euro 6 e imediat peste) la Euro 0-3 (cel mai mare). Vehiculele de marfă
+                peste 3,5 t nu mai plătesc rovinietă din 1.10.2026 (taxă pe kilometru, TollRo). Prețul exact, după norma
+                mașinii tale, îl vezi la finalizarea comenzii.
               </p>
             </div>
           </div>

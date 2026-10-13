@@ -4,22 +4,21 @@ import { useState } from 'react';
 import { ArrowRight, Lock, BadgeCheck, Zap } from 'lucide-react';
 
 const CHECKOUT_BASE = 'https://erovinieta.net/checkout';
-const UTM = 'utm_source=eghiseul&utm_medium=referral&utm_campaign=rovinieta-landing&utm_content=hero-form';
+// Same utm_source as the old WordPress CTAs (eghiseul.ro), so reports stay comparable.
+const UTM = 'utm_source=eghiseul.ro&utm_medium=referral&utm_campaign=rovinieta-landing&utm_content=hero-form';
 
-// Categorii oficiale CNAIR (A-H). Motocicletele sunt scutite (nu există rovinietă).
+// Categorii de la 1.10.2026 (Ordinul MTI 888/2026): doar A-D. Marfa peste 3,5 t
+// nu mai plătește rovinietă (taxă pe km, TollRo). `value` = litera pe care o
+// înțelege checkout-ul erovinieta.net (?category=): autocarele sunt încă G/H acolo.
 const CATEGORIES = [
-  { value: 'A', label: 'A - Autoturisme (până la 3,5t)' },
-  { value: 'B', label: 'B - Marfă, până la 3,5t' },
-  { value: 'C', label: 'C - Marfă, 3,5 - 7,5t' },
-  { value: 'D', label: 'D - Marfă, 7,5 - 12t' },
-  { value: 'E', label: 'E - Marfă, peste 12t (max 3 axe)' },
-  { value: 'F', label: 'F - Marfă, peste 12t (min 4 axe)' },
-  { value: 'G', label: 'G - Transport persoane (9-23 locuri)' },
-  { value: 'H', label: 'H - Transport persoane (peste 23 locuri)' },
+  { value: 'A', label: 'A - Autoturism (max. 8+1 locuri)' },
+  { value: 'B', label: 'B - Marfă, până la 3,5 t' },
+  { value: 'G', label: 'C - Autocar, 10-23 locuri' },
+  { value: 'H', label: 'D - Autocar, peste 23 locuri' },
 ];
 
-// Perioadele pentru categoria A (autoturisme), cazul majoritar. La finalizare,
-// platforma erovinieta.net afișează perioadele corecte pentru categoria aleasă.
+// Aceleași 5 perioade pentru toate categoriile. Prețul depinde și de norma Euro,
+// care se alege (sau se află după VIN) în checkout-ul erovinieta.net.
 const PERIODS = [
   { value: 'TWELVE_MONTHS', label: '12 luni - cea mai populară' },
   { value: 'SIXTY_DAYS', label: '60 de zile' },

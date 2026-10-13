@@ -8,7 +8,9 @@ import { useEffect, useRef } from 'react';
  * resize the iframe (clamped 360-1100px) so there is no inner scrollbar.
  * Mirrors the embed used on the current WordPress site.
  */
-const EMBED_SRC = 'https://erovinieta.net/embed/verificare-rovinieta';
+// ?src= names this site, so sales made from the widget are attributed to eghiseul
+// (utm_campaign=embed, utm_content=eghiseul.ro on erovinieta.net's buy links).
+const EMBED_SRC = 'https://erovinieta.net/embed/verificare-rovinieta?src=eghiseul.ro';
 const EMBED_ORIGIN = 'https://erovinieta.net';
 
 export function ErovinietaEmbed() {
