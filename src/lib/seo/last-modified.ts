@@ -22,7 +22,7 @@
 export const PAGE_LAST_MODIFIED: Record<string, string> = {
   'acte-necesare-casatorie': '2026-09-09',
   'acte-necesare-certificat-de-nastere': '2026-09-09',
-  'amenda-rovinieta-2025-tarife-plata-online-ghid-complet': '2026-09-09',
+  'amenda-rovinieta-2025-tarife-plata-online-ghid-complet': '2026-10-13',
   'cazier-fiscal-fara-spv': '2026-09-09',
   'ancpi-nu-functioneaza': '2026-08-21',
   'anii-lucrati-in-strainatate-se-pun-la-pensie-in-romania': '2026-08-28',

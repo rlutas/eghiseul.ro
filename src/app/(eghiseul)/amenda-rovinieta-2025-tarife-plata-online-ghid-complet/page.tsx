@@ -1,15 +1,73 @@
-import Link from 'next/link';
-import { buildPageMetadata } from '@/lib/seo';
-import { ArticleLayout } from '@/components/articole/article-layout';
+import Link from "next/link";
+import { buildPageMetadata } from "@/lib/seo";
+import { ArticleLayout } from "@/components/articole/article-layout";
 
-const SLUG = 'amenda-rovinieta-2025-tarife-plata-online-ghid-complet';
-const TITLE = 'Amendă Rovinietă 2026: Tarife, Plată Online și Contestație';
+// Slug-ul păstrează „2025” intenționat: URL-ul are poziții în Google.
+const SLUG = "amenda-rovinieta-2025-tarife-plata-online-ghid-complet";
+const TITLE = "Amendă Rovinietă 2026: Sume, Plată și Contestație";
 const DESCRIPTION =
-  'Cuantumul amenzii de rovinietă pe categorii, de când curg cele 15 zile pentru jumătate din minim, ' +
-  'cine răspunde când mașina e vândută sau în leasing și ce se schimbă de la 1 octombrie 2026.';
-const DATE_PUBLISHED = '2025-01-01';
-const DATE_MODIFIED = '2026-09-09';
+  "Amenda pentru lipsa rovinietei după 1 octombrie 2026: sumele pe categoriile A–D, " +
+  "plata a jumătate din minim în 15 zile, contestația și ce se aplică la camioane (TollRo).";
+const DATE_PUBLISHED = "2025-01-01";
+const DATE_MODIFIED = "2026-10-13";
 
+const UTM =
+  "utm_source=eghiseul.ro&utm_medium=referral&utm_campaign=articol-amenda";
+const EROVINIETA_CHECKOUT = `https://erovinieta.net/checkout?${UTM}`;
+const EROVINIETA_VERIFICARE = `https://erovinieta.net/verificare-rovinieta?${UTM}`;
+const EROVINIETA_PRETURI = `https://erovinieta.net/preturi?${UTM}`;
+const EROVINIETA_TOLLRO = `https://erovinieta.net/tollro?${UTM}`;
+const LEGEA_226 = "https://legislatie.just.ro/Public/DetaliiDocument/272230";
+
+// Legea 226/2023 art. 18 alin. (2): minim = 2 × rovinieta de 12 luni, maxim = 4 ×.
+// Tarifele de 12 luni: Ordinul MTI nr. 888/2026 (lei, cu TVA). Jumătate din minim în 15 zile
+// = regula generală din OG 2/2001 art. 28 alin. (1).
+const FINES: {
+  cat: string;
+  vehicle: string;
+  rows: [string, string, string, string][];
+}[] = [
+  {
+    cat: "A",
+    vehicle: "Autoturisme (max. 8+1 locuri)",
+    rows: [
+      ["Electric", "456", "912", "228"],
+      ["Euro 6", "508", "1.016", "254"],
+      ["Euro 4–5", "584", "1.168", "292"],
+      ["Euro 0–3", "660", "1.320", "330"],
+    ],
+  },
+  {
+    cat: "B",
+    vehicle: "Marfă, până la 3,5 t",
+    rows: [
+      ["Electric", "1.042", "2.084", "521"],
+      ["Euro 6", "1.158", "2.316", "579"],
+      ["Euro 4–5", "1.330", "2.660", "665"],
+      ["Euro 0–3", "1.504", "3.008", "752"],
+    ],
+  },
+  {
+    cat: "C",
+    vehicle: "Transport persoane, 10–23 locuri",
+    rows: [
+      ["Electric", "4.942", "9.884", "2.471"],
+      ["Euro 6", "5.492", "10.984", "2.746"],
+      ["Euro 4–5", "6.314", "12.628", "3.157"],
+      ["Euro 0–3", "7.138", "14.276", "3.569"],
+    ],
+  },
+  {
+    cat: "D",
+    vehicle: "Transport persoane, peste 23 locuri",
+    rows: [
+      ["Electric", "8.652", "17.304", "4.326"],
+      ["Euro 6", "9.614", "19.228", "4.807"],
+      ["Euro 4–5", "11.056", "22.112", "5.528"],
+      ["Euro 0–3", "12.498", "24.996", "6.249"],
+    ],
+  },
+];
 export const revalidate = 86400;
 
 export const metadata = buildPageMetadata({
@@ -29,451 +87,383 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="ianuarie 2025"
-      updatedLabel="9 septembrie 2026"
+      updatedLabel="13 octombrie 2026"
       relatedServices={[
         {
-          href: '/tools/verificare-rovinieta-online/',
-          label: 'Verificare Rovinietă Online',
-          desc: 'Verifică valabilitatea rovinietei pe numărul de înmatriculare.',
+          href: "/tools/verificare-rovinieta-online/",
+          label: "Verificare Rovinietă Online",
+          desc: "Verifică valabilitatea rovinietei pe numărul de înmatriculare.",
         },
         {
-          href: '/informatii-cazier-auto-online/',
-          label: 'Istoricul sancțiunilor rutiere',
-          desc: 'Ce rămâne în evidența Poliției Rutiere și cât timp.',
+          href: "/servicii/rovinieta-online/",
+          label: "Rovinietă Online",
+          desc: "Cumperi rovinieta pe categoria și norma Euro corecte.",
+        },
+        {
+          href: "/informatii-cazier-auto-online/",
+          label: "Istoricul sancțiunilor rutiere",
+          desc: "Ce rămâne în evidența Poliției Rutiere și cât timp.",
         },
       ]}
       faqs={[
         {
-          q: 'Cât este amenda pentru lipsa rovinietei în 2026?',
-          a: 'Pentru autoturisme (categoria A), amenda este cuprinsă între 500 și 1.000 lei. Pentru celelalte categorii de vehicule cuantumul crește în funcție de masa totală maximă autorizată și numărul de locuri, ajungând până la 14.250–28.500 lei pentru vehiculele de minimum 12 tone cu cel puțin 4 axe.',
+          q: "Cât este amenda pentru lipsa rovinietei în 2026?",
+          a: "Legea 226/2023 fixează amenda între dublul și de patru ori prețul rovinietei de 12 luni pentru vehiculul respectiv, deci depinde de categorie și de norma Euro. La un autoturism ies 456–912 lei la electric, 508–1.016 lei la Euro 6, 584–1.168 lei la Euro 4–5 și 660–1.320 lei la Euro 0–3. Dacă plătești în 15 zile, achiți jumătate din minim, adică exact prețul rovinietei anuale. Sumele se indexează anual, așa că cea exactă e pe procesul-verbal.",
         },
         {
-          q: 'De când curg cele 15 zile pentru plata a jumătate din amendă?',
-          a: 'De la data înmânării sau a comunicării procesului-verbal, nu de la data faptei. Este diferența care costă cel mai des bani: procesele-verbale de rovinietă se emit pe baza imaginilor din camere și ajung prin poștă, uneori la săptămâni după ziua în care ai circulat. Data care contează e cea de pe confirmarea de primire.',
+          q: "De când curg cele 15 zile pentru plata a jumătate din amendă?",
+          a: "De la data la care ți s-a comunicat procesul-verbal, nu de la data faptei. Procesele-verbale de rovinietă se fac pe baza imaginilor din camere și vin prin poștă, uneori la câteva săptămâni după ce ai circulat. Contează data de pe confirmarea de primire.",
         },
         {
-          q: 'Am circulat cinci zile fără rovinietă. Primesc cinci amenzi?',
-          a: 'Nu automat. Ordonanța 15/2002 prevede că, până la comunicarea procesului-verbal deja întocmit, nu se pot încheia alte procese-verbale pentru același vehicul. Protecția acoperă intervalul dintre faptă și comunicare; după ce primești actul, ciclul se reia, iar procesele-verbale ulterioare, cu alte date de săvârșire, se plătesc separat.',
+          q: "Am circulat cinci zile fără rovinietă. Primesc cinci amenzi?",
+          a: "Nu automat. Legea 226/2023 tratează lipsa rovinietei ca pe o contravenție continuă și spune că, de la data faptei până la comunicarea procesului-verbal, nu se pot încheia alte procese-verbale pentru același vehicul. După ce primești actul, dacă tot circuli fără rovinietă, pot veni procese-verbale noi.",
         },
         {
-          q: 'Am vândut mașina, dar cumpărătorul nu a transcris-o. Cine plătește?',
-          a: 'Nu tu, dar dovada se face în instanță. Înalta Curte de Casație și Justiție a stabilit prin Decizia RIL nr. 4/2018 că, la transmiterea dreptului de proprietate, fostul proprietar pierde calitatea de utilizator și de subiect activ al contravenției, iar dovada transmiterii se face potrivit dreptului comun, deci cu contractul de vânzare-cumpărare. CNAIR nu poate anula procesul-verbal pe cale administrativă; doar o instanță poate.',
+          q: "Camioanele peste 3,5 tone mai iau amendă de rovinietă?",
+          a: "Nu. De la 1 octombrie 2026 vehiculele de marfă peste 3,5 tone nu mai cumpără rovinietă, ci plătesc TollRo, pe kilometru. Neplata TollRo se amendează separat: între 10 și 20 de ori suma datorată sau 5.000 lei dacă distanța parcursă nu se poate stabili, conform art. 19 din Legea 226/2023.",
         },
         {
-          q: 'Mașina e în leasing. Pe cine se emite procesul-verbal?',
-          a: 'Pe utilizator. CNAIR precizează că, atunci când în certificatul de înmatriculare este înscris și utilizatorul pe lângă deținător, procesul-verbal se emite pe numele utilizatorului.',
+          q: "Am vândut mașina, dar cumpărătorul nu a transcris-o. Cine plătește?",
+          a: "Ataci procesul-verbal în instanță, în 15 zile, și depui contractul de vânzare-cumpărare. Pe vechea ordonanță, Înalta Curte a stabilit prin Decizia RIL nr. 4/2018 că fostul proprietar nu mai răspunde după vânzare, iar dovada se face cu contractul. CNAIR nu poate anula procesul-verbal pe cale administrativă.",
         },
         {
-          q: 'Am cumpărat rovinieta cu o literă greșită la numărul de înmatriculare. Ce fac?',
-          a: 'Corectează imediat. Normele permit îndreptarea erorii la același punct de lucru sau terminal în 60 de minute de la emitere, iar distribuitorii online aplică același termen prin condițiile lor de vânzare. Atenție însă: corecția nu anulează un proces-verbal deja întocmit pentru intervalul în care rovinieta era pe alt număr — acela se atacă tot în instanță.',
+          q: "Am cumpărat rovinieta cu o literă greșită la numărul de înmatriculare. Ce fac?",
+          a: "Anunță imediat vânzătorul de la care ai cumpărat-o și cere corectarea sau o rovinietă nouă pe numărul corect. Pentru intervalul în care rovinieta a stat pe alt număr, mașina ta a circulat fără rovinietă valabilă; un proces-verbal deja întocmit pentru acel interval se atacă în instanță.",
         },
         {
-          q: 'Am plătit rovinieta chiar în ziua în care m-au prins camerele. Mai iau amendă?',
-          a: 'Potrivit poziției publice a CNAIR, șoferul care își cumpără rovinieta în aceeași zi în care a fost înregistrat de camere nu este sancționat. Este o practică a administratorului drumului, nu un text din ordonanță, deci păstrează dovada plății cu data pe ea.',
+          q: "Unde se depune contestația la amenda de rovinietă?",
+          a: "La judecătoria de pe raza căreia domiciliezi sau îți ai sediul, nu la cea de la locul faptei (art. 20 din Legea 226/2023), în 15 zile de la comunicare. Dacă nu ataci și nu plătești, procesul-verbal ajunge la executare silită: la persoane fizice banii se fac venit la bugetul local al localității de domiciliu.",
         },
         {
-          q: 'Care este termenul de contestație pentru amenda de rovinietă?',
-          a: 'Cincisprezece zile de la înmânare sau comunicare. La rovinietă plângerea se depune la judecătoria pe raza căreia domiciliezi sau îți ai sediul, nu la cea de la locul faptei, iar depunerea ei suspendă automat executarea. Dacă nu ataci și nu plătești, procesul-verbal se trimite din oficiu spre executare silită în 30 de zile de la expirarea termenului de plângere; la persoane fizice execută organul fiscal al primăriei de domiciliu, fiindcă amenda se face venit la bugetul local.',
-        },
-        {
-          q: 'Cât costă rovinieta în 2026?',
-          a: 'Pentru autoturisme: 3,5€ o zi, 6€ zece zile, 9,5€ treizeci de zile, 15€ șaizeci de zile și 50€ pentru douăsprezece luni. Plata se face în lei, dar nu la cursul zilei: conversia se face lunar, după cursul BNR din penultima zi lucrătoare a lunii anterioare, și rămâne fixă toată luna. În septembrie 2026 asta înseamnă aproximativ 18 lei pentru o zi și 262 de lei pentru un an. Nu există rovinietă de 7 zile la autoturisme.',
+          q: "Cât costă rovinieta în 2026?",
+          a: "De la 1 octombrie 2026 prețul depinde și de norma Euro (Ordinul MTI nr. 888/2026). Pentru un autoturism, tariful CNAIR pe 12 luni este de 228 lei la electric, 254 lei la Euro 6, 292 lei la Euro 4–5 și 330 lei la Euro 0–3. O zi costă între 20 și 29 lei. Dacă norma nu se poate stabili, mașina plătește ca Euro 0.",
         },
       ]}
     >
       <p>
-        Pentru autoturisme fără rovinietă valabilă, amenda e între <strong>500 și 1.000 lei</strong>,
-        iar plata în 15 zile o taie la jumătate din minim, adică 250 lei. Partea pe care o ratează
-        aproape toată lumea nu e cuantumul, ci de unde încep să curgă cele 15 zile: de la{' '}
-        <strong>comunicarea procesului-verbal</strong>, nu de la ziua în care ai circulat.
+        Pentru un autoturism Euro 6, amenda pentru lipsa rovinietei e între{" "}
+        <strong>508 și 1.016 lei</strong>, iar dacă plătești în 15 zile scapi cu
+        254 lei. La alte norme și categorii sumele diferă. Cele 15 zile curg de
+        la <strong>comunicarea procesului-verbal</strong>, nu de la ziua în care
+        ai circulat, și aici greșește cei mai mulți.
       </p>
       <p>
-        Mai jos: tabelul pe categorii, cine răspunde când mașina e vândută sau în leasing, ce se
-        schimbă de la 1 octombrie 2026 și greșelile care produc amendă chiar și când ai plătit
-        rovinieta.
+        De la 1 octombrie 2026 rovinieta e reglementată de Legea 226/2023, nu de
+        vechea Ordonanță 15/2002. Au rămas patru categorii (A–D), prețul depinde
+        de norma Euro, iar camioanele peste 3,5 tone au ieșit din sistem și
+        plătesc TollRo, pe kilometru. Restul s-a schimbat mai puțin decât s-ar
+        crede: termenele și contestația funcționează aproape la fel.
       </p>
 
-      <h2>Cuantumul amenzii pe categorii de vehicule</h2>
+      <h2>Cât e amenda pe categorii de vehicule</h2>
       <p>
-        Cuantumul depinde de categoria vehiculului, stabilită după masa totală maximă autorizată și
-        numărul de locuri. Ultima coloană e cea care contează în practică: reducerea nu e „jumătate
-        din amendă”, ci jumătate din <strong>minimul</strong> ei. Nu poți plăti niciodată jumătate
-        din maxim, oricât de repede ai fi.
+        Din 1 octombrie 2026 amenda nu mai e o sumă fixă pe categorie. Legea
+        226/2023 (art. 18) o stabilește între{" "}
+        <strong>dublul și de patru ori prețul rovinietei de 12 luni</strong>{" "}
+        pentru vehiculul tău, deci contează și categoria, și norma Euro. Suma se
+        actualizează anual cu inflația, așa că cea exactă o găsești pe
+        procesul-verbal.
+      </p>
+      <p>
+        Dacă plătești în 15 zile, achiți jumătate din <strong>minim</strong>,
+        conform regulii generale din OG 2/2001 (art. 28), la care trimite legea
+        rovinietei. Cum minimul e dublul rovinietei anuale, jumătatea lui e
+        chiar prețul rovinietei pe un an.
       </p>
       <table>
         <thead>
           <tr>
             <th>Categorie</th>
-            <th>Tip vehicul</th>
+            <th>Normă Euro</th>
             <th>Amendă minimă</th>
             <th>Amendă maximă</th>
             <th>Plătit în 15 zile</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>A</td>
-            <td>Autoturisme</td>
-            <td>500 lei</td>
-            <td>1.000 lei</td>
-            <td>250 lei</td>
-          </tr>
-          <tr>
-            <td>B</td>
-            <td>Vehicule ≤3,5t</td>
-            <td>1.140 lei</td>
-            <td>2.280 lei</td>
-            <td>570 lei</td>
-          </tr>
-          <tr>
-            <td>C</td>
-            <td>Vehicule 3,5–7,5t</td>
-            <td>3.800 lei</td>
-            <td>7.600 lei</td>
-            <td>1.900 lei</td>
-          </tr>
-          <tr>
-            <td>D</td>
-            <td>Vehicule 7,5–12t</td>
-            <td>6.650 lei</td>
-            <td>13.300 lei</td>
-            <td>3.325 lei</td>
-          </tr>
-          <tr>
-            <td>E</td>
-            <td>Vehicule ≥12t (max. 3 axe)</td>
-            <td>8.550 lei</td>
-            <td>17.100 lei</td>
-            <td>4.275 lei</td>
-          </tr>
-          <tr>
-            <td>F</td>
-            <td>Vehicule ≥12t (min. 4 axe)</td>
-            <td>14.250 lei</td>
-            <td>28.500 lei</td>
-            <td>7.125 lei</td>
-          </tr>
-          <tr>
-            <td>G</td>
-            <td>Microbuze (9–23 locuri)</td>
-            <td>3.800 lei</td>
-            <td>7.600 lei</td>
-            <td>1.900 lei</td>
-          </tr>
-          <tr>
-            <td>H</td>
-            <td>Autobuze (peste 23 locuri)</td>
-            <td>6.650 lei</td>
-            <td>13.300 lei</td>
-            <td>3.325 lei</td>
-          </tr>
+          {FINES.flatMap(({ cat, vehicle, rows }) =>
+            rows.map(([norm, min, max, half]) => (
+              <tr key={`${cat}-${norm}`}>
+                <td>
+                  {cat} ({vehicle})
+                </td>
+                <td>{norm}</td>
+                <td>{min} lei</td>
+                <td>{max} lei</td>
+                <td>{half} lei</td>
+              </tr>
+            )),
+          )}
         </tbody>
       </table>
       <p>
-        Saltul de la categoria A la B e cel care surprinde. Aceeași masă de 3,5 tone, dar dacă
-        vehiculul e înregistrat ca transport de marfă, minimul urcă de la 500 la 1.140 de lei.
-        Autoutilitarele mici, dubițele și mașinile de firmă cad des în a doua categorie, iar
-        proprietarii lor cumpără din obișnuință rovinietă de categoria A. La control, o rovinietă
-        pe categoria greșită se tratează ca inexistentă.
+        Sumele sunt calculate de noi din tarifele de 12 luni din Ordinul MTI nr.
+        888/2026. Grila veche, cu 500–1.000 lei la autoturisme, venea din
+        Ordonanța 15/2002 și nu se mai aplică.
       </p>
       <p>
-        Cuantumurile astea sunt în vigoare din 8 septembrie 2025. La autoturisme e o creștere de
-        peste 80% față de vechiul interval de 275–550 de lei, iar la celelalte categorii de circa
-        20%. Dacă găsești pe internet o pagină care mai scrie 275 de lei, e dinainte de modificare.
-      </p>
-
-      <h2>Nu confunda amenda cu tariful de despăgubire</h2>
-      <p>
-        Prima întrebare pe care o pun oamenii care au mai avut de-a face cu subiectul acum zece ani
-        e dacă, pe lângă amendă, mai vine și tariful de despăgubire. Răspunsul e nu, și e nu de mult
-        timp.
+        Cel mai des se greșește între A și B. Dubițele, autoutilitarele și
+        mașinile mixte de până la 3,5 tone sunt categoria B, dar mulți le
+        cumpără din obișnuință rovinietă de A. Legea spune că rovinieta valabilă
+        trebuie să corespundă categoriei și clasei de emisii a vehiculului (art.
+        6), deci una pe categoria greșită nu te acoperă.
       </p>
       <p>
-        Până în 2012 exista un al doilea instrument, separat de amendă: un tarif de despăgubire
-        datorat administratorului drumului, care mergea de la câteva zeci la peste o mie de euro, în
-        funcție de categoria vehiculului. Cele două se cumulau, iar suma totală putea fi
-        devastatoare pentru un transportator. Legea 144/2012 a abrogat dispozițiile care îl
-        instituiau, împreună cu anexa în care erau trecute valorile, cu efect din 27 iulie 2012.
-        Aceeași lege a prevăzut că tarifele deja aplicate și contestate în instanță până la acea dată
-        se anulează.
-      </p>
-      <p>
-        Astăzi rămâne o singură sancțiune pecuniară pentru lipsa rovinietei: amenda din tabelul de
-        mai sus. Tabelele oficiale ale CNAIR nu mai conțin nicio coloană de despăgubire.
-      </p>
-      <p>
-        O altă confuzie, de data asta actuală: <strong>peajul nu e rovinietă</strong>. Trecerea
-        podurilor peste Dunăre se tarifează separat, iar amenda pentru lipsa peajului e și ea
-        separată, între 190 și 380 de lei la autoturisme. Poți avea rovinietă valabilă și să iei
-        amendă de peaj, sau invers.
+        Vechile categorii C–H nu mai există. Microbuzele (fostă G) au devenit C,
+        autocarele (fostă H) au devenit D, iar camioanele nu mai au deloc
+        rovinietă.
       </p>
 
-      <h2>Cine plătește, de fapt</h2>
+      <h2>Camioanele peste 3,5 tone: TollRo, nu rovinietă</h2>
       <p>
-        Amenda de rovinietă nu se dă șoferului oprit în trafic, ci pe numărul de înmatriculare, pe
-        baza imaginilor din camere. De aici vine cea mai frecventă nedreptate aparentă: primești
-        acasă un proces-verbal pentru o mașină pe care ai vândut-o acum opt luni.
+        De la 1 octombrie 2026 vehiculele de marfă cu masa maximă autorizată
+        peste 3,5 tone plătesc pe kilometru parcurs pe autostrăzi, drumuri
+        expres și drumuri naționale. Tarifele sunt în Ordinul MTI nr.
+        1.925/2025. Plata se face în trei feluri: cu un echipament de bord
+        (OBU), pe bază de contract cu un furnizor autorizat, cu un tichet de
+        rută cumpărat înainte de plecare sau prin aplicația CNAIR.
       </p>
       <p>
-        <strong>Mașina vândută, dar netranscrisă.</strong> Înalta Curte de Casație și Justiție a
-        rezolvat problema printr-o decizie obligatorie pentru toate instanțele, RIL nr. 4/2018: la
-        transmiterea dreptului de proprietate, fostul proprietar pierde calitatea de utilizator și
-        de subiect activ al contravenției, iar dovada transmiterii se face potrivit dreptului comun.
-        Adică e suficient contractul de vânzare-cumpărare, chiar dacă noul proprietar nu a făcut
-        transcrierea. Vestea proastă e că nu există cale administrativă: CNAIR nu poate anula
-        procesul-verbal, oricâte acte i-ai trimite. Se atacă în instanță, în cele 15 zile, cu
-        contractul atașat.
+        Amenda e alta decât la rovinietă. Pentru neplata TollRo, art. 19 din
+        Legea 226/2023 prevede între 10 și 20 de ori suma datorată, sau 5.000
+        lei când distanța parcursă nu se poate stabili. Aici contravenția nu e
+        continuă, iar dacă plătești suma cerută prin scrisoarea de informare în
+        72 de ore de la primire, nu mai urmează alte sancțiuni. Detalii și un
+        calculator pe traseu găsești pe{" "}
+        <a href={EROVINIETA_TOLLRO} rel="noopener">
+          erovinieta.net/tollro
+        </a>
+        .
       </p>
       <p>
-        <strong>Leasing.</strong> Când în certificatul de înmatriculare apare și utilizatorul, nu
-        doar deținătorul, procesul-verbal se emite pe numele utilizatorului. Deci pe firma sau
-        persoana care conduce mașina, nu pe societatea de leasing.
-      </p>
-      <p>
-        <strong>Mașini înmatriculate în străinătate.</strong> Aici răspunde conducătorul, nu
-        proprietarul, iar sancțiunea se aplică pe loc, în trafic, fiindcă nu există adresă în țară
-        la care să fie trimis actul.
+        Rovinietele cumpărate pentru camioane înainte de 1 octombrie și-au
+        încetat valabilitatea la acea dată. Banii pentru perioada rămasă se
+        recuperează doar la cerere scrisă către CNAIR (art. 24 alin. (4));
+        restituirea nu e automată.
       </p>
 
       <h2>Termenele, în ordinea în care contează</h2>
-      <p>
-        Sunt patru termene distincte și niciunul nu curge de acolo de unde crede lumea.
-      </p>
       <ul>
         <li>
-          <em>Patru luni de la faptă</em> pentru ca sancțiunea să poată fi aplicată. E o prescripție
-          specială a rovinietei, mai scurtă decât regula generală. Peste ea, procesul-verbal nu mai
-          poate fi întocmit valabil, deci prima verificare pe care o faci e distanța dintre data
-          circulației și data actului.
+          <em>Patru luni de la faptă.</em> În acest termen trebuie aplicată
+          sancțiunea (art. 18 alin. (12)). Prima verificare pe care o faci e
+          diferența dintre data în care ai circulat și data procesului-verbal.
         </li>
         <li>
-          <em>Două luni pentru comunicare</em>, socotite de la data aplicării sancțiunii, adică de
-          la data procesului-verbal, nu de la data faptei. Confuzia asta e răspândită. Iar
-          consecința nerespectării termenului nu e anularea actului, ci prescripția executării lui,
-          care se invocă inclusiv în fața instanței sesizate cu plângerea.
+          <em>Cel mult două luni pentru comunicare</em>, socotite de la data
+          procesului-verbal (art. 18 alin. (11)). Mulți le numără de la data
+          faptei și greșesc.
         </li>
         <li>
-          <em>Cincisprezece zile de la înmânare sau comunicare</em>, în care poți plăti jumătate din
-          minimul amenzii și în care poți depune plângere. Sunt aceleași 15 zile, curgând din același
-          moment, nu două termene separate.
-        </li>
-        <li>
-          <em>Treizeci de zile</em> de la expirarea termenului de plângere, după care actul se
-          trimite din oficiu spre executare silită.
+          <em>Cincisprezece zile de la comunicare.</em> În ele poți plăti
+          jumătate din minim (OG 2/2001, art. 28) sau poți depune plângere. E un
+          singur termen, care curge din același moment.
         </li>
       </ul>
       <p>
-        O precizare care contează dacă ajungi în instanță: Înalta Curte a stabilit, prin Decizia
-        43/2016, că „data constatării contravenției” înseamnă data la care s-a întocmit
-        procesul-verbal, nu ziua în care camera a înregistrat mașina. Cele două pot fi la săptămâni
-        distanță.
+        <strong>Cinci zile fără rovinietă nu înseamnă cinci amenzi.</strong>{" "}
+        Circulația fără rovinietă e contravenție continuă, iar până la
+        comunicarea procesului-verbal nu se pot încheia alte procese-verbale
+        pentru același vehicul. Intervalul ăsta poate dura săptămâni bune. Odată
+        ce ai primit actul, protecția se termină și, dacă tot circuli fără
+        rovinietă, vine alt proces-verbal.
+      </p>
+
+      <h2>Cine răspunde</h2>
+      <p>
+        Procesul-verbal nu se dă șoferului oprit în trafic. Se întocmește pe
+        numărul de înmatriculare, din imaginile camerelor, pe numele celui
+        trecut în certificatul de înmatriculare. Legea îl numește „utilizator”:
+        conducătorul sau deținătorul vehiculului.
       </p>
       <p>
-        <strong>Grijă la cifra „48 de ore”</strong>, care mai apare și azi în textul ordonanței
-        publicat pe portalul legislativ, fără notă de abrogare. E depășită: Legea 203/2018 a abrogat
-        toate dispozițiile care fixau pentru plata pe jumătate un termen mai scurt decât cele 15 zile
-        din regula generală. Dacă cineva îți spune că ai avut doar două zile, se uită la un text mort.
+        <strong>Mașina vândută, dar netranscrisă.</strong> Când primești amendă
+        pentru o mașină vândută acum câteva luni, calea e plângerea în instanță,
+        cu contractul de vânzare-cumpărare atașat. Pe vechea ordonanță, Înalta
+        Curte a decis prin RIL nr. 4/2018 că fostul proprietar nu mai răspunde
+        după vânzare, iar dovada se face cu contractul. CNAIR nu poate anula
+        procesul-verbal administrativ, oricâte acte i-ai trimite.
       </p>
       <p>
-        <strong>Cinci zile de circulație nu înseamnă cinci amenzi.</strong> Circulația fără rovinietă
-        e calificată drept contravenție continuă, iar ordonanța prevede expres că în intervalul de la
-        data săvârșirii faptei până la comunicarea procesului-verbal nu se pot încheia alte
-        procese-verbale pentru același vehicul. Fereastra asta poate ține până la două luni. După ce
-        primești actul, ciclul se reia, iar procesele-verbale ulterioare, cu alte date de săvârșire,
-        se plătesc fiecare în parte.
+        La mașinile în leasing, dacă în certificatul de înmatriculare e trecut
+        și utilizatorul, procesul-verbal se emite pe numele lui, nu pe al firmei
+        de leasing.
+      </p>
+      <p>
+        Pentru mașinile înmatriculate în străinătate răspunde conducătorul, iar
+        sancțiunea se aplică pe loc, la control (art. 18 alin. (6)).
       </p>
 
       <h2>Plângerea: unde se depune și ce oprește</h2>
       <p>
-        Plângerea contravențională se depune în 15 zile de la înmânare sau comunicare, iar la
-        rovinietă există o regulă specială de competență: se introduce la{' '}
-        <strong>judecătoria pe raza căreia domiciliezi</strong> sau îți ai sediul, nu la cea de la
-        locul faptei. Norma generală permite, din 2022, și alegerea locului contravenției, dar la
-        rovinietă se aplică derogarea, așa că varianta sigură rămâne judecătoria de domiciliu.
+        Plângerea se depune în 15 zile de la comunicare, la{" "}
+        <strong>judecătoria de pe raza căreia domiciliezi</strong> sau îți ai
+        sediul, nu la cea de la locul faptei. E o derogare expresă din art. 20
+        alin. (2) al Legii 226/2023.
       </p>
       <p>
-        Lucrul pe care merită să-l știi înainte de a decide dacă ataci sau plătești:{' '}
-        <strong>plângerea suspendă executarea</strong>, automat și fără condiții. Nu trebuie să ceri
-        separat suspendarea și nu trebuie să plătești ca să te aperi. Dacă ai contract de vânzare
-        pentru mașină, dacă actul e emis peste cele patru luni sau dacă rovinieta exista și era
-        valabilă, plângerea e calea, nu telefoanele la CNAIR.
+        Plângerea merită depusă când ai contractul de vânzare a mașinii, când
+        procesul-verbal a venit după cele patru luni sau când aveai rovinietă
+        valabilă și o poți dovedi.
       </p>
       <p>
-        Dacă nu ataci și nici nu plătești, procesul-verbal se trimite spre executare. La persoane
-        fizice execută <strong>organele fiscale ale primăriei de domiciliu</strong>, nu ANAF, fiindcă
-        amenzile aplicate persoanelor fizice se fac venit integral la bugetul local. La persoane
-        juridice, banii merg la bugetul de stat, deci execută ANAF.
+        Dacă nici nu ataci, nici nu plătești, procesul-verbal ajunge la
+        executare silită. La persoane fizice banii merg la{" "}
+        <strong>bugetul local al localității de domiciliu</strong>, deci execută
+        primăria. La firme, amenda se face venit la bugetul de stat (art. 20
+        alin. (4)).
       </p>
 
-      <h2>Unde se plătește, de fapt</h2>
+      <h2>Unde plătești amenda</h2>
       <p>
-        Începe cu procesul-verbal, nu cu Google. Pe el sunt trecute instituția beneficiară și
-        contul în care se face plata, iar ele decid restul: dacă plătești în alt cont, banii pleacă,
-        amenda rămâne neachitată și afli asta abia când primești somația.
+        Pornește de la procesul-verbal. Pe el scrie instituția și contul în care
+        se plătește. Dacă plătești în alt cont, banii pleacă, amenda rămâne
+        neachitată și afli abia la somație.
       </p>
       <p>
-        Platforma online a statului e <strong>ghiseul.ro</strong>, cu un „g”. Noi suntem
-        eGhișeul.ro, un serviciu privat, și nu încasăm amenzi: vindem rovinieta, adică exact ce te
-        scutește de amendă data viitoare. Confuzia dintre cele două nume e exploatată constant de
-        escroci, care trimit SMS-uri cu „amendă neplătită” și link către domenii aproape identice
-        cu al platformei oficiale. Am descris o campanie concretă în{' '}
-        <Link href="/sms-fals-amenda-ghiseul-ro/">articolul despre SMS-ul fals cu amendă</Link>.
-        Regula scurtă: nicio instituție nu îți cere datele cardului printr-un link din SMS.
+        Platforma online a statului este <strong>ghiseul.ro</strong>, cu „g”.
+        Noi suntem eGhișeul.ro, un serviciu privat, și nu încasăm amenzi.
+        Escrocii profită de asemănarea numelor și trimit SMS-uri cu „amendă
+        neplătită” și linkuri spre domenii aproape identice; am descris un
+        astfel de caz în{" "}
+        <Link href="/sms-fals-amenda-ghiseul-ro/">
+          articolul despre SMS-ul fals cu amendă
+        </Link>
+        . Nicio instituție nu îți cere datele cardului printr-un link din SMS.
       </p>
       <p>
-        În afară de plata online mai ai ghișeul băncii, oficiul poștal și unitatea de trezorerie
-        indicată pe act. Oricare ar fi calea, păstrează dovada de plată. Ea e singurul lucru care
-        oprește o executare silită pornită din eroare, iar erorile de reconciliere între instituții
-        chiar se întâmplă.
+        Mai poți plăti la bancă, la poștă sau la trezorerie. Păstrează dovada
+        plății: dacă instituțiile nu reconciliază corect plata, doar ea oprește
+        o executare pornită din greșeală.
       </p>
 
       <h2>Cum iei amendă deși ai plătit rovinieta</h2>
       <p>
-        Sunt patru situații, toate reale și toate reparabile dacă le prinzi la timp.
+        <strong>Număr de înmatriculare greșit.</strong> O literă greșită și
+        rovinieta e pe altă mașină. Verifică emailul de confirmare imediat după
+        plată și, dacă vezi o greșeală, cere corectarea de la cine ți-a
+        vândut-o. Un proces-verbal deja întocmit pentru intervalul acela nu
+        dispare prin corectare; se atacă în instanță.
       </p>
       <p>
-        <strong>Numărul de înmatriculare tastat greșit.</strong> O literă în plus și rovinieta e
-        activă pe o mașină care nu există. Normele permit îndreptarea erorii la același punct de
-        lucru sau terminal, în 60 de minute de la emitere, iar distribuitorii online aplică același
-        termen prin condițiile lor de vânzare. Verifică emailul de confirmare imediat, nu peste o
-        săptămână. Și reține că, dacă între timp ai fost înregistrat de camere, corecția nu șterge
-        procesul-verbal deja întocmit.
+        <strong>Categorie sau normă Euro greșită.</strong> Rovinieta trebuie să
+        corespundă categoriei și clasei de emisii a vehiculului. Norma se
+        găsește în cartea de identitate a vehiculului (CIV), nu în talon. Dacă
+        nu se poate stabili, se aplică tariful pentru Euro 0.
       </p>
       <p>
-        <strong>Valabilitatea începe la înregistrarea în sistem, nu la plată.</strong> O rovinietă
-        e valabilă din momentul în care apare în baza de date, nu din secunda în care ți s-a debitat
-        cardul. Între cele două momente pot trece minute. Dacă tocmai ai plătit și verificarea spune
-        că nu există, mai așteaptă și reia verificarea; nu cumpăra a doua oară.
+        <strong>Valabilitatea pornește de la înregistrare.</strong> Rovinieta e
+        valabilă din momentul în care apare în sistemul CNAIR. Între plata cu
+        cardul și înregistrare pot trece câteva minute. Dacă verificarea nu o
+        arată imediat, așteaptă și verifică din nou înainte să cumperi a doua
+        oară.
       </p>
       <p>
-        <strong>Schimbarea numărului de înmatriculare.</strong> Rovinieta rămâne valabilă pe noul
-        număr numai dacă la emitere a fost înscris corect numărul de identificare al vehiculului.
-        Când VIN-ul lipsește sau e greșit, transferul automat nu se face și trebuie depusă o cerere
-        la CNAIR, cu seria de șasiu și copii după cartea de identitate a vehiculului și certificatul
-        de înmatriculare.
-      </p>
-      <p>
-        <strong>Fereastra de după reînmatriculare.</strong> Accesul CNAIR la baza de date a
-        vehiculelor se face zilnic, nu în timp real. După ce primești plăcuțe noi există un interval
-        de până la o zi în care sistemul de camere încă nu știe de numărul tău. Nu e un motiv de
-        panică, dar explică procesele-verbale care par imposibile.
-      </p>
-      <p>
-        Există și o situație în favoarea ta: potrivit poziției publice a CNAIR, dacă îți cumperi
-        rovinieta în aceeași zi în care ai fost înregistrat de camere, nu ești sancționat.
+        <strong>Număr de înmatriculare schimbat.</strong> Rovinieta merge mai
+        departe pe numărul nou doar dacă VIN-ul (seria de șasiu) a fost trecut
+        corect la cumpărare. Altfel trebuie să ceri transferul de la CNAIR.
       </p>
 
-      <h2>Ce se schimbă de la 1 octombrie 2026</h2>
+      <h2>Cât costă rovinieta din 1 octombrie 2026</h2>
       <p>
-        Tot ce citești mai sus stă pe Ordonanța 15/2002, iar ea are termen de aplicare până pe{' '}
-        <strong>30 septembrie 2026</strong>. Data a fost amânată de două ori, de la 1 ianuarie la 1
-        iulie și apoi la 1 octombrie 2026, motiv pentru care circulă în paralel trei versiuni
-        contradictorii pe internet. De la 1 octombrie intră în aplicare Legea 226/2023, iar CNAIR a
-        confirmat public calendarul.
-      </p>
-      <p>
-        Schimbarea cu efect direct asupra buzunarului e că <strong>amenda nu mai e o sumă fixă</strong>.
-        Noul cadru o leagă de prețul rovinietei anuale, între dublul și de patru ori tariful de 12
-        luni al categoriei respective, cu actualizare anuală după indicele prețurilor de consum.
-        Practic, amenda urcă odată cu tariful, fără să mai fie nevoie de o modificare separată a
-        legii.
-      </p>
-      <p>
-        A doua schimbare privește cine răspunde: definiția utilizatorului se lărgește la
-        „conducătorul vehiculului sau deținătorul”, deci autoritatea va putea alege, în loc să fie
-        legată de cel înscris în certificatul de înmatriculare.
-      </p>
-      <p>
-        Ce se întâmplă cu rovinietele cumpărate înainte de 1 octombrie și valabile după acea dată nu
-        e limpede: textul noii legi spune că vechile roviniete își încetează valabilitatea, iar
-        presa de specialitate a scris că cele pentru vehiculele sub 3,5 tone rămân valabile. Până la
-        normele de aplicare, nu avem cum să dăm un răspuns ferm, iar cine cumpără acum o rovinietă
-        anuală ar face bine să știe că întrebarea e deschisă.
-      </p>
-
-      <h2>Prețul rovinietei în 2026</h2>
-      <p>
-        Tarifele sunt stabilite în euro prin ordonanță, dar se plătesc în lei. Conversia nu se face
-        la cursul zilei, cum crede lumea, ci <strong>lunar</strong>: se folosește cursul BNR din
-        penultima zi lucrătoare a lunii anterioare, iar prețul în lei rămâne apoi neschimbat toată
-        luna. De asta găsești pe site-uri diferite sume ușor diferite pentru aceeași rovinietă: sunt
-        din luni diferite.
+        Tarifele sunt acum în lei, cu TVA, și depind de categorie, perioadă și
+        norma Euro (Ordinul MTI nr. 888/2026). Pentru autoturisme, tariful
+        oficial CNAIR arată așa:
       </p>
       <table>
         <thead>
           <tr>
-            <th>Durată</th>
-            <th>Preț</th>
-            <th>Recomandat pentru</th>
+            <th>Perioadă</th>
+            <th>Electric</th>
+            <th>Euro 6</th>
+            <th>Euro 4–5</th>
+            <th>Euro 0–3</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>1 zi</td>
-            <td>3,5€ (~18 lei)</td>
-            <td>Călătorii ocazionale</td>
+            <td>20 lei</td>
+            <td>22 lei</td>
+            <td>26 lei</td>
+            <td>29 lei</td>
           </tr>
           <tr>
             <td>10 zile</td>
-            <td>6€ (~31 lei)</td>
-            <td>Vacanțe scurte</td>
+            <td>27 lei</td>
+            <td>30 lei</td>
+            <td>35 lei</td>
+            <td>39 lei</td>
           </tr>
           <tr>
             <td>30 de zile</td>
-            <td>9,5€ (~50 lei)</td>
-            <td>O lună de condus</td>
+            <td>43 lei</td>
+            <td>48 lei</td>
+            <td>55 lei</td>
+            <td>62 lei</td>
           </tr>
           <tr>
             <td>60 de zile</td>
-            <td>15€ (~79 lei)</td>
-            <td>Două luni, sezon</td>
+            <td>68 lei</td>
+            <td>76 lei</td>
+            <td>87 lei</td>
+            <td>99 lei</td>
           </tr>
           <tr>
             <td>12 luni</td>
-            <td>50€ (~262 lei)</td>
-            <td>Utilizare frecventă</td>
+            <td>228 lei</td>
+            <td>254 lei</td>
+            <td>292 lei</td>
+            <td>330 lei</td>
           </tr>
         </tbody>
       </table>
       <p>
-        Aritmetica e brutală în favoarea rovinietei anuale: 50 de euro pe an înseamnă mai puțin
-        decât o singură amendă redusă la jumătate. Chiar și cea de o zi, la 3,5 euro, e de peste
-        treisprezece ori mai ieftină decât cei 250 de lei ai amenzii reduse.
-      </p>
-      <p>
-        Nu există rovinietă de 7 zile pentru autoturisme, deși e căutată des. Perioadele disponibile
-        la categoria A sunt cele cinci din tabel. Șapte zile există doar la categoriile de marfă
-        grea și transport de persoane, C–H, care au altă structură: 1 zi, 7 zile, 30 de zile și 12
-        luni.
-      </p>
-
-      <h2>Se schimbă tarifele? Ce se știe despre normele EURO</h2>
-      <p>
-        Da. De la 1 octombrie 2026 se aplică Ordinul MTI nr. 888/2026: tariful depinde de norma de
-        poluare, iar valorile sunt direct în lei. Tabelul de mai sus arată tarifele plate de dinainte de
-        1 octombrie.
-      </p>
-      <p>
-        Pentru un autoturism (categoria A), rovinieta de 12 luni costă acum 228 de lei pentru electric,
-        254 de lei pentru Euro 6, 292 de lei pentru Euro 4–5 și 330 de lei pentru Euro 0–3. Dacă norma
-        nu se poate stabili, mașina e încadrată la Euro 0. Tot de la 1 octombrie, vehiculele de marfă
-        peste 3,5 tone nu mai plătesc rovinietă: trec pe taxa pe kilometru (TollRo).
-      </p>
-      <p>
-        Prețul exact pentru mașina ta, după normă, îl vezi pe{' '}
-        <a href="https://erovinieta.net/preturi?utm_source=eghiseul.ro&utm_medium=referral&utm_campaign=articol-amenda">
+        La categoria B (marfă până la 3,5 t), rovinieta de 12 luni costă între
+        521 lei (electric) și 752 lei (Euro 0–3), iar cea de o zi între 46 și 67
+        lei. Toate tarifele, inclusiv C și D, sunt pe{" "}
+        <a href={EROVINIETA_PRETURI} rel="noopener">
           erovinieta.net/preturi
         </a>
         .
       </p>
-
-      <h2>Verifică-ți rovinieta înainte de a pleca la drum</h2>
       <p>
-        Verificarea e gratuită și durează câteva secunde: introduci numărul de înmatriculare în{' '}
-        <Link href="/tools/verificare-rovinieta-online/">instrumentul de verificare rovinietă</Link>{' '}
-        și vezi dacă există una activă, până când e valabilă și, important, pe ce categorie a fost
-        cumpărată. Tot acolo găsești și pe ce drumuri se cere rovinieta și pe care nu, inclusiv
-        capcana porțiunii de drum național care traversează un municipiu.
+        Nu mai există rovinietă de 7 sau de 90 de zile. Perioadele sunt 1 zi, 10
+        zile, 30 de zile, 60 de zile și 12 luni, la toate categoriile.
+        Rovinietele de autoturism cumpărate înainte de 1 octombrie rămân
+        valabile până expiră.
+      </p>
+      <p>
+        Amenda redusă e, prin lege, cât rovinieta pe un an: 254 lei la un
+        autoturism Euro 6. Doar că după ce o plătești tot n-ai rovinietă. Una de
+        o zi costă cel mult 29 lei.
+      </p>
+
+      <h2>Verifică rovinieta înainte de drum</h2>
+      <p>
+        Verificarea e gratuită și durează câteva secunde. Introduci numărul de
+        înmatriculare în{" "}
+        <Link href="/tools/verificare-rovinieta-online/">
+          instrumentul de verificare rovinietă
+        </Link>{" "}
+        și vezi dacă ai una activă, până când e valabilă și pe ce categorie a
+        fost cumpărată. Același lucru îl poți face și pe{" "}
+        <a href={EROVINIETA_VERIFICARE} rel="noopener">
+          erovinieta.net
+        </a>
+        .
+      </p>
+      <p>
+        Dacă nu ai rovinietă sau expiră curând,{" "}
+        <a href={EROVINIETA_CHECKOUT} rel="noopener">
+          o cumperi online de pe erovinieta.net
+        </a>{" "}
+        în câteva minute, pe categoria și norma Euro ale mașinii. Textul legii
+        îl găsești pe{" "}
+        <a href={LEGEA_226} rel="noopener noreferrer" target="_blank">
+          portalul legislativ (Legea 226/2023)
+        </a>
+        .
       </p>
     </ArticleLayout>
   );
