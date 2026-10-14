@@ -3,13 +3,13 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { ChevronDown, Calculator } from 'lucide-react';
-import { CALCULATORS_NAV } from '@/config/calculators-nav';
+import { HEADER_TOOLS_NAV } from '@/config/calculators-nav';
 import { cn } from '@/lib/utils';
 
 /**
  * Desktop "Calculatoare" mega-menu — same accessible disclosure pattern as
  * ServicesMegaMenu (hover + click/keyboard, Escape/outside/blur close,
- * hydration-safe). Grupat pe categorii din CALCULATORS_NAV.
+ * hydration-safe). Grupat pe categorii din HEADER_TOOLS_NAV (calculatoare + instrumente).
  */
 export function CalculatorsMegaMenu() {
   const [open, setOpen] = useState(false);
@@ -71,7 +71,7 @@ export function CalculatorsMegaMenu() {
           className="w-[680px] bg-white rounded-2xl shadow-[0_12px_40px_rgba(6,16,31,0.16)] border border-neutral-100 p-6"
         >
           <div className="grid grid-cols-3 gap-x-6 gap-y-6">
-            {CALCULATORS_NAV.map((group) => (
+            {HEADER_TOOLS_NAV.map((group) => (
               <div key={group.category}>
                 <p className="text-[11px] font-bold uppercase tracking-wider text-primary-700 mb-3">
                   {group.category}
@@ -103,6 +103,14 @@ export function CalculatorsMegaMenu() {
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 hover:text-primary-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded"
             >
               Vezi toate calculatoarele
+              <ChevronDown className="h-4 w-4 -rotate-90" aria-hidden="true" />
+            </Link>
+            <Link
+              href="/tools/"
+              onClick={() => setOpen(false)}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 hover:text-primary-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded"
+            >
+              Toate instrumentele
               <ChevronDown className="h-4 w-4 -rotate-90" aria-hidden="true" />
             </Link>
             <span className="inline-flex items-center gap-1.5 text-xs text-neutral-500">

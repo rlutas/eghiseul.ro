@@ -61,6 +61,8 @@ const serviceGroups: { title: string; items: FooterService[] }[] = [
         ],
       },
       { name: 'Rovinietă Online', href: '/servicii/rovinieta-online/' },
+      { name: 'Verificare firmă după CUI (gratuit)', href: '/tools/verificare-firma-cui/' },
+      { name: 'Instrumente gratuite', href: '/tools/' },
     ],
   },
   // Cadastru & topografie — serviciile prin topograful autorizat + cele

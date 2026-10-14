@@ -12,7 +12,7 @@ import { HeaderServiceSearch } from '@/components/shared/header-service-search';
 import { SERVICES_NAV } from '@/config/services-nav';
 import { GOOGLE_REVIEWS_URL, GOOGLE_RATING } from '@/config/contact';
 import { SOCIAL_PROOF } from '@/lib/seo/constants';
-import { CALCULATORS_NAV } from '@/config/calculators-nav';
+import { HEADER_TOOLS_NAV } from '@/config/calculators-nav';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import {
   DropdownMenu,
@@ -481,7 +481,7 @@ export function Header() {
                           </button>
                           {mobileCalculatorsOpen && (
                             <div className="pl-3 pb-2">
-                              {CALCULATORS_NAV.map((group) => (
+                              {HEADER_TOOLS_NAV.map((group) => (
                                 <div key={group.category} className="mt-2">
                                   <p className="px-3 text-xs font-bold uppercase tracking-wider text-primary-700">
                                     {group.category}

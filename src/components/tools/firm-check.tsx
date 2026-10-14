@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { AlertTriangle, ArrowRight, Building2, CheckCircle, Loader2, Search, XCircle } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { AlertTriangle, ArrowRight, BarChart3, Building2, CheckCircle, Loader2, Percent, Search, ShieldCheck, Tags, XCircle } from 'lucide-react';
 import type { FirmReport } from '@/lib/company/firm-report';
 import { TrackedLink } from '@/components/articole/tracked-link';
 
@@ -37,25 +37,47 @@ export function FirmCheck({ constatatorHref, constatatorPrice }: { constatatorHr
   const [error, setError] = useState<string | null>(null);
   const [report, setReport] = useState<FirmReport | null>(null);
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const run = useCallback(async (value: string) => {
     setError(null);
     setReport(null);
-    if (!cui.trim()) {
+    if (!value.trim()) {
       setError('Scrie CUI-ul firmei (cu sau fără „RO”).');
       return;
     }
     setLoading(true);
     try {
-      const res = await fetch(`/api/tools/verificare-firma/?cui=${encodeURIComponent(cui.trim())}`);
+      const res = await fetch(`/api/tools/verificare-firma/?cui=${encodeURIComponent(value.trim())}`);
       const json = await res.json();
-      if (json.success) setReport(json.data);
-      else setError(json.error ?? 'Nu am putut verifica firma.');
+      if (json.success) {
+        setReport(json.data);
+        // Shareable link to this result (the page canonical stays the bare URL).
+        try {
+          const url = new URL(window.location.href);
+          url.searchParams.set('cui', String(json.data.cui));
+          window.history.replaceState(null, '', url);
+        } catch {
+          /* ignore */
+        }
+      } else setError(json.error ?? 'Nu am putut verifica firma.');
     } catch {
       setError('Nu am putut verifica firma. Verifică conexiunea și încearcă din nou.');
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  // Deep link: /tools/verificare-firma-cui/?cui=19 runs the check on load.
+  useEffect(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('cui');
+    if (fromUrl) {
+      setCui(fromUrl);
+      void run(fromUrl);
+    }
+  }, [run]);
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    void run(cui);
   };
 
   const deregistered = !!report?.deregisteredOn || /radiat/i.test(report?.registrationState ?? '');
@@ -79,7 +101,7 @@ export function FirmCheck({ constatatorHref, constatatorPrice }: { constatatorHr
           autoComplete="off"
           value={cui}
           onChange={(e) => setCui(e.target.value)}
-          placeholder="CUI, de exemplu 14399840 sau RO14399840"
+          placeholder="CUI, ex: 14399840"
           className="h-12 min-w-0 flex-1 rounded-xl border border-neutral-300 px-4 text-base text-secondary-900 placeholder:text-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200"
         />
         <button
@@ -91,7 +113,46 @@ export function FirmCheck({ constatatorHref, constatatorPrice }: { constatatorHr
           Verifică firma
         </button>
       </form>
-      <p className="mt-2 text-xs text-neutral-500">Gratuit, fără cont. Datele vin din evidențele publice ANAF.</p>
+      <p className="mt-2 text-sm text-neutral-600">
+        Gratuit, fără cont. Datele vin din evidențele publice ANAF.{' '}
+        {!report && !loading && (
+          <button
+            type="button"
+            onClick={() => {
+              setCui('19');
+              void run('19');
+            }}
+            className="font-semibold text-primary-700 underline underline-offset-2 hover:text-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded"
+          >
+            Vezi un exemplu
+          </button>
+        )}
+      </p>
+
+      {!report && !error && !loading && (
+        <ul className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Ce afli">
+          {[
+            { icon: ShieldCheck, label: 'Activă, inactivă sau radiată' },
+            { icon: Percent, label: 'Plătitor de TVA' },
+            { icon: Tags, label: 'Activitate (CAEN)' },
+            { icon: BarChart3, label: 'Bilanț pe 2 ani' },
+          ].map((f) => (
+            <li key={f.label} className="flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2.5 text-sm text-secondary-800">
+              <f.icon className="h-4 w-4 flex-shrink-0 text-primary-700" aria-hidden="true" />
+              {f.label}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {loading && (
+        <div className="mt-6 space-y-3" aria-hidden="true">
+          <div className="h-6 w-2/3 animate-pulse rounded bg-neutral-100 motion-reduce:animate-none" />
+          <div className="h-4 w-full animate-pulse rounded bg-neutral-100 motion-reduce:animate-none" />
+          <div className="h-4 w-5/6 animate-pulse rounded bg-neutral-100 motion-reduce:animate-none" />
+          <div className="h-24 w-full animate-pulse rounded-xl bg-neutral-100 motion-reduce:animate-none" />
+        </div>
+      )}
 
       <div aria-live="polite">
         {error && (

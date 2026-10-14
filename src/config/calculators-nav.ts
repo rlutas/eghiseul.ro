@@ -45,6 +45,7 @@ import {
   FileCheck,
   Hammer,
   Euro,
+  Ticket,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -124,3 +125,18 @@ export const CALCULATORS_NAV: CalculatorNavGroup[] = [
     ],
   },
 ];
+
+/**
+ * Free tools (/tools/*). Kept out of CALCULATORS_NAV so the calculators
+ * directory stays calculators-only; the header menus append it as a group.
+ */
+export const TOOLS_NAV: CalculatorNavGroup = {
+  category: 'Instrumente gratuite',
+  items: [
+    { name: 'Verificare firmă după CUI', href: '/tools/verificare-firma-cui/', icon: Building2, popular: true },
+    { name: 'Verificare rovinietă', href: '/tools/verificare-rovinieta-online/', icon: Ticket, popular: true },
+  ],
+};
+
+/** Calculator groups plus the tools group, for the header menus. */
+export const HEADER_TOOLS_NAV: CalculatorNavGroup[] = [...CALCULATORS_NAV, TOOLS_NAV];
