@@ -46,6 +46,11 @@ const EXTRA_SPECIMENS: Record<string, ServiceSpecimen> = {
     alt: 'Hartă cadastrală tipărită, cu o parcelă evidențiată sub lupă',
     illustration: true,
   },
+  'plan-amplasament-delimitare': {
+    src: '/images/servicii-ilustratii/plan-amplasament-delimitare.webp',
+    alt: 'Plan de amplasament și delimitare pe masă, cu conturul parcelei, casa și riglă',
+    illustration: true,
+  },
   'extras-multilingv-certificat-nastere': {
     src: '/images/specimens/extras-multilingv-nastere.webp',
     alt: 'Specimen extras multilingv de naștere',
