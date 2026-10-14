@@ -4,6 +4,7 @@
 ## Pentru echipă
 
 - Listele din admin (Comenzi, Abandonuri, Recuperare telefonică) se încarcă mai repede. Nu se schimbă nimic din ce vedeți sau apăsați.
+- Numărătorile de pe taburi (Toate, Plătite, Neplătite…) se pot actualiza cu până la 20 de secunde întârziere după ce mutați o comandă: se țin minte câteva secunde ca paginile să se încarce mai repede.
 - Abandonurile erau cele mai lente (peste 5 secunde): câteva drafturi vechi aveau pozele actelor salvate direct în comandă, iar lista le trimitea de fiecare dată, deși afișa doar numele.
 
 ---
@@ -15,3 +16,5 @@
 - `src/lib/admin/slim-customer-data.ts`: înlocuiește `base64` și orice string > 2.000 caractere cu `[fișier]`, păstrând forma; aplicat pe răspunsul `GET /api/admin/orders/list`. Test în `tests/unit/lib/admin/`.
 - `orders/list`: cele 6 interogări secundare (note, nr. Barou, ONRC, marcaj „Sunat”, avarii, mesaje necitite) rulează în paralel (`Promise.all`), nu una după alta; marcajul „Sunat” citește doar `customer_data->contact`, nu tot JSON-ul, pe până la 2.000 de comenzi.
 - `orders/priority-calls`: coada, indexul plăților și lista „Recuperate” pornesc împreună; „Recuperate” citește doar contactul și numele (`customer_data->contact`, `->personal->>firstName`…), nu tot `customer_data` pe 1.000 de comenzi.
+- `orders/counts` (22 de COUNT exacte): cache în memorie 20 s pe instanță, cheiat pe tot setul de filtre; autentificarea și permisiunea rulează la fiecare cerere.
+- `knowledge/feed` (badge-ul „noutăți” din meniu, pe fiecare pagină din admin): changelog-ul se parsează o dată pe instanță (se schimbă doar la deploy) + `Cache-Control: private, max-age=300`.

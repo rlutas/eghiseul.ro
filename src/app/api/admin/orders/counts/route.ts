@@ -25,6 +25,14 @@ import { applyQuickOrStage } from '@/lib/admin/order-quick-filters';
  *   - service=<service_id>   (optional)
  *   - search=<text>          (optional)
  */
+// Tab and chip counts are 22 exact COUNT queries on `orders`. They change only
+// when an order moves, so a warm instance answers repeat requests (switching
+// tabs, coming back to the list) from memory for a few seconds instead of
+// re-counting (~1.1 s each time, measured 14.10.2026). Keyed by the full
+// filter set; auth and permission checks still run on every request.
+const COUNTS_TTL_MS = 20_000;
+const countsCache = new Map<string, { at: number; data: OrdersCounts }>();
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -50,6 +58,11 @@ export async function GET(request: NextRequest) {
 
     const adminClient = createAdminClient();
     const { searchParams } = new URL(request.url);
+    const cacheKey = searchParams.toString();
+    const cached = countsCache.get(cacheKey);
+    if (cached && Date.now() - cached.at < COUNTS_TTL_MS) {
+      return NextResponse.json({ success: true, data: cached.data });
+    }
     const testFilter = parseTestFilter(searchParams.get('test'));
     const service = searchParams.get('service') || '';
     const search = searchParams.get('search') || '';
@@ -151,6 +164,8 @@ export async function GET(request: NextRequest) {
       stage_ready: stageReadyRes.count || 0,
     };
 
+    if (countsCache.size > 200) countsCache.clear();
+    countsCache.set(cacheKey, { at: Date.now(), data: counts });
     return NextResponse.json({ success: true, data: counts });
   } catch (error) {
     console.error('Failed to fetch orders counts:', error);

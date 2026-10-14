@@ -8,6 +8,11 @@ import { loadChangelog } from '@/lib/knowledge/docs';
  * Alimentează badge-ul „noutăți" de pe „Ghid & noutăți" din meniul admin:
  * clientul numără intrările mai noi decât data reținută în localStorage.
  */
+// The changelog only changes with a deploy, so a warm instance parses the
+// markdown files once instead of on every admin page view (0.6–1.1 s,
+// measured 14.10.2026). The browser may also reuse the answer for 5 minutes.
+let feedCache: { latest: string | null; dates: string[] } | null = null;
+
 export async function GET() {
   try {
     const supabase = await createClient();
@@ -25,14 +30,14 @@ export async function GET() {
       throw e;
     }
 
-    const entries = await loadChangelog({ limit: 60 });
-    return NextResponse.json({
-      success: true,
-      data: {
-        latest: entries[0]?.date ?? null,
-        dates: entries.map((e) => e.date),
-      },
-    });
+    if (!feedCache) {
+      const entries = await loadChangelog({ limit: 60 });
+      feedCache = { latest: entries[0]?.date ?? null, dates: entries.map((e) => e.date) };
+    }
+    return NextResponse.json(
+      { success: true, data: feedCache },
+      { headers: { 'Cache-Control': 'private, max-age=300' } },
+    );
   } catch (err) {
     console.error('[knowledge/feed] failed:', err);
     return NextResponse.json({ success: false, error: 'Eroare internă.' }, { status: 500 });
