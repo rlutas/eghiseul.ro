@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { ChevronRight, Calculator, ArrowRight, Phone } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ChevronRight, Calculator, ArrowRight, type LucideIcon } from 'lucide-react';
+import { CALCULATORS_NAV } from '@/config/calculators-nav';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { Footer } from '@/components/home/footer';
 import { NewsletterPopup } from '@/components/calculators/newsletter-popup';
@@ -80,6 +80,10 @@ const SVC = {
   rovinietaTool: { href: '/tools/verificare-rovinieta-online/', label: 'Verificare rovinietă', desc: 'Vezi gratuit dacă mașina are rovinieta valabilă și până când.' },
   rovinieta: { href: '/servicii/rovinieta-online/', label: 'Rovinietă online', desc: 'Cumperi rovinieta în câteva minute, cu confirmare pe email.' },
 } satisfies Record<string, RelatedService>;
+
+const CALC_ICONS: Record<string, LucideIcon> = Object.fromEntries(
+  CALCULATORS_NAV.flatMap((g) => g.items.map((i) => [i.href, i.icon])),
+);
 
 const DEFAULT_RELATED: RelatedService[] = [SVC.cazier, SVC.extrasCF, SVC.constatator];
 
@@ -354,72 +358,40 @@ export async function CalculatorLayout({
         {/* FAQ */}
         {faqs && faqs.length > 0 && <ServiceFAQ title="Întrebări frecvente" faqs={faqs} />}
 
-        {/* Related services as products — internal linking calculatoare → money pages */}
-        <ArticleServiceCards cards={cards} guides={guides} />
-
-        {/* Calculatoare înrudite — vezi nota de la CALC_CLUSTERS. */}
+        {/* Calculatoare înrudite — vezi nota de la CALC_CLUSTERS. Deasupra
+            produselor, cu iconița din meniul de calculatoare. */}
         {relatedCalcs.length > 0 && (
-          <section className="py-10 bg-white border-t border-neutral-200">
-            <div className="container mx-auto px-4 max-w-[820px]">
-              <h2 className="text-lg lg:text-xl font-bold text-secondary-900 mb-4">
+          <section className="py-10 lg:py-12 bg-white border-t border-neutral-200" aria-labelledby="calculatoare-inrudite">
+            <div className="container mx-auto px-4 max-w-[1000px]">
+              <h2 id="calculatoare-inrudite" className="text-xl lg:text-2xl font-extrabold text-secondary-900 mb-5">
                 Calculatoare înrudite
               </h2>
-              <div className="flex flex-wrap gap-2">
-                {relatedCalcs.map((c) => (
-                  <Link
-                    key={c.href}
-                    href={c.href}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm text-neutral-700 hover:border-primary-300 hover:text-primary-700 transition-colors"
-                  >
-                    {c.label}
-                  </Link>
-                ))}
-              </div>
+              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {relatedCalcs.map((c) => {
+                  const Icon = CALC_ICONS[c.href] ?? Calculator;
+                  return (
+                    <li key={c.href}>
+                      <Link
+                        href={c.href}
+                        className="group flex items-center gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-3.5 transition-all hover:border-primary-300 hover:bg-primary-50 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                      >
+                        <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-100 text-primary-800 group-hover:bg-primary-500 group-hover:text-secondary-900 transition-colors">
+                          <Icon className="h-5 w-5" aria-hidden="true" />
+                        </span>
+                        <span className="min-w-0 flex-1 font-semibold leading-snug text-secondary-900">{c.label}</span>
+                        <ArrowRight className="h-4 w-4 flex-shrink-0 text-neutral-400 group-hover:text-primary-700" aria-hidden="true" />
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           </section>
         )}
 
-        {/* CTA */}
-        <section className="relative py-14 lg:py-20 bg-gradient-to-b from-secondary-900 to-[#0C1A2F] overflow-hidden">
-          <div className="absolute inset-0 opacity-5">
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: 'radial-gradient(circle at 1px 1px, #ECB95F 1px, transparent 0)',
-                backgroundSize: '40px 40px',
-              }}
-            />
-          </div>
-          <div className="relative container mx-auto px-4 max-w-[820px] text-center">
-            <h2 className="text-2xl lg:text-3xl font-extrabold text-white mb-4">
-              Ai nevoie de un document?
-            </h2>
-            <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-              eGhișeul îți obține documentele 100% online, fără drumuri la ghișeu.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                asChild
-                className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
-              >
-                <Link href="/servicii/">
-                  Vezi serviciile
-                  <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl transition-all duration-200"
-              >
-                <a href="tel:+40757708181">
-                  <Phone className="mr-2 w-5 h-5" aria-hidden="true" />
-                  Sună-ne
-                </a>
-              </Button>
-            </div>
-          </div>
-        </section>
+        {/* Related services as products — internal linking calculatoare → money pages */}
+        <ArticleServiceCards cards={cards} guides={guides} />
+
       </main>
 
       {cards[0] && <ArticleStickyBar card={cards[0]} allWidths />}
