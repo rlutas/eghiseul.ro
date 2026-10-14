@@ -22,7 +22,7 @@ Lista roșie „Furnizori externi” din Extras bancă exista din iulie, dar doa
 
 ## Ce s-a schimbat
 
-- `src/lib/accounting/supplier-invoices.ts`: `SUPPLIER_RULES` (Meta, Google Ads, Google Cloud, TikTok, OpenAI, Anthropic, Vercel, Supabase, Railway, Resend, Zoho, Amazon), `supplierFor()` și `groupBySupplier()`. Furnizorul se calculează **la citire** din descriere, deci extrasele vechi intră fără reimport. Plățile POS în valută la comercianți necunoscuți se grupează după numele comerciantului (`pos:<NUME>`).
+- `src/lib/accounting/supplier-invoices.ts`: `SUPPLIER_RULES` (Meta, Google Ads, Google Cloud, TikTok, OpenAI, Anthropic, Vercel, Supabase, Railway, Resend, Zoho, DHL prin MyBill, Amazon), `supplierFor()` și `groupBySupplier()`. Furnizorul se calculează **la citire** din descriere, deci extrasele vechi intră fără reimport. Plățile POS în valută la comercianți necunoscuți se grupează după numele comerciantului (`pos:<NUME>`).
 - Migrarea `195_supplier_invoice_checks.sql`: cheie `(month, supplier_key)`, coloane `downloaded/printed/handed_at/_by`, `note`. RLS activ, acces doar prin service role.
 - `GET/POST /api/admin/decontari/facturi-furnizori` (`payments.verify`): istoric pe luni sau detaliu pe lună, plus bifă și notă (upsert).
 - UI: `/admin/decontari/facturi-furnizori` și `SupplierInvoicesBanner` pe `/admin/decontari` și `/admin/decontari/banca`. Lista roșie veche a fost scoasă.
@@ -38,4 +38,4 @@ Lista roșie „Furnizori externi” din Extras bancă exista din iulie, dar doa
 | august 2026 | 7 |
 | septembrie 2026 | 10 (Meta 22, TikTok 49, OpenAI 8, Google Ads, Anthropic 2 …) |
 
-Nebifate încă: `Wallet payment from MyBil` (≈13.265 lei în iunie–septembrie, plăți POS în RON). Nu e clar ce document există pentru ele.
+`Wallet payment from MyBil` (≈13.265 lei în iunie–septembrie) = **DHL Express** plătit prin MyBill. A intrat în checklist ca rând separat („DHL Express (plăți MyBill)”), cu 12 linii recategorisite. Cabinetul de avocat, Delivery Solutions și ceilalți furnizori români plătiți prin OP trimit factura în SPV, deci rămân în afara listei.

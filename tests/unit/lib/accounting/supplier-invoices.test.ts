@@ -11,6 +11,11 @@ describe('supplierFor', () => {
     expect(supplierFor({ description: pos('TikTok Ads', '13.00 RON'), debit_bani: 1300 })?.key).toBe('tiktok');
   });
 
+  it('maps MyBill wallet payments to DHL', () => {
+    const d = 'EPOS 31/08/2026 498750000374349 TID:99999999 Wallet payment from MyBil  BUCURESTI RO 42440827 valoare tranzactie: 797.43 RON RRN:624306345275';
+    expect(supplierFor({ description: d, debit_bani: 79743 })?.key).toBe('dhl');
+  });
+
   it('separates Google Cloud from Google Ads', () => {
     expect(supplierFor({ description: pos('GOOGLE*CLOUD LCBZXD', '2.39 USD'), debit_bani: 1109 })?.key).toBe('google_cloud');
   });

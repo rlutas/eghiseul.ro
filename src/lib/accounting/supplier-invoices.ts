@@ -31,6 +31,9 @@ export const SUPPLIER_RULES: SupplierRule[] = [
   { key: 'railway', label: 'Railway', where: 'railway.com → Account → Billing', test: /RAILWAY/i },
   { key: 'resend', label: 'Resend', where: 'resend.com → Settings → Billing', test: /RESEND/i },
   { key: 'zoho', label: 'Zoho', where: 'Zoho → Subscriptions → Invoices', test: /ZOHO/i },
+  // DHL Express se plătește prin portofelul MyBill: pe extras apare doar
+  // „Wallet payment from MyBil", fără numele DHL (confirmat de Raul, 14.10.2026).
+  { key: 'dhl', label: 'DHL Express (plăți MyBill)', where: 'MyBill DHL → Facturi', test: /DHL|Wallet payment from MyBil/i },
   { key: 'amazon', label: 'Amazon', where: 'Amazon Business → Comenzi → Factură', test: /AMAZON|AMZN/i },
 ];
 
