@@ -51,6 +51,26 @@ const EXTRA_SPECIMENS: Record<string, ServiceSpecimen> = {
     alt: 'Plan de amplasament și delimitare pe masă, cu conturul parcelei, casa și riglă',
     illustration: true,
   },
+  'copie-carte-funciara': {
+    src: '/images/servicii-ilustratii/copie-arhiva.webp',
+    alt: 'Dosar de arhivă cu acte vechi și o copie nouă, tipărită, pe birou',
+    illustration: true,
+  },
+  'copie-arhiva-ocpi': {
+    src: '/images/servicii-ilustratii/copie-arhiva.webp',
+    alt: 'Dosar de arhivă cu acte vechi și o copie nouă, tipărită, pe birou',
+    illustration: true,
+  },
+  'copie-intabulare': {
+    src: '/images/servicii-ilustratii/copie-arhiva.webp',
+    alt: 'Dosar de arhivă cu acte vechi și o copie nouă, tipărită, pe birou',
+    illustration: true,
+  },
+  'copie-contract-vanzare': {
+    src: '/images/servicii-ilustratii/copie-arhiva.webp',
+    alt: 'Dosar de arhivă cu acte vechi și o copie nouă, tipărită, pe birou',
+    illustration: true,
+  },
   'extras-multilingv-certificat-nastere': {
     src: '/images/specimens/extras-multilingv-nastere.webp',
     alt: 'Specimen extras multilingv de naștere',
