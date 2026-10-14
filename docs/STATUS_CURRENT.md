@@ -1,5 +1,7 @@
 # eGhiseul.ro - Status Curent
 
+> **🔵 Situația 14.10.2026** — 1–13.10: 19,8k lei pe toate platformele (−24% vs septembrie), CJO −61%, eghiseul +18%; telefonul ~18% din venitul eghiseul; B9 CJO 0/500. [raport](2026-10-14-situatie-vanzari-trafic-marketing.md)
+
 > **🟣 Update 2026-10-14 — CF cu sat separat, ghid cadastru sistematic, articolele vând, atribuire pe conținut.**
 > - **Extras CF / servicii pe imobil:** pasul „Date imobil" cere Comună/Oraș (listă) + **Sat obligatoriu** (sugestii SIRUTA INS) + stradă și proprietar opționale; Mircea vede separat UAT/Sat + numele solicitantului. Declanșator: Drajna/Podurile. [changelog](changelog/2026-10-14-extras-cf-sat-separat.md)
 > - **pnccf.site** (afișarea publică din cadastrul sistematic): analizat; serviciul de rectificare prin Mircea **respins** (îl face doar executantul). [analiză](serviciu-cadastru-sistematic/README.md)
