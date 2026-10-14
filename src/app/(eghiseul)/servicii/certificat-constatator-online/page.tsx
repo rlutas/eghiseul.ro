@@ -34,6 +34,7 @@ import { ServicePrice } from '@/components/services/service-price';
 import { ServiceAnswerBlock } from '@/components/services/service-answer-block';
 import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 import { GOOGLE_RATING, GOOGLE_REVIEW_COUNT_LABEL } from '@/config/contact';
+import { getDeliveryStats } from '@/lib/services/delivery-stats';
 
 // Database slug (order pipeline identifier). URL path uses the WP slug
 // (certificat-constatator-ONLINE) to preserve the indexed URL + backlinks.
@@ -105,6 +106,12 @@ export default async function CertificatConstatatorPage() {
   if (!data) notFound();
 
   const { service } = data;
+  // Real time from payment to document, measured on the latest paid orders.
+  const speed = await getDeliveryStats(SERVICE_SLUG);
+  const speedShort = speed ? `~${speed.medianMinutes} minute` : 'Câteva minute';
+  const speedSentence = speed
+    ? `Pe ultimele ${speed.sample} comenzi, jumătate au fost gata în cel mult ${speed.medianMinutes} minute de la plată, iar ${speed.under10Pct}% în cel mult 10 minute.`
+    : 'De obicei durează câteva minute de la plată.';
 
   const basePrice = Number(service.base_price);
   const fmt = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(2).replace('.', ','));
@@ -313,10 +320,10 @@ export default async function CertificatConstatatorPage() {
           <div className="container mx-auto px-4 max-w-[1100px] py-6 lg:py-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               {[
-                { icon: Zap, value: 'Câteva minute', label: 'Depunere automată 24/7' },
+                { icon: Zap, value: speedShort, label: speed ? `mediana, ultimele ${speed.sample} comenzi` : 'Depunere automată 24/7' },
                 { icon: Landmark, value: 'ONRC', label: 'Document semnat' },
                 { icon: Building2, value: 'Doar CUI-ul', label: 'Fără cont RECOM' },
-                { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
+                { icon: CheckCircle, value: `${GOOGLE_RATING}/5`, label: `${GOOGLE_REVIEW_COUNT_LABEL} recenzii Google` },
               ].map((t) => (
                 <div key={t.label} className="flex flex-col items-center gap-1.5">
                   <div className="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center">
@@ -523,7 +530,7 @@ export default async function CertificatConstatatorPage() {
                 </table>
               </div>
               <p className="mt-4 text-sm text-neutral-600 text-center">
-                Toate variantele costă <strong>{basePrice} RON cu TVA</strong>, taxe ONRC incluse. Ai
+                Toate variantele costă <strong>{basePrice} RON cu TVA</strong>, din care 30 lei este taxa ONRC. Ai
                 PFA, II sau IF? Primești certificat pe persoană fizică, pe CNP-ul titularului —{' '}
                 <Link href="/cele-4-tipuri-de-certificat-constatator-online/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                   vezi ghidul pentru PFA
@@ -730,7 +737,7 @@ export default async function CertificatConstatatorPage() {
                   <h3 className="font-bold text-secondary-900 mb-1.5">Fără taxă de urgență</h3>
                   <p className="text-sm text-neutral-700 leading-relaxed">
                     Sistemul nostru depune cererile la ONRC <strong>automat, 24/7</strong> — primești certificatul în
-                    câteva minute, <strong>fără taxă de urgență</strong>. La alți operatori, urgența costă în plus.
+                    câteva minute, <strong>fără taxă de urgență</strong>.
                   </p>
                 </div>
               </div>
@@ -751,7 +758,7 @@ export default async function CertificatConstatatorPage() {
           </div>
         </section>
 
-        {/* Comparison — eGhișeul vs alți operatori vs ghișeu vs portal (CF parity) */}
+        {/* Comparison — eGhișeul vs ghișeu ONRC vs platforma online ONRC. Coloana „alți operatori" scoasă 14.10.2026: afirma lucruri false (program de lucru, taxă de urgență) — risc ANPC. */}
         <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4 max-w-[1000px]">
             <div className="text-center mb-10">
@@ -759,31 +766,32 @@ export default async function CertificatConstatatorPage() {
                 De ce eGhișeul
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">
-                eGhișeul vs alți operatori, ghișeul ONRC și portalul RECOM
+                eGhișeul, ghișeul ONRC sau platforma online a ONRC
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Același certificat ONRC — diferă timpul, taxele și comoditatea.
+                Același certificat, emis de ONRC. Îl poți cere și singur, online, cu taxa ONRC de 30 lei; la noi
+                plătești în plus serviciul: alegem tipul potrivit, primești factură pe firmă și ai pe cine întreba.
               </p>
             </div>
             <div className="overflow-x-auto rounded-3xl border border-neutral-200 bg-white shadow-sm">
-              <div className="grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] min-w-[800px] text-sm">
+              <div className="grid grid-cols-[1.4fr_1fr_1fr_1fr] min-w-[680px] text-sm">
                 <div className="bg-neutral-50 p-4 font-semibold text-secondary-900" />
                 <div className="bg-primary-500 p-4 text-center font-extrabold text-secondary-900">eGhișeul</div>
-                <div className="bg-neutral-50 p-4 text-center font-semibold text-neutral-600">Alți operatori</div>
                 <div className="bg-neutral-50 p-4 text-center font-semibold text-neutral-600">Ghișeu ONRC</div>
-                <div className="bg-neutral-50 p-4 text-center font-semibold text-neutral-600">Portal RECOM</div>
+                <div className="bg-neutral-50 p-4 text-center font-semibold text-neutral-600">Platforma ONRC (online)</div>
                 {[
-                  ['Timp de obținere', 'Câteva minute', 'În program de lucru', 'Drum + așteptare', 'Cont + semnătură'],
-                  ['Taxă de urgență', '0 RON', '~19 lei', '—', '—'],
-                  ['Disponibil 24/7', true, false, false, true],
-                  ['Cont/semnătură necesare', false, false, '—', true],
-                  ['Deplasare la ghișeu', false, false, true, false],
-                  ['Taxe ONRC incluse', true, 'Variabil', 'Separat', 'Separat'],
-                  ['Livrare pe email', 'Automat', true, 'Ridici fizic', 'Manual'],
+                  ['Cost', `${basePrice} lei cu TVA (din care 30 lei taxa ONRC)`, 'Taxa ONRC', '30 lei (taxa ONRC)'],
+                  ['Timp de obținere', speedShort, 'Drum + așteptare', 'Câteva minute, dacă îl ceri singur'],
+                  ['Disponibil 24/7', true, false, true],
+                  ['Semnătură electronică necesară', false, '—', false],
+                  ['Deplasare', false, true, false],
+                  ['Te ajutăm să alegi tipul de certificat', true, true, false],
+                  ['Factură pe firmă și istoric comenzi', true, '—', '—'],
+                  ['Suport pe telefon și WhatsApp', true, '—', '—'],
                 ].map((row, i) => (
                   <div key={row[0] as string} className="contents">
                     <div className={`p-4 font-medium text-secondary-800 border-t border-neutral-100 ${i % 2 ? 'bg-neutral-50/50' : ''}`}>{row[0]}</div>
-                    {[1, 2, 3, 4].map((col) => {
+                    {[1, 2, 3].map((col) => {
                       const v = row[col];
                       const highlight = col === 1;
                       return (
@@ -817,14 +825,14 @@ export default async function CertificatConstatatorPage() {
             { q: 'Ce tipuri de certificat constatator pot comanda?', a: 'Trei: pe firmă (situația la zi a societății), pe persoană fizică (dacă o persoană deține calitatea de asociat/administrator în firme) și cu istoric (toate modificările firmei de la înființare până în prezent).' },
             { q: 'Certificatul constatator este la zi?', a: 'Da. Certificatul reflectă situația firmei din ziua eliberării, cu toate mențiunile actualizate înscrise la ONRC până la acel moment.' },
             { q: 'Cum verific dacă o persoană este asociat sau administrator într-o firmă?', a: 'Comanzi un certificat constatator pe persoană fizică. Pe baza datelor persoanei, ONRC indică firmele în care aceasta deține calitatea de asociat sau administrator. Costă 89 RON cu TVA, taxe ONRC incluse.' },
-            { q: 'În cât timp am certificatul constatator?', a: 'De obicei câteva minute — depunem cererea automat, 24/7, iar ONRC emite certificatul. În cazuri rare (procesare ONRC mai lentă) poate dura mai mult.' },
-            { q: 'Cât costă un certificat constatator?', a: `De la ${service.base_price} RON cu taxele ONRC incluse (pe firmă sau pe persoană fizică); varianta cu istoric este 487 RON cu TVA. Fără costuri ascunse.` },
+            { q: 'În cât timp am certificatul constatator?', a: `${speedSentence} Depunem cererea automat, 24/7, iar ONRC emite certificatul. Variantele pentru fonduri IMM și insolvență trec prin backoffice-ul ONRC și pot dura până la 24 de ore lucrătoare.` },
+            { q: 'Cât costă un certificat constatator?', a: `${service.base_price} RON cu TVA pe firmă sau pe persoană fizică, din care 30 lei este taxa ONRC; varianta cu istoric este 487 RON cu TVA, din care 250 lei taxa ONRC. Fără costuri ascunse.` },
             { q: 'De unde obțin certificatul constatator?', a: 'De la Oficiul Național al Registrului Comerțului (ONRC). Prin eGhișeul îl obții 100% online, fără cont RECOM și fără drum la ghișeu — îl primești pe email.' },
             { q: 'Care e diferența dintre certificatul de bază și cel extins?', a: 'Sunt denumiri folosite uzual pentru certificatul pe firmă: „de bază" = situația la zi a societății, iar „extins" = aceleași date plus mențiuni și detalii suplimentare. La noi îl comanzi ca certificat constatator pe firmă, care include datele complete.' },
             { q: 'Ce e diferit la certificatul pentru fonduri IMM și la cel de insolvență?', a: 'Sunt variante ale certificatului pe firmă. Cel pentru fonduri IMM are formatul cerut de programele de finanțare, iar cel de insolvență atestă explicit dacă firma figurează în procedurile Legii 85/2014. Ambele trec prin backoffice-ul ONRC și durează până la 24 de ore lucrătoare; doar cel de bază se emite în câteva minute.' },
             { q: 'Am PFA sau întreprindere individuală — ce certificat primesc?', a: 'PFA, II și IF primesc certificat constatator pe persoană fizică, emis pe CNP-ul titularului, nu pe CUI. Documentul arată înregistrarea (denumire, sediu profesional, coduri CAEN autorizate, stare) plus calitățile deținute în firme. Costă la fel și se emite automat, în câteva minute.' },
             { q: 'E acceptat la bancă și la notar?', a: 'Da. Băncile îl cer la deschiderea contului de firmă și la credite, notarii la tranzacții, iar ANAF la înregistrarea în scopuri de TVA. Condiția uzuală: să fie recent — de regulă emis în ultimele 30 de zile.' },
-            { q: 'Se poate obține gratuit certificatul constatator?', a: 'Anumite informații sunt disponibile gratuit prin portalul RECOM al ONRC, dar certificatul constatator semnat electronic de ONRC presupune o taxă ONRC și, de regulă, cont și semnătură electronică. Prin eGhișeul îl primești fără cont și fără deplasare.' },
+            { q: 'Se poate obține gratuit certificatul constatator?', a: 'Nu. Certificatul are o taxă ONRC de 30 lei, stabilită prin ordin al ministrului justiției. Îl poți cere și direct, pe platforma online a ONRC, plătind doar taxa cu cardul, fără semnătură electronică. Prin eGhișeul plătești în plus serviciul nostru: îl cerem noi pe tipul potrivit, primești factură pe firmă și ai suport dacă ceva nu e în regulă.' },
             { q: 'Pot obține certificat pentru orice firmă?', a: 'Da, pentru orice persoană juridică sau entitate înregistrată la Registrul Comerțului: SRL, SA, PFA, II sau IF. Ai nevoie doar de CUI-ul firmei.' },
             { q: 'Este valabil pentru licitații publice?', a: 'Da. Certificatul constatator este unul dintre documentele acceptate la licitațiile publice din SEAP/SICAP pentru a dovedi eligibilitatea și datele de identificare ale ofertantului.' },
             { q: 'Cât este valabil certificatul constatator?', a: 'Reflectă situația din ziua eliberării. În practică, autoritățile și partenerii cer un certificat emis în ultimele 30 de zile; la licitații se acceptă de regulă unul nu mai vechi de 30 de zile.' },
