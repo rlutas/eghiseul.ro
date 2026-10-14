@@ -11,6 +11,7 @@
 - Comenzile vechi nu au satul. Dacă lipsește și numărul pare ambiguu, întrebați clientul înainte să scoateți extrasul.
 
 Fișa serviciului: [Extras de carte funciară](../admin/servicii/extras-carte-funciara.md).
+De ce satul contează și ce e pnccf.site (idee de serviciu nou): [Cadastrul sistematic și numerotarea CF](../serviciu-cadastru-sistematic/README.md).
 
 ---
 

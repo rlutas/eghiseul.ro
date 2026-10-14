@@ -69,6 +69,11 @@ Se salvează în `customer_data.property` (`beneficiaryName`, `beneficiaryAddres
 `beneficiaryCnp`, `beneficiaryIdSeries`, `beneficiaryIdNumber`, `imobilLocality`,
 `imobilStreet`).
 
+> Din 14.10.2026, `imobilLocality` (Sat, obligatoriu) și `imobilStreet` (opțional)
+> nu mai stau în cardul convenției: sunt în „Localizare imobil”, pe TOATE serviciile
+> pe imobil, iar convenția le citește din aceleași câmpuri. Vezi
+> [changelog](../../changelog/2026-10-14-extras-cf-sat-separat.md).
+
 ## Șablonul
 
 - `src/templates/shared/conventie.docx` — generat din

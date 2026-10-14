@@ -42,8 +42,9 @@ email (PDF); curier doar dacă documentul e fizic și clientul l-a ales.
 
 ## Ce completează clientul
 
-Contact → **date imobil** (CF / cadastral / adresă, județ + localitate din
-nomenclator, la identificare: adresa sau datele proprietarului) → datele
+Contact → **date imobil** (județ + comună/oraș din nomenclator, satul
+obligatoriu cu sugestii din lista oficială, strada opțional — din 14.10.2026;
+apoi CF / cadastral, iar la identificare adresa sau datele proprietarului) → datele
 solicitantului (fără selfie) → semnătura (contract + convenție) → livrare →
 facturare → plată. Urgența „Procesare prioritară” e la pasul de opțiuni,
 acolo unde există.

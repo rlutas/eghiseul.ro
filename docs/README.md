@@ -29,6 +29,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 | **Design** | [`design/`](design/) | sistem de design, ghiduri vizuale |
 | **PRD / Business** | [`prd/`](prd/), [`business/`](business/), [`legal/`](legal/) | cerințe produs, business, legal |
 | **Registru central Barou** | [`registru-central/`](registru-central/) | registru numere partajat pe 3 platforme, alocare post-plată, cutover |
+| **Idee serviciu: cadastru sistematic (pnccf.site)** | [`serviciu-cadastru-sistematic/`](serviciu-cadastru-sistematic/) | cum se numerotează CF-urile (de ce satul contează), ce e pnccf.site, ce putem face legal; în analiză, așteptăm răspunsul lui Mircea |
 | **Serviciu NOU: traduceri+apostile** | [`serviciu-traduceri-apostile/`](serviciu-traduceri-apostile/) | analiză & plan (benchmark Kenna, liste documente/limbi, întrebări traducător+notar, flow, pricing draft) — în negociere |
 | **Curieri** | [`fancourier/`](fancourier/), [`sameday/`](sameday/) | integrări curier |
 | **Testing** | [`testing/`](testing/) | ghiduri de testare |

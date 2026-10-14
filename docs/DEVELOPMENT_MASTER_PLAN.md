@@ -685,6 +685,13 @@ cazier” (21.09).
 
 Features planned but not yet scheduled for a specific sprint.
 
+#### 🗺️ Serviciu „Verificare cadastru sistematic + rectificare” (în analiză 2026-10-14)
+
+pnccf.site (ANCPI) afișează public, 60 de zile, rezultatele cadastrului sistematic
+pe comune; rectificarea se cere în fereastra asta. Idee: verificare + cerere prin
+Mircea. Așteptăm de la el preț, județe, ce presupune. Fără scraping (termenii o
+interzic). Detalii: [serviciu-cadastru-sistematic/](serviciu-cadastru-sistematic/README.md).
+
 #### 👤 Cont de angajat legat de colaborator (amânat 2026-09-09)
 
 Azi angajatul lui Mircea lucrează pe contul lui, cu parolă internă pe
