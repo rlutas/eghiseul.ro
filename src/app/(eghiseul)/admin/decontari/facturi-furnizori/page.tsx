@@ -66,7 +66,7 @@ export default function FacturiFurnizoriPage() {
 function FacturiFurnizori() {
   const router = useRouter();
   const params = useSearchParams();
-  const [months, setMonths] = useState<MonthRow[]>([]);
+  const [months, setMonths] = useState<MonthRow[] | null>(null);
   const [month, setMonth] = useState<string>(params.get('month') ?? '');
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(false);
@@ -141,7 +141,7 @@ function FacturiFurnizori() {
     save(s.key, { note });
   };
 
-  const current = months.find((m) => m.month === month);
+  const current = months?.find((m) => m.month === month);
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
@@ -164,8 +164,9 @@ function FacturiFurnizori() {
         {/* Istoric pe luni */}
         <Card className="h-fit">
           <CardContent className="p-2">
-            {months.length === 0 && <p className="p-3 text-sm text-neutral-500">Niciun extras importat.</p>}
-            {months.map((m) => {
+            {months === null && <p className="p-3 text-sm text-neutral-500">Se încarcă…</p>}
+            {months?.length === 0 && <p className="p-3 text-sm text-neutral-500">Niciun extras importat.</p>}
+            {months?.map((m) => {
               const complete = m.handed === m.suppliers;
               return (
                 <button
