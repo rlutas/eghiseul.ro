@@ -19,6 +19,16 @@ Clienții care încep o comandă și nu plătesc ajung într-o coadă. Un apel s
 3. Apăsați **„Marchează sunat”**, alegeți **cine a sunat (Maria sau Carla)** și scrieți nota pe scurt, cu ce a spus clientul. Fără nume, apelul nu se salvează. Toate intrați pe același cont, deci numele ales e singurul mod în care știm cine a vorbit cu clientul. Fereastra ține minte ultimul nume ales pe calculatorul vostru: verificați-l înainte să salvați.
 4. **Doar pe eGhiseul**: dacă e cazul, la marcare puteți da o reducere. Clientul primește un email cu reducerea deja aplicată și linkul de continuare. Pe CazierJudiciarOnline clientul primește deja automat un email cu reducere după abandon, deci nu dăm alta.
 
+## Unde s-a oprit clientul (doar pe eGhiseul, din 14.10.2026)
+
+Sub numele serviciului, în Recuperare telefonică, și sub status, în **Comenzi → Neplătite**, vedeți unde s-a blocat clientul:
+
+- **🔴 „Plată cu cardul eșuată”** (cu „2×” dacă a încercat de mai multe ori): clientul a ajuns la plată, a introdus cardul și banca l-a refuzat. Dedesubt scrie motivul: fonduri insuficiente, card expirat, confirmarea 3D Secure n-a reușit sau, cel mai des, doar „card refuzat de bancă”. **Ăștia voiau să plătească, deci îi sunăm primii.** De aceea apar în capul listei „De sunat”. Spuneți-i că poate plăti **prin transfer bancar (IBAN)**: deschide comanda din linkul primit pe email și, la plată, alege „Transfer bancar”. Poate încerca și cu alt card. Apoi urmați [procedura pentru plata prin transfer](plata-transfer-bancar.md).
+- **🟡 „A ajuns la plata cu cardul”**: a apăsat „Plătește” și a ieșit de pe pagina de plată, fără să-i fie refuzat cardul. Întrebați ce l-a oprit. Transferul bancar e o variantă și aici.
+- **„pas: Livrare”, „pas: Facturare”…**: s-a oprit în formular, înainte de plată.
+
+Refuzurile se văd doar pentru încercările de după 14.10.2026. Fiecare refuz apare și în istoricul comenzii.
+
 ## Eticheta „📞 Sunat” în lista de abandonuri (din 13.10.2026)
 
 Când un client a fost sunat, apare o etichetă albastră **„Sunat 12.10 · Maria”** și în lista de abandonuri: pe eGhiseul în **Comenzi → Neplătite**, pe CazierJudiciarOnline în **Abandonuri**. Clientul e recunoscut după **email sau telefon**, deci eticheta apare pe toate comenzile lui, nu doar pe cea pe care s-a marcat apelul. Pe eGhiseul scrie „· altă comandă” când apelul s-a marcat pe o altă comandă a aceluiași client. Țineți mouse-ul pe etichetă ca să vedeți nota.

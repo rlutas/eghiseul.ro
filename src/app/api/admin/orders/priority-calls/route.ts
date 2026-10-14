@@ -85,6 +85,12 @@ interface PriorityRow {
   recoveryEmailStep: number;
   /** Pasul din wizard unde s-a oprit (draft). */
   currentStep: string | null;
+  /** Ajuns la plata Stripe (sesiune creată). */
+  reachedPayment: boolean;
+  /** Încercări de plată cu cardul refuzate de Stripe. */
+  paymentFailedCount: number;
+  /** Codul Stripe al ultimului refuz (insufficient_funds, …). */
+  paymentLastError: string | null;
   manualRecoveryEmailAt: string | null;
   manualRecoveryEmailBy: string | null;
 }
@@ -142,7 +148,7 @@ export async function GET(request: NextRequest) {
   const ordersTable = admin.from('orders') as any;
   let query = ordersTable
     .select(
-      'id, order_number, friendly_order_id, status, total_price, customer_data:customer_data_list, created_at, updated_at, phone_contacted_at, phone_contacted_by, phone_contact_notes, recovery_email_step, current_step, manual_recovery_email_at, manual_recovery_email_by, services(name, slug)'
+      'id, order_number, friendly_order_id, status, total_price, customer_data:customer_data_list, created_at, updated_at, phone_contacted_at, phone_contacted_by, phone_contact_notes, recovery_email_step, current_step, stripe_checkout_session_id, payment_failed_count, payment_last_error, manual_recovery_email_at, manual_recovery_email_by, services(name, slug)'
     )
     .in('status', ['abandoned', 'draft'])
     .gte('created_at', minIso)
@@ -262,6 +268,9 @@ export async function GET(request: NextRequest) {
       freshness: freshnessOf(order.created_at, Date.now()),
       recoveryEmailStep: Number(order.recovery_email_step ?? 0),
       currentStep: order.current_step ?? null,
+      reachedPayment: !!order.stripe_checkout_session_id,
+      paymentFailedCount: Number(order.payment_failed_count ?? 0),
+      paymentLastError: order.payment_last_error ?? null,
       manualRecoveryEmailAt: order.manual_recovery_email_at ?? null,
       manualRecoveryEmailBy: order.manual_recovery_email_by ?? null,
     });
@@ -280,6 +289,12 @@ export async function GET(request: NextRequest) {
     if (seen) {
       seen.duplicateCount += 1;
       if (r.depthScore > seen.depthScore) seen.depthScore = r.depthScore;
+      // A decline on an older attempt still tells the caller what went wrong.
+      if (seen.paymentFailedCount === 0 && r.paymentFailedCount > 0) {
+        seen.paymentFailedCount = r.paymentFailedCount;
+        seen.paymentLastError = r.paymentLastError;
+      }
+      if (r.reachedPayment) seen.reachedPayment = true;
       continue;
     }
     byEmail.set(r.email, r);
@@ -287,6 +302,10 @@ export async function GET(request: NextRequest) {
   }
 
   deduped.sort((a, b) => {
+    // Card refuzat = voia să plătească; se rezolvă la telefon cu IBAN. Primii.
+    const af = a.paymentFailedCount > 0 ? 1 : 0;
+    const bf = b.paymentFailedCount > 0 ? 1 : 0;
+    if (af !== bf) return bf - af;
     if (a.tier !== b.tier) return b.tier - a.tier;
     if (a.freshness !== b.freshness) return a.freshness - b.freshness;
     if (a.depthScore !== b.depthScore) return b.depthScore - a.depthScore;

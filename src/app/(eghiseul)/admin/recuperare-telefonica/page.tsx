@@ -32,6 +32,7 @@ import {
 import { Phone, RefreshCw, Ticket, ExternalLink, CheckCircle2, Globe, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { isPhoneCaller, PHONE_CALLERS, type PhoneCaller } from '@/lib/orders/phone-recovery-wins';
+import { PaymentSignalNote } from '@/components/admin/payment-signal-note';
 
 interface PriorityRow {
   id: string;
@@ -57,6 +58,9 @@ interface PriorityRow {
   freshness: 0 | 1 | 2;
   recoveryEmailStep: number;
   currentStep: string | null;
+  reachedPayment: boolean;
+  paymentFailedCount: number;
+  paymentLastError: string | null;
   manualRecoveryEmailAt: string | null;
   manualRecoveryEmailBy: string | null;
 }
@@ -498,6 +502,14 @@ export default function RecuperareTelefonicaPage() {
                     <div className="text-[11px] text-muted-foreground">
                       {r.depthScore > 3 ? 'date multe completate' : r.depthScore > 0 ? 'câteva date completate' : ''}
                     </div>
+                    <PaymentSignalNote
+                      order={{
+                        current_step: r.currentStep,
+                        stripe_checkout_session_id: r.reachedPayment ? 'yes' : null,
+                        payment_failed_count: r.paymentFailedCount,
+                        payment_last_error: r.paymentLastError,
+                      }}
+                    />
                   </td>
                   <td className="px-3 py-2 font-medium">{r.totalRon.toFixed(0)} RON</td>
                   <td className="px-3 py-2 text-muted-foreground">

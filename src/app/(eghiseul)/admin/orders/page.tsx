@@ -44,7 +44,6 @@ import {
 import { STATUS_TABS, type OrdersCounts } from '@/lib/admin/orders-tabs';
 import { paymentMethodShortLabel } from '@/lib/admin/payment-method';
 import { formatRelative } from '@/lib/relative-time';
-import { stepLabel } from '@/lib/admin/wizard-steps';
 import {
   instantPlatformProvider,
   PROVIDER_LABEL,
@@ -55,6 +54,7 @@ import { getCustomerName } from '@/lib/admin/customer-name';
 // used to carry a stale 9-entry copy that showed newer statuses as raw slugs.
 import { STATUS_BADGES as STATUS_CONFIG } from '@/lib/admin/status-badges';
 import { MarkCalledDialog } from '@/components/admin/mark-called-dialog';
+import { PaymentSignalNote } from '@/components/admin/payment-signal-note';
 
 interface OrderRow {
   id: string;
@@ -62,6 +62,9 @@ interface OrderRow {
   order_number: string;
   status: string | null;
   current_step: string | null;
+  stripe_checkout_session_id?: string | null;
+  payment_failed_count?: number | null;
+  payment_last_error?: string | null;
   total_price: number;
   payment_status: string | null;
   payment_method: string | null;
@@ -699,10 +702,8 @@ export default function AdminOrdersPage() {
                     <StatusBadge status={order.status || 'draft'} />
                     {/* Pt comenzile neterminate: pasul la care s-a oprit clientul
                         — ca echipa să vadă unde s-a blocat. */}
-                    {['draft', 'pending', 'abandoned', 'awaiting_payment'].includes(order.status || '') && order.current_step && (
-                      <div className="mt-0.5 text-[10px] text-muted-foreground whitespace-nowrap">
-                        pas: {stepLabel(order.current_step)}
-                      </div>
+                    {['draft', 'pending', 'abandoned', 'awaiting_payment'].includes(order.status || '') && (
+                      <PaymentSignalNote order={order} compact />
                     )}
                     {order.phone_call && (
                       <div

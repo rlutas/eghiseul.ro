@@ -9,6 +9,7 @@ import { redeemCouponForOrder } from '@/lib/coupons/redeem'
 import { ensureOnrcJobForPaidOrder } from '@/lib/onrc/ensure-onrc-job'
 import { ensureAncpiJobForPaidOrder } from '@/lib/ancpi/ensure-ancpi-job'
 import { computeEstimatedCompletionISOForOrder } from '@/lib/orders/order-estimate'
+import { declineReason, stripeErrorCode } from '@/lib/admin/payment-signal'
 
 // Use service role for webhook handler (bypasses RLS)
 const supabaseAdmin = createClient(
@@ -471,9 +472,46 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
     return
   }
 
-  // Log the failure but don't change order status
-  // User might retry payment
-  console.log(`Payment failed for order ${orderId}: ${paymentIntent.last_payment_error?.message}`)
+  // Don't change the order status — the client may retry. Record the decline
+  // so the team sees it in Neplătite / Recuperare telefonică and can offer a
+  // bank transfer (it used to be only logged: E-261014-GD94K, 14.10.2026).
+  const err = paymentIntent.last_payment_error
+  console.log(`Payment failed for order ${orderId}: ${err?.message}`)
+  if (paymentIntent.metadata?.purpose === 'extra_charge') return
+
+  const code = stripeErrorCode(err)
+  const { data: order } = await supabaseAdmin
+    .from('orders')
+    .select('payment_failed_count, payment_status')
+    .eq('id', orderId)
+    .maybeSingle()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const row = order as any
+  if (!row || row.payment_status === 'paid') return
+
+  const { error: updateError } = await supabaseAdmin
+    .from('orders')
+    .update({
+      payment_failed_count: Number(row.payment_failed_count ?? 0) + 1,
+      payment_last_failed_at: new Date().toISOString(),
+      payment_last_error: code,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any)
+    .eq('id', orderId)
+  if (updateError) {
+    console.error(`[stripe webhook] could not record payment failure for ${orderId}:`, updateError.message)
+    return
+  }
+
+  await supabaseAdmin
+    .from('order_history')
+    .insert({
+      order_id: orderId,
+      event_type: 'payment_failed',
+      notes: `Plata cu cardul a eșuat: ${declineReason(code)}${code ? ` (${code})` : ''}`,
+      new_value: { code, payment_intent: paymentIntent.id },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any)
 }
 
 async function handleChargeRefunded(charge: Stripe.Charge) {
