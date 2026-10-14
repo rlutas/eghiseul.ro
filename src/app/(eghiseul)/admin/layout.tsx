@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { Suspense, useEffect, useState, useMemo } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Toaster } from '@/components/ui/sonner';
@@ -57,8 +57,8 @@ interface NavItem {
 // colaboratori etc.) sunt operațiunile echipei — ascunse pentru rolul ei.
 const NAV_ITEMS: NavItem[] = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, hideForRoles: ['avocat'] },
-  { href: '/admin/orders', label: 'Comenzi', icon: ClipboardList, permission: 'orders.view' },
-  { href: '/admin/orders?status=abandoned', label: 'Abandonuri', icon: UserX, permission: 'orders.view', hideForRoles: ['avocat'] },
+  { href: '/admin/orders/', label: 'Comenzi', icon: ClipboardList, permission: 'orders.view' },
+  { href: '/admin/orders/?status=abandoned', label: 'Abandonuri', icon: UserX, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/recuperare-telefonica', label: 'Recuperare telefonică', icon: Phone, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/registru', label: 'Registru', icon: BookOpen, permission: 'registry.manage' },
   { href: '/admin/onrc', label: 'ONRC', icon: Landmark, permission: 'orders.view', hideForRoles: ['avocat'] },
@@ -251,36 +251,9 @@ export default function AdminLayout({
 
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-            {visibleNavItems.map((item) => {
-              // Active match — Abandonuri lives at /admin/orders?status=abandoned
-              // (no separate page yet, parity with sister achieved via query
-              // param). Match on the exact href with the query string so it
-              // highlights only on that filtered view.
-              const isActive = (() => {
-                if (item.href.includes('?')) {
-                  return typeof window !== 'undefined' && window.location.search.includes(item.href.split('?')[1] ?? '');
-                }
-                if (item.href === '/admin') return pathname === '/admin';
-                return pathname.startsWith(item.href);
-              })();
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                    isActive
-                      ? 'bg-slate-800 text-white'
-                      : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
-                  )}
-                >
-                  <item.icon className="h-5 w-5 shrink-0" />
-                  {item.label}
-                  {item.href === '/admin/ghid' && <GhidNavBadge />}
-                </Link>
-              );
-            })}
+            <Suspense fallback={null}>
+              <AdminNavLinks items={visibleNavItems} pathname={pathname} onNavigate={() => setSidebarOpen(false)} />
+            </Suspense>
           </nav>
 
           {/* User info & logout — slate palette to fit the dark sidebar. */}
@@ -330,5 +303,74 @@ export default function AdminLayout({
         <Toaster position="top-right" richColors />
       </div>
     </AdminPermissionProvider>
+  );
+}
+
+/**
+ * Sidebar links with the active item. „Abandonuri” is the orders list with
+ * `?status=abandoned`, so the active state has to follow the query string:
+ * it used to read `window.location` once (never updated on a filter change)
+ * and „Comenzi” matched every /admin/orders URL, so on Abandonuri the menu
+ * still showed „Comenzi” (Raul, 14.10.2026). `useSearchParams` re-renders on
+ * every query change. Hrefs carry the trailing slash the site redirects to.
+ */
+/** The site uses trailing slashes; linking to the final URL avoids a redirect hop. */
+function withSlash(href: string): string {
+  const [p, q] = href.split('?');
+  const path = p.endsWith('/') ? p : `${p}/`;
+  return q ? `${path}?${q}` : path;
+}
+
+function AdminNavLinks({
+  items,
+  pathname,
+  onNavigate,
+}: {
+  items: NavItem[];
+  pathname: string;
+  onNavigate: () => void;
+}) {
+  const searchParams = useSearchParams();
+  const status = searchParams.get('status');
+  const path = pathname.replace(/\/$/, '') || '/';
+  const onOrdersList = path === '/admin/orders';
+
+  const isActive = (item: NavItem) => {
+    const [hrefPath, hrefQuery] = item.href.split('?');
+    const base = hrefPath.replace(/\/$/, '') || '/';
+    if (hrefQuery) {
+      const want = new URLSearchParams(hrefQuery);
+      return onOrdersList && [...want.entries()].every(([k, v]) => searchParams.get(k) === v);
+    }
+    if (base === '/admin/orders') {
+      // Comenzi: the list (any tab except Abandonuri) and order detail pages.
+      return path.startsWith('/admin/orders') && !(onOrdersList && status === 'abandoned');
+    }
+    if (base === '/admin') return path === '/admin';
+    return path === base || path.startsWith(`${base}/`);
+  };
+
+  return (
+    <>
+      {items.map((item) => {
+        const active = isActive(item);
+        return (
+          <Link
+            key={item.href}
+            href={withSlash(item.href)}
+            onClick={onNavigate}
+            aria-current={active ? 'page' : undefined}
+            className={cn(
+              'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+              active ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'
+            )}
+          >
+            <item.icon className="h-5 w-5 shrink-0" />
+            {item.label}
+            {item.href === '/admin/ghid' && <GhidNavBadge />}
+          </Link>
+        );
+      })}
+    </>
   );
 }

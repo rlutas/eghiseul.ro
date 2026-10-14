@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-10-14 | 🔴 **Meniul admin: Abandonuri apare activ, link-uri fără redirect** — `AdminNavLinks` cu `useSearchParams`, hrefs cu slash final | [2026-10-14-meniu-admin-abandonuri-activ.md](2026-10-14-meniu-admin-abandonuri-activ.md) |
 | 2026-10-14 | ✅ **Admin: liste mai rapide** — `orders/list` (Abandonuri 795 KB → fără fișiere inline, interogări în paralel), `priority-calls` în paralel și fără `customer_data` complet; cache 20 s pe numărătorile de taburi și changelog parsat o dată pentru badge-ul „noutăți” | [2026-10-14-admin-liste-mai-rapide.md](2026-10-14-admin-liste-mai-rapide.md) |
 | 2026-10-14 | 🔴 **Decontări: plata extra de 200 lei pe E-260817-J2BXD apărea cu factura comenzii (EGH-0439); cronul de facturi nu vedea comenzile cu factură** — `unbilledExtraForRow` în payout-sync; builder postgrest refolosit în `invoice-health-check` (SPV nu rula deloc) | [2026-10-14-decontari-plata-extra-fara-factura.md](2026-10-14-decontari-plata-extra-fara-factura.md) |
 | 2026-10-14 | ✅ **Cazier judiciar: PF/PJ ales într-o fereastră, fără derulare; WhatsApp ascuns pe telefon pe articole/calculatoare/servicii; bara de comandă după ~un ecran** — `ClientTypeChooser`, `MobileStickyCTA.choices`, `WhatsAppFloat` pe tip de pagină | [2026-10-14-cazier-alege-tipul-whatsapp-bara.md](2026-10-14-cazier-alege-tipul-whatsapp-bara.md) |
