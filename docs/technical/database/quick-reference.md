@@ -792,3 +792,20 @@ politici, `REVOKE ALL` de la `anon`/`authenticated`: doar prin API (service role
 Tot în 186: `identificare-imobil` și `identificare-imobile-proprietar` →
 `estimated_days = 3`, `estimated_days_display = '1-3 zile lucrătoare'`;
 `deliverable` nou pe proprietar (un extras, pentru imobilul ales).
+
+## supplier_invoice_checks (migrarea 195, 14.10.2026)
+
+Checklist lunar pentru facturile de furnizor care nu vin prin SPV (Meta, Google,
+TikTok, OpenAI, Anthropic, Vercel…). RLS pornit, fără politici: doar prin API
+(service role, `payments.verify`). Tabela ține DOAR bifele. Furnizorii și
+plățile se calculează din `bank_statement_entries.description` cu
+`SUPPLIER_RULES` (`src/lib/accounting/supplier-invoices.ts`).
+
+| Coloană | Tip | Note |
+|---|---|---|
+| `month` | date, PK | prima zi a lunii (CHECK `date_trunc('month')`) |
+| `supplier_key` | text, PK | `meta`, `google_ads`, `tiktok`… sau `pos:<NUME>` pentru plăți POS în valută fără regulă |
+| `downloaded_at` / `downloaded_by` | timestamptz / uuid FK `profiles` | „Descărcată” |
+| `printed_at` / `printed_by` | timestamptz / uuid FK `profiles` | „Listată” |
+| `handed_at` / `handed_by` | timestamptz / uuid FK `profiles` | „Predată contabil”: o lună e completă când toți furnizorii o au |
+| `note` | text ≤500 | ex. „lipsește factura din 12.09” |

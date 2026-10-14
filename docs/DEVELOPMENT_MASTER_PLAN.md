@@ -860,6 +860,16 @@ Add-on `extras_multilingv` (399 lei) pe certificat-nastere + certificat-casatori
 
 3 tiers (București/sectoare 15-30, oficii rapide 5-7, rest 7-15), lista de oficii rapide editabilă din `/admin/settings` → „Termene stare civilă". `registrationPlace` convertit la dropdown structurat. Migrația 079 + `src/lib/civil-status/delivery-terms.ts`. Vezi changelog + `docs/plans/2026-06-23-civil-status-dynamic-terms-design.md`.
 
+#### ✅ Facturi furnizori pentru contabil (checklist lunar) — LIVRAT 2026-10-14
+
+`/admin/decontari/facturi-furnizori`: un rând pe furnizor × lună (Meta,
+Google Ads/Cloud, TikTok, OpenAI, Anthropic, Vercel, Supabase, Railway,
+Resend, Zoho, Amazon + POS în valută), bife descărcată/listată/predată cu
+cine și când (migrarea 195 `supplier_invoice_checks`), istoric pe luni,
+banner pe Decontări/Extras bancă. Furnizorii se calculează la citire din
+extras (`supplier-invoices.ts`). Fix: reimportul extrasului nu mai șterge
+legăturile payout↔bancă. Vezi `changelog/2026-10-14-facturi-furnizori-checklist.md`.
+
 #### ✅ Plată cu cardul eșuată vizibilă în Neplătite + Recuperare telefonică — LIVRAT 2026-10-14
 
 `payment_intent.payment_failed` salvat pe comandă (migrarea 194:

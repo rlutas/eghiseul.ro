@@ -39,6 +39,8 @@ Lista roșie „Furnizori externi” din Extras bancă exista din iulie, dar doa
 | august 2026 | 7 |
 | septembrie 2026 | 10 (Meta 22, TikTok 49, OpenAI 8, Google Ads, Anthropic 2 …) |
 
+Cifrele sunt fără DHL, care a fost scos din listă.
+
 `Wallet payment from MyBil` (≈13.265 lei în iunie–septembrie) = **DHL Express** plătit prin MyBill. Factura DHL vine în SPV, deci nu intră în checklist: liniile sunt categorisite `curierat` („DHL Express (MyBill)”). Cabinetul de avocat, Delivery Solutions și ceilalți furnizori români plătiți prin OP trimit factura în SPV, deci rămân în afara listei.
 
 ## Bifele afișau numele avocatei pe contul de admin
