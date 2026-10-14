@@ -25,6 +25,8 @@ Combinații în aceeași comandă (o singură plată, o singură livrare):
 
 ## Ce completează și încarcă clientul
 
+Pe pagina cazierului judiciar, butonul „Comandă cazierul” (sus) și „Comandă” (bara de jos de pe telefon) deschid o fereastră cu două variante: **persoană fizică** sau **firmă**. Clientul alege acolo și intră direct în formularul potrivit; pagina nu mai derulează până la cardurile de jos (din 14.10.2026).
+
 1. **Contact**: email, telefon (cu prefix de țară și verificare), motivul solicitării. La cazier judiciar și integritate, aici e și bifa „sunt cetățean străin”.
 2. **Date personale**: scanarea actului (OCR) sau completare manuală. CNP validat pe cifra de control (codul de județ din CNP nu e listă albă). La cazier judiciar PF și la integritate se cer și **prenumele mamei și tatălui**.
 3. **Firma** (doar cazier judiciar PJ): CUI, datele vin automat de la ANAF și rămân doar de citit; datele reprezentantului legal. Firmele **radiate sau dizolvate sunt blocate**; cele **suspendate** trec cu un avertisment. **PFA, II, ÎF nu sunt persoane juridice**: cazierul se eliberează pe persoana fizică titulară, formularul îl trimite pe fluxul PF. Instituțiile publice n-au număr de Registrul Comerțului și nici formă juridică, e normal să fie goale.
@@ -90,6 +92,7 @@ Detalii pe fiecare status (inclusiv „Așteptare client”, „Anulare solicita
 
 ## Unde s-au schimbat lucrurile (istoric util)
 
+- 14.10.2026: cazier judiciar: tipul (persoană fizică / firmă) se alege într-o fereastră la apăsarea butonului de comandă, nu prin derulare; pe telefon, butonul WhatsApp nu mai stă peste butonul de comandă.
 - 14.08.2026: cazierul auto și integritatea nu mai au buton de cerere (produceau formularul greșit). Urgența la integritate a devenit 80 lei (era 100).
 - 28.07.2026: cazier auto cu permis din străinătate (350 lei / 7-10 zile), numărul permisului nu se mai tastează.
 - 29.09.2026: cazier auto cu permis străin: pe site și în formular scrie ce document primește clientul (adresa Serviciului Rutier, cu exemplu real). Textul vechi, „se cere autorității care a emis permisul”, era greșit și a fost scos.
