@@ -530,6 +530,8 @@ export interface CompanyAutoCompleteData {
 /** One additional imobil in a multi-extract order (same county as the primary). */
 export interface AdditionalImobil {
   locality: string;
+  /** Satul / localitatea componentă din UAT (text liber, opțional). */
+  imobilLocality?: string;
   carteFunciara: string;
   cadastral: string;
   topografic?: string;
@@ -563,7 +565,7 @@ export interface PropertyState {
   beneficiaryIdSeries?: string;
   /** Numărul actului de identitate al beneficiarului. */
   beneficiaryIdNumber?: string;
-  /** Localitatea imobilului (satul/orașul din UAT — poate diferi de UAT). */
+  /** Satul / localitatea imobilului din UAT (`locality` e comuna/orașul) — obligatoriu din 14.10.2026. */
   imobilLocality?: string;
   /** Strada și numărul imobilului. */
   imobilStreet?: string;

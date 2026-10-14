@@ -278,6 +278,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
     // Check required fields based on config
     if (config.fields.county.required && !property.county) return false;
     if (config.fields.locality.required && !property.locality) return false;
+    if (!property.imobilLocality?.trim()) return false;
     if (config.fields.cadastral.required && !property.cadastral) return false;
     if (config.fields.carteFunciara.required && !property.carteFunciara) return false;
     if (!conventieDataComplete) return false;
@@ -359,7 +360,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
             {/* Locality / UAT — dependent on the selected county (ANCPI nomenclator) */}
             <div className="space-y-2">
               <Label htmlFor="locality">
-                Localitate / UAT {config.fields.locality.required && <span className="text-red-500">*</span>}
+                Comună / Oraș {config.fields.locality.required && <span className="text-red-500">*</span>}
               </Label>
               <Select
                 value={property.locality}
@@ -378,6 +379,31 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          {/* Satul / localitatea componentă. Lista de mai sus are doar UAT-uri
+              (comune, orașe), iar o comună are mai multe sate cu cărți funciare
+              proprii (cele vechi erau numerotate pe sat). Fără satul ăsta
+              topograful scotea CF-ul de pe alt sat al aceleiași comune
+              (Drajna/Podurile, 14.10.2026). Text liber, nu listă: comune
+              desființate, denumiri vechi. Același câmp `imobilLocality` pe care
+              convenția îl folosea deja — portalul colaboratorului îl afișează. */}
+          <div className="space-y-2">
+            <Label htmlFor="imobil-locality">
+              Sat / Localitate <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="imobil-locality"
+              value={property.imobilLocality || ''}
+              onChange={(e) => updateProperty?.({ imobilLocality: e.target.value })}
+              placeholder={property.locality ? `ex: satul din comuna ${property.locality}` : 'ex: Podurile'}
+              disabled={!property.locality}
+            />
+            <p className="text-xs text-muted-foreground">
+              Satul sau orașul unde e imobilul, cum apare în acte. O comună are mai multe sate,
+              iar fără sat putem găsi alt imobil cu același număr. Dacă are același nume ca
+              comuna, scrie-l din nou.
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -478,6 +504,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                           jumpToService('extras-cf-colectiv', {
                             county: property.county,
                             locality: property.locality,
+                            imobilLocality: property.imobilLocality,
                             carteFunciara: property.carteFunciara,
                           })
                         }
@@ -555,6 +582,29 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                   </div>
                 )}
               </div>
+              )}
+
+              {/* Numele din CF — opțional, dar e singurul lucru care-i spune
+                  topografului că a găsit imobilul corect când clientul a
+                  inversat nr. CF cu nr. cadastral. La serviciile cu convenție
+                  îl cerem oricum mai jos (beneficiaryName). */}
+              {!conventie?.enabled && (
+                <div className="space-y-2">
+                  <Label htmlFor="ownerNameCf">
+                    Numele proprietarului din cartea funciară{' '}
+                    <span className="text-muted-foreground font-normal">(opțional, recomandat)</span>
+                  </Label>
+                  <Input
+                    id="ownerNameCf"
+                    type="text"
+                    value={property.ownerName || ''}
+                    onChange={(e) => updateProperty?.({ ownerName: e.target.value })}
+                    placeholder="ex: Popescu Ion"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Ne ajută să verificăm că extrasul e pentru imobilul tău.
+                  </p>
+                </div>
               )}
 
               <CfSpecimenExplainer />
@@ -697,7 +747,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <Label>Localitate / UAT</Label>
+                  <Label>Comună / Oraș</Label>
                   <Select
                     value={im.locality}
                     onValueChange={(value) => updateImobil(i, { locality: value })}
@@ -714,6 +764,15 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label>Sat / Localitate</Label>
+                  <Input
+                    className="bg-white"
+                    value={im.imobilLocality || ''}
+                    onChange={(e) => updateImobil(i, { imobilLocality: e.target.value })}
+                    placeholder="ex: Podurile"
+                  />
                 </div>
                 <div className="space-y-1">
                   <Label>Număr Carte Funciară</Label>
@@ -856,19 +915,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                   placeholder="ex: 123456"
                 />
               </div>
-              <div className="space-y-2 col-span-2 md:col-span-1">
-                <Label htmlFor="imobil-locality">Localitatea imobilului</Label>
-                <Input
-                  id="imobil-locality"
-                  value={property.imobilLocality || ''}
-                  onChange={(e) => updateProperty?.({ imobilLocality: e.target.value })}
-                  placeholder={property.locality ? `ex: ${property.locality}` : 'satul / orașul'}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Satul sau orașul, dacă diferă de UAT-ul ales mai sus.
-                </p>
-              </div>
-              <div className="space-y-2 col-span-2 md:col-span-1">
+              <div className="space-y-2 col-span-2">
                 <Label htmlFor="imobil-street">Strada și numărul imobilului</Label>
                 <Input
                   id="imobil-street"
@@ -892,8 +939,8 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               : conventie?.enabled && !conventieDataComplete
               ? 'Completează numele, domiciliul, CNP-ul și seria/numărul actului de identitate ale proprietarului — apar în angajamentul de execuție pe care îl semnezi la pasul următor.'
               : config.identificationService.enabled
-                ? 'Completează județul, localitatea și adresa imobilului (sau numărul cadastral / CF, dacă îl știi).'
-                : 'Completează cel puțin județul, localitatea și unul din: număr cadastral sau număr CF.'}
+                ? 'Completează județul, comuna, satul și adresa imobilului (sau numărul cadastral / CF, dacă îl știi).'
+                : 'Completează județul, comuna, satul și unul din: număr CF sau număr cadastral.'}
           </AlertDescription>
         </Alert>
       )}

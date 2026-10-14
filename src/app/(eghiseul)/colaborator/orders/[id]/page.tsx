@@ -343,7 +343,8 @@ export default function CollaboratorOrderDetail() {
         <h2 className="mb-3 text-sm font-semibold text-slate-900">Date pentru lucrare</h2>
         <dl className="grid grid-cols-2 gap-4">
           <Field label="Județ" value={property.county} />
-          <Field label="Localitate" value={property.locality} />
+          <Field label="Comună / Oraș (UAT)" value={property.locality} />
+          <Field label="Sat / Localitate" value={property.imobilLocality} />
           <Field label="Carte Funciară" value={property.carteFunciara} />
           <Field label="Nr. cadastral" value={property.cadastral} />
           <Field label="Nr. topografic" value={property.topografic} />
@@ -352,11 +353,12 @@ export default function CollaboratorOrderDetail() {
             value={
               property.propertyAddress ||
               property.address ||
-              [property.imobilStreet, property.imobilLocality].filter(Boolean).join(', ') ||
+              property.imobilStreet ||
               undefined
             }
           />
           <Field label="Proprietar" value={property.ownerName ?? property.beneficiaryName} />
+          <Field label="Solicitant (cine a comandat)" value={order.customer_data?.requester_name} />
           <Field label="Motivul solicitării" value={property.motiv} />
           <Field label="Alte informații de la client" value={property.additionalInfo} />
         </dl>

@@ -21,7 +21,15 @@ serviciu cu avocat (doar contract de prestări). Livrare doar pe email.
 ## Ce completează clientul
 
 1. Contact.
-2. **Date imobil**: un singur identificator e de ajuns, pe taburi: **numărul de carte funciară** (implicit), **numărul cadastral** sau **adresa**; plus **județul și localitatea (UAT)** din nomenclatorul ANCPI (nu se poate scrie greșit). Butonul **„Nu știu”** îl trimite la serviciul „Identificare imobil după adresă” (298 lei), cu datele păstrate.
+2. **Date imobil**:
+   - **Județ** și **Comună / Oraș** din listă (nomenclatorul ANCPI, nu se poate scrie greșit);
+   - **Sat / Localitate**, obligatoriu din 14.10.2026, scris de client. O comună are mai multe sate, iar un număr de CF vechi se poate repeta în sate diferite ale aceleiași comune (cazul Drajna / Podurile);
+   - **numărul de carte funciară** (implicit) și, la cărțile vechi, **nr. cadastral / topografic**;
+   - **numele proprietarului din CF**, opțional, marcat „recomandat”: ajută la verificare când clientul a inversat nr. CF cu nr. cadastral.
+
+   Butonul **„Nu știu”** îl trimite la serviciul „Identificare imobil după adresă” (298 lei), cu datele păstrate.
+
+   În portal, Mircea vede separat „Comună / Oraș (UAT)” și „Sat / Localitate”, plus numele celui care a comandat („Solicitant”), fără alte date personale.
 3. Facturare, apoi plata.
 
 Clientul vede în formular și pe pagină starea portalului ANCPI (badge roșu

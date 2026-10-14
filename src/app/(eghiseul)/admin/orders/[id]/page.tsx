@@ -5793,7 +5793,8 @@ function CopyAddressButton({ label }: { label: string }) {
  *  servicii cadastrale), in display order. Unknown keys fall back verbatim. */
 const PROPERTY_LABELS: Array<[string, string]> = [
   ['county', 'Județ'],
-  ['locality', 'Localitate'],
+  ['locality', 'Comună / Oraș (UAT)'],
+  ['imobilLocality', 'Sat / Localitate'],
   ['propertyAddress', 'Adresa imobilului'],
   ['ownerName', 'Proprietar (nume complet)'],
   ['cadastral', 'Nr. cadastral'],
@@ -5850,7 +5851,8 @@ function PropertySection({ property }: { property: AnyObj | null }) {
 
   const imobilSummary = (im: Record<string, unknown>): string =>
     [
-      im.locality ? `Localitate: ${im.locality}` : null,
+      im.locality ? `UAT: ${im.locality}` : null,
+      im.imobilLocality ? `Sat: ${im.imobilLocality}` : null,
       im.carteFunciara ? `CF: ${im.carteFunciara}` : null,
       im.cadastral ? `Cadastral/Topo: ${im.cadastral}` : null,
       im.topografic ? `Topografic: ${im.topografic}` : null,

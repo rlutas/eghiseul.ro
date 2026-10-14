@@ -21,6 +21,7 @@ export const HANDOFF_MAX_AGE_MS = 10 * 60_000;
 export type HandoffProperty = {
   county?: string;
   locality?: string;
+  imobilLocality?: string;
   carteFunciara?: string;
   cadastral?: string;
   topografic?: string;

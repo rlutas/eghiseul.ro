@@ -8,6 +8,8 @@ import { cereriForOrderSlug, type OrderForCereri } from '@/lib/ancpi/cereri-for-
 import { cerereDateRo } from '@/lib/ancpi/cerere-date';
 import { getDownloadUrl } from '@/lib/aws/s3';
 import { sanitizeClientFiles } from '@/lib/orders/client-files';
+import { identifiableName } from '@/lib/orders/abandoned-progress';
+import { formatPersonName } from '@/lib/format/person-name';
 
 
 /**
@@ -86,10 +88,22 @@ export async function GET(
     // Privacy: only the work data (property) reaches the collaborator —
     // contact/billing/personal client data stays server-side. ownerName/address
     // inside property ARE the object of the work on identificare services.
+    // Exception: the requester's NAME only (no CNP, phone, email, address).
+    // The topograf cross-checks it against the owners in the CF when the
+    // client mixed up the CF and cadastral numbers (cerut de Mircea, 14.10.2026).
+    const billing = order.customer_data?.billing as
+      | { type?: string; companyName?: string }
+      | undefined;
+    const person = identifiableName(order.customer_data);
+    const requesterName =
+      (billing?.type === 'persoana_juridica' && billing.companyName?.trim()) ||
+      (person ? formatPersonName(person.lastName, person.firstName) : '') ||
+      null;
     const sanitizedOrder = {
       ...order,
       customer_data: {
         property: order.customer_data?.property ?? null,
+        requester_name: requesterName,
         // What HE reported on identificare orders — the source of the cerere.
         identified_property: order.customer_data?.identified_property ?? null,
         // OCPI submission number he reported — shown back so he can correct it.
