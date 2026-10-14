@@ -250,6 +250,11 @@ export default function Page() {
         geoportalul nu arată nimic din toate astea.
       </p>
       <p>
+        Dacă localitatea ta a trecut prin cadastrul sistematic, imobilul are acum un număr nou, iar
+        numerele din actele vechi nu-l mai identifică. Ce s-a schimbat și cum afli numărul nou am
+        explicat în <Link href="/cadastru-sistematic/">ghidul despre cadastrul sistematic</Link>.
+      </p>
+      <p>
         <strong>Când numărul nu găsește nimic</strong>, aproape întotdeauna e unul vechi. Imobilul a
         fost între timp dezmembrat, alipit sau renumerotat la intabulare, ori pur și simplu nu a
         ajuns încă în sistemul integrat. Nu insista pe numărul din actul vechi: pornește de la

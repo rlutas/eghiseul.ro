@@ -186,7 +186,9 @@ export default function Page() {
         proprietate, certificate de moștenitor) și memoria locului. Merită totuși verificat întâi
         dacă există CF: programul național de cadastru a înscris multe zone în ultimii ani, iar o{' '}
         <Link href={serviceUrl('identificare-imobil')}>identificare după adresă</Link> îți spune
-        exact asta.
+        exact asta. Dacă localitatea e chiar acum în lucru, vezi{' '}
+        <Link href="/cadastru-sistematic/">ce se afișează la cadastrul sistematic</Link>: acolo apare
+        și lista proprietarilor.
       </p>
 
       <h2>Nota momentului: căderea ANCPI din iulie 2026</h2>

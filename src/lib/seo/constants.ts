@@ -209,6 +209,7 @@ export const HARDCODED_ARTICLE_SLUGS = [
   'totul-despre-cartea-funciara-colectiva',
   'cat-costa-cadastrul-si-intabularea',
   'plan-de-amplasament-si-delimitare-copie-sau-intocmire',
+  'cadastru-sistematic',
   'ancpi-nu-functioneaza',
   'sms-fals-amenda-ghiseul-ro',
   'cazier-judiciar-vs-certificat-integritate-comportamentala',

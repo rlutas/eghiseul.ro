@@ -400,7 +400,8 @@ export default function Page() {
         limitelor în teren, cu actele pe care le ai, și la verificarea documentelor tehnice în
         perioada de afișare publică, când se pot depune contestații, în termen de 60 de zile (art.
         14). Cine nu verifică afișarea descoperă după ani că vecinul e înscris cu doi metri din
-        curtea lui.
+        curtea lui. Pașii, de la afișare la cererea de rectificare și la cartea funciară nouă, sunt în{' '}
+        <Link href="/cadastru-sistematic/">ghidul despre cadastrul sistematic</Link>.
       </p>
       <h3>Ce nu acoperă</h3>
       <p>

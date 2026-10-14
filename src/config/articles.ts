@@ -19,6 +19,13 @@ export interface ArticleMeta {
 
 export const ARTICLES: ArticleMeta[] = [
   {
+    slug: 'cadastru-sistematic',
+    title: 'Cadastru sistematic: afișarea publică, rectificarea în 60 de zile și cartea funciară nouă',
+    excerpt:
+      'Statul îți măsoară gratuit imobilul, dar greșelile se corectează simplu doar într-un termen. Cum afli dacă localitatea ta e în lucru, ce verifici la afișare, cum ceri rectificarea și ce se schimbă la numărul de carte funciară.',
+    category: 'Cadastru & imobiliare',
+  },
+  {
     slug: 'cazier-si-certificat-de-integritate-pentru-profesori',
     title: 'Cazier și certificat de integritate pentru profesori: ghid pentru începutul anului școlar',
     excerpt:

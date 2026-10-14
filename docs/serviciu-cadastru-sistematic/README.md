@@ -35,6 +35,6 @@ Portalul ANCPI pentru **afișarea publică din cadastrul sistematic** (art. 11 d
 
 1. ~~**Serviciu plătit „Verificare cadastru sistematic + cerere de rectificare”**, cu Mircea.~~ **Respins 14.10.2026.** Rectificarea o face executantul contractului de cadastru sistematic al comunei, în cadrul contractului; un topograf din afară nu are acces la lucrare. Ce poate face clientul singur: caută în opis pe pnccf.site și depune cererea la primărie sau la executant, în cele 60 de zile.
 2. **„Ia-ți CF-ul nou după cadastrul sistematic”**: extras CF pe numărul nou, cu serviciile existente.
-3. **Un singur ghid pe site** (acum ideea principală), cu link spre pnccf.site: „Comuna ta e în cadastru sistematic? Ce se schimbă cu numărul CF”. Fără pagini pe comune (vezi `.claude/rules/content-and-seo.md`).
+3. **Un singur ghid pe site** — PUBLICAT 14.10.2026: https://eghiseul.ro/cadastru-sistematic/ ([changelog](../changelog/2026-10-14-ghid-cadastru-sistematic.md)), cu link spre pnccf.site: „Comuna ta e în cadastru sistematic? Ce se schimbă cu numărul CF”. Fără pagini pe comune (vezi `.claude/rules/content-and-seo.md`).
 
 Analiza tehnică a CF-urilor vechi pe partea de robot: `worker-ancpi/docs/cf-vechi-dezambiguizare.md` (repo separat).

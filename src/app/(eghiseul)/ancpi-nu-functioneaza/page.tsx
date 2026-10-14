@@ -782,6 +782,12 @@ export default function Page() {
           le listează pe scenarii.
         </li>
         <li>
+          <strong>Cadastrul sistematic merge mai departe:</strong> cât geoportalul e oprit, documentele
+          afișate pe comune (planuri, liste de proprietari) se văd pe portalul de afișare pnccf.site.
+          Ce verifici și cum ceri rectificarea în cele 60 de zile, în{' '}
+          <Link href="/cadastru-sistematic/">ghidul despre cadastrul sistematic</Link>.
+        </li>
+        <li>
           <strong>Amână depunerile fizice:</strong> OCPI-urile au recomandat oficial reprogramarea
           operațiunilor programate în acest interval.
         </li>

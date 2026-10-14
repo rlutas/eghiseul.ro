@@ -467,7 +467,14 @@ export default async function ExtrasCarteFunciaraPage() {
                 >
                   Identificare Imobil
                 </Link>
-                , apoi îți obținem extrasul.
+                , apoi îți obținem extrasul. Dacă localitatea a trecut prin{' '}
+                <Link
+                  href="/cadastru-sistematic/"
+                  className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                >
+                  cadastrul sistematic
+                </Link>
+                , imobilul are un număr nou de carte funciară.
               </p>
             </div>
           </div>
