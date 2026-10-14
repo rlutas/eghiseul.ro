@@ -121,7 +121,7 @@ function CfSpecimenExplainer() {
           <div className="relative rounded-md border border-neutral-300 bg-white overflow-hidden shadow-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/images/specimens/specimen-cf-antet.png"
+              src="/images/specimens/specimen-cf-antet-anonim.png"
               alt="Antetul unui extras de carte funciară cu numerele evidențiate"
               className="w-full h-auto"
               width={858}

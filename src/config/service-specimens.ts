@@ -18,7 +18,7 @@ export const SERVICE_SPECIMENS: Record<string, ServiceSpecimen> = {
   'certificat-casatorie': { src: '/images/specimens/certificat-casatorie.webp', alt: 'Specimen certificat de căsătorie' },
   'certificat-celibat': { src: '/images/specimens/certificat-celibat.webp', alt: 'Specimen certificat de celibat' },
   'certificat-constatator': { src: '/images/specimens/certificat-constatator.png', alt: 'Specimen certificat constatator' },
-  'extras-carte-funciara': { src: '/images/specimens/extras-cf.png', alt: 'Specimen extras de carte funciară' },
+  'extras-carte-funciara': { src: '/images/specimens/extras-cf-anonim.png', alt: 'Specimen extras de carte funciară' },
   'rovinieta': { src: '/images/specimens/rovinieta.webp', alt: 'Specimen rovinietă' },
 };
 

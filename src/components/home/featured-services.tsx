@@ -21,7 +21,7 @@ const PF_SERVICES: ServiceItem[] = [
   { name: 'Certificat de Căsătorie', href: '/servicii/eliberare-certificat-de-casatorie/', img: '/images/specimens/certificat-casatorie.webp', badge: null, desc: 'Eliberare certificat de căsătorie online — duplicat oficial cu livrare prin curier oriunde în lume.' },
   { name: 'Extras Multilingv Certificat Căsătorie', href: '/servicii/extras-multilingv-certificat-casatorie/', img: '/images/specimens/extras-multilingv-casatorie.webp', badge: null, desc: 'Extras multilingv căsătorie, acceptat în 23 de state fără traducere legalizată sau apostilă Haga.' },
   { name: 'Certificat de Celibat', href: '/servicii/eliberare-certificat-de-celibat/', img: '/images/specimens/certificat-celibat.webp', badge: 'popular', desc: 'Certificat de celibat online pentru căsătorie în străinătate. Eliberare rapidă, livrare internațională.' },
-  { name: 'Extras Carte Funciară', href: '/servicii/extras-de-carte-funciara/', img: '/images/specimens/extras-cf.png', badge: null, desc: 'Extras de carte funciară online de la ANCPI. Verifici proprietatea instant, livrare pe email în câteva minute.' },
+  { name: 'Extras Carte Funciară', href: '/servicii/extras-de-carte-funciara/', img: '/images/specimens/extras-cf-anonim.png', badge: null, desc: 'Extras de carte funciară online de la ANCPI. Verifici proprietatea instant, livrare pe email în câteva minute.' },
   { name: 'Certificat Constatator Persoană Fizică', href: '/servicii/certificat-constatator-online/', img: '/images/specimens/certificat-constatator.png', badge: null, desc: 'Verifică, după CNP, dacă o persoană este asociat sau administrator în firme înregistrate la Registrul Comerțului.' },
   { name: 'Rovinieta Online', href: '/servicii/rovinieta-online/', img: '/images/specimens/rovinieta.webp', badge: 'nou', desc: 'Cumpără rovinieta online rapid și simplu. Valabilă imediat după plată, fără așteptare.' },
 ];
@@ -29,7 +29,7 @@ const PF_SERVICES: ServiceItem[] = [
 const PJ_SERVICES: ServiceItem[] = [
   { name: 'Certificat Constatator ONRC', href: '/servicii/certificat-constatator-online/', img: '/images/specimens/certificat-constatator.png', badge: null, desc: 'Certificat constatator online de la Registrul Comerțului. Date oficiale firmă pentru licitații și contracte.' },
   { name: 'Cazier Judiciar pentru Firme', href: '/servicii/cazier-judiciar-online/', img: '/images/specimens/cazier-judiciar.png', badge: null, desc: 'Cazier judiciar online pentru administratori, asociați și reprezentanți legali ai firmei.' },
-  { name: 'Extras Carte Funciară', href: '/servicii/extras-de-carte-funciara/', img: '/images/specimens/extras-cf.png', badge: null, desc: 'Extras CF online pentru verificări imobiliare, due diligence și tranzacții comerciale.' },
+  { name: 'Extras Carte Funciară', href: '/servicii/extras-de-carte-funciara/', img: '/images/specimens/extras-cf-anonim.png', badge: null, desc: 'Extras CF online pentru verificări imobiliare, due diligence și tranzacții comerciale.' },
   { name: 'Rovinieta pentru Flote Auto', href: '/servicii/rovinieta-online/', img: '/images/specimens/rovinieta.webp', badge: 'nou', desc: 'Rovinieta online pentru flote auto. Gestionează rovinietele pentru toate vehiculele companiei.' },
 ];
 

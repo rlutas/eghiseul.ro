@@ -1,14 +1,15 @@
 import Link from 'next/link';
 import { buildPageMetadata, serviceUrl } from '@/lib/seo';
 import { ArticleLayout } from '@/components/articole/article-layout';
+import { CfSpecimenAnnotated } from '@/components/articole/cf-specimen-annotated';
 
 const SLUG = 'cum-aflam-numarul-carte-functionara-si-nr-cadastral';
-const TITLE = 'Numărul cadastral și numărul de carte funciară: cum le afli și cum localizezi terenul';
+const TITLE = 'Numărul cadastral și numărul de carte funciară: unde le găsești și cum citești extrasul';
 const DESCRIPTION =
   'Cum afli numărul cadastral și numărul de carte funciară: din actul de proprietate, dintr-un extras CF ' +
-  'mai vechi sau după adresă. Plus cum localizezi terenul pe hartă după numărul cadastral, pas cu pas.';
+  'mai vechi sau după adresă. Plus cum citești extrasul rând cu rând, pe un specimen, și cum localizezi terenul.';
 const DATE_PUBLISHED = '2023-12-01';
-const DATE_MODIFIED = '2026-09-09';
+const DATE_MODIFIED = '2026-10-14';
 
 export const revalidate = 86400;
 
@@ -29,7 +30,7 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="decembrie 2023"
-      updatedLabel="9 septembrie 2026"
+      updatedLabel="14 octombrie 2026"
       relatedServices={[
         { slug: 'identificare-imobil', label: 'Identificare Imobil după Adresă', desc: 'Nu știi numărul cadastral? Îl aflăm noi după adresă.' },
         { slug: 'extras-carte-funciara', label: 'Extras de Carte Funciară', desc: 'Document ANCPI, livrat pe email în câteva minute.' },
@@ -44,6 +45,10 @@ export default function Page() {
         { q: 'Numărul cadastral este unic în toată țara?', a: 'Nu. Numerotarea se reia în fiecare unitate administrativ-teritorială, la fel și cea a cărților funciare. Numărul cadastral 1234 există în sute de comune, deci un număr fără județ și fără UAT nu identifică niciun imobil. De asta orice cerere de extras cere întâi localitatea.' },
         { q: 'Am un apartament. De ce îmi apar două numere de carte funciară în acte?', a: 'La blocuri există o carte funciară colectivă, a întregii construcții, și câte una individuală pentru fiecare apartament. Extrasul pentru apartamentul tău se cere pe numărul individual; pe cel colectiv primești descrierea blocului și cotele-părți, nu situația locuinței.' },
         { q: 'În actul meu scrie „nr. topografic”, nu „nr. cadastral”. E același lucru?', a: 'Nu. Numărul topografic vine din cărțile funciare vechi, din Transilvania și Banat, și descrie parcela din evidența istorică. Numărul cadastral se atribuie la înregistrarea în sistemul integrat de azi. Un imobil poate avea ambele, iar extrasul le arată pe amândouă în Partea I. Pe geoportal se caută cel cadastral.' },
+        { q: 'Ce înseamnă B5 sau C3 în extrasul de carte funciară?', a: 'Sunt numerele de ordine ale înscrierilor. Literele arată partea: B în Partea a II-a (proprietari și notări), C în Partea a III-a (sarcini), iar A în Partea I (A1 = terenul, A1.1 = o construcție). Numerele nu încep neapărat de la 1: înscrierile radiate între timp, de regulă, nu mai apar pe extras.' },
+        { q: 'Dacă Partea a III-a e goală, imobilul e liber de sarcini?', a: 'Nu neapărat. Interdicțiile de înstrăinare, litigiile, sechestrul sau urmărirea silită se înscriu ca notări și pot apărea în Partea a II-a, lângă proprietari. Citește toate rândurile din Partea a II-a, nu doar numele.' },
+        { q: 'Ce diferență e între intabulare și notare?', a: 'Intabularea înscrie definitiv un drept: proprietatea, o ipotecă. Notarea face cunoscute fapte sau drepturi legate de imobil, cum ar fi o interdicție de vânzare, un proces sau un sechestru, ca să fie opozabile oricui cumpără.' },
+        { q: 'Ce înseamnă „Referințe: A1, A1.1” în extras?', a: 'Arată la ce imobil din Partea I se aplică înscrierea: A1 e terenul, A1.1 e construcția de pe el. „A1, A1.1” înseamnă că dreptul privește și terenul, și casa.' },
         { q: 'Cum localizez terenul pe hartă după numărul cadastral?', a: 'Pe geoportalul ANCPI (geoportal.ancpi.ro) cauți după județ, unitate administrativ-teritorială și numărul cadastral, iar parcela apare conturată peste ortofotoplan. Vezi forma și poziția, dar nu și limitele exacte în teren. Pentru un document care arată parcela cu coordonate, îți trebuie extrasul de plan cadastral.' },
         { q: 'Am numărul cadastral, dar nu apare nimic pe geoportal. De ce?', a: 'Cel mai des, numărul e dintr-un act vechi și nu e cel actual: imobilul a fost dezmembrat, alipit sau renumerotat la intabulare, ori nu e încă înregistrat în sistemul integrat de cadastru. Verifică întâi ce număr apare în extrasul CF actual — dacă nu ai unul, se poate afla după adresă.' },
         { q: 'Cât costă identificarea imobilului dacă nu am numărul de carte funciară?', a: 'Identificarea imobilului costă 163,64 lei + TVA — același preț și după adresă, și după numele proprietarului. În ambele cazuri primești numărul de carte funciară al imobilului, apoi poți comanda extrasul CF.' },
@@ -184,38 +189,117 @@ export default function Page() {
         </div>
       </div>
 
-      <h2>Cum se citește un extras de carte funciară</h2>
+      {/* Extins 14.10.2026: un cabinet de avocatură rankează pe „cum citești
+          extrasul" cu teorie, fără documentul în pagină. Aici citim un extras
+          real (anonimizat) rând cu rând. */}
+      <h2 id="cum-se-citeste">Cum se citește un extras de carte funciară, rând cu rând</h2>
       <p>
-        Dacă ai deja un extras, chiar vechi de zece ani, ai toate numerele în el. Documentul e
-        împărțit în trei părți, mereu în aceeași ordine:
+        Dacă ai deja un extras, chiar vechi de zece ani, ai toate numerele în el. Documentul are un
+        antet și trei părți, mereu în aceeași ordine. Mai jos e un extras pentru informare, cu datele
+        personale acoperite, și ce înseamnă fiecare zonă.
       </p>
+
+      <CfSpecimenAnnotated />
+
+      <h3>Antetul</h3>
+      <p>
+        Sus apar oficiul de cadastru care l-a emis, tipul extrasului („pentru informare”), numărul
+        cărții funciare și localitatea. Numărul de CF e aici, nu mai jos. În dreapta sunt numărul și
+        data cererii: data spune cât de proaspăt e documentul, iar asta contează la notar sau la bancă
+        (vezi <Link href="/valabilitate-extras-de-carte-funciara/">cât e valabil un extras</Link>).
+      </p>
+
+      <h3>Partea I: imobilul</h3>
+      <p>
+        Fiecare imobil are un cod de poziție. <strong>A1</strong> e terenul, cu numărul cadastral și
+        suprafața. <strong>A1.1</strong> e o construcție de pe el, cu numărul ei, format din numărul
+        terenului plus „-C1”, „-C2” pentru fiecare corp. La apartamente apare și „-U” pentru unitatea
+        individuală. Dacă imobilul vine dintr-o carte funciară veche, în dreapta apar „Nr. CF vechi” și,
+        în Ardeal și Banat, numărul topografic.
+      </p>
+
+      <h3>Partea a II-a: proprietarii și actele</h3>
+      <p>
+        Fiecare înscriere are trei rânduri. Primul e numărul și data cererii depuse la cadastru (în
+        specimen, „70551 / 16/07/2020”). Al doilea e actul care a produs înscrierea: contractul de
+        vânzare-cumpărare, certificatul de moștenitor, hotărârea judecătorească. Al treilea e înscrierea
+        propriu-zisă, cu un număr de ordine: <strong>B5</strong> spune „Intabulare, drept de PROPRIETATE”,
+        cota (1/1 înseamnă tot imobilul) și titularii. Coloana „Referințe” din dreapta arată la ce imobil
+        din Partea I se aplică: A1, A1.1 înseamnă și terenul, și casa.
+      </p>
+      <p>
+        Numerele de ordine (B5, B8) nu încep neapărat de la 1: extrasul pentru informare arată, de
+        regulă, înscrierile în vigoare, iar cele radiate între timp nu mai apar, deși numărul lor rămâne
+        ocupat.
+      </p>
+
+      <h3>Partea a III-a: sarcinile</h3>
+      <p>
+        Aici stau drepturile altora asupra imobilului: ipoteci, servituți, uzufruct. În specimen,
+        <strong> C3</strong> e o ipotecă în favoarea unei bănci, cu valoarea creditului și rangul. Rangul
+        arată ordinea în care se plătesc creditorii, dacă sunt mai mulți.
+      </p>
+
+      <h3>Capcana: o Parte a III-a goală nu înseamnă imobil liber</h3>
+      <p>
+        Uită-te la <strong>B8</strong>: aceeași cerere care a înscris ipoteca a notat și interdicțiile de
+        înstrăinare și grevare în favoarea băncii, dar le-a trecut în Partea a II-a, lângă proprietari.
+        La fel pot apărea în Partea a II-a notări de litigiu sau de urmărire silită. Cine citește doar
+        partea de sarcini le ratează. Citește toate rândurile din Partea a II-a, nu doar numele
+        proprietarului.
+      </p>
+
+      <h3>Termenii de pe extras, pe scurt</h3>
       <ul>
         <li>
-          în antet, „Carte Funciară Nr.” și localitatea. Numărul de CF e acolo, nu mai jos;
+          <strong>Intabulare:</strong> înscrierea definitivă a unui drept (proprietate, ipotecă).
         </li>
         <li>
-          în Partea I, descrierea imobilului: numărul cadastral, numărul topografic dacă există,
-          suprafața înregistrată și, la construcții, corpurile C1, C2 și unitățile individuale;
+          <strong>Înscriere provizorie:</strong> dreptul e înscris sub o condiție, de exemplu până se
+          finalizează o hotărâre; devine definitiv abia după justificare.
         </li>
         <li>
-          în Partea a II-a, proprietarii: cine deține imobilul și în ce cotă, cu actul care a
-          produs fiecare înscriere;
+          <strong>Notare:</strong> face cunoscute fapte sau drepturi legate de imobil: interdicții,
+          litigii, sechestru, urmărire silită. Codul civil (art. 877) numără trei feluri de înscrieri:
+          intabularea, înscrierea provizorie și notarea.
         </li>
         <li>
-          în Partea a III-a, sarcinile: ipoteci, interdicții de înstrăinare, servituți, notări de
-          litigiu.
+          <strong>Radiere:</strong> ștergerea unei înscrieri, de exemplu a ipotecii după ce creditul e
+          plătit.
+        </li>
+        <li>
+          <strong>Cotă:</strong> partea fiecărui proprietar; 1/2 și 1/2 înseamnă doi coproprietari pe
+          jumătate.
+        </li>
+        <li>
+          <strong>CF colectivă și CF individuală:</strong> la bloc există o carte pentru toată clădirea
+          și câte una pentru fiecare apartament; detalii în{' '}
+          <Link href="/totul-despre-cartea-funciara-colectiva/">ghidul despre CF colectivă</Link>.
         </li>
       </ul>
+
+      <h3>Ce verifici înainte să cumperi</h3>
+      <ol>
+        <li>că extrasul e emis recent, nu adus de vânzător de acum un an;</li>
+        <li>suprafața din Partea I, față de acte și de ce vezi în teren;</li>
+        <li>toți titularii din Partea a II-a și cotele lor: un coproprietar nu poate vinde singur tot;</li>
+        <li>notările din Partea a II-a: interdicții, litigii, urmărire silită;</li>
+        <li>fiecare rând din Partea a III-a;</li>
+        <li>
+          actul de la baza înscrierii, dacă ceva nu se leagă: se cere ca{' '}
+          <Link href={serviceUrl('copie-carte-funciara')}>copie din arhiva cărții funciare</Link>.
+        </li>
+      </ol>
       <p>
-        Numerele din antet și din Partea I nu se schimbă în timp, deci le poți lua dintr-un extras
-        vechi fără grijă. Ce se schimbă e Partea a II-a și a III-a, adică exact motivul pentru care
-        un extras vechi nu ține loc de unul actual la o tranzacție: proprietarul poate fi altul,
-        iar ipoteca de care nu știi s-a înscris ieri.
+        Numerele din antet și din Partea I nu se schimbă în timp, deci le poți lua dintr-un extras vechi
+        fără grijă. Ce se schimbă e Partea a II-a și a III-a, adică exact motivul pentru care un extras
+        vechi nu ține loc de unul actual la o tranzacție: proprietarul poate fi altul, iar ipoteca de
+        care nu știi s-a înscris ieri.
       </p>
       <p>
         Un lucru care nu e evident: registrul de publicitate imobiliară e public, iar un extras de
-        informare poate fi cerut de oricine, nu doar de proprietar. Extrasul pentru autentificare,
-        cel care blochează cartea funciară până la semnarea actului, îl cere doar notarul.
+        informare poate fi cerut de oricine, nu doar de proprietar. Extrasul pentru autentificare, cel
+        care blochează cartea funciară până la semnarea actului, îl cere doar notarul.
       </p>
 
       <div className="not-prose my-6 rounded-xl border border-amber-300 bg-amber-50 p-4">

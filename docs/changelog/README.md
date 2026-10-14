@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-10-14 | 🔴 **Specimenul extras CF era un extras real → anonimizat; ghid „cum citești extrasul” pe specimen** — 4 imagini redactate + redenumite (cache), `CfSpecimenAnnotated` cu 12 markere, secțiunea `#cum-se-citeste` + 4 FAQ în `/cum-aflam-numarul…/` | [2026-10-14-cum-citesti-extrasul-cf.md](2026-10-14-cum-citesti-extrasul-cf.md) |
 | 2026-10-14 | 🟣 **Admin: ce articole și calculatoare aduc comenzi** — `attribution.content` (click pe card, `recordContentClick`), `contentSource()` click > landing, `GET /api/admin/marketing/content`, card în /admin/marketing, rând „Din conținut” pe comandă | [2026-10-14-atribuire-continut-blog.md](2026-10-14-atribuire-continut-blog.md) |
 | 2026-10-14 | 🟣 **Articole + calculatoare: servicii ca produse (document întreg, preț, termen), card fix pe desktop, bară fixă pe telefon** — `getServiceCards` din `services`, `ArticleServiceCards`/`ArticleRailCard`/`ArticleInlineCta`/`ArticleStickyBar`, GA4 `article_service_click`, WhatsApp urcă peste bară | [2026-10-14-articole-carduri-servicii-bara-fixa.md](2026-10-14-articole-carduri-servicii-bara-fixa.md) |
 | 2026-10-14 | 🟣 **Ghid nou: cadastrul sistematic** — `/cadastru-sistematic/` (afișare 60 zile, rectificare, fereastra gratuită la OCPI până la prima vânzare, CF nou, impozit), surse Legea 7/1996 + Ord. 1/2020; linkuri din 5 pagini (inclusiv „ANCPI nu funcționează”); pnccf.site ca portal de afișare | [2026-10-14-ghid-cadastru-sistematic.md](2026-10-14-ghid-cadastru-sistematic.md) |

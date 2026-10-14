@@ -52,6 +52,15 @@ export default function Page() {
         verifice valabilitatea extrasului pentru a evita orice probleme legale ulterioare.
       </p>
 
+      <p>
+        Data emiterii e în antetul extrasului, în dreapta, lângă numărul cererii. Ce înseamnă fiecare zonă
+        a documentului am explicat pe un specimen în{' '}
+        <Link href="/cum-aflam-numarul-carte-functionara-si-nr-cadastral/#cum-se-citeste">
+          ghidul despre cum citești extrasul de carte funciară
+        </Link>
+        .
+      </p>
+
       <h2>De ce este importantă valabilitatea extrasului de carte funciară?</h2>
 
       <h3>Ce reprezintă valabilitatea unui extras de carte funciară?</h3>

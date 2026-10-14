@@ -52,7 +52,7 @@ const SERVICE_SPECIMENS: Record<string, string> = {
   'certificat-celibat': '/images/specimens/certificat-celibat.webp',
   'certificat-constatator': '/images/specimens/certificat-constatator.png',
   rovinieta: '/images/specimens/rovinieta.webp',
-  'extras-carte-funciara': '/images/specimens/extras-cf.png',
+  'extras-carte-funciara': '/images/specimens/extras-cf-anonim.png',
   'extras-multilingv-certificat-nastere': '/images/specimens/extras-multilingv-nastere.webp',
   'extras-multilingv-certificat-casatorie': '/images/specimens/extras-multilingv-casatorie.webp',
 };
@@ -60,7 +60,7 @@ const SERVICE_SPECIMENS: Record<string, string> = {
 function serviceSpecimen(service: Service): string | null {
   return (
     SERVICE_SPECIMENS[service.slug] ||
-    (service.category === 'imobiliare' ? '/images/specimens/extras-cf.png' : null)
+    (service.category === 'imobiliare' ? '/images/specimens/extras-cf-anonim.png' : null)
   );
 }
 

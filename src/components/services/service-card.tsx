@@ -33,7 +33,7 @@ const SPECIMEN_BY_SLUG: Record<string, string> = {
   'cazier-fiscal-persoana-juridica': '/images/specimens/cazier-fiscal.png',
   'cazier-auto': '/images/specimens/cazier-auto.png',
   'certificat-integritate': '/images/specimens/certificat-integritate.png',
-  'extras-carte-funciara': '/images/specimens/extras-cf.png',
+  'extras-carte-funciara': '/images/specimens/extras-cf-anonim.png',
   'certificat-constatator': '/images/specimens/certificat-constatator.png',
   'certificat-nastere': '/images/specimens/certificat-nastere.webp',
   'certificat-casatorie': '/images/specimens/certificat-casatorie.webp',

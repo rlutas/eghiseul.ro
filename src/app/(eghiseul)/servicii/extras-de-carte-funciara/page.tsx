@@ -78,7 +78,7 @@ export const metadata = buildPageMetadata({
   title: TITLE,
   description: DESCRIPTION,
   path: PAGE_PATH,
-  ogImage: '/og/services/extras-cf.png',
+  ogImage: '/og/services/extras-cf-anonim.png',
 });
 
 const jsonLdGraph = buildServicePageGraph({
@@ -719,7 +719,7 @@ export default async function ExtrasCarteFunciaraPage() {
                 <div className="absolute -inset-3 bg-gradient-to-br from-primary-500/10 to-secondary-900/5 rounded-[2rem] blur-xl" aria-hidden="true" />
                 <div className="relative bg-white rounded-2xl p-3 ring-1 ring-neutral-200 shadow-[0_20px_50px_rgba(6,16,31,0.16)]">
                   <Image
-                    src="/images/extras-cf-specimen.webp"
+                    src="/images/extras-cf-specimen-anonim.webp"
                     alt="Specimen Extras de Carte Funciară emis de ANCPI / OCPI — exemplu document cu proprietar, suprafață și sarcini"
                     width={1414}
                     height={2000}
@@ -787,7 +787,7 @@ export default async function ExtrasCarteFunciaraPage() {
                 <h3 className="text-xl font-bold text-secondary-900 mb-4">Ce conține extrasul CF</h3>
                 <ul className="space-y-2.5 text-sm text-neutral-700">
                   {[
-                    'Partea I — descrierea imobilului (suprafață, categorie, vecinătăți)',
+                    'Partea I — descrierea imobilului (adresă, suprafață, număr cadastral, construcții)',
                     'Partea a II-a — proprietarul actual și modul de dobândire',
                     'Partea a III-a — sarcini: ipoteci, interdicții, litigii',
                   ].map((row) => (
@@ -797,6 +797,15 @@ export default async function ExtrasCarteFunciaraPage() {
                     </li>
                   ))}
                 </ul>
+                <p className="mt-4 text-sm text-neutral-600">
+                  <Link
+                    href="/cum-aflam-numarul-carte-functionara-si-nr-cadastral/#cum-se-citeste"
+                    className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                  >
+                    Cum citești extrasul rând cu rând
+                  </Link>
+                  , pe un specimen cu fiecare zonă explicată.
+                </p>
               </div>
               <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
                 <h3 className="text-xl font-bold text-secondary-900 mb-4">Cât este valabil</h3>
