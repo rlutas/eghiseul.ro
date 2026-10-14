@@ -297,8 +297,8 @@ export default function Page() {
         care nu știi s-a înscris ieri.
       </p>
       <p>
-        Un lucru care nu e evident: registrul de publicitate imobiliară e public, iar un extras de
-        informare poate fi cerut de oricine, nu doar de proprietar. Extrasul pentru autentificare, cel
+        Mulți nu știu că registrul de publicitate imobiliară e public: un extras de informare îl poate cere
+        oricine, nu doar proprietarul. Extrasul pentru autentificare, cel
         care blochează cartea funciară până la semnarea actului, îl cere doar notarul.
       </p>
 
