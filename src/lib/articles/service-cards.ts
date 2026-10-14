@@ -51,6 +51,16 @@ const EXTRA_SPECIMENS: Record<string, ServiceSpecimen> = {
     alt: 'Plan de amplasament și delimitare pe masă, cu conturul parcelei, casa și riglă',
     illustration: true,
   },
+  'extras-plan-cadastral': {
+    src: '/images/servicii-ilustratii/plan-cadastral.webp',
+    alt: 'Ortofotoplan tipărit cu parcela conturată în galben și aceeași parcelă pe telefon',
+    illustration: true,
+  },
+  'copie-plan-cadastral': {
+    src: '/images/servicii-ilustratii/plan-cadastral.webp',
+    alt: 'Ortofotoplan tipărit cu parcela conturată în galben și aceeași parcelă pe telefon',
+    illustration: true,
+  },
   'copie-carte-funciara': {
     src: '/images/servicii-ilustratii/copie-arhiva.webp',
     alt: 'Dosar de arhivă cu acte vechi și o copie nouă, tipărită, pe birou',

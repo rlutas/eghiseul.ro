@@ -6,6 +6,7 @@
 - La finalul fiecărui articol și calculator, serviciile apar acum ca produse: poza documentului (întreagă), prețul, termenul și butonul „Comandă”, pe o bandă bleumarin, separată de întrebările frecvente.
 - Pe telefon, după ce omul citește cam o treime din pagină, apare jos o bară mică cu documentul, prețul și „Comandă”. Se închide din „×” și nu mai apare o zi. Butonul de WhatsApp urcă deasupra ei.
 - Pe calculator (ecran mare), articolele au în dreapta un card fix cu documentul principal al articolului.
+- Serviciile fără specimen de document (identificare imobil, plan de amplasament, copii din arhiva OCPI, plan cadastral) au acum poze generate, fără text sau însemne oficiale.
 - Prețurile vin din setările serviciilor: dacă schimbați un preț în admin, se schimbă și în articole.
 - Pe calculatoare, „Calculatoare înrudite” stă acum deasupra documentelor, cu iconițe, iar caseta generică „Ai nevoie de un document? / Vezi serviciile / Sună-ne” de la final a fost scoasă; la fel și pe articolele de blog.
 - Fiecare click pe aceste butoane se vede în Google Analytics (evenimentul `article_service_click`), ca să știm ce articol aduce comenzi.
@@ -21,4 +22,5 @@
 - `ArticleLayout` și `CalculatorLayout` devin `async`; FAQ pe articole pe o coloană (`twoColumns={false}`); `CalculatorLayout.SVC` primește `slug` (DB) lângă `href`.
 - `CalculatorLayout`: „Calculatoare înrudite” mutat deasupra benzii de produse, carduri cu iconița din `CALCULATORS_NAV` (`CALC_ICONS` pe href); secțiunea CTA generică de la final scoasă, și din `ArticleLayout`.
 - Caseta în text pusă pe `/cadastru-sistematic/` (extras CF pe numărul nou).
+- Ilustrații în `public/images/servicii-ilustratii/` (identificare-imobil, plan-amplasament-delimitare, copie-arhiva, plan-cadastral), mapate în `EXTRA_SPECIMENS` cu `illustration: true` → `object-cover`; specimenele reale rămân `object-contain`.
 - Deschis: pe calculatoare, popup-ul de newsletter (`NewsletterPopup`) acoperă jumătate de ecran pe telefon și se suprapune cu bara.
