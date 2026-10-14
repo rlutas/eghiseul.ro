@@ -7,7 +7,7 @@
   1. **17.08: 1.546 lei**, comanda (extras multilingv + certificat de naștere + livrare). Factura EGH-0439, banii în decontarea din 20.08.
   2. **03.09: 200 lei**, plată extra din admin („Taxa amendă eliberare certificat naștere nou”). Pentru ea s-a emis doar **proforma PEGH-0008**, iar **factura fiscală nu s-a emis** (în istoricul comenzii scrie „FACTURA NEEMISĂ — verifică Oblio”). Banii au intrat în decontarea din 08.09.
 - Decontările afișau greșit factura comenzii (EGH-0439) și pe plata de 200 lei. Acum o afișează ca **„plată extra, factură neemisă (proforma PEGH-0008)”**.
-- **De făcut:** factura pentru cei 200 de lei trebuie emisă din proforma PEGH-0008 (în Oblio sau o emitem noi la cerere), cu data stabilită împreună cu contabilul.
+- **Rezolvat în aceeași zi:** factura pentru cei 200 de lei a fost emisă din proforma PEGH-0008: **EGH-0857** (data 14.10.2026). În decontarea din 08.09, plata de 200 de lei apare acum cu EGH-0857, iar EGH-0439 rămâne doar pe încasarea din 20.08.
 - Când vedeți în istoricul unei comenzi „FACTURA NEEMISĂ”, anunțați: de azi cronul o reîncearcă singur, dar doar 14 zile.
 
 ---
