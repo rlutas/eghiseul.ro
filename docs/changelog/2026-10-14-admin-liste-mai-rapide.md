@@ -11,6 +11,7 @@
 ## Tehnic
 
 - Măsurat live (Chrome, 14.10): `orders/list` pe `status=abandoned` 5,3 s / **795 KB** (2 drafturi pre-S3 cu `personal.uploadedDocuments[].base64`, ~1 MB); `orders/list` normal 2,0 s / 17 KB; `orders/priority-calls` 3,1 s; `orders/counts` 1,1 s (deja paralel, lăsat).
+- **Rezultat live după deploy:** Abandonuri 5,3 s / 795 KB → **1,7 s / 8 KB**; Recuperare telefonică 3,1 s → **0,9 s**; Comenzi 2,0 s → **1,4 s** (prima încărcare după deploy 2,9 s, instanță rece).
 - `src/lib/admin/slim-customer-data.ts`: înlocuiește `base64` și orice string > 2.000 caractere cu `[fișier]`, păstrând forma; aplicat pe răspunsul `GET /api/admin/orders/list`. Test în `tests/unit/lib/admin/`.
 - `orders/list`: cele 6 interogări secundare (note, nr. Barou, ONRC, marcaj „Sunat”, avarii, mesaje necitite) rulează în paralel (`Promise.all`), nu una după alta; marcajul „Sunat” citește doar `customer_data->contact`, nu tot JSON-ul, pe până la 2.000 de comenzi.
 - `orders/priority-calls`: coada, indexul plăților și lista „Recuperate” pornesc împreună; „Recuperate” citește doar contactul și numele (`customer_data->contact`, `->personal->>firstName`…), nu tot `customer_data` pe 1.000 de comenzi.
