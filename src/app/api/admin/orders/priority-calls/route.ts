@@ -153,7 +153,33 @@ export async function GET(request: NextRequest) {
     query = query.is('phone_contacted_at', null);
   }
 
-  const { data, error } = await query;
+  // The paid-orders index and the calls of the lookback window don't depend on
+  // the queue query: start all three together (they ran one after another,
+  // ~3 s for this page, 14.10.2026).
+  const lookbackIso = new Date(Date.now() - RECOVERY_LOOKBACK_MS).toISOString();
+  const paidPromise = admin
+    .from('orders')
+    .select('id, friendly_order_id, order_number, total_price, paid_at, email:customer_data->contact->>email')
+    .eq('payment_status', 'paid')
+    .gte('paid_at', lookbackIso)
+    .limit(5000);
+  // Only the fields the „Recuperate” list reads (contact + names), not the
+  // whole customer_data: some old drafts carry ID scans as base64 inside it.
+  const contactedPromise = admin
+    .from('orders')
+    .select(
+      'id, friendly_order_id, contact:customer_data->contact, pf:customer_data->personal->>firstName, pl:customer_data->personal->>lastName, bf:customer_data->billing->>firstName, bl:customer_data->billing->>lastName, phone_contacted_at, phone_contacted_by, phone_contact_notes, services(name)'
+    )
+    .not('phone_contacted_at', 'is', null)
+    .gte('phone_contacted_at', lookbackIso)
+    .order('phone_contacted_at', { ascending: false })
+    .limit(1000);
+
+  const [{ data, error }, { data: paidRows }, { data: contactedRows }] = await Promise.all([
+    query,
+    paidPromise,
+    contactedPromise,
+  ]);
   if (error) {
     return NextResponse.json(
       { success: false, error: { code: 'FETCH_FAILED', message: error.message } },
@@ -163,13 +189,6 @@ export async function GET(request: NextRequest) {
 
   // Paid orders of the lookback window, indexed by email: a client who paid on
   // ANOTHER order after starting this one is not someone to call any more.
-  const lookbackIso = new Date(Date.now() - RECOVERY_LOOKBACK_MS).toISOString();
-  const { data: paidRows } = await admin
-    .from('orders')
-    .select('id, friendly_order_id, order_number, total_price, paid_at, email:customer_data->contact->>email')
-    .eq('payment_status', 'paid')
-    .gte('paid_at', lookbackIso)
-    .limit(5000);
   const paidIndex = buildPaidIndex(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ((paidRows ?? []) as any[]).map((p) => ({
@@ -278,14 +297,26 @@ export async function GET(request: NextRequest) {
 
   // Calls of the lookback window: who paid afterwards (on any order, usually a
   // new one) is a recovery, shown in its own list instead of the open queue.
-  const { data: contactedRows } = await admin
-    .from('orders')
-    .select('id, friendly_order_id, customer_data, phone_contacted_at, phone_contacted_by, phone_contact_notes, services(name)')
-    .not('phone_contacted_at', 'is', null)
-    .gte('phone_contacted_at', lookbackIso)
-    .order('phone_contacted_at', { ascending: false })
-    .limit(1000);
-  const contacted = (contactedRows ?? []) as unknown as Array<{
+  const contacted = ((contactedRows ?? []) as unknown as Array<{
+    id: string;
+    friendly_order_id: string | null;
+    contact: { email?: string | null; phone?: string | null } | null;
+    pf: string | null;
+    pl: string | null;
+    bf: string | null;
+    bl: string | null;
+    phone_contacted_at: string;
+    phone_contacted_by: string | null;
+    phone_contact_notes: string | null;
+    services: { name: string } | null;
+  }>).map((c) => ({
+    ...c,
+    customer_data: {
+      contact: c.contact ?? {},
+      personal: { firstName: c.pf ?? undefined, lastName: c.pl ?? undefined },
+      billing: { firstName: c.bf ?? undefined, lastName: c.bl ?? undefined },
+    } as unknown,
+  })) as Array<{
     id: string;
     friendly_order_id: string | null;
     customer_data: unknown;

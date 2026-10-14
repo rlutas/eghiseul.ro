@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { slimCustomerData } from '@/lib/admin/slim-customer-data';
 import { unreadClientMessageCounts } from '@/lib/orders/messages';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -193,6 +194,10 @@ export async function GET(request: NextRequest) {
     const noteCounts: Record<string, number> = {};
     const orderRows = (orders || []) as unknown as Array<Record<string, unknown> & { id: string }>;
     const ids = orderRows.map((o) => o.id);
+    // The five lookups below only depend on the current page of orders, so
+    // they run in parallel (they used to run one after another: ~2–5 s on
+    // „Abandonuri”, 14.10.2026).
+    const loadNotes = async () => {
     if (ids.length > 0) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: noteRows } = await (adminClient as any)
@@ -212,9 +217,12 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    };
+
     // Nr. contract asistență + delegație per comandă (order_documents) —
     // afișate sub numărul comenzii, paritate cu admin-ul CJO.
     const barouByOrder: Record<string, { contract: string | null; delegation: string | null }> = {};
+    const loadBarou = async () => {
     if (orderRows.length) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: docNumbers } = await (adminClient as any)
@@ -230,11 +238,14 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    };
+
     // Starea automatizării ONRC per comandă (constatator) — lista arată un badge
     // roșu când botul a eșuat, ca echipa să știe că trebuie făcut manual fără
     // să deschidă /admin/onrc (incident 14.09.2026: 2 comenzi plătite, eșuate
     // tăcut). Un job per comandă; dacă sunt mai multe, îl luăm pe cel mai nou.
     const onrcByOrder: Record<string, { status: string; error_message: string | null }> = {};
+    const loadOnrc = async () => {
     if (orderRows.length) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: onrcJobs } = await (adminClient as any)
@@ -247,6 +258,8 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    };
+
     // Open ANCPI/ONRC outage windows — the list UI shows instant services
     // (extras CF / plan cadastral / constatator) as "on hold" instead of a
     // deadline while the backing platform is down.
@@ -255,12 +268,13 @@ export async function GET(request: NextRequest) {
     // already called from „Recuperare telefonică" and does not call twice.
     const callByOrder: Record<string, ReturnType<typeof findCall>> = {};
     const unpaidRows = orderRows.filter((o) => !o.paid_at);
+    const loadCalls = async () => {
     if (unpaidRows.length) {
       const callSince = new Date(Date.now() - CALL_MARK_DAYS * 86_400_000).toISOString();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data: calledRows, error: calledError } = await (adminClient as any)
         .from('orders')
-        .select('id, friendly_order_id, order_number, customer_data, phone_contacted_at, phone_contacted_by, phone_contact_notes')
+        .select('id, friendly_order_id, order_number, contact:customer_data->contact, phone_contacted_at, phone_contacted_by, phone_contact_notes')
         .not('phone_contacted_at', 'is', null)
         .gte('phone_contacted_at', callSince)
         .limit(2000);
@@ -269,8 +283,8 @@ export async function GET(request: NextRequest) {
         ((cd as { contact?: { email?: string | null; phone?: string | null } } | null)?.contact) ?? {};
       const callIndex = buildCallIndex(
         ((calledRows ?? []) as Array<Record<string, unknown>>).map((o): CalledOrderRef => ({
-          email: contactOf(o.customer_data).email ?? null,
-          phone: contactOf(o.customer_data).phone ?? null,
+          email: ((o.contact as { email?: string | null } | null)?.email) ?? null,
+          phone: ((o.contact as { phone?: string | null } | null)?.phone) ?? null,
           at: o.phone_contacted_at as string,
           by: (o.phone_contacted_by as string | null) ?? null,
           notes: (o.phone_contact_notes as string | null) ?? null,
@@ -284,13 +298,25 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const openOutages = await getOpenOutages(adminClient);
-    const unreadMessages = await unreadClientMessageCounts(orderRows.map((o) => o.id));
+    };
+
+    const [, , , , openOutages, unreadMessages] = await Promise.all([
+      loadNotes(),
+      loadBarou(),
+      loadOnrc(),
+      loadCalls(),
+      getOpenOutages(adminClient),
+      unreadClientMessageCounts(orderRows.map((o) => o.id)),
+    ]);
 
     return NextResponse.json({
       success: true,
       data: orderRows.map((o) => ({
         ...o,
+        // Old drafts carry ID scans as base64 inside customer_data (pre-S3):
+        // two of them made „Abandonuri” a 795 KB response. The list only
+        // needs names, contact and document types.
+        customer_data: slimCustomerData(o.customer_data),
         note_count: noteCounts[o.id] || 0,
         barou: barouByOrder[o.id] ?? null,
         onrc: onrcByOrder[o.id] ?? null,
