@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { ClientTypeChooser, type ClientTypeOption } from './client-type-chooser';
 
 interface MobileStickyCTAProps {
   /** Order wizard target, e.g. `/comanda/extras-carte-funciara`. */
@@ -10,6 +11,8 @@ interface MobileStickyCTAProps {
   /** VAT-inclusive total as stored in services.base_price. */
   basePrice: number | string;
   ctaLabel?: string;
+  /** When set, the button opens the PF/PJ chooser instead of following `href`. */
+  choices?: ClientTypeOption[];
 }
 
 const fmt = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(2).replace('.', ','));
@@ -21,7 +24,7 @@ const fmt = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(2).repla
  * area. Hidden on lg+ (desktop keeps the in-page price card). Price math matches
  * the ServicePrice hero block (ex-VAT headline + total cu TVA).
  */
-export function MobileStickyCTA({ href, basePrice, ctaLabel = 'Comandă acum' }: MobileStickyCTAProps) {
+export function MobileStickyCTA({ href, basePrice, ctaLabel = 'Comandă acum', choices }: MobileStickyCTAProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -49,6 +52,12 @@ export function MobileStickyCTA({ href, basePrice, ctaLabel = 'Comandă acum' }:
           </span>
           <span className="text-[11px] text-neutral-500">{fmt(withVat)} RON cu TVA</span>
         </div>
+        {choices ? (
+          <ClientTypeChooser options={choices} className="ml-auto inline-flex h-12 flex-1 max-w-[60%] items-center justify-center gap-2 rounded-xl bg-primary-500 px-5 text-base font-bold text-secondary-900 shadow-[0_4px_14px_rgba(236,185,95,0.45)] transition-colors hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2">
+            {ctaLabel}
+            <ArrowRight className="h-5 w-5" aria-hidden="true" />
+          </ClientTypeChooser>
+        ) : (
         <Link
           href={href}
           className="ml-auto inline-flex h-12 flex-1 max-w-[60%] items-center justify-center gap-2 rounded-xl bg-primary-500 px-5 text-base font-bold text-secondary-900 shadow-[0_4px_14px_rgba(236,185,95,0.45)] transition-colors hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2"
@@ -56,6 +65,7 @@ export function MobileStickyCTA({ href, basePrice, ctaLabel = 'Comandă acum' }:
           {ctaLabel}
           <ArrowRight className="h-5 w-5" aria-hidden="true" />
         </Link>
+        )}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-10-14 | ✅ **Cazier judiciar: PF/PJ ales într-o fereastră, fără derulare; WhatsApp ascuns pe telefon pe articole/calculatoare/servicii; bara de comandă după ~un ecran** — `ClientTypeChooser`, `MobileStickyCTA.choices`, `WhatsAppFloat` pe tip de pagină | [2026-10-14-cazier-alege-tipul-whatsapp-bara.md](2026-10-14-cazier-alege-tipul-whatsapp-bara.md) |
 | 2026-10-14 | 🟣 **Unealtă gratuită „Verificare firmă după CUI” + popup newsletter scos** — ANAF TVA v9 + bilanț 2 ani, `/api/tools/verificare-firma/`, CTA spre constatator (`placement=tool`); `NewsletterPopup` scos de pe calculatoare și rovinietă | [2026-10-14-verificare-firma-cui.md](2026-10-14-verificare-firma-cui.md) |
 | 2026-10-14 | 🔴 **Certificat constatator: viteză reală din DB, taxa ONRC afișată, tabel comparativ fără afirmații false** — `getDeliveryStats` (mediana 4 min / 75 comenzi), coloana „alți operatori” scoasă, FAQ corectate; diagnostic + idei B2B | [2026-10-14-constatator-pagina-adevarata.md](2026-10-14-constatator-pagina-adevarata.md) |
 | 2026-10-14 | 🔴 **Specimenul extras CF era un extras real → anonimizat; ghid „cum citești extrasul” pe specimen** — 4 imagini redactate + redenumite (cache), `CfSpecimenAnnotated` cu 12 markere, secțiunea `#cum-se-citeste` + 4 FAQ în `/cum-aflam-numarul…/` | [2026-10-14-cum-citesti-extrasul-cf.md](2026-10-14-cum-citesti-extrasul-cf.md) |

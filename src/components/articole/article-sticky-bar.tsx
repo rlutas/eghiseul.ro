@@ -12,8 +12,8 @@ const DISMISS_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Phone/tablet bar (below xl, where articles have the rail; calculators pass
- * `allWidths` because they have no rail). Shows after ~30% of the
- * page, hides again near the bottom band (which already shows the same
+ * `allWidths` because they have no rail). Shows after about one screen of
+ * scrolling, hides again near the bottom band (which already shows the same
  * product) and can be closed for a day. Small and closable on purpose: Google
  * penalizes overlays that cover the content on mobile, not a slim bottom bar.
  */
@@ -35,7 +35,10 @@ export function ArticleStickyBar({ card, allWidths = false }: { card: ServiceCar
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const band = document.getElementById('servicii-legate');
       const bandTop = band ? band.getBoundingClientRect().top : Infinity;
-      setVisible(window.scrollY > max * 0.3 && bandTop > window.innerHeight);
+      // Show once the reader is past the hero (~one screen), not after 30%
+      // of a long article — that was thousands of pixels on a phone.
+      const threshold = Math.min(window.innerHeight * 0.9, max * 0.3);
+      setVisible(window.scrollY > threshold && bandTop > window.innerHeight);
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });

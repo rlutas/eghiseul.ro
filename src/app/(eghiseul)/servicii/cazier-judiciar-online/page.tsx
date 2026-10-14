@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Footer } from '@/components/home/footer';
 import { MobileStickyCTA } from '@/components/services/mobile-sticky-cta';
+import { ClientTypeChooser, type ClientTypeOption } from '@/components/services/client-type-chooser';
 import { ServiceAnswerBlock } from '@/components/services/service-answer-block';
 import { PrivateServiceNotice } from '@/components/services/private-service-notice';
 import { ServiceFAQ, type FAQ } from '@/components/services/service-faq';
@@ -264,6 +265,21 @@ const FAQ_ITEMS: FAQ[] = [
 const linkClass =
   'text-primary-600 font-semibold underline underline-offset-2 hover:text-primary-700';
 
+const CAZIER_CHOICES: ClientTypeOption[] = [
+  {
+    kind: 'pf',
+    href: '/comanda/cazier-judiciar-persoana-fizica/',
+    title: 'Persoană fizică',
+    desc: 'Cazierul tău, pe CNP. Tot aici: PFA, întreprindere individuală sau familială.',
+  },
+  {
+    kind: 'pj',
+    href: '/comanda/cazier-judiciar-persoana-juridica/',
+    title: 'Firmă (persoană juridică)',
+    desc: 'Cazierul societății, pe CUI: SRL, SA, ONG, cooperativă.',
+  },
+];
+
 export default function CazierJudiciarHubPage() {
   return (
     <>
@@ -398,13 +414,13 @@ export default function CazierJudiciarHubPage() {
                       </div>
                     </div>
 
-                    <a
-                      href="#alege-tip"
+                    <ClientTypeChooser
+                      options={CAZIER_CHOICES}
                       className="flex items-center justify-center gap-2 w-full mt-4 px-6 py-3.5 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
                     >
-                      Alege tipul și comandă
+                      Comandă cazierul
                       <ArrowRight className="w-4 h-4" />
-                    </a>
+                    </ClientTypeChooser>
 
                     <GoogleReviewsBadge variant="bar" className="mt-3" />
                   </div>
@@ -1238,7 +1254,7 @@ export default function CazierJudiciarHubPage() {
         </section>
       </main>
 
-      <MobileStickyCTA href="#alege-tip" basePrice={198} ctaLabel="Alege tipul" />
+      <MobileStickyCTA href="#alege-tip" basePrice={198} ctaLabel="Comandă" choices={CAZIER_CHOICES} />
 
       <Footer />
     </>
