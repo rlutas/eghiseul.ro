@@ -138,7 +138,7 @@ export const CURATED_GUIDES: GuideLink[] = [
     slug: 'admin/recuperare-telefonica',
     category: 'clienti',
     description:
-      'Coada „De sunat” pe eGhiseul și CazierJudiciarOnline: apel sau WhatsApp, „Marchează sunat” cu notă, tabul „✅ Recuperate” cu cine a plătit după apel. Ținta: toată coada sunată în aceeași zi.',
+      'Coada „De sunat” pe eGhiseul și CazierJudiciarOnline: apel sau WhatsApp, „Marchează sunat” cu notă, tabul „✅ Recuperate” cu cine a plătit după apel. Pe eGhiseul vedeți unde s-a oprit clientul; „Plată cu cardul eșuată” = sunați primii și propuneți IBAN. Ținta: toată coada sunată în aceeași zi.',
   },
   {
     title: 'Chatbotul din Ghid și raportarea problemelor',

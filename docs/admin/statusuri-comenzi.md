@@ -24,7 +24,7 @@ zi lucrătoare e o comandă uitată.
 | **Ciornă** | Neplătite | formularul, la primul pas | „Neterminată” | clientul continuă singur; din admin: „Copiază link continuare” (48 h), „Editează datele clientului” |
 | **În așteptare (pending)** | Neplătite | formularul, la trimitere spre plată | „În așteptare” | plata; după 30 de minute fără plată devine Abandonată |
 | **Așteptare plată (transfer bancar)** | Așteptare plată | clientul alege IBAN; sau voi, din dropdown, când spune la telefon că plătește prin bancă | „Așteptăm plata prin transfer” | „Dovadă verificată — pornește lucrul” → „Confirmă plata” |
-| **Abandonată** | Neplătite | cronul, la 30 de minute | „Abandonată” | emailurile de recuperare (3 pași, cupon la al treilea) + Recuperare telefonică |
+| **Abandonată** | Neplătite | cronul, la 30 de minute | „Abandonată” | emailurile de recuperare + Recuperare telefonică. Sub status vedeți unde s-a oprit: „pas: …” (în formular), „A ajuns la plata cu cardul” sau **„Plată cu cardul eșuată”** (banca a refuzat cardul: propuneți IBAN, vezi [Recuperare telefonică](recuperare-telefonica.md)) |
 | **Plătită** | Plătite | Stripe / „Confirmă plata” | „Plata a intrat. Pregătim documentele.” | **„Începe procesarea”** |
 | **În procesare** | În procesare | voi / Mircea „În lucru” / „Dovadă verificată” | „Lucrăm la comanda ta.” | verificați actele; **„Marchează documente generate”** |
 | **Documente generate** | În procesare | voi | „Am pregătit actele necesare pentru depunere.” | **„Marchează depusă la IPJ”** (numele butonului e generic pentru orice instituție) |

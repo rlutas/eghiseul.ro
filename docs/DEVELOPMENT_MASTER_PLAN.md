@@ -860,6 +860,15 @@ Add-on `extras_multilingv` (399 lei) pe certificat-nastere + certificat-casatori
 
 3 tiers (București/sectoare 15-30, oficii rapide 5-7, rest 7-15), lista de oficii rapide editabilă din `/admin/settings` → „Termene stare civilă". `registrationPlace` convertit la dropdown structurat. Migrația 079 + `src/lib/civil-status/delivery-terms.ts`. Vezi changelog + `docs/plans/2026-06-23-civil-status-dynamic-terms-design.md`.
 
+#### ✅ Plată cu cardul eșuată vizibilă în Neplătite + Recuperare telefonică — LIVRAT 2026-10-14
+
+`payment_intent.payment_failed` salvat pe comandă (migrarea 194:
+`payment_failed_count`, `payment_last_failed_at`, `payment_last_error`;
+`order_history.event_type='payment_failed'`). `paymentSignal()` în
+`src/lib/admin/payment-signal.ts`: refuz > sesiune Stripe > pas wizard;
+refuzurile primele în coada de apeluri, cu sugestia IBAN. Doar eghiseul;
+CJO de portat la cerere. Vezi `changelog/2026-10-14-plata-card-esuata-vizibila.md`.
+
 #### ✅ Recuperare telefonică comenzi abandonate — LIVRAT 2026-09-14
 
 Pagină `/admin/recuperare-telefonica`: coadă prioritizată (telefon străin +

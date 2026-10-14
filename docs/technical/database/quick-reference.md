@@ -68,6 +68,13 @@ WHERE customer_data @> '{"contact": {"email": "email@example.com"}}';
 -- Orders with specific option
 SELECT * FROM orders
 WHERE selected_options ? 'urgenta';
+
+-- Unpaid orders whose card was declined by Stripe (migration 194, from 2026-10-14)
+-- payment_last_error = Stripe decline_code or code (insufficient_funds, card_declined, ...)
+SELECT friendly_order_id, payment_failed_count, payment_last_failed_at, payment_last_error
+FROM orders
+WHERE payment_failed_count > 0 AND payment_status <> 'paid'
+ORDER BY payment_last_failed_at DESC;
 ```
 
 ### Order History

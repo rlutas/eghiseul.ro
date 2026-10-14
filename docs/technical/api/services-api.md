@@ -766,7 +766,7 @@ Raw Stripe webhook payload (verified by Stripe SDK).
 #### Supported Events
 
 - `payment_intent.succeeded`: Payment completed successfully
-- `payment_intent.payment_failed`: Payment failed
+- `payment_intent.payment_failed`: Payment failed — order status unchanged; increments `payment_failed_count`, stores `payment_last_error` (Stripe `decline_code`/`code`) + `payment_last_failed_at`, logs `order_history` `payment_failed` (since 2026-10-14, migration 194)
 - `payment_intent.canceled`: Payment cancelled
 - `charge.refunded`: Refund processed
 
