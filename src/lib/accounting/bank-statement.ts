@@ -254,6 +254,20 @@ export async function importBankStatement(content: string): Promise<BankImportRe
   const { entries } = parseBtCsv(content);
   const admin = createAdminClient();
 
+  // Reimportul aceluiași extras e upsert pe `reference`. Payout-urile deja
+  // legate au `bank_matched_at` și nu mai sunt candidate, așa că fără asta
+  // reimportul scria `matched_payout_id = null` peste legăturile existente
+  // (14.10.2026: septembrie ar fi pierdut 22 de legături). Păstrăm legăturile.
+  const existing = new Map<string, { matched_payout_id: string | null; matched_order_id: string | null }>();
+  for (let i = 0; i < entries.length; i += 200) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (admin as any)
+      .from('bank_statement_entries')
+      .select('reference, matched_payout_id, matched_order_id')
+      .in('reference', entries.slice(i, i + 200).map((e) => e.reference));
+    for (const r of data ?? []) existing.set(r.reference, r);
+  }
+
   // match stripe credits → payouts
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: payouts } = await (admin as any)
@@ -265,6 +279,12 @@ export async function importBankStatement(content: string): Promise<BankImportRe
   const usedPayouts = new Set<string>();
   for (const e of entries) {
     if (e.category !== 'stripe_payout') continue;
+    const prev = existing.get(e.reference)?.matched_payout_id;
+    if (prev) {
+      e.matched_payout_id = prev;
+      payoutsMatched++;
+      continue;
+    }
     const cands = free.filter(
       (p: { id: string; amount_bani: number; arrival_date: string | null }) =>
         !usedPayouts.has(p.id) &&
@@ -285,6 +305,10 @@ export async function importBankStatement(content: string): Promise<BankImportRe
   // așteaptă confirmarea. Odată legate, operatorul deschide comanda direct din
   // extras, cu referința tranzacției deja completată.
   const { clientPaymentsMatched, unmatchedClientCredits } = await matchClientPayments(entries);
+
+  for (const e of entries) {
+    e.matched_order_id ??= existing.get(e.reference)?.matched_order_id ?? null;
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (admin as any).from('bank_statement_entries').upsert(entries);

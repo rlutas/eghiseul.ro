@@ -28,6 +28,7 @@ Lista roșie „Furnizori externi” din Extras bancă exista din iulie, dar doa
 - UI: `/admin/decontari/facturi-furnizori` și `SupplierInvoicesBanner` pe `/admin/decontari` și `/admin/decontari/banca`. Lista roșie veche a fost scoasă.
 - `bank-statement.ts`: regulă nouă înaintea celei de valută. Furnizorii cunoscuți devin `furnizor_extern` + `needs_invoice` indiferent de monedă. 73 de linii existente au fost recategorisite din „altele”.
 - Test: `tests/unit/lib/accounting/supplier-invoices.test.ts`.
+- Reimport sigur: `importBankStatement` păstrează `matched_payout_id`/`matched_order_id` existente. Înainte, reimportul aceluiași extras scria `null` peste legăturile payout↔bancă, pentru că payout-urile deja legate nu mai erau candidate.
 
 ## La import (stare 14.10)
 
