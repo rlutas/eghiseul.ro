@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/home/footer';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { ErovinietaEmbed } from '@/components/tools/erovinieta-embed';
-import { NewsletterPopup } from '@/components/calculators/newsletter-popup';
 import { buildPageMetadata, BASE_URL } from '@/lib/seo';
 import { organizationNode, websiteNode, breadcrumbNode } from '@/lib/seo/schema';
 
@@ -351,7 +350,6 @@ export default function VerificareRovinietaPage() {
 
       {/* Colectare emailuri — același popup ca pe calculatoare (GDPR opt-in,
           /api/newsletter → newsletter_subscribers). */}
-      <NewsletterPopup />
       <Footer />
     </>
   );

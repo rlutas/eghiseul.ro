@@ -68,6 +68,14 @@ export default function Page() {
         oficială din registru.
       </p>
 
+      <p>
+        Dacă vrei doar să vezi rapid dacă o firmă e activă, plătitoare de TVA sau ce cifră de afaceri a
+        declarat, nu ai nevoie de certificat: o verifici gratuit, după CUI, cu{' '}
+        <Link href="/tools/verificare-firma-cui/">unealta noastră de verificare a firmei</Link>. Certificatul
+        constatator îți trebuie când ai nevoie de asociați, administratori și capital, sau de un document pe
+        care să-l depui.
+      </p>
+
       <h2>Tipurile de certificat constatator (actualizat 2026)</h2>
       <p>
         În formularul nostru de comandă alegi întâi subiectul certificatului, firmă (CUI),

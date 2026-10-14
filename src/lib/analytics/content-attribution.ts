@@ -68,4 +68,5 @@ export const PLACEMENT_LABEL: Record<string, string> = {
   rail: 'cardul din dreapta',
   sticky_bar: 'bara fixă',
   inline: 'caseta din text',
+  tool: 'rezultatul uneltei',
 };

@@ -365,10 +365,15 @@ export default async function CertificatConstatatorPage() {
                   Cât costă și de unde obții certificatul constatator
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  Pentru fiecare certificat constatator, ONRC percepe o <strong>taxă oficială</strong>. Îl poți obține
-                  personal la ghișeul ONRC sau prin portalul RECOM online (dacă ai cont și semnătură electronică). Prin
-                  eGhișeul plătești <strong>de la {service.base_price} RON cu taxele ONRC incluse</strong>, 100% online,
-                  fără cont RECOM și fără deplasare. Primești documentul pe email. Vezi pas cu pas{' '}
+                  Pentru fiecare certificat constatator, ONRC percepe o taxă de 30 lei (250 lei la cel cu istoric). Îl
+                  poți obține la ghișeul ONRC sau direct pe platforma online a ONRC, plătind taxa cu cardul. Prin
+                  eGhișeul plătești <strong>{service.base_price} RON cu taxa ONRC inclusă</strong>, 100% online, fără
+                  deplasare, iar documentul vine pe email. Vrei întâi să vezi dacă firma e activă și plătitoare de TVA?
+                  Folosește{' '}
+                  <Link href="/tools/verificare-firma-cui/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
+                    verificarea gratuită după CUI
+                  </Link>
+                  . Vezi pas cu pas{' '}
                   <Link href="/eliberare-certificat-constatator-onrc-ghid/" className="font-semibold text-primary-700 underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2">
                     cum se eliberează certificatul constatator de la ONRC
                   </Link>{' '}

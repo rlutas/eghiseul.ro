@@ -182,6 +182,7 @@ export const HARDCODED_CALCULATOR_SLUGS: readonly string[] = [
 /** Tools pages (ported from WP /tools/*). */
 export const HARDCODED_TOOL_SLUGS = [
   'verificare-rovinieta-online',
+  'verificare-firma-cui',
 ] as const;
 
 /**

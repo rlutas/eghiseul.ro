@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ChevronRight, Ticket, Calculator, ArrowRight } from 'lucide-react';
+import { Building2, ChevronRight, Ticket, Calculator, ArrowRight } from 'lucide-react';
 import { Footer } from '@/components/home/footer';
 import { buildPageMetadata, BASE_URL } from '@/lib/seo';
 import { organizationNode, websiteNode, breadcrumbNode } from '@/lib/seo/schema';
@@ -25,6 +25,13 @@ const TOOLS = [
     desc: 'Verifică gratuit, după numărul de înmatriculare, dacă o mașină are rovinietă validă și până când expiră.',
     href: '/tools/verificare-rovinieta-online/',
     cta: 'Verifică rovinieta',
+  },
+  {
+    icon: Building2,
+    title: 'Verificare firmă după CUI',
+    desc: 'Vezi gratuit dacă o firmă e activă, dacă plătește TVA și ce cifră de afaceri și profit a declarat.',
+    href: '/tools/verificare-firma-cui/',
+    cta: 'Verifică firma',
   },
   {
     icon: Calculator,

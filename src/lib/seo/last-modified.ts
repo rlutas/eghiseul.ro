@@ -150,6 +150,7 @@ export const PATH_LAST_MODIFIED: Record<string, string> = {
   '/calculator/valabilitate-documente/': '2026-09-09',
   '/calculator/cost-cadastru-intabulare/': '2026-09-25',
   '/tools/verificare-rovinieta-online/': '2026-09-09',
+  '/tools/verificare-firma-cui/': '2026-10-14',
 };
 
 /** Data de modificare pentru o cale publică (`/servicii/x/`), ca `Date` — sau undefined. */

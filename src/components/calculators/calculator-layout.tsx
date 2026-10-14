@@ -3,7 +3,6 @@ import { ChevronRight, Calculator, ArrowRight, type LucideIcon } from 'lucide-re
 import { CALCULATORS_NAV } from '@/config/calculators-nav';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { Footer } from '@/components/home/footer';
-import { NewsletterPopup } from '@/components/calculators/newsletter-popup';
 import { WebMcpTools } from '@/components/calculators/webmcp-tools';
 import { BASE_URL } from '@/lib/seo';
 import { getServiceCards } from '@/lib/articles/service-cards';
@@ -396,7 +395,6 @@ export async function CalculatorLayout({
 
       {cards[0] && <ArticleStickyBar card={cards[0]} allWidths />}
       <Footer />
-      <NewsletterPopup />
       <WebMcpTools />
     </>
   );
