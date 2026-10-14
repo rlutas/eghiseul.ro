@@ -27,6 +27,7 @@ import { createCjoClient } from '@/lib/supabase/cjo';
 import { REFUND_TYPES, resolveRefundReference } from '@/lib/accounting/refund-tx';
 import {
   extraInvoiceForRow,
+  unbilledExtraForRow,
   parseOblioProformaDesc,
   pickInvoiceForProforma,
   type ExtraBillingEntry,
@@ -158,6 +159,7 @@ async function enrichEghiseul(rows: TxRow[]) {
       anyO.extra_billing as ExtraBillingEntry[] | null,
       { payment_intent_id: r.payment_intent_id, gross_bani: r.gross_bani }
     );
+    const unbilled = unbilledExtraForRow(anyO.extra_billing, { payment_intent_id: r.payment_intent_id, gross_bani: r.gross_bani });
     if (REFUND_TYPES.has(r.type)) {
       // Documentul fiscal al unei rambursări e STORNOUL, nu factura inițială
       // (care rămâne pe rândul încasării). Lipsă = anulare nefacturată încă.
@@ -166,6 +168,13 @@ async function enrichEghiseul(rows: TxRow[]) {
     } else if (extra && r.payment_intent_id !== (anyO as { stripe_payment_intent_id?: string }).stripe_payment_intent_id) {
       r.invoice_number = extra.invoiceNumber;
       r.invoice_url = extra.invoiceUrl;
+    } else if (unbilled) {
+      // Extra payment collected without its own invoice: show it as unbilled,
+      // never with the order's main invoice (see unbilledExtraForRow).
+      const u = unbilled;
+      r.invoice_number = null;
+      r.invoice_url = null;
+      r.description = `${r.description ?? ''} · plată extra, factură neemisă${u?.proformaNumber ? ` (proforma ${u.proformaNumber})` : ''}`.trim();
     } else {
       r.invoice_number = anyO.invoice_number ?? r.invoice_number;
       r.invoice_url = anyO.invoice_url ?? r.invoice_url;
@@ -228,6 +237,7 @@ async function enrichCjo(rows: TxRow[], errors: string[]) {
       o.extra_billing as ExtraBillingEntry[] | null,
       { payment_intent_id: r.payment_intent_id, gross_bani: r.gross_bani }
     );
+    const unbilled = unbilledExtraForRow(o.extra_billing as ExtraBillingEntry[] | null, { payment_intent_id: r.payment_intent_id, gross_bani: r.gross_bani });
     if (REFUND_TYPES.has(r.type)) {
       const storno = (o as { storno_invoice_number?: string | null }).storno_invoice_number ?? null;
       r.invoice_number = storno ?? r.invoice_number;
@@ -235,6 +245,13 @@ async function enrichCjo(rows: TxRow[], errors: string[]) {
     } else if (extra && r.payment_intent_id !== o.stripe_payment_intent_id) {
       r.invoice_number = extra.invoiceNumber;
       r.invoice_url = extra.invoiceUrl;
+    } else if (unbilled) {
+      // Extra payment collected without its own invoice: show it as unbilled,
+      // never with the order's main invoice (see unbilledExtraForRow).
+      const u = unbilled;
+      r.invoice_number = null;
+      r.invoice_url = null;
+      r.description = `${r.description ?? ''} · plată extra, factură neemisă${u?.proformaNumber ? ` (proforma ${u.proformaNumber})` : ''}`.trim();
     } else {
       r.invoice_number =
         o.oblio_invoice_number ||

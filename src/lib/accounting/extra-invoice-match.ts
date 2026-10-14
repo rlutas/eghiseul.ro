@@ -93,6 +93,28 @@ export function extraInvoiceForRow(
   return null;
 }
 
+/**
+ * An extra payment that WAS collected but whose fiscal invoice was never
+ * issued (Oblio failed at payment time; only the proforma exists). Without
+ * this the payout sync fell back to the ORDER's main invoice — E-260817-J2BXD:
+ * the 200 lei extra of 03.09 showed up as EGH-0439, the invoice of the
+ * 1.546 lei paid on 17.08, so the accountant saw the same invoice collected
+ * twice (14.10.2026). Matched by PaymentIntent only: amount guessing would
+ * risk hiding a real invoice.
+ */
+export function unbilledExtraForRow(
+  entries: (ExtraBillingEntry & { proforma?: ExtraInvoiceRef | null })[] | null | undefined,
+  row: ExtraMatchInput
+): { proformaNumber: string | null } | null {
+  if (!entries?.length || !row.payment_intent_id) return null;
+  const hit = entries.find((e) => e.paymentIntentId === row.payment_intent_id && !(e.invoice && e.invoice.number));
+  if (!hit) return null;
+  const pf = hit.proforma;
+  const proformaNumber =
+    pf && pf.number ? `${(pf.seriesName ?? '').toString().trim()}-${pf.number.toString().trim()}`.replace(/^-/, '') : null;
+  return { proformaNumber };
+}
+
 export interface OblioProformaRef {
   series: string;
   number: string;

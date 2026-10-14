@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   extraInvoiceForRow,
+  unbilledExtraForRow,
   parseOblioProformaDesc,
   pickInvoiceForProforma,
   type ExtraBillingEntry,
@@ -136,5 +137,36 @@ describe('pickInvoiceForProforma', () => {
 
   it('returns null when more than one invoice fits (never guesses)', () => {
     expect(pickInvoiceForProforma(proforma, [target, { ...target, number: '24181' }])).toBeNull();
+  });
+});
+
+describe('unbilledExtraForRow (E-260817-J2BXD, 14.10.2026)', () => {
+  const entries = [
+    {
+      amount: 200,
+      invoice: null,
+      proforma: { seriesName: 'PEGH', number: '0008', link: null },
+      paymentIntentId: 'pi_extra',
+    },
+  ];
+
+  it('flags an extra payment collected without its own invoice, with the proforma', () => {
+    expect(unbilledExtraForRow(entries, { payment_intent_id: 'pi_extra', gross_bani: 20000 })).toEqual({
+      proformaNumber: 'PEGH-0008',
+    });
+  });
+
+  it('ignores the main order charge and invoiced extras', () => {
+    expect(unbilledExtraForRow(entries, { payment_intent_id: 'pi_main', gross_bani: 154600 })).toBeNull();
+    expect(
+      unbilledExtraForRow(
+        [{ ...entries[0], invoice: { seriesName: 'EGH', number: '0700' } }],
+        { payment_intent_id: 'pi_extra', gross_bani: 20000 },
+      ),
+    ).toBeNull();
+  });
+
+  it('never guesses by amount', () => {
+    expect(unbilledExtraForRow(entries, { payment_intent_id: null, gross_bani: 20000 })).toBeNull();
   });
 });

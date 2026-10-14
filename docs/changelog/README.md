@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-10-14 | 🔴 **Decontări: plata extra de 200 lei pe E-260817-J2BXD apărea cu factura comenzii (EGH-0439); cronul de facturi nu vedea comenzile cu factură** — `unbilledExtraForRow` în payout-sync; builder postgrest refolosit în `invoice-health-check` (SPV nu rula deloc) | [2026-10-14-decontari-plata-extra-fara-factura.md](2026-10-14-decontari-plata-extra-fara-factura.md) |
 | 2026-10-14 | ✅ **Cazier judiciar: PF/PJ ales într-o fereastră, fără derulare; WhatsApp ascuns pe telefon pe articole/calculatoare/servicii; bara de comandă după ~un ecran** — `ClientTypeChooser`, `MobileStickyCTA.choices`, `WhatsAppFloat` pe tip de pagină | [2026-10-14-cazier-alege-tipul-whatsapp-bara.md](2026-10-14-cazier-alege-tipul-whatsapp-bara.md) |
 | 2026-10-14 | 🟣 **Unealtă gratuită „Verificare firmă după CUI” + popup newsletter scos** — ANAF TVA v9 + bilanț 2 ani, `/api/tools/verificare-firma/`, CTA spre constatator (`placement=tool`); `NewsletterPopup` scos de pe calculatoare și rovinietă | [2026-10-14-verificare-firma-cui.md](2026-10-14-verificare-firma-cui.md) |
 | 2026-10-14 | 🔴 **Certificat constatator: viteză reală din DB, taxa ONRC afișată, tabel comparativ fără afirmații false** — `getDeliveryStats` (mediana 4 min / 75 comenzi), coloana „alți operatori” scoasă, FAQ corectate; diagnostic + idei B2B | [2026-10-14-constatator-pagina-adevarata.md](2026-10-14-constatator-pagina-adevarata.md) |

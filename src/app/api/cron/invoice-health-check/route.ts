@@ -135,9 +135,14 @@ export async function POST(request: NextRequest) {
   // Paid orders without invoice_number set, in the [7 days, 30 min] window.
   // We filter on `paid_at` (when the Stripe webhook fired) — fall back to
   // `updated_at` when `paid_at` is NULL (legacy rows).
+  // A FRESH builder per query: postgrest-js keeps the filters of a reused
+  // `from()` builder, so the later queries (Barou, SPV, extra-invoice heal)
+  // silently inherited `payment_status=paid AND invoice_number IS NULL` and
+  // never saw orders that HAVE a main invoice — the extra invoice of
+  // E-260817-J2BXD (200 lei, 03.09) was never re-issued (14.10.2026).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const ordersTable = supabase.from('orders') as any;
-  const { data, error } = await ordersTable
+  const ordersTable = () => supabase.from('orders') as any;
+  const { data, error } = await ordersTable()
     .select(
       'id, friendly_order_id, order_number, total_price, paid_at, updated_at, status, customer_data, payment_status, invoice_number'
     )
@@ -171,7 +176,7 @@ export async function POST(request: NextRequest) {
   // per run. 14-day lookback.
   let barouHealed = 0;
   try {
-    const { data: barouPending } = await ordersTable
+    const { data: barouPending } = await ordersTable()
       .select('id')
       .eq('payment_status', 'paid')
       .is('barou_numbers_allocated_at', null)
@@ -199,7 +204,7 @@ export async function POST(request: NextRequest) {
   let spvChecked = 0;
   const spvBlocked: { ref: string; invoice: string; error: string }[] = [];
   try {
-    const { data: toCheck } = await ordersTable
+    const { data: toCheck } = await ordersTable()
       .select('id, friendly_order_id, order_number, invoice_number, invoice_spv_status')
       .not('invoice_number', 'is', null)
       .gte('invoice_issued_at', new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString())
@@ -215,7 +220,7 @@ export async function POST(request: NextRequest) {
         if (!parts) continue;
         const res = await checkEinvoiceExport(parts.seriesName, parts.number);
         spvChecked++;
-        await ordersTable
+        await ordersTable()
           .update({
             invoice_spv_status: res.ok ? 'ok' : 'blocked',
             invoice_spv_error: res.ok ? null : (res.error ?? 'Export e-Factura respins'),
@@ -273,7 +278,7 @@ export async function POST(request: NextRequest) {
   // writes it back. Fail-soft per entry; 14-day lookback, capped per run.
   let extraHealed = 0;
   try {
-    const { data: withExtra } = await ordersTable
+    const { data: withExtra } = await ordersTable()
       .select('id, friendly_order_id, order_number, customer_data, extra_billing')
       .not('extra_billing', 'is', null)
       .gte('updated_at', new Date(now - 14 * 24 * 60 * 60 * 1000).toISOString())
@@ -304,7 +309,7 @@ export async function POST(request: NextRequest) {
             entries[i] = { ...entries[i], invoice: inv };
             changed = true;
             extraHealed++;
-            await ordersTable
+            await ordersTable()
               .update({ extra_billing: entries })
               .eq('id', o.id);
             await (supabase.from('order_history') as ReturnType<typeof supabase.from>)
