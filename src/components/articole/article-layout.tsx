@@ -1,8 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight, CalendarDays, RefreshCw, ArrowRight, Phone, PenLine } from 'lucide-react';
+import { ChevronRight, CalendarDays, RefreshCw, PenLine } from 'lucide-react';
 import { Footer } from '@/components/home/footer';
-import { Button } from '@/components/ui/button';
 import { ServiceFAQ } from '@/components/services/service-faq';
 import { buildArticlePageGraph, BASE_URL, SITE_AUTHOR } from '@/lib/seo';
 import { getServiceCards, type RelatedServiceInput } from '@/lib/articles/service-cards';
@@ -186,47 +185,6 @@ export async function ArticleLayout({
           <ServiceFAQ title="Întrebări Frecvente" faqs={faqs} twoColumns={false} />
         )}
 
-        {/* CTA */}
-        <section className="relative py-14 lg:py-20 bg-gradient-to-b from-secondary-900 to-[#0C1A2F] overflow-hidden">
-          <div className="absolute inset-0 opacity-5">
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: 'radial-gradient(circle at 1px 1px, #ECB95F 1px, transparent 0)',
-                backgroundSize: '40px 40px',
-              }}
-            />
-          </div>
-          <div className="relative container mx-auto px-4 max-w-[820px] text-center">
-            <h2 className="text-2xl lg:text-3xl font-extrabold text-white mb-4">
-              Ai nevoie de un document?
-            </h2>
-            <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-              eGhișeul îți obține documentele 100% online, fără drumuri la ghișeu.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                asChild
-                className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl shadow-[0_6px_14px_rgba(236,185,95,0.35)] hover:shadow-[0_10px_20px_rgba(236,185,95,0.45)] hover:-translate-y-0.5 transition-all duration-200"
-              >
-                <Link href="/servicii/">
-                  Vezi serviciile
-                  <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-secondary-900 font-bold px-8 py-6 text-lg rounded-xl transition-all duration-200"
-              >
-                <a href="tel:+40757708181">
-                  <Phone className="mr-2 w-5 h-5" aria-hidden="true" />
-                  Sună-ne
-                </a>
-              </Button>
-            </div>
-          </div>
-        </section>
       </main>
 
       {mainCard && <ArticleStickyBar card={mainCard} />}
