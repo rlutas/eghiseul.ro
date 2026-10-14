@@ -200,6 +200,34 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
   const localities: string[] =
     (uatNomenclator as Record<string, string[]>)[normalizeJudet(property?.county ?? '')] ?? [];
 
+  // Satele UAT-ului ales (SIRUTA, INS) — sugestii pentru câmpul „Sat”, nu
+  // listă închisă. JSON-ul (~80 KB gzip) se încarcă doar pe pasul ăsta.
+  const [villages, setVillages] = useState<string[]>([]);
+  const uatKey = property?.county && property?.locality
+    ? `${normalizeJudet(property.county)}|${normalizeJudet(property.locality)}`
+    : '';
+  useEffect(() => {
+    if (!uatKey) {
+      setVillages([]);
+      return;
+    }
+    let cancelled = false;
+    import('@/lib/ancpi/sate-per-uat.json')
+      .then((m) => {
+        if (cancelled) return;
+        const list = (m.default as Record<string, string[]>)[uatKey] ?? [];
+        setVillages(list);
+        // Un singur sat (sau sector din București) → nu-l mai punem să scrie.
+        const only = list.length === 1
+          ? list[0]
+          : uatKey.startsWith('BUCURESTI|BUCURESTISECTORUL') ? 'București' : '';
+        if (only && !property?.imobilLocality) updateProperty?.({ imobilLocality: only });
+      })
+      .catch(() => { /* fără sugestii — câmpul rămâne text liber */ });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- rulează doar la schimbarea UAT-ului
+  }, [uatKey]);
+
   // Non-blocking input rules for the electronic identifier (warn, don't block).
   const cfCheck = checkCf(property?.carteFunciara ?? '');
   // On the collective-extract wizard a "-C1" number IS the right format —
@@ -340,7 +368,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               </Label>
               <Select
                 value={property.county}
-                onValueChange={(value) => updateProperty?.({ county: value, locality: '' })}
+                onValueChange={(value) => updateProperty?.({ county: value, locality: '', imobilLocality: '' })}
               >
                 {/* w-full: the shadcn trigger defaults to w-fit + nowrap and the
                     two dropdowns overlapped each other in the 2-col mobile grid */}
@@ -364,7 +392,7 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               </Label>
               <Select
                 value={property.locality}
-                onValueChange={(value) => updateProperty?.({ locality: value })}
+                onValueChange={(value) => updateProperty?.({ locality: value, imobilLocality: '' })}
                 disabled={!property.county}
               >
                 <SelectTrigger id="locality" className="w-full min-w-0">
@@ -385,8 +413,8 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               (comune, orașe), iar o comună are mai multe sate cu cărți funciare
               proprii (cele vechi erau numerotate pe sat). Fără satul ăsta
               topograful scotea CF-ul de pe alt sat al aceleiași comune
-              (Drajna/Podurile, 14.10.2026). Text liber, nu listă: comune
-              desființate, denumiri vechi. Același câmp `imobilLocality` pe care
+              (Drajna/Podurile, 14.10.2026). Text liber cu sugestii din SIRUTA,
+              nu listă închisă: comune desființate, denumiri vechi. Același câmp `imobilLocality` pe care
               convenția îl folosea deja — portalul colaboratorului îl afișează. */}
           <div className="space-y-2">
             <Label htmlFor="imobil-locality">
@@ -396,9 +424,24 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               id="imobil-locality"
               value={property.imobilLocality || ''}
               onChange={(e) => updateProperty?.({ imobilLocality: e.target.value })}
-              placeholder={property.locality ? `ex: satul din comuna ${property.locality}` : 'ex: Podurile'}
+              placeholder={
+                !property.locality
+                  ? 'Alege întâi comuna'
+                  : villages.length > 1
+                    ? `Scrie sau alege: ${villages.slice(0, 2).join(', ')}…`
+                    : 'ex: Podurile'
+              }
               disabled={!property.locality}
+              list={villages.length > 0 ? 'imobil-locality-options' : undefined}
+              autoComplete="off"
             />
+            {villages.length > 0 && (
+              <datalist id="imobil-locality-options">
+                {villages.map((v) => (
+                  <option key={v} value={v} />
+                ))}
+              </datalist>
+            )}
             <p className="text-xs text-muted-foreground">
               Satul sau orașul unde e imobilul, cum apare în acte. O comună are mai multe sate,
               iar fără sat putem găsi alt imobil cu același număr. Dacă are același nume ca
