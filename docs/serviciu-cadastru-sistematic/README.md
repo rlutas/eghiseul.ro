@@ -1,6 +1,6 @@
 # Cadastrul sistematic și numerotarea cărților funciare: ce am aflat și ce putem face
 
-**Stare:** în analiză (14.10.2026). Am întrebat-o pe Mircea dacă face cereri de rectificare în afișarea publică, la ce preț și în ce județe.
+**Stare:** serviciul de rectificare e **respins** (14.10.2026, răspunsul lui Mircea): rectificările din afișarea publică le face doar firma sau topograful care are contractul de cadastru sistematic pentru acea comună, nu un topograf din afară. Rămân ideile 2 și 3, ambele mici.
 
 ## De ce contează satul la extrasul CF
 
@@ -33,8 +33,8 @@ Portalul ANCPI pentru **afișarea publică din cadastrul sistematic** (art. 11 d
 
 ## Ce putem face
 
-1. **Serviciu plătit „Verificare cadastru sistematic + cerere de rectificare”**, cu Mircea. Clientul dă comuna și numele, verificăm dacă apare corect, iar dacă nu, Mircea întocmește și depune cererea. Valoare mare: termen-limită clar, deci urgență reală. Depinde de răspunsul lui Mircea (preț, deplasare, județe).
+1. ~~**Serviciu plătit „Verificare cadastru sistematic + cerere de rectificare”**, cu Mircea.~~ **Respins 14.10.2026.** Rectificarea o face executantul contractului de cadastru sistematic al comunei, în cadrul contractului; un topograf din afară nu are acces la lucrare. Ce poate face clientul singur: caută în opis pe pnccf.site și depune cererea la primărie sau la executant, în cele 60 de zile.
 2. **„Ia-ți CF-ul nou după cadastrul sistematic”**: extras CF pe numărul nou, cu serviciile existente.
-3. **Un singur ghid pe site**, cu link spre pnccf.site: „Comuna ta e în cadastru sistematic? Ce se schimbă cu numărul CF”. Fără pagini pe comune (vezi `.claude/rules/content-and-seo.md`).
+3. **Un singur ghid pe site** (acum ideea principală), cu link spre pnccf.site: „Comuna ta e în cadastru sistematic? Ce se schimbă cu numărul CF”. Fără pagini pe comune (vezi `.claude/rules/content-and-seo.md`).
 
 Analiza tehnică a CF-urilor vechi pe partea de robot: `worker-ancpi/docs/cf-vechi-dezambiguizare.md` (repo separat).
