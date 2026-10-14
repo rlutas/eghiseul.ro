@@ -127,6 +127,13 @@ export interface GuideLink {
  */
 export const CURATED_GUIDES: GuideLink[] = [
   {
+    title: 'Facturi furnizori pentru contabil: checklist lunar',
+    slug: 'admin/facturi-furnizori-contabil',
+    category: 'plati',
+    description:
+      'Meta, Google, TikTok, OpenAI, Anthropic, Vercel… nu trimit factura în SPV. Din extrasul importat se face lista lunii; bifați Descărcată → Listată → Predată contabil pe fiecare furnizor.',
+  },
+  {
     title: 'Plată extra încasată fără factură: ce faceți',
     slug: 'admin/factura-plata-extra-neemisa',
     category: 'plati',

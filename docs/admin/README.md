@@ -434,3 +434,4 @@ For the full security audit, see [Security Audit](./security-audit.md).
 | `src/app/api/admin/dashboard/stats/route.ts` | GET dashboard statistics |
 | `src/app/api/admin/dashboard/activity/route.ts` | GET recent activity |
 - [Plată extra încasată fără factură: ce faceți](factura-plata-extra-neemisa.md)
+- [Facturi furnizori pentru contabil: checklist lunar](facturi-furnizori-contabil.md)

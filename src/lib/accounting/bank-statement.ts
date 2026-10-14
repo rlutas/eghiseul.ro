@@ -7,6 +7,7 @@
  * Dates are DD/MM/YYYY, amounts use dot decimals. Reference is unique per tx.
  */
 import { createAdminClient } from '@/lib/supabase/admin';
+import { SUPPLIER_RULES, posMerchant } from '@/lib/accounting/supplier-invoices';
 
 export interface BankEntry {
   reference: string;
@@ -120,6 +121,15 @@ const RULES: Array<{
   {
     test: (d) => /ORANGE|VODAFONE|TELEKOM|DIGI\b/i.test(d),
     category: 'telecom',
+  },
+  {
+    // Furnizori cunoscuți fără factură în SPV (Meta, Google Ads, TikTok…),
+    // indiferent de monedă: Meta/Google/TikTok taxează în RON, iar regula de
+    // valută de mai jos nu-i prindea (14.10.2026, facturi lipsă la contabil).
+    test: (d, _t, c) => !c && SUPPLIER_RULES.some((r) => r.test.test(d)),
+    category: 'furnizor_extern',
+    needsInvoice: true,
+    counterparty: (d) => posMerchant(d) ?? SUPPLIER_RULES.find((r) => r.test.test(d))?.label ?? null,
   },
   {
     // POS payments in foreign currency — the supplier invoice must be

@@ -3,8 +3,8 @@
 /**
  * /admin/decontari/banca — extras de cont BT: upload CSV, categorii automate
  * (Stripe, traduceri, ONRC, furnizori externi, salarii, comisioane…),
- * match automat payout↔bancă, semnal „factură furnizor de listat" pentru
- * plățile externe (Vercel, Google — nu apar în SPV).
+ * match automat payout↔bancă. Facturile de furnizor fără SPV (Meta, Google,
+ * Vercel…) se bifează în /admin/decontari/facturi-furnizori.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { SupplierInvoicesBanner } from '../supplier-invoices-banner';
 
 interface Entry {
   reference: string;
@@ -60,6 +61,7 @@ export default function BancaPage() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [month, setMonth] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [imports, setImports] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -89,6 +91,7 @@ export default function BancaPage() {
         toast.warning(`${unmatchedClientCredits} încasări de la clienți fără comandă pereche — verifică-le manual`);
       toast.success(`Import: ${imported} mișcări · ${payoutsMatched} decontări confirmate în bancă`);
       if (unmatchedStripeCredits > 0) toast.warning(`${unmatchedStripeCredits} încasări Stripe fără payout pereche (probabil în afara ferestrei sincronizate)`);
+      setImports((n) => n + 1);
       await load();
     } catch (err) {
       toast.error(`Import eșuat: ${err instanceof Error ? err.message : err}`);
@@ -104,7 +107,6 @@ export default function BancaPage() {
     s.count++; s.debit += e.debit_bani; s.credit += e.credit_bani;
     summary.set(e.category, s);
   }
-  const needInvoice = entries.filter((e) => e.needs_invoice);
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
@@ -128,24 +130,8 @@ export default function BancaPage() {
         </div>
       </div>
 
-      {/* Furnizori externi — facturi de listat pentru contabil */}
-      {needInvoice.length > 0 && (
-        <Card className="border-red-200">
-          <CardContent className="p-4">
-            <p className="font-semibold text-red-800 mb-2 flex items-center gap-1.5">
-              <AlertTriangle className="h-4 w-4" /> Furnizori externi — facturi de descărcat/listat pentru contabil (nu apar în SPV)
-            </p>
-            <ul className="text-sm space-y-1">
-              {needInvoice.map((e) => (
-                <li key={e.reference} className="flex justify-between gap-3">
-                  <span>{e.tx_date} · {e.counterparty ?? e.description?.slice(0, 60)}</span>
-                  <span className="font-medium whitespace-nowrap">{ron(e.debit_bani)} RON</span>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      )}
+      {/* Facturi furnizori fără SPV: checklist lunar în pagina dedicată. */}
+      <SupplierInvoicesBanner refreshKey={imports} />
 
       {/* Sumar categorii */}
       {summary.size > 0 && (

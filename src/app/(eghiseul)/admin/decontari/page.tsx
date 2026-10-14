@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { SupplierInvoicesBanner } from './supplier-invoices-banner';
 
 interface Payout {
   id: string;
@@ -100,6 +101,9 @@ export default function DecontariPage() {
           <Button asChild variant="outline" size="sm">
             <Link href="/admin/decontari/banca">Extras bancă</Link>
           </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/admin/decontari/facturi-furnizori">Facturi furnizori</Link>
+          </Button>
           <input
             type="month"
             value={month}
@@ -122,6 +126,8 @@ export default function DecontariPage() {
           </Button>
         </div>
       </div>
+
+      <SupplierInvoicesBanner />
 
       <Card>
         <CardContent className="p-0">
