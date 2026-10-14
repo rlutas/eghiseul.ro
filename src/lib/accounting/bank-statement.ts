@@ -77,9 +77,12 @@ const RULES: Array<{
     counterparty: () => 'ONRC București (taxe constatatoare)',
   },
   {
-    test: (d) => /FAN Curier|FANCOURIER|SAMEDAY/i.test(d),
+    // DHL Express se plătește prin portofelul MyBill: pe extras apare doar
+    // „Wallet payment from MyBil". Factura DHL vine în SPV (Raul, 14.10.2026).
+    test: (d) => /FAN Curier|FANCOURIER|SAMEDAY|DHL|Wallet payment from MyBil/i.test(d),
     category: 'curierat',
-    counterparty: (d) => (/SAMEDAY/i.test(d) ? 'Sameday' : 'Fan Courier'),
+    counterparty: (d) =>
+      /SAMEDAY/i.test(d) ? 'Sameday' : /DHL|MyBil/i.test(d) ? 'DHL Express (MyBill)' : 'Fan Courier',
   },
   {
     test: (d) => /SALARIU/i.test(d),

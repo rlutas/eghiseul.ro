@@ -2,9 +2,9 @@
 
 ## De ce există
 
-Unele cheltuieli le plătim cu cardul firmei la furnizori care **nu trimit factura în SPV**: Meta (Facebook/Instagram Ads), Google Ads, Google Cloud, TikTok Ads, OpenAI, Anthropic (Claude), Vercel, Supabase, Railway, Resend, Zoho, Amazon și **DHL Express** (pe extras apare ca „Wallet payment from MyBil”, pentru că DHL se plătește prin MyBill). Factura acestor furnizori stă doar în contul de pe site-ul lor. Dacă nu o descarcă nimeni, contabilul nu o are, iar cheltuiala apare în bancă fără document.
+Unele cheltuieli le plătim cu cardul firmei la furnizori care **nu trimit factura în SPV**: Meta (Facebook/Instagram Ads), Google Ads, Google Cloud, TikTok Ads, OpenAI, Anthropic (Claude), Vercel, Supabase, Railway, Resend, Zoho, Amazon. Factura acestor furnizori stă doar în contul de pe site-ul lor. Dacă nu o descarcă nimeni, contabilul nu o are, iar cheltuiala apare în bancă fără document.
 
-Furnizorii români plătiți prin ordin de plată (cabinetul de avocat, curierii, contabilitatea) **nu** apar aici: factura lor vine în SPV.
+Furnizorii români plătiți prin ordin de plată (cabinetul de avocat, curierii, contabilitatea) **nu** apar aici: factura lor vine în SPV. La fel DHL Express, deși îl plătim cu cardul (pe extras apare ca „Wallet payment from MyBil”).
 
 Lista se face singură din extrasul de cont importat. Voi doar bifați.
 
