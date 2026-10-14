@@ -43,9 +43,25 @@ export interface TouchPoint {
   at: string;
 }
 
+/**
+ * Ultimul click pe un card de serviciu dintr-un articol sau calculator
+ * (banda de produse, cardul din dreapta, bara fixă, caseta din text). Spune
+ * CE pagină de conținut a vândut, nu doar unde a aterizat omul.
+ */
+export interface ContentClick {
+  /** Pagina pe care era (ex. `/cadastru-sistematic/`). */
+  page: string;
+  /** band | rail | sticky_bar | inline */
+  placement: string;
+  /** Slug-ul serviciului pe care a dat click. */
+  service: string;
+  at: string;
+}
+
 export interface Attribution {
   first: TouchPoint;
   last: TouchPoint;
+  content?: ContentClick;
   /** Momentul ultimei actualizări — folosit ca să detectăm sesiune nouă. */
   updated: string;
 }
@@ -154,6 +170,33 @@ export function captureAttribution(): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
   } catch {
     // localStorage indisponibil (mod privat, cote depășite) — mergem mai departe
+  }
+}
+
+/**
+ * Reține click-ul pe un card de serviciu din conținut. Suprascrie click-ul
+ * anterior: contează ultima pagină care l-a trimis spre comandă.
+ */
+export function recordContentClick(click: Omit<ContentClick, 'at' | 'page'>): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const now = new Date().toISOString();
+    const content: ContentClick = {
+      page: window.location.pathname.slice(0, 200),
+      placement: click.placement.slice(0, 40),
+      service: click.service.slice(0, 80),
+      at: now,
+    };
+    const stored = read();
+    if (stored) {
+      stored.content = content;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+    } else {
+      const touch = readCurrentTouch();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ first: touch, last: touch, updated: now, content }));
+    }
+  } catch {
+    // atribuirea nu are voie să blocheze navigarea
   }
 }
 

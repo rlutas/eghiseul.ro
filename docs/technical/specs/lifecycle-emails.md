@@ -135,3 +135,20 @@ Nu măsurăm deschideri (Apple Mail Privacy Protection le umflă).
 - Recovery-ul în 3 pași e separat, în cronul `recovery-emails` (livrat tot 14.09) — vezi
   `docs/admin/abandoned-carts.md` Layer 2.
 - Preview fizic al tuturor șabloanelor pe o adresă: `npx tsx scripts/email-previews.ts <email>`.
+
+## Conținut — `GET /api/admin/marketing/content?days=30` + cardul „Ce pagini aduc comenzi”
+
+Din 14.10.2026. Grupează comenzile începute în interval după pagina de conținut
+(articol, calculator, unealtă) de pe care au pornit, cu `contentSource()` din
+`src/lib/analytics/content-attribution.ts`:
+
+- `click` — `orders.attribution.content`: ultimul click pe un card de serviciu
+  (`TrackedLink` → `recordContentClick()`; `placement` = band / rail /
+  sticky_bar / inline, `service` = slug);
+- `landing` — altfel, `last.landing` apoi `first.landing`, dacă e articol
+  (`ARTICLES`), `/calculator/…` sau `/tools/…`.
+
+Răspuns: `{ days, ordersWithAttribution, started, paid, rows: [{ page, kind,
+started, paid, revenueRon, clickStarted, clickPaid, placements, services }] }`.
+Permisiune `settings.manage`. Pagina comenzii arată același lucru în
+„Proveniență client” („Din conținut: …”).

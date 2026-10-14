@@ -22,6 +22,7 @@ import { toast } from 'sonner';
 import { LifecycleEmailsCard } from './lifecycle-card';
 import { CampaignsCard } from './campaigns-card';
 import { MarketingKpisCard } from './kpis-card';
+import { ContentAttributionCard } from './content-card';
 
 interface Subscriber {
   id: string;
@@ -228,6 +229,7 @@ export default function AdminMarketingPage() {
   return (
     <div className="space-y-5">
       <MarketingKpisCard />
+      <ContentAttributionCard />
       <LifecycleEmailsCard />
       <CampaignsCard />
       <WarmupCampaignCard />

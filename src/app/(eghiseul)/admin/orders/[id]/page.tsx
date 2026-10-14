@@ -1,6 +1,7 @@
 'use client';
 
 import { classifyAttribution, CHANNEL_LABEL } from '@/lib/analytics/attribution-channel';
+import { contentSource, PLACEMENT_LABEL } from '@/lib/analytics/content-attribution';
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -109,6 +110,8 @@ type AnyObj = Record<string, any>;
 interface OrderAttribution {
   first?: AttributionTouch;
   last?: AttributionTouch;
+  /** Last click on a service card in an article/calculator (since 14.10.2026). */
+  content?: { page?: string; placement?: string; service?: string; at?: string };
 }
 interface AttributionTouch {
   utm_source?: string;
@@ -2855,6 +2858,25 @@ export default function AdminOrderDetailPage() {
                   <span className="text-neutral-500">Canal: </span>
                   <span className="font-semibold text-neutral-900">{CHANNEL_LABEL[c.channel]}</span>
                   <span className="text-neutral-500"> · {c.source}</span>
+                </p>
+              );
+            })()}
+            {(() => {
+              const cs = contentSource(order.attribution);
+              if (!cs) return null;
+              return (
+                <p className="text-sm">
+                  <span className="text-neutral-500">Din conținut: </span>
+                  <a href={cs.page} target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-neutral-900 underline">
+                    {cs.page}
+                  </a>
+                  <span className="text-neutral-500">
+                    {' '}
+                    · {cs.kind} ·{' '}
+                    {cs.via === 'click'
+                      ? `click pe ${PLACEMENT_LABEL[cs.placement ?? ''] ?? 'card'}${cs.service ? ` (${cs.service})` : ''}`
+                      : 'a aterizat aici'}
+                  </span>
                 </p>
               );
             })()}
