@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
   const ordersTable = admin.from('orders') as any;
   let query = ordersTable
     .select(
-      'id, order_number, friendly_order_id, status, total_price, customer_data, created_at, updated_at, phone_contacted_at, phone_contacted_by, phone_contact_notes, recovery_email_step, current_step, manual_recovery_email_at, manual_recovery_email_by, services(name, slug)'
+      'id, order_number, friendly_order_id, status, total_price, customer_data:customer_data_list, created_at, updated_at, phone_contacted_at, phone_contacted_by, phone_contact_notes, recovery_email_step, current_step, manual_recovery_email_at, manual_recovery_email_by, services(name, slug)'
     )
     .in('status', ['abandoned', 'draft'])
     .gte('created_at', minIso)

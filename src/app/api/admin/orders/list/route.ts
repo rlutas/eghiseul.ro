@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
         delivery_method,
         is_test,
         platform,
-        customer_data,
+        customer_data:customer_data_list,
         selected_options,
         created_at,
         paid_at,
