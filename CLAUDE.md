@@ -69,6 +69,15 @@ fișier `docs/changelog/YYYY-MM-DD-<slug>.md` care începe cu
 Procedură nouă pentru echipă → `docs/admin/<slug>.md` + `CURATED_GUIDES` în
 `src/lib/knowledge/docs.ts`. Detalii: `.claude/rules/documentation.md`.
 
+### Commit-uri: repo PUBLIC, doar căi explicite
+
+`rlutas/eghiseul.ro` e public. `git add` DOAR pe fișierele modificate, cu cale
+exactă — niciodată `git add docs`, `git add .`, `git add -A`. Fișierele
+necomise de dinaintea sesiunii sunt ale lui Raul: nu intră în commit. Citește
+`git status --short` înainte de `git commit`. Date personale (echipă, clienți,
+plângeri, acte) nu stau în `docs/`. Incident: 14.10.2026, plângerile ANSPDCP
+ale echipei publicate prin `git add docs`.
+
 ### Worktree-uri
 
 Lucrul în paralel (agenți, branch-uri) se face DOAR în `<repo>/.claude/worktrees/<nume>`,
