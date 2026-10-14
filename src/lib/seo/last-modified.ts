@@ -30,7 +30,7 @@ export const PAGE_LAST_MODIFIED: Record<string, string> = {
   'cazier-si-certificat-de-integritate-pentru-profesori': '2026-07-29',
   'cazier-judiciar-vs-certificat-integritate-comportamentala': '2026-06-16',
   'cele-4-tipuri-de-certificat-constatator-online': '2026-08-28',
-  'cum-aflam-numarul-carte-functionara-si-nr-cadastral': '2026-09-09',
+  'cum-aflam-numarul-carte-functionara-si-nr-cadastral': '2026-10-14',
   'cum-vor-arata-documentele-de-stare-civila-2025': '2026-09-09',
   'eliberare-certificat-constatator-onrc-ghid': '2026-09-09',
   'extras-carte-funciara-gratuit': '2026-07-13',
