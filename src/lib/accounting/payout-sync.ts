@@ -77,6 +77,8 @@ export function isOrderUuid(value: string | null | undefined): value is string {
 interface TxRow {
   /** Transient: charge metadata.orderId (extra charges lack orderNumber). */
   _orderId?: string | null;
+  /** Extra payment collected without its own invoice: must stay unbilled (never re-filled from the DB). */
+  _unbilledExtra?: boolean;
   id: string;
   payout_id: string;
   type: string;
@@ -172,6 +174,7 @@ async function enrichEghiseul(rows: TxRow[]) {
       // Extra payment collected without its own invoice: show it as unbilled,
       // never with the order's main invoice (see unbilledExtraForRow).
       const u = unbilled;
+      r._unbilledExtra = true;
       r.invoice_number = null;
       r.invoice_url = null;
       r.description = `${r.description ?? ''} · plată extra, factură neemisă${u?.proformaNumber ? ` (proforma ${u.proformaNumber})` : ''}`.trim();
@@ -249,6 +252,7 @@ async function enrichCjo(rows: TxRow[], errors: string[]) {
       // Extra payment collected without its own invoice: show it as unbilled,
       // never with the order's main invoice (see unbilledExtraForRow).
       const u = unbilled;
+      r._unbilledExtra = true;
       r.invoice_number = null;
       r.invoice_url = null;
       r.description = `${r.description ?? ''} · plată extra, factură neemisă${u?.proformaNumber ? ` (proforma ${u.proformaNumber})` : ''}`.trim();
@@ -524,7 +528,7 @@ export async function syncPayouts(opts: { sinceDays?: number } = {}): Promise<Pa
         for (const r of rows) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const prev = keep.get(r.id) as any;
-          if (prev && !r.invoice_number) {
+          if (prev && !r.invoice_number && !r._unbilledExtra) {
             r.invoice_number = prev.invoice_number;
             r.invoice_url = r.invoice_url ?? prev.invoice_url;
             r.client_name = r.client_name ?? prev.client_name;
@@ -558,7 +562,7 @@ export async function syncPayouts(opts: { sinceDays?: number } = {}): Promise<Pa
       if (pErr) throw new Error(pErr.message);
 
       if (rows.length) {
-        const persistable = rows.map(({ _orderId, ...rest }) => { void _orderId; return rest; });
+        const persistable = rows.map(({ _orderId, _unbilledExtra, ...rest }) => { void _orderId; void _unbilledExtra; return rest; });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error: tErr } = await (admin as any).from('stripe_payout_transactions').upsert(persistable);
         if (tErr) throw new Error(tErr.message);
