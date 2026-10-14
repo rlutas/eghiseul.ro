@@ -5795,6 +5795,7 @@ const PROPERTY_LABELS: Array<[string, string]> = [
   ['county', 'Județ'],
   ['locality', 'Comună / Oraș (UAT)'],
   ['imobilLocality', 'Sat / Localitate'],
+  ['imobilStreet', 'Strada și nr.'],
   ['propertyAddress', 'Adresa imobilului'],
   ['ownerName', 'Proprietar (nume complet)'],
   ['cadastral', 'Nr. cadastral'],

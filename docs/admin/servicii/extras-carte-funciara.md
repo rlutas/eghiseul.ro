@@ -25,6 +25,7 @@ serviciu cu avocat (doar contract de prestări). Livrare doar pe email.
    - **Județ** și **Comună / Oraș** din listă (nomenclatorul ANCPI, nu se poate scrie greșit);
    - **Sat / Localitate**, obligatoriu din 14.10.2026, cu sugestii din lista oficială de sate a comunei (poate scrie și altceva). O comună are mai multe sate, iar un număr de CF vechi se poate repeta în sate diferite ale aceleiași comune (cazul Drajna / Podurile);
    - **numărul de carte funciară** (implicit) și, la cărțile vechi, **nr. cadastral / topografic**;
+   - **strada și numărul**, opțional (la bloc: bl., sc., ap.);
    - **numele proprietarului din CF**, opțional, marcat „recomandat”: ajută la verificare când clientul a inversat nr. CF cu nr. cadastral.
 
    Butonul **„Nu știu”** îl trimite la serviciul „Identificare imobil după adresă” (298 lei), cu datele păstrate.

@@ -448,6 +448,25 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
               comuna, scrie-l din nou.
             </p>
           </div>
+
+          {/* Strada — opțională (cerută de Mircea, 14.10.2026): adresa din
+              rezultatele ePay e singura coloană care diferențiază două imobile
+              cu același nr. CF vechi. Pe identificare o acoperă textarea de adresă. */}
+          {!config.identificationService.enabled && (
+            <div className="space-y-2">
+              <Label htmlFor="imobil-street">
+                Strada și numărul{' '}
+                <span className="text-muted-foreground font-normal">(opțional)</span>
+              </Label>
+              <Input
+                id="imobil-street"
+                value={property.imobilStreet || ''}
+                onChange={(e) => updateProperty?.({ imobilStreet: e.target.value })}
+                placeholder="ex: Str. Principală nr. 12 (la bloc: bl., sc., ap.)"
+                autoComplete="off"
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -608,21 +627,10 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                   placeholder="ex: 123456 sau 7584/2-7583/2/3/2/V"
                 />
                 {cfCheck.status === 'old_format' && (
-                  <div className="space-y-1.5 pt-1">
-                    <Label htmlFor="propertyAddressOld" className="text-amber-800">
-                      Adresa imobilului (stradă, nr., bloc, scară, apartament)
-                    </Label>
-                    <Input
-                      id="propertyAddressOld"
-                      type="text"
-                      value={property.propertyAddress || ''}
-                      onChange={(e) => updateProperty?.({ propertyAddress: e.target.value })}
-                      placeholder="ex: Str. Soarelui nr. 5, Bl. 9, Sc. B, Ap. 13"
-                    />
-                    <p className="text-xs text-amber-700">
-                      Ne ajută să confirmăm că emitem extrasul exact pentru apartamentul tău.
-                    </p>
-                  </div>
+                  <p className="text-xs text-amber-700">
+                    La cărțile vechi, completează și strada și numărul de mai sus (la bloc: bl., sc.,
+                    ap.) — ne ajută să confirmăm că emitem extrasul exact pentru imobilul tău.
+                  </p>
                 )}
               </div>
               )}
@@ -956,15 +964,6 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                     updateProperty?.({ beneficiaryIdNumber: e.target.value.replace(/\D/g, '') })
                   }
                   placeholder="ex: 123456"
-                />
-              </div>
-              <div className="space-y-2 col-span-2">
-                <Label htmlFor="imobil-street">Strada și numărul imobilului</Label>
-                <Input
-                  id="imobil-street"
-                  value={property.imobilStreet || ''}
-                  onChange={(e) => updateProperty?.({ imobilStreet: e.target.value })}
-                  placeholder="ex: Grivitei nr. 1"
                 />
               </div>
             </div>
