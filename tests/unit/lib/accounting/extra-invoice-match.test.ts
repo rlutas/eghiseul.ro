@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   extraInvoiceForRow,
   unbilledExtraForRow,
+  listUnbilledExtras,
   parseOblioProformaDesc,
   pickInvoiceForProforma,
   type ExtraBillingEntry,
@@ -168,5 +169,18 @@ describe('unbilledExtraForRow (E-260817-J2BXD, 14.10.2026)', () => {
 
   it('never guesses by amount', () => {
     expect(unbilledExtraForRow(entries, { payment_intent_id: null, gross_bani: 20000 })).toBeNull();
+  });
+});
+
+describe('listUnbilledExtras', () => {
+  it('lists paid extras without an invoice, ignores unpaid and invoiced ones', () => {
+    expect(
+      listUnbilledExtras([
+        { amount: 200, paidAt: '2026-09-03T11:05:12Z', invoice: null, proforma: { seriesName: 'PEGH', number: '0008' } },
+        { amount: 50, paidAt: null, invoice: null },
+        { amount: 80, paidAt: '2026-09-01T10:00:00Z', invoice: { seriesName: 'EGH', number: '0700' } },
+      ]),
+    ).toEqual([{ amount: 200, paidAt: '2026-09-03T11:05:12Z', proformaNumber: 'PEGH-0008' }]);
+    expect(listUnbilledExtras(null)).toEqual([]);
   });
 });

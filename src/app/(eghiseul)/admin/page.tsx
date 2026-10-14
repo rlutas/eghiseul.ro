@@ -68,6 +68,8 @@ interface DashboardStats {
   // Breakdowns rendered as horizontal bar charts on the dashboard.
   statusDistribution: Array<{ status: string; count: number }>;
   serviceBreakdown: Array<{ slug: string; name: string; count: number; revenue: number }>;
+  /** Extra payments collected without a fiscal invoice. */
+  unbilledExtras?: Array<{ orderId: string; ref: string; amount: number | null; paidAt: string | null; proformaNumber: string | null }>;
 }
 
 interface ActivityItem {
@@ -296,6 +298,35 @@ export default function AdminDashboardPage() {
           </Button>
         </div>
       </div>
+
+      {/* Plăți extra încasate fără factură: avertisment până se rezolvă. */}
+      {stats?.unbilledExtras && stats.unbilledExtras.length > 0 && (
+        <div className="rounded-lg border-2 border-red-400 bg-red-50 p-4" role="alert">
+          <p className="font-semibold text-red-900">
+            {stats.unbilledExtras.length === 1
+              ? '1 plată extra încasată fără factură'
+              : `${stats.unbilledExtras.length} plăți extra încasate fără factură`}
+          </p>
+          <p className="mt-1 text-sm text-red-800">
+            Factura se emite automat din proformă după plată; aici emiterea a eșuat. Cronul reîncearcă din oră în
+            oră. Dacă rămâne aici, emiteți factura din proformă în Oblio.
+          </p>
+          <ul className="mt-2 space-y-1 text-sm">
+            {stats.unbilledExtras.map((u, i) => (
+              <li key={`${u.orderId}-${i}`}>
+                <Link href={`/admin/orders/${u.orderId}`} className="font-mono font-semibold text-red-900 underline">
+                  {u.ref}
+                </Link>
+                <span className="text-red-800">
+                  {u.amount != null ? ` · ${u.amount.toFixed(2)} RON` : ''}
+                  {u.paidAt ? ` · plătit ${new Date(u.paidAt).toLocaleDateString('ro-RO')}` : ''}
+                  {u.proformaNumber ? ` · proforma ${u.proformaNumber}` : ''}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Row 1: KPI cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

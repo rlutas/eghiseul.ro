@@ -127,6 +127,13 @@ export interface GuideLink {
  */
 export const CURATED_GUIDES: GuideLink[] = [
   {
+    title: 'Plată extra încasată fără factură: ce faceți',
+    slug: 'admin/factura-plata-extra-neemisa',
+    category: 'plati',
+    description:
+      'După plata unei proforme extra, factura se emite automat. Dacă Oblio nu răspunde, apare un avertisment roșu pe comandă și pe dashboard; cronul reîncearcă orar, iar dacă rămâne o zi, se emite factura din proformă și se anunță contabilitatea.',
+  },
+  {
     title: 'Recuperare telefonică: sunăm zilnic clienții care n-au plătit',
     slug: 'admin/recuperare-telefonica',
     category: 'clienti',

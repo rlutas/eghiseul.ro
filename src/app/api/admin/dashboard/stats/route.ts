@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
+import { listUnbilledExtras } from '@/lib/accounting/extra-invoice-match';
 import {
   aggregateStatusDistribution,
   aggregateServiceRevenue,
@@ -265,9 +266,26 @@ export async function GET() {
     const recovered = recoveryRecovered30dRes.count || 0;
     const recoveryRate = computeRecoveryRatePercent({ emailsSent, recovered });
 
+    // Extra payments collected without a fiscal invoice (fresh builder).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: extraRows } = await (adminClient.from('orders') as any)
+      .select('id, friendly_order_id, extra_billing, is_test')
+      .not('extra_billing', 'is', null)
+      .limit(1000);
+    const unbilledExtras = ((extraRows ?? []) as { id: string; friendly_order_id: string | null; extra_billing: unknown; is_test: boolean | null }[])
+      .filter((r) => !r.is_test)
+      .flatMap((r) =>
+        listUnbilledExtras(r.extra_billing as Parameters<typeof listUnbilledExtras>[0]).map((u) => ({
+          orderId: r.id,
+          ref: r.friendly_order_id ?? r.id,
+          ...u,
+        })),
+      );
+
     return NextResponse.json({
       success: true,
       data: {
+        unbilledExtras,
         ordersToday: ordersTodayRes.count || 0,
         ordersYesterday: ordersYesterdayRes.count || 0,
         revenueMonth: Math.round(revenueMonth * 100) / 100,

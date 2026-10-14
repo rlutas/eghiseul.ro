@@ -281,8 +281,9 @@ export async function POST(request: NextRequest) {
     const { data: withExtra } = await ordersTable()
       .select('id, friendly_order_id, order_number, customer_data, extra_billing')
       .not('extra_billing', 'is', null)
-      .gte('updated_at', new Date(now - 14 * 24 * 60 * 60 * 1000).toISOString())
-      .limit(100);
+      // No date window: an unbilled extra stays a problem until it's invoiced
+      // (E-260817-J2BXD sat unbilled for 6 weeks behind a 14-day window).
+      .limit(1000);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const needingHeal = ((withExtra ?? []) as any[]).filter((o) =>

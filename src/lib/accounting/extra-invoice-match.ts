@@ -187,3 +187,33 @@ export function pickInvoiceForProforma(
   });
   return candidates.length === 1 ? candidates[0] : null;
 }
+
+/** A collected extra payment that still has no fiscal invoice (admin warnings). */
+export interface UnbilledExtra {
+  amount: number | null;
+  paidAt: string | null;
+  proformaNumber: string | null;
+}
+
+/**
+ * Extra payments that were PAID (paidAt set) but have no invoice yet. The
+ * webhook issues the invoice from the proforma right after payment; when Oblio
+ * fails, the hourly cron retries. This list feeds the red warnings on the
+ * order page and the admin dashboard so a failure can't stay silent for weeks
+ * (E-260817-J2BXD: 03.09 → found by the accountant on 14.10.2026).
+ */
+export function listUnbilledExtras(
+  entries: (ExtraBillingEntry & { paidAt?: string | null; proforma?: ExtraInvoiceRef | null })[] | null | undefined
+): UnbilledExtra[] {
+  if (!Array.isArray(entries)) return [];
+  return entries
+    .filter((e) => !!e.paidAt && !(e.invoice && e.invoice.number))
+    .map((e) => ({
+      amount: e.amount != null ? Number(e.amount) : e.amount_bani != null ? Number(e.amount_bani) / 100 : null,
+      paidAt: e.paidAt ?? null,
+      proformaNumber:
+        e.proforma && e.proforma.number
+          ? `${(e.proforma.seriesName ?? '').toString().trim()}-${e.proforma.number.toString().trim()}`.replace(/^-/, '')
+          : null,
+    }));
+}

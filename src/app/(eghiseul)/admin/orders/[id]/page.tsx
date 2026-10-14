@@ -1,6 +1,7 @@
 'use client';
 
 import { classifyAttribution, CHANNEL_LABEL } from '@/lib/analytics/attribution-channel';
+import { listUnbilledExtras } from '@/lib/accounting/extra-invoice-match';
 import { contentSource, PLACEMENT_LABEL } from '@/lib/analytics/content-attribution';
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
@@ -2385,7 +2386,7 @@ export default function AdminOrderDetailPage() {
                           )
                         ) : (
                           <span className="text-xs font-semibold text-amber-600" title="Webhook-ul nu a reușit emiterea; cron-ul orar o emite automat.">
-                            ⚠️ neemisă — se emite automat
+                            ⚠️ neemisă (vezi avertismentul de sus)
                           </span>
                         )}
                         {eb.proforma?.number && (
@@ -3579,10 +3580,31 @@ function ExtraPaymentBanners({ order, onRefresh }: { order: OrderDetail; onRefre
     }
   };
 
-  if (!pendingUrl && additionalPaid <= 0) return null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const unbilled = listUnbilledExtras(o.extra_billing as any);
+
+  if (!pendingUrl && additionalPaid <= 0 && unbilled.length === 0) return null;
 
   return (
     <>
+      {unbilled.length > 0 && (
+        <div className="rounded-lg border-2 border-red-400 bg-red-50 p-4" role="alert">
+          <p className="text-sm font-semibold text-red-900">Plată extra încasată fără factură</p>
+          <ul className="mt-1 text-sm text-red-800">
+            {unbilled.map((u, i) => (
+              <li key={i}>
+                {u.amount != null ? `${u.amount.toFixed(2)} RON` : 'Sumă necunoscută'}
+                {u.paidAt ? `, plătit ${new Date(u.paidAt).toLocaleDateString('ro-RO')}` : ''}
+                {u.proformaNumber ? `, proforma ${u.proformaNumber}` : ''}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1 text-xs text-red-800">
+            Factura se emite automat din proformă după plată; aici a eșuat. Cronul reîncearcă din oră în oră.
+            Dacă rămâne, emiteți factura din proformă în Oblio și anunțați contabilitatea.
+          </p>
+        </div>
+      )}
       {additionalPaid > 0 && (
         <div className="rounded-lg border-2 border-emerald-300 bg-emerald-50 p-4">
           <p className="text-sm font-semibold text-emerald-900">
