@@ -4,16 +4,12 @@ import { ChevronRight, CalendarDays, RefreshCw, ArrowRight, Phone, PenLine } fro
 import { Footer } from '@/components/home/footer';
 import { Button } from '@/components/ui/button';
 import { ServiceFAQ } from '@/components/services/service-faq';
-import { buildArticlePageGraph, serviceUrl, BASE_URL, SITE_AUTHOR } from '@/lib/seo';
+import { buildArticlePageGraph, BASE_URL, SITE_AUTHOR } from '@/lib/seo';
+import { getServiceCards, type RelatedServiceInput } from '@/lib/articles/service-cards';
+import { ArticleRailCard, ArticleServiceCards } from './article-service-cards';
+import { ArticleStickyBar } from './article-sticky-bar';
 
-export interface RelatedService {
-  /** DB service slug — resolved through serviceUrl(). Ignored if `href` is set. */
-  slug?: string;
-  /** Explicit href for non-service targets (calculators, tools, other articles). */
-  href?: string;
-  label: string;
-  desc: string;
-}
+export type RelatedService = RelatedServiceInput;
 
 export interface ArticleLayoutProps {
   slug: string; // root-path slug (no leading slash)
@@ -39,7 +35,7 @@ export interface ArticleLayoutProps {
   children: React.ReactNode;
 }
 
-export function ArticleLayout({
+export async function ArticleLayout({
   slug,
   category,
   title,
@@ -57,6 +53,10 @@ export function ArticleLayout({
 }: ArticleLayoutProps) {
   // Featured image: derive from slug by convention unless explicitly passed.
   const featuredImage = image ?? `/images/articole/${slug}.webp`;
+  // Products for the bottom band, the desktop rail and the phone bar. The
+  // first service in `relatedServices` is the article's main product.
+  const { cards, guides } = await getServiceCards(relatedServices);
+  const mainCard = cards[0] ?? null;
 
   const jsonLdGraph = buildArticlePageGraph({
     slug,
@@ -136,7 +136,14 @@ export function ArticleLayout({
 
         {/* Body */}
         <article className="py-10 lg:py-14 bg-white">
-          <div className="container mx-auto px-4 max-w-[760px]">
+          <div
+            className={
+              mainCard
+                ? 'container mx-auto px-4 max-w-[760px] xl:max-w-[1100px] xl:grid xl:grid-cols-[minmax(0,760px)_280px] xl:justify-center xl:gap-12'
+                : 'container mx-auto px-4 max-w-[760px]'
+            }
+          >
+            <div className="min-w-0">
             {/* Featured image — overlaps the dark hero for a polished header */}
             <div className="relative -mt-16 lg:-mt-24 mb-8 overflow-hidden rounded-2xl border border-neutral-200 shadow-lg aspect-[16/9] bg-neutral-100">
               <Image
@@ -162,38 +169,21 @@ export function ArticleLayout({
             >
               {children}
             </div>
+            </div>
+            {mainCard && (
+              <aside className="hidden xl:block" aria-label="Documentul legat de acest articol">
+                <ArticleRailCard card={mainCard} />
+              </aside>
+            )}
           </div>
         </article>
 
-        {/* Related services CTA */}
-        {relatedServices.length > 0 && (
-          <section className="py-12 lg:py-16 bg-neutral-50">
-            <div className="container mx-auto px-4 max-w-[860px]">
-              <h2 className="text-xl sm:text-2xl font-bold text-secondary-900 mb-6 text-center">
-                Servicii eGhișeul legate de acest articol
-              </h2>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {relatedServices.map((s) => (
-                  <Link
-                    key={s.href ?? s.slug}
-                    href={s.href ?? serviceUrl(s.slug as string)}
-                    className="group flex items-start gap-3 rounded-2xl border border-neutral-200 bg-white p-5 hover:border-primary-300 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
-                  >
-                    <div>
-                      <p className="font-bold text-secondary-900 group-hover:text-primary-700">{s.label}</p>
-                      <p className="text-sm text-neutral-600">{s.desc}</p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-neutral-400 ml-auto flex-shrink-0 mt-1 group-hover:text-primary-600" aria-hidden="true" />
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+        {/* Related services as products (navy band, distinct from the FAQ) */}
+        <ArticleServiceCards cards={cards} guides={guides} />
 
         {/* FAQ */}
         {faqs && faqs.length > 0 && (
-          <ServiceFAQ title="Întrebări Frecvente" faqs={faqs} />
+          <ServiceFAQ title="Întrebări Frecvente" faqs={faqs} twoColumns={false} />
         )}
 
         {/* CTA */}
@@ -239,6 +229,7 @@ export function ArticleLayout({
         </section>
       </main>
 
+      {mainCard && <ArticleStickyBar card={mainCard} />}
       <Footer />
     </>
   );

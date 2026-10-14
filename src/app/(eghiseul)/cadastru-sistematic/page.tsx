@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { buildPageMetadata, serviceUrl } from '@/lib/seo';
 import { ArticleLayout } from '@/components/articole/article-layout';
+import { ArticleInlineCta } from '@/components/articole/article-service-cards';
+import { getServiceCards } from '@/lib/articles/service-cards';
 
 const SLUG = 'cadastru-sistematic';
 const TITLE = 'Cadastru sistematic: afișarea publică, rectificarea în 60 de zile și cartea funciară nouă';
@@ -25,7 +27,11 @@ export const metadata = buildPageMetadata({
   ogImage: `/images/articole/${SLUG}.webp`,
 });
 
-export default function Page() {
+export default async function Page() {
+  const {
+    cards: [extrasCf],
+  } = await getServiceCards([{ slug: 'extras-carte-funciara', label: 'Extras de carte funciară', desc: '' }]);
+
   return (
     <ArticleLayout
       slug={SLUG}
@@ -341,6 +347,13 @@ export default function Page() {
           și art. 466 alin. 6).
         </li>
       </ul>
+      {extrasCf && (
+        <ArticleInlineCta
+          card={extrasCf}
+          title="Ai nevoie de extrasul pe numărul nou?"
+          text="Îl obținem de la ANCPI și ți-l trimitem pe email. La comandă scrii comuna, satul și numărul de carte funciară."
+        />
+      )}
 
       <h2>Ce ai de făcut, pas cu pas</h2>
       <ol>

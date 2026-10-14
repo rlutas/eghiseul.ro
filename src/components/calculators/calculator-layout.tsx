@@ -6,6 +6,9 @@ import { Footer } from '@/components/home/footer';
 import { NewsletterPopup } from '@/components/calculators/newsletter-popup';
 import { WebMcpTools } from '@/components/calculators/webmcp-tools';
 import { BASE_URL } from '@/lib/seo';
+import { getServiceCards } from '@/lib/articles/service-cards';
+import { ArticleServiceCards } from '@/components/articole/article-service-cards';
+import { ArticleStickyBar } from '@/components/articole/article-sticky-bar';
 import { organizationNode, websiteNode, breadcrumbNode } from '@/lib/seo/schema';
 
 export interface CalculatorLayoutProps {
@@ -52,23 +55,25 @@ function lunaAnul(iso: string): string {
  * subiectul calculatorului. Mapare per slug, cu fallback pe setul default.
  */
 interface RelatedService {
+  /** DB slug → product card (price, term, document). Without it: plain link. */
+  slug?: string;
   href: string;
   label: string;
   desc: string;
 }
 
 const SVC = {
-  cazier: { href: '/servicii/cazier-judiciar-online/', label: 'Cazier judiciar online', desc: 'Eliberat rapid, 100% online — pentru angajare, licitații sau străinătate.' },
-  cazierAuto: { href: '/servicii/cazier-auto-online/', label: 'Cazier auto online', desc: 'Istoricul sancțiunilor rutiere, fără drum la poliție.' },
-  cazierFiscal: { href: '/servicii/cazier-fiscal-online/', label: 'Cazier fiscal online', desc: 'De la ANAF, necesar la înființare firmă sau licitații.' },
-  extrasCF: { href: '/servicii/extras-de-carte-funciara/', label: 'Extras de carte funciară online', desc: 'Automat, în câteva minute, 24/7 — fără cont ANCPI.' },
-  constatator: { href: '/servicii/certificat-constatator-online/', label: 'Certificat constatator online', desc: 'De la ONRC, doar cu CUI-ul firmei — eliberare instant, 24/7.' },
-  nastere: { href: '/servicii/eliberare-certificat-de-nastere/', label: 'Certificat de naștere online', desc: 'Duplicat eliberat oficial, livrat oriunde.' },
-  casatorie: { href: '/servicii/eliberare-certificat-de-casatorie/', label: 'Certificat de căsătorie online', desc: 'Duplicat de la Starea Civilă — cerut la dosarul de pensie când numele diferă de cel din acte.' },
-  multilingvNastere: { href: '/servicii/extras-multilingv-certificat-nastere/', label: 'Extras multilingv de naștere', desc: 'Fără traducere și fără apostilă în statele Convenției CIEC nr. 16, pentru dosare depuse în străinătate.' },
-  identificareImobil: { href: '/servicii/identificare-imobil/', label: 'Identificare imobil', desc: 'Afli numărul de CF și cadastral când ai doar date vechi.' },
-  copieCF: { href: '/servicii/copie-carte-funciara/', label: 'Copie carte funciară', desc: 'Copia CF-ului vechi, cu istoricul înscrierilor.' },
-  urbanism: { href: '/servicii/certificat-urbanism-informare/', label: 'Certificat de urbanism pentru informare', desc: 'Afli ce se poate construi pe teren ÎNAINTE să cumperi — restricții, POT/CUT, interdicții.' },
+  cazier: { slug: 'cazier-judiciar', href: '/servicii/cazier-judiciar-online/', label: 'Cazier judiciar online', desc: 'Eliberat rapid, 100% online — pentru angajare, licitații sau străinătate.' },
+  cazierAuto: { slug: 'cazier-auto', href: '/servicii/cazier-auto-online/', label: 'Cazier auto online', desc: 'Istoricul sancțiunilor rutiere, fără drum la poliție.' },
+  cazierFiscal: { slug: 'cazier-fiscal', href: '/servicii/cazier-fiscal-online/', label: 'Cazier fiscal online', desc: 'De la ANAF, necesar la înființare firmă sau licitații.' },
+  extrasCF: { slug: 'extras-carte-funciara', href: '/servicii/extras-de-carte-funciara/', label: 'Extras de carte funciară online', desc: 'Automat, în câteva minute, 24/7 — fără cont ANCPI.' },
+  constatator: { slug: 'certificat-constatator', href: '/servicii/certificat-constatator-online/', label: 'Certificat constatator online', desc: 'De la ONRC, doar cu CUI-ul firmei — eliberare instant, 24/7.' },
+  nastere: { slug: 'certificat-nastere', href: '/servicii/eliberare-certificat-de-nastere/', label: 'Certificat de naștere online', desc: 'Duplicat eliberat oficial, livrat oriunde.' },
+  casatorie: { slug: 'certificat-casatorie', href: '/servicii/eliberare-certificat-de-casatorie/', label: 'Certificat de căsătorie online', desc: 'Duplicat de la Starea Civilă — cerut la dosarul de pensie când numele diferă de cel din acte.' },
+  multilingvNastere: { slug: 'extras-multilingv-certificat-nastere', href: '/servicii/extras-multilingv-certificat-nastere/', label: 'Extras multilingv de naștere', desc: 'Fără traducere și fără apostilă în statele Convenției CIEC nr. 16, pentru dosare depuse în străinătate.' },
+  identificareImobil: { slug: 'identificare-imobil', href: '/servicii/identificare-imobil/', label: 'Identificare imobil', desc: 'Afli numărul de CF și cadastral când ai doar date vechi.' },
+  copieCF: { slug: 'copie-carte-funciara', href: '/servicii/copie-carte-funciara/', label: 'Copie carte funciară', desc: 'Copia CF-ului vechi, cu istoricul înscrierilor.' },
+  urbanism: { slug: 'certificat-urbanism-informare', href: '/servicii/certificat-urbanism-informare/', label: 'Certificat de urbanism pentru informare', desc: 'Afli ce se poate construi pe teren ÎNAINTE să cumperi — restricții, POT/CUT, interdicții.' },
   // Tool gratuit, nu serviciu — dar e pagina cu cele mai multe clicuri de pe site
   // (32.589 pe trei luni) și avea DOUĂ linkuri interne. Poziția i-a căzut de la
   // 5,95 la 31,92 după update (audit 09.09.2026).
@@ -213,7 +218,7 @@ const RELATED_BY_SLUG: Record<string, RelatedService[]> = {
   'pensie-alimentara': [SVC.nastere, SVC.cazier],
 };
 
-export function CalculatorLayout({
+export async function CalculatorLayout({
   slug,
   title,
   heading,
@@ -227,6 +232,13 @@ export function CalculatorLayout({
   const url = `${BASE_URL}/calculator/${slug}/`;
   const dataActualizarii = dateModified ?? DATE_MODIFIED_DEFAULT;
   const relatedCalcs = relatedCalculators(slug);
+  // Services with a DB slug become product cards (+ the sticky bar for the
+  // first one); the free tools (rovinietă) stay plain links.
+  const { cards, guides } = await getServiceCards(
+    (RELATED_BY_SLUG[slug] ?? DEFAULT_RELATED).map((s) =>
+      s.slug ? { slug: s.slug, label: s.label, desc: s.desc } : { href: s.href, label: s.label, desc: s.desc },
+    ),
+  );
   const actualizat = lunaAnul(dataActualizarii);
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -342,29 +354,8 @@ export function CalculatorLayout({
         {/* FAQ */}
         {faqs && faqs.length > 0 && <ServiceFAQ title="Întrebări frecvente" faqs={faqs} />}
 
-        {/* Related services — internal linking calculatoare → money pages */}
-        <section className="py-12 bg-neutral-50 border-t border-neutral-200">
-          <div className="container mx-auto px-4 max-w-[820px]">
-            <h2 className="text-xl lg:text-2xl font-extrabold text-secondary-900 mb-6">
-              Documente utile, 100% online
-            </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {(RELATED_BY_SLUG[slug] ?? DEFAULT_RELATED).map((s) => (
-                <Link
-                  key={s.href}
-                  href={s.href}
-                  className="group rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm hover:shadow-md hover:border-primary-300 transition-all"
-                >
-                  <p className="font-bold text-secondary-900 group-hover:text-primary-700 transition-colors mb-1.5 flex items-center gap-1.5">
-                    {s.label}
-                    <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
-                  </p>
-                  <p className="text-sm text-neutral-600 leading-relaxed">{s.desc}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Related services as products — internal linking calculatoare → money pages */}
+        <ArticleServiceCards cards={cards} guides={guides} />
 
         {/* Calculatoare înrudite — vezi nota de la CALC_CLUSTERS. */}
         {relatedCalcs.length > 0 && (
@@ -431,6 +422,7 @@ export function CalculatorLayout({
         </section>
       </main>
 
+      {cards[0] && <ArticleStickyBar card={cards[0]} allWidths />}
       <Footer />
       <NewsletterPopup />
       <WebMcpTools />
