@@ -23,7 +23,13 @@ export function DocumentThumb({
       className={`relative aspect-[1/1.414] w-full overflow-hidden rounded-md border border-neutral-200 bg-white shadow-sm ${className}`}
     >
       {card.image ? (
-        <Image src={card.image.src} alt={card.image.alt} fill sizes={sizes} className="object-contain" />
+        <Image
+          src={card.image.src}
+          alt={card.image.alt}
+          fill
+          sizes={sizes}
+          className={card.image.illustration ? 'object-cover' : 'object-contain'}
+        />
       ) : (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-primary-50 p-2 text-center">
           <FileText className="h-6 w-6 text-primary-700" aria-hidden="true" />

@@ -84,7 +84,7 @@ export function ArticleStickyBar({ card, allWidths = false }: { card: ServiceCar
         </button>
         <div className="relative aspect-[1/1.414] w-10 flex-shrink-0 overflow-hidden rounded bg-white">
           {card.image ? (
-            <Image src={card.image.src} alt="" fill sizes="40px" className="object-contain" />
+            <Image src={card.image.src} alt="" fill sizes="40px" className={card.image.illustration ? 'object-cover' : 'object-contain'} />
           ) : (
             <FileText className="absolute inset-0 m-auto h-5 w-5 text-primary-700" aria-hidden="true" />
           )}

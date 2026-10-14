@@ -37,8 +37,15 @@ export interface GuideLink {
   desc: string;
 }
 
-// Specimens the wizard does not show (yet) but that exist for these services.
+// Images for the article/calculator cards that the wizard does not show.
 const EXTRA_SPECIMENS: Record<string, ServiceSpecimen> = {
+  // Services without a document specimen get a generated illustration
+  // (no text, no emblems — never a fake official document).
+  'identificare-imobil': {
+    src: '/images/servicii-ilustratii/identificare-imobil.webp',
+    alt: 'Hartă cadastrală tipărită, cu o parcelă evidențiată sub lupă',
+    illustration: true,
+  },
   'extras-multilingv-certificat-nastere': {
     src: '/images/specimens/extras-multilingv-nastere.webp',
     alt: 'Specimen extras multilingv de naștere',

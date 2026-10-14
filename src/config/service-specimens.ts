@@ -5,6 +5,8 @@
 export interface ServiceSpecimen {
   src: string;
   alt: string;
+  /** Photo/illustration, not a scanned document: fills the frame (cover) instead of being contained. */
+  illustration?: boolean;
 }
 
 export const SERVICE_SPECIMENS: Record<string, ServiceSpecimen> = {
