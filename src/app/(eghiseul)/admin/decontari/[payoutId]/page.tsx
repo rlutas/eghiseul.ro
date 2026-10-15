@@ -42,6 +42,15 @@ interface Payout {
 const ron = (bani: number) =>
   (bani / 100).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+/** Accounting note appended by the payout sync ("EGH-0692 = 59,40 lei…",
+ *  "plată extra, factură neemisă…"): the last " · " part, shown under the
+ *  service so the invoice column is never read as covering the full amount. */
+const invoiceNote = (t: { description: string | null }) => {
+  const parts = (t.description ?? '').split(' · ');
+  const last = parts.length > 1 ? parts[parts.length - 1] : '';
+  return /factur|storno|rambursare/i.test(last) ? last : null;
+};
+
 /** Rows rewritten by refreshDisputeRows (src/lib/accounting/disputes.ts). */
 const isDispute = (t: { description: string | null }) =>
   /^(Dispută bancară|Comision Stripe pentru dispută)/.test(t.description ?? '');
@@ -122,8 +131,9 @@ export default function PayoutDetailPage() {
           <div className="whitespace-normal">{t.description}</div>
         </td>
       ) : (
-        <td className="px-3 py-2 max-w-[180px] truncate" title={t.service_name ?? t.description ?? ''}>
-          {t.service_name ?? t.description ?? '—'}
+        <td className="px-3 py-2 max-w-[260px]" title={t.service_name ?? t.description ?? ''}>
+          <div className="truncate">{t.service_name ?? t.description ?? '—'}</div>
+          {invoiceNote(t) && <div className="mt-0.5 whitespace-normal text-xs text-amber-800">{invoiceNote(t)}</div>}
         </td>
       )}
       <td className="px-3 py-2">

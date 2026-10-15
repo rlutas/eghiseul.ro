@@ -188,6 +188,36 @@ export function pickInvoiceForProforma(
   return candidates.length === 1 ? candidates[0] : null;
 }
 
+const ronText = (bani: number) =>
+  (bani / 100).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/**
+ * Note for the payout rows of an order cancelled (70% refunded) before its
+ * first invoice was issued. The only fiscal document is the 30% cancel-fee
+ * invoice, linked to both the charge and the refund row. Without the amounts
+ * spelled out, the accountant read "EGH-0692 collected 198 lei" on the
+ * charge row, while EGH-0692 is 59,40 lei (18.09.2026 payout, asked
+ * 16.10.2026).
+ */
+export function cancelFeeOnlyNote(opts: {
+  type: string;
+  invoiceNumber: string;
+  totalBani: number;
+  refundedBani: number;
+}): string {
+  const kept = Math.max(0, opts.totalBani - opts.refundedBani);
+  if (opts.type === 'refund' || opts.type === 'payment_refund') {
+    return (
+      `rambursare ${ronText(opts.refundedBani)} lei (70%), fără storno: nu a existat factură inițială; ` +
+      `${opts.invoiceNumber} = ${ronText(kept)} lei, taxa de anulare 30% rămasă din ${ronText(opts.totalBani)} lei`
+    );
+  }
+  return (
+    `${opts.invoiceNumber} = ${ronText(kept)} lei (taxa de anulare 30%), NU ${ronText(opts.totalBani)} lei: ` +
+    `din ${ronText(opts.totalBani)} lei încasați s-au rambursat ${ronText(opts.refundedBani)} lei; fără factură inițială`
+  );
+}
+
 /** A collected extra payment that still has no fiscal invoice (admin warnings). */
 export interface UnbilledExtra {
   amount: number | null;
