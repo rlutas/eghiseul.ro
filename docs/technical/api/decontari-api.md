@@ -7,7 +7,7 @@ Spec complet: [`../specs/decontari-stripe-reconciliation.md`](../specs/decontari
 | Metodă | Rută | Ce face |
 |---|---|---|
 | GET | `/api/admin/decontari?month=YYYY-MM` | payout-uri Stripe cu statusul facturilor |
-| POST | `/api/admin/decontari/sync` | `{ sinceDays }`: sincronizează payout-urile din Stripe |
+| POST | `/api/admin/decontari/sync` | `{ sinceDays }`: sincronizează payout-urile din Stripe; la final rescrie TOATE rândurile de dispută cu clientul, factura inițială și starea live (`refreshDisputeRows`, `src/lib/accounting/disputes.ts`) |
 | GET | `/api/admin/decontari/[payoutId]` | detaliul unui payout |
 | GET | `/api/admin/decontari/export?month=YYYY-MM` | CSV lunar pentru contabil |
 | POST | `/api/admin/decontari/bank-import` | `multipart file`: import CSV BT (upsert pe `reference`; reimportul păstrează legăturile payout/comandă) |

@@ -33,6 +33,7 @@ import {
   type ExtraBillingEntry,
   type OblioDocLite,
 } from '@/lib/accounting/extra-invoice-match';
+import { refreshDisputeRows } from '@/lib/accounting/disputes';
 
 /** Order-number regex: E-260710-F3AYS, CJO-20260710-86615, CAO-, CFO-, CIC-, EJC-, EFC- */
 const ORDER_RE = /\b(E|EJC|EFC|CJO|CAO|CFO|CIC)-[A-Z0-9-]+\b/i;
@@ -572,6 +573,14 @@ export async function syncPayouts(opts: { sinceDays?: number } = {}): Promise<Pa
     } catch (err) {
       errors.push(`${payout.id}: ${err instanceof Error ? err.message : String(err)}`);
     }
+  }
+
+  // Dispute rows: client, original invoice and live status, on ALL stored
+  // payouts (a dispute is decided months after its payout left the window).
+  try {
+    await refreshDisputeRows(admin, stripe, errors);
+  } catch (err) {
+    errors.push(`disputes: ${err instanceof Error ? err.message : String(err)}`);
   }
 
   return { payoutsSynced, txSynced, errors };

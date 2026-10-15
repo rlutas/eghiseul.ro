@@ -42,6 +42,10 @@ interface Payout {
 const ron = (bani: number) =>
   (bani / 100).toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+/** Rows rewritten by refreshDisputeRows (src/lib/accounting/disputes.ts). */
+const isDispute = (t: { description: string | null }) =>
+  /^(Dispută bancară|Comision Stripe pentru dispută)/.test(t.description ?? '');
+
 function PlatformBadge({ platform }: { platform: string }) {
   if (platform === 'eghiseul') return <Badge className="bg-blue-100 text-blue-800">eGhișeul</Badge>;
   if (platform === 'cjo') return <Badge className="bg-purple-100 text-purple-800">CJO</Badge>;
@@ -112,9 +116,16 @@ export default function PayoutDetailPage() {
           <div className="text-xs text-neutral-400 print:hidden">{t.client_email}</div>
         )}
       </td>
-      <td className="px-3 py-2 max-w-[180px] truncate" title={t.service_name ?? t.description ?? ''}>
-        {t.service_name ?? t.description ?? '—'}
-      </td>
+      {isDispute(t) ? (
+        <td className="px-3 py-2 max-w-[360px] text-xs text-amber-900">
+          <Badge className="mb-1 bg-amber-100 text-amber-900">Dispută bancară</Badge>
+          <div className="whitespace-normal">{t.description}</div>
+        </td>
+      ) : (
+        <td className="px-3 py-2 max-w-[180px] truncate" title={t.service_name ?? t.description ?? ''}>
+          {t.service_name ?? t.description ?? '—'}
+        </td>
+      )}
       <td className="px-3 py-2">
         {t.invoice_number ? (
           t.invoice_url ? (
@@ -124,6 +135,8 @@ export default function PayoutDetailPage() {
           ) : (
             t.invoice_number
           )
+        ) : isDispute(t) ? (
+          <span className="text-xs text-neutral-500">vezi dispută</span>
         ) : (
           <Badge className="bg-red-100 text-red-800">
             <AlertTriangle className="h-3 w-3 mr-1" /> nefacturat
