@@ -218,6 +218,26 @@ export function cancelFeeOnlyNote(opts: {
   );
 }
 
+/**
+ * Note for the refund row of a partial cancellation that WAS invoiced: the
+ * original invoice is stornoed in full and a new invoice covers what we
+ * kept, so the storno (−198) never equals the refund (−138,60). Spelled out
+ * so the accountant doesn't read a mismatch (audit 16.10.2026: EGH-0683,
+ * EGH-0474, EGH-0377, EGH-0245).
+ */
+export function stornoWithFeeNote(opts: {
+  stornoNumber: string;
+  feeNumber: string | null;
+  totalBani: number;
+  refundedBani: number;
+}): string {
+  const kept = Math.max(0, opts.totalBani - opts.refundedBani);
+  return (
+    `rambursat ${ronText(opts.refundedBani)} lei = storno ${opts.stornoNumber} (−${ronText(opts.totalBani)} lei, factura inițială anulată integral)` +
+    (opts.feeNumber ? ` + factura ${opts.feeNumber} (${ronText(kept)} lei păstrați)` : '')
+  );
+}
+
 /** A collected extra payment that still has no fiscal invoice (admin warnings). */
 export interface UnbilledExtra {
   amount: number | null;

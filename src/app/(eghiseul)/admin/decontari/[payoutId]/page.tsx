@@ -147,6 +147,8 @@ export default function PayoutDetailPage() {
           )
         ) : isDispute(t) ? (
           <span className="text-xs text-neutral-500">vezi dispută</span>
+        ) : /fără storno/.test(t.description ?? '') ? (
+          <span className="text-xs text-neutral-500">fără document (vezi nota)</span>
         ) : (
           <Badge className="bg-red-100 text-red-800">
             <AlertTriangle className="h-3 w-3 mr-1" /> nefacturat

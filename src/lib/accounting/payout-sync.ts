@@ -29,6 +29,7 @@ import {
   extraInvoiceForRow,
   unbilledExtraForRow,
   cancelFeeOnlyNote,
+  stornoWithFeeNote,
   parseOblioProformaDesc,
   pickInvoiceForProforma,
   type ExtraBillingEntry,
@@ -81,6 +82,8 @@ interface TxRow {
   _orderId?: string | null;
   /** Extra payment collected without its own invoice: must stay unbilled (never re-filled from the DB). */
   _unbilledExtra?: boolean;
+  /** Row that has no fiscal document by design (refund with no initial invoice): never re-filled from the DB. */
+  _keepEmpty?: boolean;
   id: string;
   payout_id: string;
   type: string;
@@ -99,6 +102,45 @@ interface TxRow {
   invoice_number: string | null;
   invoice_url: string | null;
   raw: unknown;
+}
+
+/**
+ * Fiscal document of a refund row. Full storno (+ new invoice for the part
+ * kept): storno number with the arithmetic spelled out. Refunded before any
+ * invoice existed: no document at all, said so explicitly — never the
+ * positive cancel-fee invoice, which the accountant read as a negative
+ * invoice (EGH-0681 / EGH-0692, 18.09.2026 payout; audit 16.10.2026).
+ */
+function applyRefundDocument(
+  r: TxRow,
+  o: { invoiceNumber: string | null; stornoNumber: string | null; feeNumber: string | null; totalBani: number; refundedBani: number }
+) {
+  if (o.stornoNumber) {
+    r.invoice_number = o.stornoNumber;
+    r.invoice_url = null;
+    if (o.refundedBani > 0 && o.totalBani > o.refundedBani) {
+      r.description = `${r.description ?? ''} · ${stornoWithFeeNote({
+        stornoNumber: o.stornoNumber,
+        feeNumber: o.feeNumber,
+        totalBani: o.totalBani,
+        refundedBani: o.refundedBani,
+      })}`.trim();
+    }
+    return;
+  }
+  if (!o.invoiceNumber && o.feeNumber && o.refundedBani > 0) {
+    r.invoice_number = null;
+    r.invoice_url = null;
+    r._keepEmpty = true;
+    r.description = `${r.description ?? ''} · ${cancelFeeOnlyNote({
+      type: r.type,
+      invoiceNumber: o.feeNumber,
+      totalBani: o.totalBani,
+      refundedBani: o.refundedBani,
+    })}`.trim();
+  }
+  // Otherwise: storno missing on an invoiced order → stays without a document
+  // (shown "nefacturat") unless one was attached manually earlier.
 }
 
 /** Enrich eghiseul rows from our own DB (invoice + client + service).
@@ -165,10 +207,13 @@ async function enrichEghiseul(rows: TxRow[]) {
     );
     const unbilled = unbilledExtraForRow(anyO.extra_billing, { payment_intent_id: r.payment_intent_id, gross_bani: r.gross_bani });
     if (REFUND_TYPES.has(r.type)) {
-      // Documentul fiscal al unei rambursări e STORNOUL, nu factura inițială
-      // (care rămâne pe rândul încasării). Lipsă = anulare nefacturată încă.
-      r.invoice_number = anyO.storno_invoice_number ?? r.invoice_number;
-      r.invoice_url = anyO.storno_invoice_number ? null : r.invoice_url;
+      applyRefundDocument(r, {
+        invoiceNumber: anyO.invoice_number ?? null,
+        stornoNumber: anyO.storno_invoice_number ?? null,
+        feeNumber: anyO.cancel_fee_invoice_number ?? null,
+        totalBani: Math.round(Number(anyO.total_price ?? 0) * 100),
+        refundedBani: Math.round(Number(anyO.refunded_amount ?? 0) * 100),
+      });
     } else if (extra && r.payment_intent_id !== (anyO as { stripe_payment_intent_id?: string }).stripe_payment_intent_id) {
       r.invoice_number = extra.invoiceNumber;
       r.invoice_url = extra.invoiceUrl;
@@ -189,7 +234,7 @@ async function enrichEghiseul(rows: TxRow[]) {
     // factură, nici storno — documentul fiscal al încasării RĂMASE e factura
     // taxei de anulare. Legăm încasarea și refundul de ea, ca să nu apară
     // „nefacturat" (po_1UGTTLHGb8JBHhclSJd80vUX, 18.09.2026).
-    if (!r.invoice_number && !anyO.invoice_number && anyO.cancel_fee_invoice_number && Number(anyO.refunded_amount) > 0) {
+    if (!REFUND_TYPES.has(r.type) && !r.invoice_number && !anyO.invoice_number && anyO.cancel_fee_invoice_number && Number(anyO.refunded_amount) > 0) {
       r.invoice_number = anyO.cancel_fee_invoice_number;
       r.invoice_url = anyO.cancel_fee_invoice_url ?? null;
       r.description = `${r.description ?? ''} · ${cancelFeeOnlyNote({
@@ -249,9 +294,14 @@ async function enrichCjo(rows: TxRow[], errors: string[]) {
     );
     const unbilled = unbilledExtraForRow(o.extra_billing as ExtraBillingEntry[] | null, { payment_intent_id: r.payment_intent_id, gross_bani: r.gross_bani });
     if (REFUND_TYPES.has(r.type)) {
-      const storno = (o as { storno_invoice_number?: string | null }).storno_invoice_number ?? null;
-      r.invoice_number = storno ?? r.invoice_number;
-      r.invoice_url = storno ? null : r.invoice_url;
+      const oc0 = o as { storno_invoice_number?: string | null; cancel_fee_invoice_number?: string | null; refunded_amount_bani?: number | null; amount_total?: number | null };
+      applyRefundDocument(r, {
+        invoiceNumber: o.oblio_invoice_number || o.invoice_number || null,
+        stornoNumber: oc0.storno_invoice_number ?? null,
+        feeNumber: oc0.cancel_fee_invoice_number ?? null,
+        totalBani: Number(oc0.amount_total ?? 0),
+        refundedBani: Number(oc0.refunded_amount_bani ?? 0),
+      });
     } else if (extra && r.payment_intent_id !== o.stripe_payment_intent_id) {
       r.invoice_number = extra.invoiceNumber;
       r.invoice_url = extra.invoiceUrl;
@@ -275,7 +325,7 @@ async function enrichCjo(rows: TxRow[], errors: string[]) {
     {
       const oc = o as { cancel_fee_invoice_number?: string | null; cancel_fee_invoice_url?: string | null; refunded_amount_bani?: number | null };
       const hadInvoice = !!(o.oblio_invoice_number || o.invoice_number);
-      if (!r.invoice_number && !hadInvoice && oc.cancel_fee_invoice_number && Number(oc.refunded_amount_bani) > 0) {
+      if (!REFUND_TYPES.has(r.type) && !r.invoice_number && !hadInvoice && oc.cancel_fee_invoice_number && Number(oc.refunded_amount_bani) > 0) {
         r.invoice_number = oc.cancel_fee_invoice_number;
         r.invoice_url = oc.cancel_fee_invoice_url ?? null;
         r.description = `${r.description ?? ''} · ${cancelFeeOnlyNote({
@@ -540,7 +590,7 @@ export async function syncPayouts(opts: { sinceDays?: number } = {}): Promise<Pa
         for (const r of rows) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const prev = keep.get(r.id) as any;
-          if (prev && !r.invoice_number && !r._unbilledExtra) {
+          if (prev && !r.invoice_number && !r._unbilledExtra && !r._keepEmpty) {
             r.invoice_number = prev.invoice_number;
             r.invoice_url = r.invoice_url ?? prev.invoice_url;
             r.client_name = r.client_name ?? prev.client_name;
@@ -574,7 +624,7 @@ export async function syncPayouts(opts: { sinceDays?: number } = {}): Promise<Pa
       if (pErr) throw new Error(pErr.message);
 
       if (rows.length) {
-        const persistable = rows.map(({ _orderId, _unbilledExtra, ...rest }) => { void _orderId; void _unbilledExtra; return rest; });
+        const persistable = rows.map(({ _orderId, _unbilledExtra, _keepEmpty, ...rest }) => { void _orderId; void _unbilledExtra; void _keepEmpty; return rest; });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error: tErr } = await (admin as any).from('stripe_payout_transactions').upsert(persistable);
         if (tErr) throw new Error(tErr.message);
