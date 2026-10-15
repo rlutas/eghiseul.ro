@@ -24,6 +24,20 @@ Legendă: ✅ făcut · 🔄 în lucru · ⬜ de făcut · ⏸ așteaptă ceva
 
 ## ▶ Planul de urmat (refăcut 07.10.2026)
 
+### 👀 Urmărire (deschis 15–16.10.2026): verificăm dacă s-a reparat
+
+| # | Ce urmărim | Când | Cum știm că e reparat | Stare |
+|---|---|---|---|---|
+| U1 | Warm-up la **400/zi** (de pe `eghiseul.ro`) | zilnic, decizie 22.10 | sub 3% suprimate pe zi și 0 plângeri; altfel înapoi la 300 | 🔄 pornit 15.10 |
+| U2 | Vânzările pe săptămâna 42 (12–18.10) față de 41 | luni 19.10 | eghiseul ≥ 25 comenzi, CJO ≥ 15 | 🔄 la 15.10: eghiseul 31, CJO 16 |
+| U3 | Contabilul confirmă: dispută (storno doar 79,99 la pierdere, 100 lei cheltuială) + EGH-0681/0692 + EGH-0873 | după mesajele trimise | răspuns „ok” de la contabil | ⏸ trimise de Raul |
+| U4 | Disputa du_1UC9voHGb8JBHhclAT55CWaV (79,99 lei) | Decontări o arată singură; termen ~13.01.2027 | „câștigată” → nimic; „pierdută” → storno −79,99 pe EGI2024-24278 | 🔄 contestată 15.10 |
+| U5 | Plăți extra CJO: proforma PEGH se emite la link, factura după plată | la prima plată extra pe CJO | `extra_billing` cu `proforma` și `invoice` completate; 0 pe dashboard-ul CJO | ⬜ așteaptă primul caz |
+| U6 | Cronul CJO `health-check` nu raportează plăți extra eșuate | săptămânal | `extraFailed: []`, fără alertă pe Slack | ⬜ |
+| U7 | Contabilul nu mai găsește linii neclare în decontări | la următoarea lună predată | zero întrebări de tipul „ce factură e asta” | ⬜ |
+| U8 | CJO **ONLINE10** (−10%) pe 28 din 30 de comenzi în octombrie | decizie Raul | oprit sau limitat; prețul net CJO crește | ⏸ decizie |
+| U9 | Pasul 3 de recuperare pe eghiseul (0 din 115) | decizie Raul | oprit sau rescris fără cupon | ⏸ decizie |
+
 ### ⏭ Unde am rămas (09.10, ~12:00): de aici se reia
 
 **09.10, făcut** (detalii: jurnalul 09.10 mai jos + `changelog/2026-10-09-cjo-cadere-gsc-reindexare-linkuri.md`):

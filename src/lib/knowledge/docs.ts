@@ -134,6 +134,13 @@ export const CURATED_GUIDES: GuideLink[] = [
       'Meta, Google, TikTok, OpenAI, Anthropic, Vercel… nu trimit factura în SPV. Din extrasul importat se face lista lunii; bifați Descărcată → Listată → Predată contabil pe fiecare furnizor.',
   },
   {
+    title: 'Decontări Stripe: cum citești liniile (anulări, plăți extra, dispute)',
+    slug: 'admin/decontari-cum-citesti',
+    category: 'plati',
+    description:
+      'Suma din decontare nu e mereu suma facturii: anulările cu storno sau fără factură inițială, plățile extra și disputele bancare au o notă galbenă care explică diferența. Dispută: storno doar pe suma clientului și doar după ce e pierdută; comisionul de 100 lei e cheltuială.',
+  },
+  {
     title: 'Plată extra încasată fără factură: ce faceți',
     slug: 'admin/factura-plata-extra-neemisa',
     category: 'plati',

@@ -62,6 +62,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Meta Conversions API (tracking server-side):** [`technical/specs/meta-capi-tracking.md`](technical/specs/meta-capi-tracking.md)
 - **Webhook Resend (bounce → banner admin + alertă):** [`technical/specs/resend-bounce-webhook.md`](technical/specs/resend-bounce-webhook.md)
 - **Decontări Stripe (reconciliere cross-platform + proforme extra):** [`technical/specs/decontari-stripe-reconciliation.md`](technical/specs/decontari-stripe-reconciliation.md); API: [`technical/api/decontari-api.md`](technical/api/decontari-api.md)
+- **Decontări: cum citești liniile (anulări 70%, plăți extra, dispute bancare) — echipă + contabil:** [`admin/decontari-cum-citesti.md`](admin/decontari-cum-citesti.md)
 - **Facturi furnizori pentru contabil (Meta, Google, TikTok, OpenAI… fără SPV):** [`admin/facturi-furnizori-contabil.md`](admin/facturi-furnizori-contabil.md) — checklist lunar descărcată/listată/predată, din extrasul BT
 - **Runbook schimbare firmă (Stripe/Oblio/bancă noi):** [`technical/specs/schimbare-firma-runbook.md`](technical/specs/schimbare-firma-runbook.md)
 - **ANCPI automation:** [`technical/specs/ancpi-automation-plan.md`](technical/specs/ancpi-automation-plan.md)

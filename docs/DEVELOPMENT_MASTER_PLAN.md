@@ -860,6 +860,23 @@ Add-on `extras_multilingv` (399 lei) pe certificat-nastere + certificat-casatori
 
 3 tiers (București/sectoare 15-30, oficii rapide 5-7, rest 7-15), lista de oficii rapide editabilă din `/admin/settings` → „Termene stare civilă". `registrationPlace` convertit la dropdown structurat. Migrația 079 + `src/lib/civil-status/delivery-terms.ts`. Vezi changelog + `docs/plans/2026-06-23-civil-status-dynamic-terms-design.md`.
 
+#### ✅ Decontări corecte pentru contabil: dispute, anulări, plăți extra + audit vs Oblio — LIVRAT 2026-10-15/16
+
+Răspuns la întrebările contabilului pe decontările din 08.09, 11.09 și 18.09.
+(1) **CJO, plata extra fără factură:** EGH-0873 emisă pentru 250 lei (DHL,
+CJO-20260901-27360); pe CJO proforma PEGH implicită, reîncercare orară în
+`cron/health-check`, avertismente pe `/admin` și pe comandă, `new_status` lipsă
+în istoric (CJO `f84e407b`). (2) **Dispute:** `refreshDisputeRows` etichetează
+rândurile cu clientul, factura inițială și starea live; disputa de 79,99 lei
+contestată pe 15.10. (3) **Anulări:** rambursarea poartă storno-ul (cu
+socoteala) sau „fără document”, niciodată factura pozitivă de taxă
+(`applyRefundDocument`, `cancelFeeOnlyNote`, `stornoWithFeeNote`). (4)
+**Audit** 1.174 linii vs Oblio: toate facturile există, 12 afișări corectate,
+8 diferențe intenționate cu notă. Ghid: `admin/decontari-cum-citesti.md`.
+Changelog: `2026-10-15-cjo-plata-extra-factura-automata.md`,
+`2026-10-15-decontari-disputa-bancara.md`,
+`2026-10-16-decontari-taxa-anulare-suma-reala.md`.
+
 #### ✅ Facturi furnizori pentru contabil (checklist lunar) — LIVRAT 2026-10-14
 
 `/admin/decontari/facturi-furnizori`: un rând pe furnizor × lună (Meta,

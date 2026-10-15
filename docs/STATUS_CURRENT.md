@@ -1,5 +1,11 @@
 # eGhiseul.ro - Status Curent
 
+> **🟣 Update 2026-10-15/16 — vânzări, email, decontări pentru contabil.**
+> - **Vânzări:** săptămâna 12.10 e cea mai bună din septembrie încoace (eghiseul 31 / 10,6k, CJO 16 / 4,6k până miercuri). CJO și-a revenit după reparația formularului (32–45 de formulare pe zi, față de 16–17). Octombrie merge spre ~50–52k lei (septembrie: 58k). GSC: eghiseul +6% (articolele +31%), CJO −7%, paginile de servicii eghiseul stau încă la ~850 de afișări pe săptămână.
+> - **Email:** warm-up 300 → **400/zi** (decizia lui Raul, 15.10). Lead-urile WP: 3.845 trimise → 0 plătite; foștii clienți: 455 → 18 plătite. B9 CJO s-a oprit singur la 500 → 0 plătite. Subdomeniul de marketing (B7) nu există încă. [plan A–Z §B](2026-10-plan-a-z-vanzari.md)
+> - **Decontări (întrebările contabilului):** EGH-0873 emisă pentru plata extra CJO de 250 lei (DHL) și protecție ca pe eghiseul (proformă PEGH, reîncercare orară, avertismente); disputele bancare etichetate cu starea live, disputa de 79,99 lei contestată; anulările afișate corect (storno cu socoteală sau „fără document”); audit 1.174 linii vs Oblio: toate facturile există, 12 afișări corectate. [ghid](admin/decontari-cum-citesti.md) · changelog: [CJO extra](changelog/2026-10-15-cjo-plata-extra-factura-automata.md) · [dispute](changelog/2026-10-15-decontari-disputa-bancara.md) · [anulări](changelog/2026-10-16-decontari-taxa-anulare-suma-reala.md)
+> - **De urmărit** (tabelul „Urmărire” din [planul A–Z](2026-10-plan-a-z-vanzari.md)): suprimările la 400/zi, confirmarea contabilului pe dispută și anulări, cronul CJO pentru facturi extra, decizia băncii pe dispută (~13.01.2027), ONLINE10 pe CJO.
+
 > **🔵 Situația 14.10.2026** — 1–13.10: 19,8k lei pe toate platformele (−24% vs septembrie), CJO −61%, eghiseul +18%; telefonul ~18% din venitul eghiseul; B9 CJO 0/500. [raport](2026-10-14-situatie-vanzari-trafic-marketing.md)
 
 > **🟣 Update 2026-10-14 (după-amiază) — Plata cu cardul eșuată se vede în admin.** Neplătite + Recuperare telefonică arată „Plată cu cardul eșuată (N×)” cu motivul și sugestia IBAN, „A ajuns la plata cu cardul” sau pasul din formular; refuzurile primele în coada de apeluri. Doar eGhiseul, de azi încolo (migrarea 194). [changelog](changelog/2026-10-14-plata-card-esuata-vizibila.md)

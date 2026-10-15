@@ -98,3 +98,19 @@ CJO emitea pe seria EGI2024 (moștenită din integrarea WP). Pentru decontări l
 ## Verificare SPV (14 iul)
 
 `invoice/list?withEinvoiceStatus=1` — câmpul `einvoice` = link XML când e trimisă. **Toate cele 398 de facturi active (1 iun–14 iul, EGH 43 + EGI2024 355) sunt trimise în SPV, 0 netrimise.** Facturile furnizorilor STRĂINI (Vercel etc.) nu apar în SPV prin natura lor — de aia există alerta roșie din pagina de bancă.
+
+## Reguli de prezentare a rândurilor (15–16.10.2026)
+
+Introduse după întrebările contabilului pe decontările din 08.09, 11.09 și 18.09. Ghidul pentru echipă: [`../../admin/decontari-cum-citesti.md`](../../admin/decontari-cum-citesti.md).
+
+| Caz | Rând încasare | Rând rambursare / altele | Cod |
+|---|---|---|---|
+| Plată extra | factura din `extra_billing`, potrivită pe PaymentIntent | — | `extraInvoiceForRow` |
+| Plată extra nefacturată | fără factură + „plată extra, factură neemisă” | — | `unbilledExtraForRow`; CJO reîncearcă orar (`healUnbilledExtras`) |
+| Anulare cu storno integral + factură nouă | factura inițială | storno + „rambursat X = storno −Y + factura Z (păstrați)” | `applyRefundDocument`, `stornoWithFeeNote` |
+| Anulare fără factură inițială | factura taxei + „= 59,40 lei, NU 198” | **fără document** (`_keepEmpty`, nu e repus din DB) + „fără storno” | `applyRefundDocument`, `cancelFeeOnlyNote` |
+| Dispută (chargeback) | — | „Dispută bancară: retras X + 100 comision · stare · factura inițială” | `refreshDisputeRows` (toate rândurile, la fiecare sync) |
+
+- **Audit 16.10.2026:** 1.230 de facturi Oblio (din 01.05, API) comparate cu 1.174 de rânduri `stripe_payout_transactions` cu factură. Regulă: încasare = total pozitiv egal, rambursare = storno egal. Toate facturile există, 12 rânduri au fost corectate, 8 diferă intenționat (cazurile de anulare de mai sus) și au notă.
+- **Date completate manual pe CJO:** `storno_invoice_number`/`cancel_fee_invoice_number` pe CJO-20260615-13680 (EGI2024-24129/24130) și CFO-20260618-78061 (EGI2024-24160/24161); `extra_billing` pe CJO-20260626-60476 (EGI2024-24233) și CJO-20260709-26957 (EGH-0016).
+- Rândurile vechi se schimbă doar după un sync cu `sinceDays` mare (admin POST, maximum 400 de zile).
