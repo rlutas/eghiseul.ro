@@ -1,5 +1,7 @@
 # Plată extra încasată fără factură: ce faceți
 
+Se aplică pe **eghiseul.ro** și, din 15.10.2026, la fel pe **cazierjudiciaronline.com** (dashboard-ul și pagina comenzii din adminul CJO).
+
 ## Cum funcționează normal
 
 Când cereți clientului o plată suplimentară din pagina comenzii („Modifică” → link de plată extra):
@@ -30,4 +32,4 @@ Sistemul reîncearcă singur emiterea **din oră în oră**. De obicei avertisme
 
 ## De ce contează
 
-Fără factură, banii încasați nu au document fiscal, iar contabilul vede în extras o sumă pe care n-o poate pune pe nicio factură. Cazul de la care a pornit procedura: comanda E-260817-J2BXD, 200 lei plătiți pe 03.09.2026, factură emisă abia pe 14.10.2026 (EGH-0857), după ce contabilul a observat că factura principală EGH-0439 apărea „încasată de două ori”.
+Fără factură, banii încasați nu au document fiscal, iar contabilul vede în extras o sumă pe care n-o poate pune pe nicio factură. Cazul de la care a pornit procedura: comanda E-260817-J2BXD, 200 lei plătiți pe 03.09.2026, factură emisă abia pe 14.10.2026 (EGH-0857), după ce contabilul a observat că factura principală EGH-0439 apărea „încasată de două ori”. Pe CJO: comanda CJO-20260901-27360, 250 lei pentru DHL plătiți pe 08.09.2026, factură emisă pe 15.10.2026 (EGH-0873).

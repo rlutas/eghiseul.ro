@@ -203,6 +203,8 @@ Planul complet: `ads/2026-10-05-documentero-lansare-ads.md`, `ads/2026-10-05-doc
 
 Istoric: B1 (warm-up din oră în oră, plafon până la 5.000) și B2 (300/zi) ✅ 05.10; B3 (600/zi) ↩ 07.10, întors la 300 din cauza emailurilor întoarse; B4 (1.200, apoi 2.000) e înlocuit de B8; B5 (măsurarea) e acum B12.
 
+**15.10:** warm-up 300 → **400/zi** (decizia lui Raul), tot de pe `eghiseul.ro`, fără subdomeniu. Bilanț la 15.10: foști clienți 455 trimiși → 18 plătite (3.039 lei); lead-uri WP 3.845 → 0 plătite; 68.008 rămași în coadă. B9 pe CJO s-a oprit singur la 500 → 0 plătite (nu se repornește). Regula rămâne: dacă emailurile întoarse trec de 3% într-o zi sau apare o plângere, înapoi la 300.
+
 ## C. cazierjudiciaronline.com (vinde cel mai bine din organic)
 
 | # | Ce | Când | Stare |
