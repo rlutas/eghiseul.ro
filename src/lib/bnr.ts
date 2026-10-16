@@ -1,5 +1,5 @@
 /**
- * Cursul valutar oficial BNR — feed-ul zilnic bnr.ro/nbrfxrates.xml (referință
+ * Cursul valutar oficial BNR — feed-ul zilnic curs.bnr.ro/nbrfxrates.xml (referință
  * RON). Folosit de ruta /api/bnr-rate (toggle €/Lei din calculatoare) și de
  * pagina /curs-valutar. Cache 1h; degradează grațios dacă feed-ul e indisponibil.
  */
@@ -16,7 +16,15 @@ export interface BnrData {
   eur: number; // lei / 1 EUR (shortcut folosit de calculatoare)
 }
 
-const FALLBACK_EUR = 5.07;
+const FALLBACK_EUR = 5.33;
+
+/**
+ * BNR moved the XML feeds to curs.bnr.ro (seen 2026-10-16). The old
+ * www.bnr.ro/nbrfxrates.xml now 302s to the homepage and answers 200 with HTML,
+ * so `res.ok` passed, the regex matched nothing and every caller silently got
+ * the fallback. The parsers below therefore throw when no rate is found.
+ */
+const BNR_FEED_BASE = 'https://curs.bnr.ro';
 
 /**
  * Both calls go to bnr.ro, which we do not control, and they run at BUILD time
@@ -34,7 +42,7 @@ const BNR_TIMEOUT_MS = 8000;
 
 export async function getBnrRates(): Promise<BnrData> {
   try {
-    const res = await fetch('https://www.bnr.ro/nbrfxrates.xml', {
+    const res = await fetch(`${BNR_FEED_BASE}/nbrfxrates.xml`, {
       next: { revalidate: 3600 },
       signal: AbortSignal.timeout(BNR_TIMEOUT_MS),
     });
@@ -51,6 +59,7 @@ export async function getBnrRates(): Promise<BnrData> {
         value: parseFloat(m[3]),
       });
     }
+    if (rates.length === 0) throw new Error('bnr feed returned no rates');
     const eur = rates.find((r) => r.currency === 'EUR')?.value ?? FALLBACK_EUR;
     return { date, rates, eur };
   } catch (err) {
@@ -64,10 +73,10 @@ export interface BnrHistory {
   series: Record<string, number[]>; // valoare per 1 unitate, aliniată cu `dates`
 }
 
-/** Istoricul pe 10 zile (bnr.ro/nbrfxrates10days.xml) pentru variație + grafice. */
+/** Istoricul pe 10 zile (curs.bnr.ro/nbrfxrates10days.xml) pentru variație + grafice. */
 export async function getBnrHistory(): Promise<BnrHistory> {
   try {
-    const res = await fetch('https://www.bnr.ro/nbrfxrates10days.xml', {
+    const res = await fetch(`${BNR_FEED_BASE}/nbrfxrates10days.xml`, {
       next: { revalidate: 3600 },
       signal: AbortSignal.timeout(BNR_TIMEOUT_MS),
     });
@@ -77,6 +86,7 @@ export async function getBnrHistory(): Promise<BnrHistory> {
     const cubes: { date: string; body: string }[] = [];
     let cm: RegExpExecArray | null;
     while ((cm = cubeRe.exec(xml)) !== null) cubes.push({ date: cm[1], body: cm[2] });
+    if (cubes.length === 0) throw new Error('bnr history feed returned no cubes');
     cubes.sort((a, b) => a.date.localeCompare(b.date));
 
     const dates: string[] = [];
