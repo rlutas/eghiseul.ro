@@ -28,7 +28,10 @@ lui.
 
 Pe comenzile neterminate: banner galben cu **„Copiază link continuare”**
 (link special, 48 de ore, îl duce la pasul lui cu datele lui, merge și fără
-email) și **pasul unde s-a oprit**.
+email) și **pasul unde s-a oprit**. Tot acolo e **„Finalizează ca comandă
+telefonică”**: pentru comenzile începute de echipă pe formularul public, le
+trece pe fluxul telefonic (link de plată, apoi link de completare pentru acte,
+selfie și semnătură), fără să mai ceară selfie înainte de plată.
 
 ## Date stare civilă / Date imobil / Firmă
 

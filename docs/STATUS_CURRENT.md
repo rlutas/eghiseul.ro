@@ -1,5 +1,9 @@
 # eGhiseul.ro - Status Curent
 
+> **🔴 Update 2026-10-21 — „Plătește” părea mort când serverul refuza comanda.** O colegă a pus poza verso-ului de buletin și la selfie, ca să poată plăti clientul. Serverul a refuzat cu „lipsește selfie”, dar wizardul arăta doar un toast care dispărea și rămânea pe Facturare. Același lucru li se putea întâmpla oricărui client (selfie lipsă, facturare incompletă, email greșit), iar refuzul nu se salvează nicăieri. **Reparat:** saltul automat la pasul cu problema + mesaj roșu persistent; poza identică cu alt act e refuzată la încărcare; buton admin „Finalizează ca comandă telefonică” pe ciorne. **Rămâne deschis:** refuzurile de la „Plătește” nu se salvează încă pe comandă, deci nu se văd în admin (cum se văd plățile cu cardul eșuate). [changelog](changelog/2026-10-21-wizard-erori-plata-selfie.md)
+>
+> **🔧 Setup local 2026-10-21:** Vercel CLI instalat și legat de `eghiseul-ro` (`vercel logs` merge); `.env.local` refăcut din producție (`vercel env pull`) + cheile doar-locale din backup. `package-lock.json` nu e sincronizat cu `package.json` (`npm ci` refuză); `npm install` se blochează la postinstall-ul `sharp`.
+
 > **🟣 Update 2026-10-15/16 — vânzări, email, decontări pentru contabil.**
 > - **Vânzări:** săptămâna 12.10 e cea mai bună din septembrie încoace (eghiseul 31 / 10,6k, CJO 16 / 4,6k până miercuri). CJO și-a revenit după reparația formularului (32–45 de formulare pe zi, față de 16–17). Octombrie merge spre ~50–52k lei (septembrie: 58k). GSC: eghiseul +6% (articolele +31%), CJO −7%, paginile de servicii eghiseul stau încă la ~850 de afișări pe săptămână.
 > - **Email:** warm-up 300 → **400/zi** (decizia lui Raul, 15.10). Lead-urile WP: 3.845 trimise → 0 plătite; foștii clienți: 455 → 18 plătite. B9 CJO s-a oprit singur la 500 → 0 plătite. Subdomeniul de marketing (B7) nu există încă. [plan A–Z §B](2026-10-plan-a-z-vanzari.md)

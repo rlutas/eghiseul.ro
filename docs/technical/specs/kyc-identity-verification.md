@@ -12,6 +12,12 @@
 > the repo but is **no longer called by the wizard**. Sections below describing
 > the automatic match are historical. When a photo is wrong, the team requests a
 > new one via [`post-order-photo-reupload.md`](./post-order-photo-reupload.md).
+>
+> **2026-10-21 — duplicate photo guard at upload.** `KYCDocumentsStep` refuses a
+> file identical to another document on the order (`lib/kyc/duplicate-upload.ts`:
+> base64 while in memory, byte size after a draft reload). It mirrors the
+> SHA-256 check in `/api/orders/[id]/submit`, which still refuses such a selfie
+> with `KYC_INCOMPLETE`; the wizard now routes that refusal to `kyc-documents`.
 
 How eghiseul.ro confirms that the person submitting an order is the same person
 shown on the uploaded ID document (selfie ↔ document face matching), and how

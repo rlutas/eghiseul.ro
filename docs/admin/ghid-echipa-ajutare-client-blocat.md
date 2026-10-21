@@ -48,7 +48,17 @@ plătească din nou — doar reîncarcă documentele cerute.
   **merge chiar dacă clientul nu apucase să-și pună emailul**.
 - **„Editează datele clientului"** — corectați nume / CNP / adresă / contact
   direct din admin; la revenire clientul primește automat datele corectate.
+- **„Finalizează ca comandă telefonică"** — când comanda a fost începută de voi
+  pe formularul public și clientul nu poate face selfie acum: comanda trece pe
+  fluxul telefonic (link de plată → link de completare cu acte + selfie +
+  semnătură). Vezi [Comenzi telefonice](comenzi-telefonice/README.md).
 (Contractul, KYC-ul și plata rămân mereu la client — pe astea nu le facem noi.)
+
+**6. Clientul spune că „Plătește” nu face nimic (din 21.10.2026):** formularul
+îl duce acum singur la pasul cu problema și îi arată un mesaj roșu cu ce lipsește
+(selfie, date de facturare, email greșit). Întrebați-l ce scrie în caseta roșie.
+**Nu puneți poza buletinului și la selfie:** formularul o refuză pe loc („Ai
+încărcat aceeași poză ca la…”). Folosiți butonul de la punctul 5.
 
 ---
 
