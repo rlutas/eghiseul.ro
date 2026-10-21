@@ -43,6 +43,7 @@ Echipa preia comenzi la telefon/WhatsApp și le introduce în platformă de la A
 - Link expirat / client blocat → apeși din nou butonul: link-ul vechi se anulează, se emite unul nou.
 
 ### Cazuri speciale
+- **Ai început comanda pe formularul public (nu din „+ Comandă nouă")**: nu pune poza buletinului și la selfie, pentru că formularul o refuză. Pe pagina comenzii din admin, în bannerul „Comandă neterminată", apasă **„Finalizează ca comandă telefonică"**. De acolo continui exact ca la pașii 2–3: link de plată, apoi link de completare.
 - **Doar semnătura** (actele există deja): link-ul cere numai semnătura.
 - **Email greșit introdus la creare**: gate-ul de confirmare blochează clientul — corectezi emailul pe comandă și retrimiți link-ul. (La creare se verifică MX-ul domeniului tocmai ca să prindem typo-urile.)
 - **Client plătește link-ul după ce ai marcat manual**: blocat — checkout-ul refuză comenzile deja plătite.

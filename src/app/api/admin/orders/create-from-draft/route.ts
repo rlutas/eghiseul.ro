@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     const admin = createAdminClient();
     const { data: order, error: fetchError } = await admin
       .from('orders')
-      .select('id, friendly_order_id, status, payment_status, customer_data, total_price, services(name)')
+      .select('id, friendly_order_id, status, payment_status, user_id, customer_data, total_price, services(name)')
       .eq('id', body.orderId)
       .single();
     if (fetchError || !order) {
@@ -95,8 +95,10 @@ export async function POST(request: NextRequest) {
         created_by_admin: user.id,
         // Draft-ul creat cu sesiunea adminului se leagă de contul LUI
         // (draft route: user_id = user?.id) — comanda e a clientului, o
-        // detașăm ca să nu apară în /account-ul adminului.
-        user_id: null,
+        // detașăm ca să nu apară în /account-ul adminului. Un draft început
+        // de client (finalizat din bannerul „Comandă neterminată") rămâne
+        // legat de contul CLIENTULUI.
+        user_id: o.user_id === user.id ? null : o.user_id ?? null,
         customer_data: {
           ...customerData,
           manual_order: { createdBy: user.id, createdAt: now, via: 'wizard_telefonic' },

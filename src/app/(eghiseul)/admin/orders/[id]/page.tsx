@@ -6141,6 +6141,7 @@ function StuckClientBanner({ order, onChanged }: { order: OrderDetail; onChanged
   const [generating, setGenerating] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [finalizing, setFinalizing] = useState(false);
   const cd = (order.customer_data as AnyObj | null) ?? {};
   const contact = (cd.contact as AnyObj | null) ?? {};
   const personal = (cd.personal as AnyObj | null) ?? {};
@@ -6180,6 +6181,32 @@ function StuckClientBanner({ order, onChanged }: { order: OrderDetail; onChanged
       toast.error(e instanceof Error ? e.message : 'Nu am putut genera linkul');
     } finally {
       setGenerating(false);
+    }
+  };
+
+  // Comandă începută de echipă pe formularul public: o trecem pe fluxul
+  // telefonic (fără acte/selfie la plată — vin prin linkul de completare).
+  const finalizeAsPhoneOrder = async () => {
+    if (!window.confirm(
+      'Finalizezi ca comandă telefonică?\n\n' +
+      'Comanda trece în „neplătită", fără să mai ceară selfie sau acte înainte de plată. ' +
+      'Apoi trimiți clientului linkul de plată, iar după plată linkul de completare (acte + selfie + semnătură).'
+    )) return;
+    setFinalizing(true);
+    try {
+      const res = await fetch('/api/admin/orders/create-from-draft', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: order.id }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || 'Eroare');
+      toast.success('Comandă telefonică creată — trimite acum linkul de plată din banner');
+      onChanged();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Nu am putut finaliza comanda');
+    } finally {
+      setFinalizing(false);
     }
   };
 
@@ -6232,6 +6259,12 @@ function StuckClientBanner({ order, onChanged }: { order: OrderDetail; onChanged
         <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setEditOpen((v) => !v)}>
           {editOpen ? 'Închide editarea' : 'Editează datele clientului'}
         </Button>
+        {order.status === 'draft' && (
+          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={finalizeAsPhoneOrder} disabled={finalizing}>
+            {finalizing ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
+            Finalizează ca comandă telefonică
+          </Button>
+        )}
       </div>
 
       {editOpen && (

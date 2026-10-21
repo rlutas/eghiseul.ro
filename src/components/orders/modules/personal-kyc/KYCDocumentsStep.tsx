@@ -39,6 +39,7 @@ import { cn } from '@/lib/utils';
 import type { PersonalKYCConfig, DocumentType, UploadedDocumentState } from '@/types/verification-modules';
 import { compressImage } from '@/lib/images/compress';
 import { randomId } from '@/lib/random-id';
+import { findDuplicateUpload } from '@/lib/kyc/duplicate-upload';
 import { SelfieLegalNotice } from './SelfieLegalNotice';
 import { DataSafetyNote } from './DataSafetyNote';
 
@@ -413,6 +414,24 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
         const compressed = await compressImage(file);
         console.log(`[KYC] ${type}: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB`);
         const base64 = compressed.base64;
+
+        // Same picture as another document → refuse here; /submit would
+        // refuse it later anyway, after the customer has left this step.
+        const duplicate = findDuplicateUpload(
+          type,
+          base64,
+          compressed.sizeAfter,
+          personalKycRef.current?.uploadedDocuments || []
+        );
+        if (duplicate) {
+          const otherLabel =
+            DOCUMENT_CONFIG[duplicate.type as KYCDocType]?.title || 'alt document';
+          throw new Error(
+            type === 'selfie'
+              ? `Ai încărcat aceeași poză ca la „${otherLabel}". Selfie-ul trebuie să fie o poză nouă, cu tine ținând actul în mână.`
+              : `Poza este identică cu cea de la „${otherLabel}". Încarcă documentul corect.`
+          );
+        }
 
         setUploads((prev) => ({
           ...prev,

@@ -54,6 +54,15 @@ interface ModularOrderWizardProps {
   headerExtra?: React.ReactNode;
 }
 
+// /submit refusal code → the wizard step where the customer can fix it.
+const SUBMIT_ERROR_STEP: Record<string, ModularStepId> = {
+  KYC_INCOMPLETE: 'kyc-documents',
+  ACCOUNT_KYC_UNAVAILABLE: 'kyc-documents',
+  ACCOUNT_KYC_COPY_FAILED: 'kyc-documents',
+  BILLING_INCOMPLETE: 'billing',
+  EMAIL_DOMAIN_INVALID: 'contact',
+};
+
 export function ModularOrderWizard({ initialService, initialOptions, headerExtra }: ModularOrderWizardProps) {
   const {
     state,
@@ -97,6 +106,10 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
     Component: React.ComponentType<any>;
   } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Refusal from /submit, pinned on the step that can fix it. A toast alone
+  // vanished in seconds and left the customer on Billing with a „dead"
+  // Plătește (E-261021-2446F: selfie = ID back, KYC_INCOMPLETE).
+  const [submitError, setSubmitError] = useState<{ message: string; stepId: ModularStepId | null } | null>(null);
   // Mod telefonic: citit post-mount (SSR nu vede URL-ul → hydration-safe;
   // setTimeout 0 pt react-compiler — fără setState sincron în effect).
   const [phoneMode, setPhoneMode] = useState(false);
@@ -285,12 +298,19 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
       });
 
       if (!submitResponse.ok) {
-        const submitError = await submitResponse.json().catch(() => ({}));
-        console.error('Order submission failed:', submitError);
-        toast.error(
-          submitError?.error?.message ||
-            'Nu am putut finaliza comanda. Verifică datele introduse și încearcă din nou.'
-        );
+        const failure = await submitResponse.json().catch(() => ({}));
+        console.error('Order submission failed:', failure);
+        const message: string =
+          failure?.error?.message ||
+          'Nu am putut finaliza comanda. Verifică datele introduse și încearcă din nou.';
+        const target = SUBMIT_ERROR_STEP[failure?.error?.code as string] ?? null;
+        const stepId = target && visibleSteps.some((s) => s.id === target) ? target : null;
+        setSubmitError({ message, stepId });
+        if (stepId) {
+          goToStep(stepId);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        toast.error(message);
         setIsSubmitting(false);
         return;
       }
@@ -302,7 +322,7 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
       toast.error('Eroare de conexiune la trimiterea comenzii. Verifică internetul și încearcă din nou.');
       setIsSubmitting(false);
     }
-  }, [state.orderId, priceBreakdown.totalPrice, state.signature?.signatureBase64, state.signature?.termsAccepted, state.consent, saveDraftNow]);
+  }, [state.orderId, priceBreakdown.totalPrice, state.signature?.signatureBase64, state.signature?.termsAccepted, state.consent, saveDraftNow, visibleSteps, goToStep]);
 
   // Handle next
   const handleNext = () => {
@@ -555,6 +575,29 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
             </div>
 
             <CardContent className="p-6">
+              {submitError && (!submitError.stepId || submitError.stepId === state.currentStepId) && (
+                <div
+                  role="alert"
+                  className="mb-5 flex items-start gap-3 rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-900"
+                >
+                  <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+                  <div className="flex-1">
+                    <p className="font-semibold">Comanda nu a putut fi trimisă la plată</p>
+                    <p className="mt-1">{submitError.message}</p>
+                    {submitError.stepId && (
+                      <p className="mt-1">Corectează aici, apoi mergi din nou până la „Plătește&rdquo;.</p>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSubmitError(null)}
+                    className="text-red-700 hover:text-red-900"
+                    aria-label="Închide mesajul"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
               <Suspense fallback={<StepLoading />}>
                 {renderStep()}
               </Suspense>
