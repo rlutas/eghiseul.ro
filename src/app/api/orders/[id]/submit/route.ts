@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { sanitizeClientFiles } from '@/lib/orders/client-files';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -677,16 +677,20 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Auto-generate documents (contract-complet, imputernicire, cerere)
-    try {
-      const docResults = await autoGenerateOrderDocuments(id, user?.id || null);
-      if (docResults.length > 0) {
-        console.log(`Auto-generated ${docResults.length} documents for order ${id}`);
+    // Auto-generate documents (submit mode = contract-prestari only) AFTER the
+    // response: nothing on the checkout page needs it, and running it inline
+    // kept the customer waiting on «Plătește» for the whole DOCX build.
+    after(async () => {
+      try {
+        const docResults = await autoGenerateOrderDocuments(id, user?.id || null);
+        if (docResults.length > 0) {
+          console.log(`Auto-generated ${docResults.length} documents for order ${id}`);
+        }
+      } catch (docError) {
+        // Don't fail the submission if document generation fails
+        console.error('Auto-document generation failed (order still submitted):', docError);
       }
-    } catch (docError) {
-      // Don't fail the submission if document generation fails
-      console.error('Auto-document generation failed (order still submitted):', docError);
-    }
+    });
 
     // Create order_history entry for submission (audit trail)
     await adminClient.from('order_history').insert({

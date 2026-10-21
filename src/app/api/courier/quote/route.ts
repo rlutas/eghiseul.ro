@@ -102,21 +102,30 @@ export async function GET(request: NextRequest) {
     // Get available providers for information
     const availableProviders = getAvailableProvidersForDestination({ country });
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        quotes,
-        route: {
-          sender: { county: senderCounty, city: senderCity },
-          recipient: { county: recipientCounty, city: recipientCity, country },
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          quotes,
+          route: {
+            sender: { county: senderCounty, city: senderCity },
+            recipient: { county: recipientCounty, city: recipientCity, country },
+          },
+          availableProviders: availableProviders.map((p) => ({
+            code: p.code,
+            name: p.name,
+            type: p.type,
+          })),
         },
-        availableProviders: availableProviders.map((p) => ({
-          code: p.code,
-          name: p.name,
-          type: p.type,
-        })),
       },
-    });
+      // Tariffs depend only on the query string. The live call to Fan/Sameday
+      // took 1.5–1.9 s and the delivery step asks again on every remount, so
+      // let the CDN answer repeats. An empty answer (both couriers down) is
+      // not cached.
+      quotes.length > 0
+        ? { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' } }
+        : undefined
+    );
   } catch (error) {
     console.error('[Courier Quote API] Error:', error);
     return NextResponse.json(
