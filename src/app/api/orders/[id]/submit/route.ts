@@ -6,8 +6,9 @@ import { logAudit, getAuditContext } from '@/lib/security/audit-logger';
 import { createHash, timingSafeEqual } from 'crypto';
 import { autoGenerateOrderDocuments } from '@/lib/documents/auto-generate';
 import { uploadOrderSignature, uploadBase64, copyFile, getFileInfo, downloadFile } from '@/lib/aws/s3';
-import { computeEstimatedCompletionISOForOrder, hasForeignDrivingLicense } from '@/lib/orders/order-estimate';
+import { computeEstimatedCompletionISOForOrder } from '@/lib/orders/order-estimate';
 import { getMissingInvoiceClientFields } from '@/lib/oblio/invoice';
+import { computeServerPricing, type CouponRow, type OptionRow, type StoredOption } from '@/lib/orders/server-pricing';
 import { emailDomainAcceptsMail } from '@/lib/email-mx';
 import { isIdentityFrontType, isPassportType, isSelfieType, identityFrontTypes } from '@/lib/kyc/identity-documents';
 
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Include service fields so we can compute the estimated completion date.
     const { data: order, error: orderError } = await adminClient
       .from('orders')
-      .select('*, services(slug, estimated_days, urgent_days, urgent_available, verification_config)')
+      .select('*, services(slug, base_price, estimated_days, urgent_days, urgent_available, verification_config)')
       .eq('id', id)
       .single();
 
@@ -342,96 +343,72 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
     }
 
-    // ── Tarif „permis emis în străinătate" (cazier auto) ────────────────
-    // Prețul de bază e calculat în wizard (ca la variantele de constatator) și
-    // persistat pe comandă, deci un client care umblă la payload-ul draftului ar
-    // putea plăti tariful de permis românesc pentru o fișă cerută în străinătate.
-    // Recalculăm din config înainte de plată și corectăm în sus dacă e nevoie.
-    {
+    // ── Prețul calculat pe server ───────────────────────────────────────
+    // Draftul păstrează bază/opțiuni/livrare/reducere/total exact cum le-a
+    // trimis browserul, iar din ele se construiesc liniile Stripe și suma de
+    // la transfer bancar. Le recalculăm din surse de încredere (config
+    // serviciu, service_options, lista de prețuri pentru traduceri, minimul de
+    // livrare) și le scriem pe comandă mai jos, odată cu trecerea în pending.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pricedOrder = order as any;
+    const storedOptions: StoredOption[] = Array.isArray(pricedOrder.selected_options)
+      ? pricedOrder.selected_options
+      : [];
+    const optionIds = storedOptions
+      .map((o) => o?.option_id)
+      .filter((v): v is string => typeof v === 'string' && v.length > 0);
+    const [{ data: ownRows }, { data: idRows }, { data: plRow }, { data: couponRow }] = await Promise.all([
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const o = order as any;
-      const fl = o.services?.verification_config?.vehicleVerification?.foreignLicense;
-      if (
-        fl?.enabled &&
-        typeof fl.price === 'number' &&
-        fl.price > 0 &&
-        hasForeignDrivingLicense(o.customer_data)
-      ) {
-        const currentBase = Number(o.base_price ?? 0);
-        if (currentBase + 0.01 < fl.price) {
-          const diff = Math.round((fl.price - currentBase) * 100) / 100;
-          const newTotal = Math.round((Number(o.total_price ?? 0) + diff) * 100) / 100;
-          await adminClient
-            .from('orders')
-            .update({ base_price: fl.price, total_price: newTotal })
-            .eq('id', id);
-          o.base_price = fl.price;
-          o.total_price = newTotal;
-          console.warn(
-            `[submit] tarif permis străin corectat pe ${id}: base ${currentBase} → ${fl.price} (total ${newTotal})`
-          );
+      (adminClient as any)
+        .from('service_options')
+        .select('id, code, price, max_quantity')
+        .eq('service_id', pricedOrder.service_id),
+      optionIds.length > 0
+        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (adminClient as any).from('service_options').select('id, code, price, max_quantity').in('id', optionIds)
+        : Promise.resolve({ data: [] }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (adminClient as any).from('admin_settings').select('value').eq('key', 'translation_price_list').maybeSingle(),
+      typeof pricedOrder.coupon_code === 'string' && pricedOrder.coupon_code.trim()
+        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (adminClient as any)
+            .from('coupons')
+            .select('discount_type, discount_value, owner_user_id, max_uses, times_used, valid_from, valid_until, min_amount')
+            .ilike('code', pricedOrder.coupon_code.trim())
+            .eq('is_active', true)
+            .maybeSingle()
+        : Promise.resolve({ data: null }),
+    ]);
+    const translationPrices = new Map<string, number>();
+    const translationApostilaExtras = new Map<string, number>();
+    for (const row of (plRow?.value as Array<{ language?: string; active?: boolean; clientPriceDoc?: number | null; clientPriceApostilaExtra?: number | null }> | null) ?? []) {
+      if (row?.language && row.active && row.clientPriceDoc != null) {
+        translationPrices.set(row.language, Number(row.clientPriceDoc));
+        if (row.clientPriceApostilaExtra != null) {
+          translationApostilaExtras.set(row.language, Number(row.clientPriceApostilaExtra));
         }
       }
     }
-
-    // ── Preț traducere per limbă ────────────────────────────────────────
-    // Limbile scumpe (nordice/slave) au preț propriu în admin_settings.
-    // translation_price_list; wizardul îl aplică, dar payload-ul draftului e
-    // editabil de client — recalculăm și corectăm ÎN SUS înainte de plată,
-    // altfel daneza (cost 150 la traducător) s-ar plăti ca engleza.
-    {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const o = order as any;
-      const opts = Array.isArray(o.selected_options) ? o.selected_options : [];
-      const hasTranslation = opts.some(
-        (op: { code?: string }) => op?.code === 'traducere'
+    const serverPricing = computeServerPricing({
+      serviceBasePrice: Number(pricedOrder.services?.base_price ?? 0),
+      verificationConfig: pricedOrder.services?.verification_config,
+      customerData: pricedOrder.customer_data,
+      selectedOptions: storedOptions,
+      optionsById: new Map(((idRows ?? []) as OptionRow[]).map((r) => [r.id, r])),
+      ownOptionsByCode: new Map(
+        ((ownRows ?? []) as OptionRow[]).filter((r) => !!r.code).map((r) => [r.code as string, r])
+      ),
+      translationPrices,
+      translationApostilaExtras,
+      deliveryMethod: pricedOrder.delivery_method ?? null,
+      deliveryPrice: Number(pricedOrder.delivery_price ?? 0),
+      coupon: (couponRow as CouponRow | null) ?? null,
+      orderUserId: pricedOrder.user_id ?? user?.id ?? null,
+    });
+    if (Math.abs(serverPricing.totalPrice - Number(pricedOrder.total_price ?? 0)) > 0.01) {
+      console.warn(
+        `[submit] total recalculat pe server pentru ${id}: ${pricedOrder.total_price} → ${serverPricing.totalPrice}`
       );
-      if (hasTranslation) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: plRow } = await (adminClient as any)
-          .from('admin_settings')
-          .select('value')
-          .eq('key', 'translation_price_list')
-          .maybeSingle();
-        const priceByLang = new Map<string, number>();
-        const extraByLang = new Map<string, number>();
-        for (const row of (plRow?.value as Array<{ language?: string; active?: boolean; clientPriceDoc?: number | null; clientPriceApostilaExtra?: number | null }> | null) ?? []) {
-          if (row?.language && row.active && row.clientPriceDoc != null) {
-            priceByLang.set(row.language, Number(row.clientPriceDoc));
-            if (row.clientPriceApostilaExtra != null) {
-              extraByLang.set(row.language, Number(row.clientPriceApostilaExtra));
-            }
-          }
-        }
-        // Cu Apostilă Haga pe comandă, traducerea are supliment (se traduce și apostila).
-        const hasHaga = opts.some((op: { code?: string }) => op?.code === 'apostila_haga');
-        let totalDiff = 0;
-        const corrected = opts.map(
-          (op: { code?: string; priceModifier?: number; quantity?: number; metadata?: { language?: string } }) => {
-            if (op?.code !== 'traducere') return op;
-            const lang = op.metadata?.language ?? '';
-            const base = priceByLang.get(lang);
-            const expected =
-              base == null ? undefined : base + (hasHaga ? extraByLang.get(lang) ?? 0 : 0);
-            const current = Number(op.priceModifier ?? 0);
-            if (expected == null || current + 0.01 >= expected) return op;
-            totalDiff += (expected - current) * Number(op.quantity ?? 1);
-            return { ...op, priceModifier: expected };
-          }
-        );
-        if (totalDiff > 0) {
-          const newTotal = Math.round((Number(o.total_price ?? 0) + totalDiff) * 100) / 100;
-          await adminClient
-            .from('orders')
-            .update({ selected_options: corrected, total_price: newTotal })
-            .eq('id', id);
-          o.selected_options = corrected;
-          o.total_price = newTotal;
-          console.warn(
-            `[submit] preț traducere corectat pe ${id}: +${totalDiff.toFixed(2)} lei (total ${newTotal})`
-          );
-        }
-      }
     }
 
     // Capture audit context (IP, user agent) from request
@@ -541,10 +518,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
     }
 
-    // Update total price if provided
-    if (body.total_price !== undefined) {
-      updateData.total_price = body.total_price;
-    }
+    // Prices: always the server-side computation, never the browser's total.
+    updateData.base_price = serverPricing.basePrice;
+    updateData.options_price = serverPricing.optionsPrice;
+    updateData.delivery_price = serverPricing.deliveryPrice;
+    updateData.discount_amount = serverPricing.discountAmount;
+    updateData.total_price = serverPricing.totalPrice;
+    updateData.selected_options = serverPricing.selectedOptions;
 
     // Save signature, consent data, and audit metadata into customer_data
     const existingCustomerData = (order.customer_data as Record<string, unknown>) || {};
@@ -553,7 +533,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // This proves which contract version was agreed to
     const contractContentForHash = JSON.stringify({
       customer_data: existingCustomerData,
-      total_price: body.total_price || order.total_price,
+      total_price: serverPricing.totalPrice,
       service_id: order.service_id,
     });
     const documentHash = createHash('sha256').update(contractContentForHash).digest('hex');
