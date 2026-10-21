@@ -2,6 +2,8 @@
 
 > **🔴 Update 2026-10-21 — „Plătește” părea mort când serverul refuza comanda.** O colegă a pus poza verso-ului de buletin și la selfie, ca să poată plăti clientul. Serverul a refuzat cu „lipsește selfie”, dar wizardul arăta doar un toast care dispărea și rămânea pe Facturare. Același lucru li se putea întâmpla oricărui client (selfie lipsă, facturare incompletă, email greșit), iar refuzul nu se salvează nicăieri. **Reparat:** saltul automat la pasul cu problema + mesaj roșu persistent; poza identică cu alt act e refuzată la încărcare; buton admin „Finalizează ca comandă telefonică” pe ciorne. **Rămâne deschis:** refuzurile de la „Plătește” nu se salvează încă pe comandă, deci nu se văd în admin (cum se văd plățile cu cardul eșuate). [changelog](changelog/2026-10-21-wizard-erori-plata-selfie.md)
 >
+> **✅ Viteză 2026-10-21 — funcțiile mutate din Washington (iad1) la Londra (lhr1).** Remăsurat live după deploy: cotația de curier repetată 1,5–1,9 s → **0,18 s** (cache CDN HIT); prima cotație pe o localitate nouă tot ~1,5–2 s (Fan + Sameday cer token nou la fiecare instanță rece: cache-ul de token se scrie în `/var/task`, read-only → `EROFS`); refuz `/submit` 0,4–0,6 s → 0,26 s; localități 0,65 s → 0,34–0,41 s. Fără erori în producție după deploy. [changelog](changelog/2026-10-21-viteza-plata-curier-regiune.md)
+>
 > **🔧 Setup local 2026-10-21:** Vercel CLI instalat și legat de `eghiseul-ro` (`vercel logs` merge); `.env.local` refăcut din producție (`vercel env pull`) + cheile doar-locale din backup. `package-lock.json` nu e sincronizat cu `package.json` (`npm ci` refuză); `npm install` se blochează la postinstall-ul `sharp`.
 
 > **🟣 Update 2026-10-15/16 — vânzări, email, decontări pentru contabil.**
