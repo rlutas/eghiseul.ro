@@ -17,7 +17,8 @@ const PATH = '/cazier-fiscal-online/';
 const TITLE = 'Cazier fiscal online, fără SPV și fără drum la ANAF';
 const DESCRIPTION =
   'Cazier fiscal pentru persoane fizice, obținut de avocat, fără cont SPV și fără drum la ANAF. Scan pe email, originalul prin curier. Serviciu privat.';
-const UPDATED = '2026-10-06';
+const PUBLISHED = '2026-10-06';
+const UPDATED = '2026-11-02';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -58,7 +59,7 @@ export default async function CazierFiscalAdsPage() {
       { name: 'Cazier fiscal', price: p.basePrice },
       { name: 'Cazier fiscal, procesare urgentă', price: p.basePrice + urgenta },
     ],
-    datePublished: UPDATED,
+    datePublished: PUBLISHED,
     dateModified: UPDATED,
     breadcrumb: [{ name: 'Acasă', path: '/' }, { name: 'Cazier fiscal', path: PATH }],
     faq: FAQ,

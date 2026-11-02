@@ -7,7 +7,7 @@ const TITLE = 'Schimbare Certificat de Naștere Vechi cu Unul Nou: Ghid Complet'
 const DESCRIPTION =
   "Schimbă certificatul de naștere vechi sau deteriorat cu modelul actual: ce acte îți trebuie, cât durează și cum obții duplicatul online.";
 const DATE_PUBLISHED = '2026-06-19';
-const DATE_MODIFIED = '2026-09-25';
+const DATE_MODIFIED = '2026-11-02';
 
 export const revalidate = 86400;
 
@@ -103,9 +103,9 @@ export default function Page() {
       <h2>Cât durează și cât costă</h2>
       <p>
         La ghișeu, duplicatul se eliberează de regulă în aceeași zi sau în câteva zile lucrătoare.
-        <strong> Taxa de stare civilă</strong> este mică sau inexistentă în multe primării. Prin
-        eGhișeul.ro, costul afișat acoperă întocmirea și depunerea cererii prin împuternicire,
-        achitarea taxelor și livrarea prin curier — vezi prețul curent pe pagina de{' '}
+        Nu se plătește <strong>taxă de timbru</strong> (abrogată din februarie 2017); unele primării cer
+        doar o taxă locală pentru eliberarea urgentă. Prin eGhișeul.ro, costul afișat e final și acoperă
+        întocmirea și depunerea cererii prin împuternicire și livrarea prin curier — vezi prețul curent pe pagina de{' '}
         <Link href={nastereUrl}>certificat de naștere online</Link>.
       </p>
 

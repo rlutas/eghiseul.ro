@@ -46,7 +46,7 @@ const DESCRIPTION =
   'Cazier fiscal online de la ANAF pentru persoană fizică, fără cont SPV și fără drum la ' +
   'ghișeu. Arată dacă ai fapte fiscale sancționate înscrise, valabil 30 de zile. 198 RON.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-10-06';
+const DATE_MODIFIED = '2026-11-02';
 
 export const revalidate = 3600;
 
@@ -198,7 +198,7 @@ export default async function CazierFiscalOnlinePage() {
                   <div className="relative bg-gradient-to-br from-secondary-900 via-secondary-800 to-[#0C1A2F] p-6 text-center">
                     <div className="relative">
                       <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
-                        TAXE ANAF INCLUSE
+                        PREȚ FINAL
                       </span>
                       <ServicePrice basePrice={service.base_price} />
                       <p className="text-white/60 text-sm mt-2">Fără taxe ascunse</p>
@@ -331,8 +331,9 @@ export default async function CazierFiscalOnlinePage() {
                   Cazier fiscal gratuit prin SPV vs. online prin eGhișeul
                 </h3>
                 <p className="text-sm text-neutral-700">
+                  {/* SPV (verificat 02.11.2026): OMFP 660/2017, Termeni și condiții SPV, art. 6 — persoanele fizice se identifică cu certificat calificat SAU cu utilizator + parolă + OTP; doar PJ și împuterniciții au nevoie de certificat calificat. https://static.anaf.ro/static/10/Anaf/termeni_conditii_spv.pdf ; cazierul fiscal se eliberează gratuit (AJFP Vrancea, https://static.anaf.ro/static/10/Galati/Vrancea/cazier-fiscal.pdf), deci fără „taxe ANAF incluse”. */}
                   Îți poți obține cazierul fiscal <strong>gratuit prin Spațiul Privat Virtual (SPV)</strong> al ANAF,
-                  dar ai nevoie de un <strong>cont SPV activ și semnătură electronică</strong> sau de o deplasare la
+                  dar ai nevoie de un <strong>cont SPV activ</strong> sau de o deplasare la
                   ghișeu. Prin noi obții documentul <strong>100% online, fără cont SPV</strong> și fără deplasare:
                   plătești <strong>{service.base_price} RON</strong>, noi ne ocupăm de relația cu ANAF, iar tu
                   <strong> primești cazierul fiscal scanat pe email</strong>, iar originalul prin curier, dacă îl alegi.
@@ -350,8 +351,8 @@ export default async function CazierFiscalOnlinePage() {
                   fiscal de la ANAF</strong>.
                 </p>
                 <p>
-                  Poți face verificarea prin <strong>Spațiul Privat Virtual (SPV)</strong> al ANAF (cu cont și
-                  semnătură electronică) sau prin eGhișeul, complet online și fără cont SPV: completezi formularul cu
+                  Poți face verificarea prin <strong>Spațiul Privat Virtual (SPV)</strong> al ANAF (cu cont SPV)
+                  sau prin eGhișeul, complet online și fără cont SPV: completezi formularul cu
                   CNP-ul tău, noi depunem cererea la ANAF, iar tu primești cazierul fiscal scanat pe email și, la cerere, originalul prin curier.
                   Astfel verifici exact ce conține cazierul tău fiscal, fără drum la ghișeu.
                 </p>
@@ -570,7 +571,7 @@ export default async function CazierFiscalOnlinePage() {
             { q: 'În cât timp primesc cazierul fiscal?', a: `${formatEstimatedDays(service)} în mod standard. Există și opțiunea Urgent pentru livrare mai rapidă.` },
             { q: 'De ce aveți nevoie de datele mele personale?', a: 'CNP-ul și actul de identitate sunt necesare pentru a depune cererea de cazier fiscal în numele tău la ANAF și pentru validarea identității (KYC). Datele sunt prelucrate securizat și folosite exclusiv pentru emiterea documentului.' },
             { q: 'Pot cere cazier fiscal pentru o firmă?', a: 'Această pagină acoperă cazierul fiscal pentru persoană fizică. Pentru persoane juridice (firme) procedura și actele diferă — contactează-ne și te ajutăm cu varianta potrivită.' },
-            { q: 'Cazierul fiscal este gratuit?', a: 'Îl poți obține gratuit prin Spațiul Privat Virtual (SPV) al ANAF dacă ai cont SPV și semnătură electronică. Prin noi plătești un tarif pentru serviciul complet 100% online, fără cont SPV și fără deplasare la ghișeu.' },
+            { q: 'Cazierul fiscal este gratuit?', a: 'Îl poți obține gratuit prin Spațiul Privat Virtual (SPV) al ANAF dacă ai cont SPV. Prin noi plătești un tarif pentru serviciul complet 100% online, fără cont SPV și fără deplasare la ghișeu.' },
             { q: 'Cazierul fiscal vine ca PDF semnat de ANAF?', a: 'Nu. ANAF eliberează certificatul pe hârtie, la ghișeu; avocatul îl ridică, iar noi ți-l trimitem scanat pe email și, dacă alegi livrarea, originalul prin curier, în țară sau în străinătate. Varianta electronică, semnată de ANAF, există doar dacă îl ceri singur din SPV.' },
             { q: 'Cum verific cazierul fiscal?', a: 'Nu există o verificare separată de eliberare: singurul mod oficial de a verifica situația ta în cazierul fiscal este să soliciți certificatul de cazier fiscal de la ANAF. Îl poți obține prin SPV (cu cont și semnătură electronică) sau prin eGhișeul, complet online și fără cont SPV.' },
             { q: 'Care e diferența dintre cazierul fiscal și certificatul de atestare fiscală?', a: 'Cazierul fiscal arată dacă figurezi cu fapte sancționate de legile fiscale; datoriile nu apar în el. Certificatul de atestare fiscală arată situația obligațiilor tale de plată la un moment dat. Sunt documente ANAF diferite. Această pagină se referă la cazierul fiscal.' },

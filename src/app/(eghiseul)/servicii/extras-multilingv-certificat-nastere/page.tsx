@@ -41,7 +41,7 @@ const DESCRIPTION =
   'Extrasul multilingv al actului de naștere (Convenția CIEC nr. 16) e acceptat fără traducere și ' +
   'fără apostilă în Italia, Spania, Germania, Franța și alte 19 state. 798 RON totul inclus.';
 const DATE_PUBLISHED = '2026-06-25';
-const DATE_MODIFIED = '2026-10-06';
+const DATE_MODIFIED = '2026-11-02';
 
 export const revalidate = 3600;
 
@@ -324,12 +324,13 @@ export default async function ExtrasMultilingvNasterePage() {
                 extrasul are aceeași putere doveditoare ca certificatul, iar ca să-l obții nu ai nevoie
                 de certificat: se eliberează după actul din registru.
               </p>
+              {/* Primăria competentă (verificat 02.11.2026): HG 255/2024, Normele metodologice de stare civilă, în vigoare 31.03.2024 — art. 158 alin. (1): certificatele de stare civilă se eliberează „de către oricare S.P.C.L.E.P. sau, după caz, primărie”; art. 171 alin. (1): la fel extrasele multilingve; art. 12 lit. o): ofițerii de stare civilă din S.P.C.L.E.P. eliberează adeverința privind statutul civil (Anexa 18); art. 28 alin. (3): un act nedigitizat se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598 — aplicat de SPCLEP: „cererea pentru certificat duplicat/extras sau formular multilingv/Adeverință cu privire la statutul civil se poate depune la oricare primărie/serviciu de stare civilă/SPCLEP din România” https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf */}
               <p>
-                Cererea se depune la <strong>primăria care deține actul de naștere</strong>, adică
-                acolo unde s-a înregistrat nașterea. Pentru majoritatea oamenilor plecați din țară,
-                aceea nu e primăria din orașul unde locuiesc acum, ci cea din localitatea natală. De-aia
-                serviciul are sens: completezi datele online, semnezi electronic împuternicirea în
-                formular, iar avocatul partener depune cererea la primăria competentă. Primești extrasul
+                Din 2024, cererea se poate depune la <strong>orice serviciu de stare civilă din țară</strong>,
+                nu doar la primăria unde s-a înregistrat nașterea (HG 255/2024, art. 171). Pentru cine e
+                plecat din țară, tot trebuie cineva care să meargă la un ghișeu. De-aia serviciul are sens:
+                completezi datele online, semnezi electronic împuternicirea în
+                formular, iar avocatul partener depune cererea la starea civilă. Primești extrasul
                 pe email și, dacă vrei, originalul prin curier, inclusiv în afara țării.
               </p>
               <p>
@@ -710,7 +711,8 @@ export default async function ExtrasMultilingvNasterePage() {
             { q: 'Ce acte îmi trebuie ca să comand?', a: 'Doar actul de identitate (îl scanezi în formular), un selfie cu actul pentru verificarea identității și datele actului de naștere: data, locul înregistrării și numele părinților. Wizard-ul online te ghidează pas cu pas.' },
             { q: 'Extrasul multilingv înlocuiește certificatul de naștere?', a: 'În statele convenției, da: are aceeași putere doveditoare. În România, nu: aici ți se cere certificatul. Ca să obții extrasul nu ai nevoie de certificat, pentru că se eliberează după actul din registru.' },
             { q: 'Copilul s-a născut în străinătate. Pot cere extrasul multilingv?', a: 'Nu direct. Actul de naștere românesc există abia după transcrierea certificatului străin în registrele de stare civilă din România. Până la transcriere nu are cine elibera extrasul, fiindcă nu există act românesc de naștere. Transcrierea se face la primăria de domiciliu sau prin misiunea diplomatică.' },
-            { q: 'La ce primărie se depune cererea?', a: 'La primăria care deține actul de naștere, adică cea din localitatea unde s-a înregistrat nașterea — nu cea unde locuiești acum. Pentru cine e plecat din țară, asta e de obicei localitatea natală, la câteva sute de kilometri distanță.' },
+            // Primăria competentă (verificat 02.11.2026): HG 255/2024, Normele metodologice de stare civilă, în vigoare 31.03.2024 — art. 158 alin. (1): certificatele de stare civilă se eliberează „de către oricare S.P.C.L.E.P. sau, după caz, primărie”; art. 171 alin. (1): la fel extrasele multilingve; art. 12 lit. o): ofițerii de stare civilă din S.P.C.L.E.P. eliberează adeverința privind statutul civil (Anexa 18); art. 28 alin. (3): un act nedigitizat se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598 — aplicat de SPCLEP: „cererea pentru certificat duplicat/extras sau formular multilingv/Adeverință cu privire la statutul civil se poate depune la oricare primărie/serviciu de stare civilă/SPCLEP din România” https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
+            { q: 'La ce primărie se depune cererea?', a: 'Din 2024, la orice serviciu de stare civilă sau primărie din țară, nu doar la cea unde s-a înregistrat nașterea (HG 255/2024, art. 171). Dacă actul vechi nu e încă în sistemul electronic, primăria care îl păstrează îl încarcă întâi, așa că poate dura câteva zile în plus.' },
             { q: 'Îmi trebuie extrasul de naștere sau cel de căsătorie?', a: 'Depinde ce dovedești. Extrasul de naștere dovedește data, locul nașterii și filiația (numele părinților) — se cere la înscrierea copilului la școală, la alocații, la dosarele de cetățenie prin descendență. Extrasul de căsătorie dovedește căsătoria și numele purtat după căsătorie. Sunt documente distincte; unele dosare le cer pe amândouă.' },
           ]}
         />

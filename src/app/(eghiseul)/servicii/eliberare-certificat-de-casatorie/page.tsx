@@ -182,7 +182,7 @@ export default async function CertificatCasatoriePage() {
                     {[
                       'Completezi datele soților și data/locul căsătoriei',
                       'Confirmi localitatea de înregistrare a căsătoriei',
-                      'Plătești securizat (taxe incluse)',
+                      'Plătești securizat, preț final',
                       `Primești certificatul pe email în ${formatEstimatedDays(service)}`,
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
@@ -204,7 +204,7 @@ export default async function CertificatCasatoriePage() {
                   <div className="relative bg-gradient-to-br from-secondary-900 via-secondary-800 to-[#0C1A2F] p-6 text-center">
                     <div className="relative">
                       <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
-                        TAXE INCLUSE
+                        PREȚ FINAL
                       </span>
                       <ServicePrice basePrice={service.base_price} />
                       <p className="text-white/60 text-sm mt-2">Fără taxe ascunse</p>
@@ -265,7 +265,7 @@ export default async function CertificatCasatoriePage() {
         </section>
 
         <PrivateServiceNotice
-          institutionLabel="la Starea Civilă din localitatea de înregistrare sau pe hub.mai.gov.ro"
+          institutionLabel="la orice serviciu de stare civilă din țară sau pe hub.mai.gov.ro"
           institutionUrl="https://hub.mai.gov.ro"
         />
 
@@ -307,7 +307,7 @@ export default async function CertificatCasatoriePage() {
               <p>
                 Prin eGhișeul obții <strong>certificat de căsătorie online</strong>, fără drum la primărie. Completezi
                 datele soților și locul căsătoriei, iar noi depunem cererea la Direcția de Evidență a Persoanelor (Starea
-                Civilă), plătim taxele și îți trimitem documentul. Soluția este utilă mai ales pentru proceduri de cetățenie,
+                Civilă) și îți trimitem documentul. Soluția este utilă mai ales pentru proceduri de cetățenie,
                 divorț, moștenire sau dosare administrative.
               </p>
               <div className="rounded-2xl border border-neutral-200 bg-white p-5">
@@ -320,10 +320,11 @@ export default async function CertificatCasatoriePage() {
                     duplicatele de stare civilă: https://www.primariagalati.ro/portal/act/comspclep_18072016.pdf).
                     Unele primării percep doar o taxă locală pentru eliberarea în regim de urgență, ex.
                     https://primariatgfrumos.ro/wp-content/uploads/2023/01/Eliberare-la-cerere-a-certificatelor-de-nastere-1.pdf */}
+                {/* Primăria competentă (verificat 02.11.2026): HG 255/2024, Normele metodologice de stare civilă, în vigoare 31.03.2024 — art. 158 alin. (1): certificatele de stare civilă se eliberează „de către oricare S.P.C.L.E.P. sau, după caz, primărie”; art. 171 alin. (1): la fel extrasele multilingve; art. 12 lit. o): ofițerii de stare civilă din S.P.C.L.E.P. eliberează adeverința privind statutul civil (Anexa 18); art. 28 alin. (3): un act nedigitizat se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598 — aplicat de SPCLEP: „cererea pentru certificat duplicat/extras sau formular multilingv/Adeverință cu privire la statutul civil se poate depune la oricare primărie/serviciu de stare civilă/SPCLEP din România” https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf */}
                 <p className="text-sm text-neutral-700">
                   Eliberarea unui duplicat se poate face <strong>personal și fără taxă de timbru, la Starea Civilă</strong>
-                  {' '}din localitatea de înregistrare a căsătoriei. Problema apare când nu poți ajunge acolo — locuiești în
-                  altă localitate sau ești în <strong>diaspora</strong>. Prin noi rezolvi totul online: depunem cererea în
+                  {' '}din orice localitate din țară, nu doar din cea unde v-ați căsătorit (HG 255/2024, art. 158). Problema apare când
+                  nu poți ajunge la niciun ghișeu: ești în <strong>diaspora</strong> sau nu ai timp de programare. Prin noi rezolvi totul online: depunem cererea în
                   numele tău <strong>pe bază de împuternicire</strong>, plătești <strong>{service.base_price} RON, preț
                   final</strong> și primești certificatul fără deplasare.
                 </p>
@@ -393,7 +394,7 @@ export default async function CertificatCasatoriePage() {
                   {
                     icon: Globe,
                     title: 'Din diaspora',
-                    desc: 'Românii plecați din țară pot obține duplicatul fără să revină acasă. Depunem cererea prin împuternicire la primăria de înregistrare și îți trimitem documentul prin curier — util pentru dosare de cetățenie sau acte la autoritățile străine.',
+                    desc: 'Românii plecați din țară pot obține duplicatul fără să revină acasă. Depunem cererea prin împuternicire la Starea Civilă și îți trimitem documentul prin curier — util pentru dosare de cetățenie sau acte la autoritățile străine.',
                   },
                 ].map((c) => (
                   <div
@@ -463,7 +464,7 @@ export default async function CertificatCasatoriePage() {
               {[
                 { step: 1, title: 'Completezi Datele', desc: 'Introduci datele soților, data și locul căsătoriei.', icon: Users },
                 { step: 2, title: 'Confirmi Localitatea', desc: 'Confirmi localitatea de înregistrare. Verificăm datele înainte de depunere.', icon: FileText },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele de stare civilă sunt incluse în preț.', icon: Shield },
+                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay. Prețul afișat e final.', icon: Shield },
                 { step: 4, title: 'Primești Documentul', desc: `În ${formatEstimatedDays(service)} primești certificatul pe email și, opțional, prin curier.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
@@ -595,7 +596,8 @@ export default async function CertificatCasatoriePage() {
             { q: 'Ce este certificatul de căsătorie?', a: 'Este actul de stare civilă care atestă încheierea căsătoriei dintre doi soți. Primul certificat se eliberează la încheierea căsătoriei; un exemplar nou se poate cere de la oricare serviciu de stare civilă sau primărie din țară (HG 255/2024 art. 158).' },
             { q: 'Care e diferența dintre duplicat și copie legalizată?', a: 'Duplicatul este un nou exemplar oficial al certificatului, eliberat de Starea Civilă, care înlocuiește originalul pierdut sau deteriorat. Copia legalizată este o fotocopie a certificatului existent, certificată conform cu originalul de un notar — folosită când trebuie să depui mai multe exemplare.' },
             { q: 'Am pierdut certificatul de căsătorie. Ce fac?', a: 'Soliciți un duplicat la oricare serviciu de stare civilă sau primărie din țară (HG 255/2024 art. 158). Prin eGhișeul faci asta online, fără să te deplasezi — depunem cererea pe bază de împuternicire și primești noul certificat.' },
-            { q: 'Pot obține certificatul dintr-o altă localitate sau din străinătate?', a: 'Da. Nu trebuie să fii prezent. Pe baza unei împuterniciri (pe care o pregătim noi), depunem cererea la Starea Civilă din localitatea de înregistrare. Serviciul este util mai ales pentru românii din diaspora.' },
+            // Primăria competentă (verificat 02.11.2026): HG 255/2024, Normele metodologice de stare civilă, în vigoare 31.03.2024 — art. 158 alin. (1): certificatele de stare civilă se eliberează „de către oricare S.P.C.L.E.P. sau, după caz, primărie”; art. 171 alin. (1): la fel extrasele multilingve; art. 12 lit. o): ofițerii de stare civilă din S.P.C.L.E.P. eliberează adeverința privind statutul civil (Anexa 18); art. 28 alin. (3): un act nedigitizat se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598 — aplicat de SPCLEP: „cererea pentru certificat duplicat/extras sau formular multilingv/Adeverință cu privire la statutul civil se poate depune la oricare primărie/serviciu de stare civilă/SPCLEP din România” https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
+            { q: 'Pot obține certificatul dintr-o altă localitate sau din străinătate?', a: 'Da. Nu trebuie să fii prezent. Pe baza unei împuterniciri (pe care o pregătim noi), depunem cererea la Starea Civilă; din 2024 se poate depune la orice primărie din țară, nu doar la cea unde v-ați căsătorit (HG 255/2024 art. 158). Serviciul este util mai ales pentru românii din diaspora.' },
             { q: 'În cât timp ajunge duplicatul certificatului de căsătorie?', a: `${formatEstimatedDays(service)} în mod standard, în funcție de Starea Civilă a localității. Pentru căsătorii mai vechi sau din altă localitate poate dura puțin mai mult. Există și opțiunea Urgent.` },
             { q: 'Cât este valabil certificatul de căsătorie?', a: 'Certificatul de căsătorie nu expiră — atestă un eveniment de stare civilă. Totuși, unele instituții (în special pentru proceduri de cetățenie) pot cere un duplicat recent, emis în ultimele luni.' },
             { q: 'Cine poate cere un duplicat?', a: 'Oricare dintre soți, sau o persoană împuternicită. În anumite cazuri (succesiune, deces), îl pot solicita și descendenții sau persoanele cu interes legitim, cu documente justificative.' },

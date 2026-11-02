@@ -205,7 +205,7 @@ export default async function CertificatCelibatPage() {
                   <div className="relative bg-gradient-to-br from-secondary-900 via-secondary-800 to-[#0C1A2F] p-6 text-center">
                     <div className="relative">
                       <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
-                        TAXE INCLUSE
+                        PREȚ FINAL
                       </span>
                       <ServicePrice basePrice={service.base_price} />
                       <p className="text-white/60 text-sm mt-2">Fără taxe ascunse</p>
@@ -274,9 +274,10 @@ export default async function CertificatCelibatPage() {
             { label: 'Valabil', value: 'legea nu fixează un termen; statul străin cere de obicei sub 3-6 luni' },
           ]}
         >
+          {/* Primăria competentă (verificat 02.11.2026): HG 255/2024, Normele metodologice de stare civilă, în vigoare 31.03.2024 — art. 158 alin. (1): certificatele de stare civilă se eliberează „de către oricare S.P.C.L.E.P. sau, după caz, primărie”; art. 171 alin. (1): la fel extrasele multilingve; art. 12 lit. o): ofițerii de stare civilă din S.P.C.L.E.P. eliberează adeverința privind statutul civil (Anexa 18); art. 28 alin. (3): un act nedigitizat se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598 — aplicat de SPCLEP: „cererea pentru certificat duplicat/extras sau formular multilingv/Adeverință cu privire la statutul civil se poate depune la oricare primărie/serviciu de stare civilă/SPCLEP din România” https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf */}
           Certificatul de celibat se numește legal adeverință privind statutul civil (Anexa 18 la H.G. 255/2024). O
-          eliberează oficiul de stare civilă care păstrează actul tău de naștere și confirmă că în registrele din România
-          nu figurezi căsătorit. Se cere de obicei pentru o căsătorie în străinătate; cererea o depune avocatul, pe bază
+          eliberează serviciul de stare civilă, iar din 2024 cererea se poate depune la oricare din țară, nu doar la cel
+          din localitatea de naștere sau de domiciliu. Confirmă că în registrele din România nu figurezi căsătorit. Se cere de obicei pentru o căsătorie în străinătate; cererea o depune avocatul, pe bază
           de împuternicire avocațială, fără să vii în țară.
         </ServiceAnswerBlock>
 
@@ -293,7 +294,7 @@ export default async function CertificatCelibatPage() {
               {[
                 { icon: Clock, value: formatEstimatedDays(service), label: 'Livrare estimată' },
                 { icon: Mail, value: 'Email + curier', label: 'Original livrat acasă' },
-                { icon: Shield, value: 'Taxe incluse', label: 'Fără cont, fără cozi' },
+                { icon: Shield, value: 'Preț final', label: 'Fără cont, fără cozi' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
               ].map((t) => (
                 <div key={t.label} className="flex flex-col items-center gap-1.5">
@@ -333,9 +334,9 @@ export default async function CertificatCelibatPage() {
                   La ghișeu vs. online prin eGhișeul
                 </h3>
                 <p className="text-sm text-neutral-700">
-                  În mod normal, certificatul de celibat se solicită personal la Serviciul de Stare Civilă din
-                  localitatea de domiciliu, cu deplasare și timp de așteptare. Prin noi îl obții <strong>100% online</strong>,
-                  fără cont și fără drum la ghișeu — completezi datele, confirmi localitatea de domiciliu, plătești
+                  În mod normal, certificatul de celibat se solicită personal la un serviciu de stare civilă (din 2024,
+                  oricare din țară), cu deplasare și timp de așteptare. Prin noi îl obții <strong>100% online</strong>,
+                  fără cont și fără drum la ghișeu — completezi datele, plătești
                   <strong> {service.base_price} RON</strong> și primești documentul pe email și prin curier. Util în
                   special când ai nevoie de el pentru <strong>căsătoria în străinătate</strong> și nu te poți deplasa.
                 </p>
@@ -398,8 +399,8 @@ export default async function CertificatCelibatPage() {
               <div className="hidden lg:block absolute top-8 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-500/0 via-primary-500/50 to-primary-500/0" aria-hidden="true" />
               {[
                 { step: 1, title: 'Completezi Datele', desc: 'Introduci datele personale și starea civilă pentru cerere.', icon: FileText },
-                { step: 2, title: 'Confirmi Localitatea', desc: 'Confirmi localitatea de domiciliu — acolo se eliberează certificatul.', icon: Landmark },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele sunt incluse în preț.', icon: Shield },
+                { step: 2, title: 'Confirmi Localitatea', desc: 'Confirmi datele de naștere și de domiciliu. Verificăm datele înainte de depunere.', icon: Landmark },
+                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay. Prețul afișat e final.', icon: Shield },
                 { step: 4, title: 'Primești Documentul', desc: `În ${formatEstimatedDays(service)} primești certificatul pe email și prin curier.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
@@ -541,12 +542,13 @@ export default async function CertificatCelibatPage() {
                 </h2>
               </div>
               <div className="space-y-3 text-sm text-neutral-700 leading-relaxed">
+                {/* Primăria competentă (verificat 02.11.2026): HG 255/2024, Normele metodologice de stare civilă, în vigoare 31.03.2024 — art. 158 alin. (1): certificatele de stare civilă se eliberează „de către oricare S.P.C.L.E.P. sau, după caz, primărie”; art. 171 alin. (1): la fel extrasele multilingve; art. 12 lit. o): ofițerii de stare civilă din S.P.C.L.E.P. eliberează adeverința privind statutul civil (Anexa 18); art. 28 alin. (3): un act nedigitizat se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598 — aplicat de SPCLEP: „cererea pentru certificat duplicat/extras sau formular multilingv/Adeverință cu privire la statutul civil se poate depune la oricare primărie/serviciu de stare civilă/SPCLEP din România” https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf */}
                 <p>
-                  Certificatul de celibat se eliberează la Serviciul de Stare Civilă din{' '}
-                  <strong>localitatea de domiciliu</strong>, indiferent unde te afli acum. Dacă ești plecat în alt
-                  oraș sau în <strong>diaspora</strong>, nu trebuie să te întorci în România: completezi datele
-                  online, noi depunem cererea în localitatea ta de domiciliu, iar documentul îl primești pe email
-                  și prin curier la adresa indicată.
+                  Din 2024, cererea pentru certificatul de celibat se poate depune la{' '}
+                  <strong>orice serviciu de stare civilă din țară</strong>, nu doar la cel din localitatea de naștere
+                  sau de domiciliu. Dacă ești plecat în alt oraș sau în <strong>diaspora</strong>, nu trebuie să te
+                  întorci în România: completezi datele online, noi depunem cererea, iar documentul îl primești pe
+                  email și prin curier la adresa indicată.
                 </p>
                 <p>
                   Astfel obții <strong>certificat de celibat în România</strong> chiar dacă locuiești în
@@ -575,14 +577,15 @@ export default async function CertificatCelibatPage() {
         <ServiceFAQ
           title="Întrebări Frecvente — Certificat de Celibat"
           faqs={[
-            { q: 'Ce este certificatul de celibat?', a: 'Este documentul de stare civilă care atestă că o persoană nu este căsătorită la data eliberării. Se eliberează pe baza datelor din registrele de stare civilă din localitatea de domiciliu.' },
-            { q: 'Certificatul de celibat este același cu adeverința de celibat?', a: 'Da. Certificatul de celibat, adeverința de celibat și certificatul de stare civilă se referă la același document — dovada că nu ești căsătorit(ă). Diferă doar denumirea folosită de diverse instituții.' },
+            // Primăria competentă (verificat 02.11.2026): HG 255/2024, Normele metodologice de stare civilă, în vigoare 31.03.2024 — art. 158 alin. (1): certificatele de stare civilă se eliberează „de către oricare S.P.C.L.E.P. sau, după caz, primărie”; art. 171 alin. (1): la fel extrasele multilingve; art. 12 lit. o): ofițerii de stare civilă din S.P.C.L.E.P. eliberează adeverința privind statutul civil (Anexa 18); art. 28 alin. (3): un act nedigitizat se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598 — aplicat de SPCLEP: „cererea pentru certificat duplicat/extras sau formular multilingv/Adeverință cu privire la statutul civil se poate depune la oricare primărie/serviciu de stare civilă/SPCLEP din România” https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
+            { q: 'Ce este certificatul de celibat?', a: 'Este adeverința privind statutul civil (Anexa 18 la HG 255/2024), nu un certificat de stare civilă. Atestă că persoana nu figurează căsătorită în registrele de stare civilă din România la data eliberării și o eliberează serviciul de stare civilă.' },
+            { q: 'Certificatul de celibat este același cu adeverința de celibat?', a: 'Da. Certificatul de celibat, adeverința de celibat și adeverința privind statutul civil se referă la același document — dovada că nu ești căsătorit(ă). Diferă doar denumirea folosită de diverse instituții.' },
             { q: 'Pot folosi certificatul de celibat pentru căsătoria în străinătate?', a: 'Da, acesta este cel mai frecvent motiv. Multe primării din străinătate cer dovada că ești necăsătorit(ă) pentru a întocmi dosarul de căsătorie. De obicei mai e nevoie de apostilă și traducere legalizată.' },
             { q: 'Am nevoie de apostilă pe certificatul de celibat?', a: 'Dacă îl folosești în străinătate, de regulă da — apostila de la Haga (sau supralegalizarea) confirmă autenticitatea documentului pentru autoritățile străine. Putem adăuga apostila și traducerea legalizată la comandă.' },
             { q: 'Cât durează eliberarea certificatului de celibat?', a: `${formatEstimatedDays(service)} în mod standard. Dacă ai nevoie mai repede, există și opțiunea Urgent. Apostila și traducerea pot adăuga câteva zile.` },
             { q: 'Cât este valabil certificatul de celibat?', a: 'Reflectă situația din ziua eliberării. În practică, autoritățile (mai ales cele străine) cer un certificat emis recent — de obicei în ultimele 3-6 luni. Verifică termenul cerut de instituția unde îl depui.' },
-            { q: 'Cine poate cere certificatul de celibat?', a: 'Persoana în cauză, pe baza datelor proprii de stare civilă. Prin eGhișeul completezi datele tale și noi depunem cererea în localitatea ta de domiciliu, fără să te deplasezi.' },
-            { q: 'Pot obține certificatul de celibat din altă localitate sau din diaspora?', a: 'Da. Certificatul se eliberează la Starea Civilă din localitatea ta de domiciliu, dar nu trebuie să te deplasezi acolo. Completezi datele online, noi depunem cererea, iar documentul ajunge la tine pe email și prin curier, oriunde te-ai afla în țară sau în străinătate.' },
+            { q: 'Cine poate cere certificatul de celibat?', a: 'Persoana în cauză, pe baza datelor proprii de stare civilă. Prin eGhișeul completezi datele tale și noi depunem cererea, fără să te deplasezi.' },
+            { q: 'Pot obține certificatul de celibat din altă localitate sau din diaspora?', a: 'Da. Din 2024 cererea se poate depune la orice serviciu de stare civilă din țară (HG 255/2024), iar oricum nu trebuie să te deplasezi. Completezi datele online, noi depunem cererea, iar documentul ajunge la tine pe email și prin curier, oriunde te-ai afla în țară sau în străinătate.' },
             // Taxa de timbru: Legea nr. 1/2017 art. VI abrogă Legea nr. 117/1999 (taxe extrajudiciare de timbru),
             // în vigoare 01.02.2017 — https://legislatie.just.ro/Public/DetaliiDocument/185507 (verificat 02.11.2026)
             { q: 'Cât costă certificatul de celibat în România?', a: 'Prin eGhișeul costă 698 RON, preț final, fără cont și fără drum la ghișeu. La ghișeul Stării Civile nu se plătește taxă de timbru (taxele extrajudiciare de timbru au fost abrogate din februarie 2017). Apostila de la Haga și traducerea legalizată, dacă îl folosești în străinătate, se pot adăuga separat la comandă.' },

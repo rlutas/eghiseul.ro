@@ -17,7 +17,8 @@ const PATH = '/cazier-judiciar-online/';
 const TITLE = 'Cazier judiciar online, obținut prin avocat';
 const DESCRIPTION =
   'Cazier judiciar pentru persoane fizice, obținut de avocat cu împuternicire, fără drum la poliție. PDF pe email și original prin curier. Serviciu privat, nu Poliția.';
-const UPDATED = '2026-10-05';
+const PUBLISHED = '2026-10-05';
+const UPDATED = '2026-11-02';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -59,7 +60,7 @@ export default async function CazierJudiciarAdsPage() {
       { name: 'Cazier judiciar', price: p.basePrice },
       { name: 'Cazier judiciar, procesare urgentă', price: p.basePrice + urgenta },
     ],
-    datePublished: UPDATED,
+    datePublished: PUBLISHED,
     dateModified: UPDATED,
     breadcrumb: [{ name: 'Acasă', path: '/' }, { name: 'Cazier judiciar', path: PATH }],
     faq: FAQ,

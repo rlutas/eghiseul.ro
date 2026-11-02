@@ -15,7 +15,7 @@ const PATH = '/ghiduri/certificat-de-nastere-pierdut/';
 const TITLE = 'Certificat de naștere pierdut: ce faci în 2026';
 const DESCRIPTION = 'Nu te duci la poliție, nu te duci neapărat în orașul natal și nu plătești taxă de stat. Unde se cere duplicatul, ce acte trebuie, cât durează de fapt, ce faci din străinătate.';
 const DATE_PUBLISHED = '2026-09-19';
-const DATE_MODIFIED = '2026-09-21';
+const DATE_MODIFIED = '2026-11-02';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -48,6 +48,15 @@ function A({ href, children }: { href: string; children: string }) {
   return <Link href={href} className="font-semibold text-d-ink underline underline-offset-2 hover:text-d-acc">{children}</Link>;
 }
 
+/*
+ * Primăria competentă (verificat 02.11.2026): HG 255/2024, Normele metodologice de stare civilă, în vigoare
+ * 31.03.2024 — art. 158 alin. (1): certificatele de stare civilă se eliberează „de către oricare S.P.C.L.E.P. sau,
+ * după caz, primărie”; art. 171 alin. (1): la fel extrasele multilingve; art. 12 lit. o): ofițerii de stare civilă
+ * din S.P.C.L.E.P. eliberează adeverința privind statutul civil (Anexa 18); art. 28 alin. (3): un act nedigitizat
+ * se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598
+ * Aplicat de SPCLEP: https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
+ * Era „din 2023” — regula vine din HG 255/2024.
+ */
 export default async function GhidPierdutPage() {
   const p = await getServicePricing('certificat-nastere');
   const stats = PROCESSING_STATS.byService['certificat-nastere'];
@@ -92,7 +101,7 @@ export default async function GhidPierdutPage() {
 
             <Card className="flex flex-col gap-2 border-l-4 border-l-d-acc p-5">
               <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-d-muted">Pe scurt</span>
-              <P>Certificatul de naștere pierdut se înlocuiește cu un duplicat, cerut la orice primărie din România (din 2023), pe baza actului de naștere din registru. Nu e nevoie de declarație la poliție. Cererea o depune titularul, părintele pentru minor sau un avocat cu împuternicire. Termen legal: cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală de câțiva lei.</P>
+              <P>Certificatul de naștere pierdut se înlocuiește cu un duplicat, cerut la orice primărie din România (din 2024), pe baza actului de naștere din registru. Nu e nevoie de declarație la poliție. Cererea o depune titularul, părintele pentru minor sau un avocat cu împuternicire. Termen legal: cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală de câțiva lei.</P>
             </Card>
 
             <H id="s1">Ce NU trebuie să faci</H>
@@ -100,7 +109,7 @@ export default async function GhidPierdutPage() {
             <P>Nu te duci nici la notar. Dacă vrei să ceară altcineva în locul tău, ai două variante: o procură notarială (drum, taxă, și tot trebuie cineva care să meargă la primărie) sau împuternicirea avocațială, pe care o semnezi electronic. A doua e ce folosim noi.</P>
 
             <H id="s2">Unde se cere duplicatul</H>
-            <P>Din 2023, cererea se depune la orice primărie din România, nu doar la cea unde a fost înregistrată nașterea. Primăria unde depui trimite cererea, prin sistemul informatic de stare civilă, la primăria care păstrează actul, iar duplicatul se eliberează pe formularul actual, cu CNP. În București, fiecare sector are propriul oficiu de stare civilă, dar regula e aceeași: depui la oricare.</P>
+            <P>Din 31 martie 2024, cererea se depune la orice primărie din România, nu doar la cea unde a fost înregistrată nașterea. Primăria unde depui eliberează duplicatul din registrul electronic de stare civilă, pe formularul actual, cu CNP. Dacă actul vechi nu e încă digitizat, primăria care îl păstrează îl încarcă întâi în sistem, în cel mult 3 zile. În București, fiecare sector are propriul oficiu de stare civilă, dar regula e aceeași: depui la oricare.</P>
             <P>Contează totuși unde e actul. Dacă e deja scanat în sistem, duplicatul iese repede. Dacă e într-un registru de hârtie din 1958, la o primărie de comună, cineva trebuie să-l caute și să-l scaneze întâi. De aici vine toată diferența de termen de mai jos.</P>
 
             <H id="s3">Cine poate cere</H>

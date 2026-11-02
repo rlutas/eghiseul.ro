@@ -17,7 +17,7 @@ const TITLE = 'Certificat de Naștere Online: Duplicat prin Avocat, Livrat Acas�
 const DESCRIPTION =
   'Duplicat certificat de naștere obținut de un avocat de la starea civilă: pierdut, deteriorat, model vechi sau pentru străinătate. Semnezi pe telefon, fără programare, fără notar. Originalul vine prin curier.';
 const DATE_PUBLISHED = '2026-09-19';
-const DATE_MODIFIED = '2026-10-06';
+const DATE_MODIFIED = '2026-11-02';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -48,7 +48,7 @@ const WHO_CAN_ASK = [
 const MISMATCH = [
   ['Numele e scris altfel în pașaport', 'Diacritice lipsă sau „Ş” cu sedilă în loc de „Ș”: nu contează, duplicatul iese după actul de naștere. Pentru autoritățile străine, extrasul multilingv are numele exact ca în act.'],
   ['Data nașterii sau numele părinților sunt greșite în act', 'Duplicatul reproduce actul, cu greșeală cu tot. Corectarea se numește rectificare, se face de primăria care are actul, prin dispoziție a primarului, și e o procedură separată. Îți spunem înainte să plătești dacă vedem o problemă.'],
-  ['Nu știu la ce primărie e actul', 'Scrie localitatea nașterii așa cum o știi. Din 2023 cererea se depune la orice primărie și pleacă electronic la cea care păstrează actul; avocatul nostru găsește primăria corectă și pentru sate care s-au comasat între timp.'],
+  ['Nu știu la ce primărie e actul', 'Scrie localitatea nașterii așa cum o știi. Din 2024 cererea se depune la orice primărie, care eliberează duplicatul din registrul electronic; avocatul nostru găsește primăria corectă și pentru sate care s-au comasat între timp.'],
   ['Născut în străinătate, fără act românesc', 'Atunci nu ai nevoie de duplicat, ci de transcriere: certificatul străin se înscrie în registrele din România. E alt serviciu, cu alte acte; nu-l vindem încă, dar îți spunem ce trebuie.'],
 ] as const;
 
@@ -56,13 +56,22 @@ const FAQ = [
   { q: 'Cât durează să obțin duplicatul certificatului de naștere?', a: `Termenul legal este de cel mult 30 de zile de la depunere. La comenzile noastre din vara lui 2026, jumătate au ajuns la client în cel mult ${PROCESSING_STATS.byService['certificat-nastere'].medianDays} zile de la plată, cu tot cu curier. Actele vechi, nescanate, ajung aproape de termenul maxim, fiindcă primăria de origine le caută în registrul de hârtie.` },
   { q: 'Trebuie să merg la notar pentru împuternicire?', a: `Nu. Împuternicirea avocațială se semnează electronic în formular și este recunoscută de oficiile de stare civilă în temeiul ${LEGAL_BASIS.shortGen}.` },
   { q: 'Cine poate cere duplicatul certificatului de naștere?', a: 'Titularul, părintele pentru copilul minor, o persoană cu procură notarială sau un avocat cu împuternicire avocațială. Pentru un alt adult (soț, frate, prieten) nu poți cere tu, chiar dacă plătești tu comanda: el semnează împuternicirea, de pe telefonul lui.' },
-  { q: 'Trebuie să știu exact primăria unde am fost înregistrat?', a: 'Ajută, dar nu e obligatoriu. Din 2023 cererea se depune la orice primărie și e trimisă electronic la cea care păstrează actul. Scrii localitatea nașterii și ne ocupăm noi.' },
+  { q: 'Trebuie să știu exact primăria unde am fost înregistrat?', a: 'Ajută, dar nu e obligatoriu. Din 2024 cererea se depune la orice primărie din țară; dacă actul vechi nu e încă în registrul electronic, primăria care îl păstrează îl încarcă întâi. Scrii localitatea nașterii și ne ocupăm noi.' },
   { q: 'Cât costă duplicatul la primărie?', a: 'Nimic sau o taxă locală de câțiva lei, stabilită de consiliul local. La noi plătești avocatul, împuternicirea, depunerea, urmărirea dosarului și livrarea, nu documentul.' },
   { q: 'Ce se întâmplă cu certificatul vechi, dacă îl găsesc?', a: 'La eliberarea duplicatului, cel vechi își pierde valabilitatea. Dacă îl mai ai, se predă primăriei. Dacă apare mai târziu, nu îl mai folosești.' },
   { q: 'Duplicatul iese pe modelul nou, cu CNP?', a: 'Da. Orice duplicat eliberat acum iese pe formularul actual, cu CNP și elemente de siguranță, indiferent de anul nașterii. Certificatele vechi, tipizate, rămân valabile, dar la pașaport sau în străinătate ți se cere tot mai des modelul nou.' },
   { q: 'Ce se întâmplă dacă primăria refuză?', a: 'Te sunăm, îți explicăm motivul și, dacă nu se poate rezolva, returnăm banii conform politicii de anulare. Cele mai dese motive: act de identitate expirat sau o cerere de transcriere confundată cu una de duplicat.' },
 ];
 
+/*
+ * Primăria competentă (verificat 02.11.2026): HG 255/2024, Normele metodologice de stare civilă, în vigoare
+ * 31.03.2024 — art. 158 alin. (1): certificatele de stare civilă se eliberează „de către oricare S.P.C.L.E.P. sau,
+ * după caz, primărie”; art. 171 alin. (1): la fel extrasele multilingve; art. 12 lit. o): ofițerii de stare civilă
+ * din S.P.C.L.E.P. eliberează adeverința privind statutul civil (Anexa 18); art. 28 alin. (3): un act nedigitizat
+ * se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598
+ * Aplicat de SPCLEP: https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
+ * Era „din 2023” — regula vine din HG 255/2024.
+ */
 export default async function NasterePage() {
   const p = await getServicePricing('certificat-nastere');
   const extras = optionPrice(p, 'extras_multilingv', 398);
@@ -100,7 +109,7 @@ export default async function NasterePage() {
           orderSlug="certificat-nastere"
           cta="Comandă duplicatul"
           secondary={{ label: 'În ce situații', href: '#situatii' }}
-          facts={[['≤ 30 de zile', 'termen legal de eliberare'], ['Orice primărie', 'din 2023, indiferent unde te-ai născut'], ['0 lei taxă de stat', 'plătești doar serviciul']]}
+          facts={[['≤ 30 de zile', 'termen legal de eliberare'], ['Orice primărie', 'din 2024, indiferent unde te-ai născut'], ['0 lei taxă de stat', 'plătești doar serviciul']]}
           media={<Image src="/images/documentero/clienta-usa-certificat.webp" alt="Clientă în ușa apartamentului, cu certificatul de naștere scos din plic" width={1370} height={1148} className="h-full w-full object-cover" sizes="(min-width: 1024px) 760px, 100vw" priority />}
           priceLabel="Duplicat certificat de naștere"
           price={p.basePrice}
@@ -115,14 +124,14 @@ export default async function NasterePage() {
         />
 
         <QuickAnswer updated={DATE_MODIFIED}>
-          Duplicatul certificatului de naștere se eliberează de oficiul de stare civilă, pe baza actului de naștere din registru, și din 2023 se poate cere la orice primărie din România. Cererea o depune titularul, părintele pentru minor sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}). Termenul legal este de cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală de câțiva lei. Prin documentero.ro, avocatul depune cererea în locul tău și primești originalul prin curier. Prețul la noi: {lei(p.basePrice)} lei, cu onorariul și taxele incluse.
+          Duplicatul certificatului de naștere se eliberează de oficiul de stare civilă, pe baza actului de naștere din registru, și din 2024 se poate cere la orice primărie din România. Cererea o depune titularul, părintele pentru minor sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}). Termenul legal este de cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală de câțiva lei. Prin documentero.ro, avocatul depune cererea în locul tău și primești originalul prin curier. Prețul la noi: {lei(p.basePrice)} lei, cu onorariul inclus, preț final.
         </QuickAnswer>
 
         <Section id="situatii" className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-4 lg:col-span-5">
             <Eyebrow>Situații frecvente</Eyebrow>
             <H2>Oricare ar fi motivul, procedura e aceeași: un duplicat nou.</H2>
-            <p className="m-0 text-[16px] leading-[1.55] text-d-muted">Din 2023, duplicatul se poate cere de la orice primărie. Noi mergem oricum acolo unde e actul.</p>
+            <p className="m-0 text-[16px] leading-[1.55] text-d-muted">Din 2024, duplicatul se poate cere de la orice primărie. Noi mergem oricum acolo unde e actul.</p>
             <div className="h-[240px] overflow-hidden rounded-[20px]">
               <Image src="/images/documentero/certificat-pe-masa.webp" alt="Certificat de naștere pe masă, lângă plicul în care a venit" width={1370} height={1148} className="h-full w-full object-cover" sizes="(min-width: 1024px) 520px, 100vw" />
             </div>

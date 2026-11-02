@@ -43,7 +43,7 @@ const DESCRIPTION =
   'Cazier judiciar pentru firmă (persoană juridică) 100% online — necesar la licitații publice ' +
   'SEAP, contracte cu statul și fonduri europene. 198 RON, livrare în 3-5 zile. Auto-completare CUI de la ONRC.';
 const DATE_PUBLISHED = '2026-04-16';
-const DATE_MODIFIED = '2026-06-13';
+const DATE_MODIFIED = '2026-11-02';
 
 // Enable ISR with 1-hour revalidation
 export const revalidate = 3600;
@@ -484,7 +484,7 @@ export default async function CazierJudiciarPJPage() {
                 Preț & opțiuni
               </span>
               <h2 className="text-2xl sm:text-3xl font-bold text-secondary-900 mb-3">Prețuri transparente, fără surprize</h2>
-              <p className="text-neutral-600 max-w-xl mx-auto">Prețul de bază include taxele oficiale IGPR. Opțiunile sunt complet la alegerea ta.</p>
+              <p className="text-neutral-600 max-w-xl mx-auto">Prețul de bază e final; IGPR nu percepe taxă pentru certificat. Opțiunile sunt complet la alegerea ta.</p>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
@@ -504,7 +504,7 @@ export default async function CazierJudiciarPJPage() {
                   <span className="text-3xl font-black text-secondary-900">{(service.base_price / 1.21).toFixed(2)}</span>
                   <span className="text-sm font-bold text-neutral-400">RON</span>
                 </div>
-                <p className="text-xs text-neutral-500">+ TVA 21% · {service.base_price} RON cu TVA · taxe IGPR incluse</p>
+                <p className="text-xs text-neutral-500">+ TVA 21% · {service.base_price} RON cu TVA · preț final</p>
               </div>
 
               {/* Urgent processing (+80 RON — la cazier NU e gratis) */}

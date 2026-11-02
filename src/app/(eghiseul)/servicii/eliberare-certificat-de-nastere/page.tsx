@@ -179,7 +179,7 @@ export default async function CertificatNasterePage() {
                     {[
                       'Completezi datele (nume, CNP, data și localitatea nașterii)',
                       'Avocatul colaborator depune cererea prin împuternicire la Starea Civilă',
-                      'Plătești securizat (taxe incluse)',
+                      'Plătești securizat, preț final',
                       `Primești certificatul în ${formatEstimatedDays(service)}`,
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
@@ -201,7 +201,7 @@ export default async function CertificatNasterePage() {
                   <div className="relative bg-gradient-to-br from-secondary-900 via-secondary-800 to-[#0C1A2F] p-6 text-center">
                     <div className="relative">
                       <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
-                        TAXE INCLUSE
+                        PREȚ FINAL
                       </span>
                       <ServicePrice basePrice={service.base_price} />
                       <p className="text-white/60 text-sm mt-2">Fără taxe ascunse</p>
@@ -276,7 +276,7 @@ export default async function CertificatNasterePage() {
         </ServiceAnswerBlock>
 
         <PrivateServiceNotice
-          institutionLabel="la Starea Civilă din localitatea de înregistrare sau pe hub.mai.gov.ro"
+          institutionLabel="la orice serviciu de stare civilă din țară sau pe hub.mai.gov.ro"
           institutionUrl="https://hub.mai.gov.ro"
         />
 
@@ -287,7 +287,7 @@ export default async function CertificatNasterePage() {
               {[
                 { icon: CalendarDays, value: formatEstimatedDays(service), label: 'Livrare estimată' },
                 { icon: Mail, value: 'Email + curier', label: 'Primești originalul' },
-                { icon: Landmark, value: 'Taxe incluse', label: 'Fără deplasare' },
+                { icon: Landmark, value: 'Preț final', label: 'Fără deplasare' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
               ].map((t) => (
                 <div key={t.label} className="flex flex-col items-center gap-1.5">
@@ -321,7 +321,7 @@ export default async function CertificatNasterePage() {
                 oricare serviciu public comunitar local de evidență a persoanelor sau primărie din țară, nu doar
                 de la cea care are registrul nașterii (HG 255/2024 art. 158). Indiferent dacă ai
                 un <strong>certificat de naștere pierdut</strong>, deteriorat sau furat, noi depunem cererea în
-                numele tău, plătim taxele și îți trimitem documentul pe email și prin curier, fără să te deplasezi.
+                numele tău și îți trimitem documentul pe email și prin curier, fără să te deplasezi.
               </p>
               <p>
                 Cel mai mare avantaj este că obții duplicatul fără să mergi în localitatea de naștere și fără
@@ -483,7 +483,7 @@ export default async function CertificatNasterePage() {
               {[
                 { step: 1, title: 'Completezi Datele', desc: 'Introduci numele, CNP-ul, data nașterii și numele părinților titularului.', icon: User },
                 { step: 2, title: 'Confirmi Localitatea', desc: 'Confirmi localitatea de naștere unde a fost înregistrat actul. Verificăm datele.', icon: Landmark },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele Stării Civile sunt incluse în preț.', icon: Shield },
+                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay. Prețul afișat e final.', icon: Shield },
                 { step: 4, title: 'Primești Documentul', desc: `În ${formatEstimatedDays(service)} primești certificatul pe email și prin curier.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
@@ -672,7 +672,7 @@ export default async function CertificatNasterePage() {
           faqs={[
             { q: 'Ce este certificatul de naștere?', a: 'Este actul de stare civilă care atestă identitatea, data și locul nașterii unei persoane, precum și numele părinților. Primul certificat se eliberează la înregistrarea nașterii; un exemplar nou se poate cere de la oricare serviciu de stare civilă sau primărie din țară (HG 255/2024 art. 158).' },
             { q: 'Care e diferența dintre duplicat și copie legalizată?', a: 'Duplicatul este un certificat de naștere nou, original, emis de Starea Civilă atunci când ai pierdut sau ai deteriorat documentul. Copia legalizată este o fotocopie certificată conform cu originalul de un notar. Pentru cele mai multe dosare se cere duplicatul (originalul).' },
-            { q: 'Cum obțin un certificat de naștere pierdut?', a: 'Soliciți un nou exemplar de la Starea Civilă; din 2024 se poate cere de la orice primărie, nu doar de la cea a localității de naștere (HG 255/2024 art. 158). Prin eGhișeul completezi datele online, noi depunem cererea și plătim taxele, iar tu primești noul certificat fără să te deplasezi.' },
+            { q: 'Cum obțin un certificat de naștere pierdut?', a: 'Soliciți un nou exemplar de la Starea Civilă; din 2024 se poate cere de la orice primărie, nu doar de la cea a localității de naștere (HG 255/2024 art. 158). Prin eGhișeul completezi datele online, noi depunem cererea, iar tu primești noul certificat fără să te deplasezi.' },
             { q: 'Pot obține certificatul din altă localitate sau din străinătate?', a: 'Da. Certificatul se poate cere de la orice primărie din țară (HG 255/2024 art. 158), iar oricum nu trebuie să mergi tu. Depunem cererea prin împuternicire în numele tău, util mai ales pentru românii din diaspora.' },
             { q: 'În cât timp ajunge duplicatul certificatului de naștere?', a: `${formatEstimatedDays(service)} în mod standard. Dacă Starea Civilă are nevoie de verificări, eliberarea poate dura până la 30 de zile (HG 255/2024 art. 162). Pentru cereri din diaspora termenul poate fi puțin mai lung. Există și opțiunea Urgent.` },
             { q: 'Cât timp este valabil certificatul de naștere?', a: 'Certificatul de naștere nu expiră — este valabil pe toată durata vieții. Unele instituții pot cere însă o copie legalizată recentă, emisă în ultimele luni, pentru anumite dosare.' },
@@ -681,7 +681,7 @@ export default async function CertificatNasterePage() {
             { q: 'Pot obține certificatul de naștere dintr-o altă localitate, fără să mă deplasez?', a: 'Da. Nașterea poate fi înregistrată la Galați, Timișoara sau oriunde altundeva; din 2024 certificatul se poate cere de la orice primărie din țară (HG 255/2024 art. 158). Depunem cererea prin împuternicire și îți trimitem documentul prin curier, oriunde te-ai afla.' },
             { q: 'Trebuie să fac programare pentru eliberarea duplicatului?', a: 'Nu. Prin eGhișeul nu ai nevoie de programare la ghișeul Stării Civile și nu stai la coadă. Completezi cererea online, iar noi depunem documentația la primărie în numele tău.' },
             { q: 'Ce acte îmi trebuie pentru un duplicat de certificat de naștere?', a: 'Ai nevoie de un act de identitate valabil și de datele de naștere ale titularului: nume complet, CNP, data și localitatea nașterii și numele părinților așa cum apar în actul de naștere. Pentru cereri în numele altei persoane sau din diaspora se adaugă o împuternicire.' },
-            { q: 'Sunt cetățean român plecat din țară — pot cere certificatul din diaspora?', a: 'Da. Românii din diaspora pot obține duplicatul fără să revină în țară. Depunem cererea prin împuternicire la primăria de naștere și îți trimitem documentul prin curier, util pentru dosare de cetățenie, pașaport sau acte la autoritățile străine.' },
+            { q: 'Sunt cetățean român plecat din țară — pot cere certificatul din diaspora?', a: 'Da. Românii din diaspora pot obține duplicatul fără să revină în țară. Depunem cererea prin împuternicire la Starea Civilă și îți trimitem documentul prin curier, util pentru dosare de cetățenie, pașaport sau acte la autoritățile străine.' },
           ]}
         />
 

@@ -16,7 +16,7 @@ const TITLE = 'Certificat de Căsătorie Online: Duplicat, cu Mențiune de Divor
 const DESCRIPTION =
   'Duplicat certificat de căsătorie obținut de un avocat de la starea civilă: pierdut, deteriorat, cu mențiunea de divorț sau pentru străinătate. Semnezi pe telefon, primești originalul prin curier.';
 const DATE_PUBLISHED = '2026-09-19';
-const DATE_MODIFIED = '2026-10-06';
+const DATE_MODIFIED = '2026-11-02';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -28,7 +28,7 @@ export const metadata = buildPageMetadata({
 });
 
 const CASES = [
-  ['L-ai pierdut sau s-a deteriorat', 'Se eliberează un duplicat de la primăria unde s-a încheiat căsătoria. Cel vechi, dacă îl mai ai, se predă.'],
+  ['L-ai pierdut sau s-a deteriorat', 'Se eliberează un duplicat; din 2024 îl cere orice primărie din țară, nu doar cea unde v-ați căsătorit. Cel vechi, dacă îl mai ai, se predă.'],
   ['Ai divorțat și îți trebuie cu mențiunea de divorț', 'Duplicatul nou poartă mențiunea, dacă divorțul a fost înregistrat în România. Sentința singură nu ține loc de certificat.'],
   ['Ai nevoie de el în străinătate', 'În statele Convenției CIEC nr. 16 (Italia, Spania, Germania, Franța și altele), extrasul multilingv de căsătorie merge fără traducere. În rest: duplicat cu traducere și, în afara UE, apostilă.'],
   ['Schimbi numele după căsătorie sau divorț', 'Banca, angajatorul sau evidența persoanelor cer certificatul actual, nu o copie veche.'],
@@ -52,6 +52,15 @@ const FAQ = [
   { q: 'Trebuie să merg la notar pentru împuternicire?', a: `Nu. Împuternicirea avocațială se semnează electronic în formular și e recunoscută de starea civilă în temeiul ${LEGAL_BASIS.shortGen}.` },
 ];
 
+/*
+ * Primăria competentă (verificat 02.11.2026): HG 255/2024, Normele metodologice de stare civilă, în vigoare
+ * 31.03.2024 — art. 158 alin. (1): certificatele de stare civilă se eliberează „de către oricare S.P.C.L.E.P. sau,
+ * după caz, primărie”; art. 171 alin. (1): la fel extrasele multilingve; art. 12 lit. o): ofițerii de stare civilă
+ * din S.P.C.L.E.P. eliberează adeverința privind statutul civil (Anexa 18); art. 28 alin. (3): un act nedigitizat
+ * se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598
+ * Aplicat de SPCLEP: https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
+ * Era „din 2023” — regula vine din HG 255/2024.
+ */
 export default async function CasatoriePage() {
   const p = await getServicePricing('certificat-casatorie');
   const ml = await getServicePricing('extras-multilingv-certificat-casatorie');
@@ -90,7 +99,7 @@ export default async function CasatoriePage() {
           orderSlug="certificat-casatorie"
           cta="Comandă duplicatul"
           secondary={{ label: 'Cu mențiunea de divorț', href: '#divort' }}
-          facts={[['≤ 30 de zile', 'termen legal de eliberare'], ['Oriunde în RO', 'se cere de la orice primărie din 2023'], ['Oricare dintre soți', 'poate semna împuternicirea']]}
+          facts={[['≤ 30 de zile', 'termen legal de eliberare'], ['Oriunde în RO', 'se cere de la orice primărie din 2024'], ['Oricare dintre soți', 'poate semna împuternicirea']]}
           media={<Image src="/images/documentero/cuplu-certificat-casatorie.webp" alt="Cuplu la birou, verificând certificatul de căsătorie lângă laptop și pașaport" width={1370} height={1148} className="h-full w-full object-cover" sizes="(min-width: 1024px) 760px, 100vw" />}
           priceLabel="Duplicat certificat de căsătorie"
           price={p.basePrice}
@@ -104,7 +113,7 @@ export default async function CasatoriePage() {
         />
 
         <QuickAnswer updated={DATE_MODIFIED}>
-          Duplicatul certificatului de căsătorie se eliberează de oficiul de stare civilă pe baza actului de căsătorie din registru și poartă mențiunile ulterioare: divorțul înregistrat în România sau decesul unuia dintre soți. Din 2023 cererea se depune la orice primărie din țară. Poate cere oricare dintre soți, personal sau printr-un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}). Termen legal: cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală. Prin documentero.ro, avocatul depune cererea în locul tău, pentru {lei(p.basePrice)} lei cu tot cu taxe, iar originalul vine prin curier.
+          Duplicatul certificatului de căsătorie se eliberează de oficiul de stare civilă pe baza actului de căsătorie din registru și poartă mențiunile ulterioare: divorțul înregistrat în România sau decesul unuia dintre soți. Din 2024 cererea se depune la orice primărie din țară. Poate cere oricare dintre soți, personal sau printr-un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}). Termen legal: cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală. Prin documentero.ro, avocatul depune cererea în locul tău, pentru {lei(p.basePrice)} lei, preț final, iar originalul vine prin curier.
         </QuickAnswer>
 
         <Section id="divort" className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
@@ -161,7 +170,7 @@ export default async function CasatoriePage() {
         <SeoBlock
           title="Duplicat certificat de căsătorie online: cum funcționează prin avocat"
           intro={[
-            'Duplicatul certificatului de căsătorie se eliberează pe baza actului de căsătorie din registrul primăriei unde s-a oficiat căsătoria. Din 2023 cererea se poate depune la orice primărie din țară, iar sistemul informatic de stare civilă o trimite la cea competentă. Poate cere oricare dintre soți, personal sau prin avocat cu împuternicire avocațială, conform articolului 10 din Legea 119/1996 și Legii 51/1995. Pe duplicat apar mențiunile ulterioare: divorțul, dacă a fost înregistrat în România, sau decesul unuia dintre soți.',
+            'Duplicatul certificatului de căsătorie se eliberează pe baza actului de căsătorie din registrul primăriei unde s-a oficiat căsătoria. Din 2024 cererea se poate depune la orice primărie din țară, care eliberează duplicatul din registrul electronic de stare civilă; un act vechi, încă nedigitizat, îl încarcă întâi primăria care îl păstrează. Poate cere oricare dintre soți, personal sau prin avocat cu împuternicire avocațială, conform articolului 10 din Legea 119/1996 și Legii 51/1995. Pe duplicat apar mențiunile ulterioare: divorțul, dacă a fost înregistrat în România, sau decesul unuia dintre soți.',
             'Noi lucrăm așa: completezi datele căsătoriei (data, localitatea, numele soțului sau soției înainte de căsătorie), încarci o poză a actului de identitate și semnezi împuternicirea pe telefon. Avocatul depune cererea, ridică duplicatul și îl trimitem prin curier, cu scanul pe email în ziua ridicării. Dacă ai divorțat în străinătate și divorțul nu e recunoscut încă în România, îți spunem înainte să plătești că duplicatul va ieși fără mențiune.',
           ]}
           acte={['Act de identitate valabil al soțului care semnează', 'Data și localitatea căsătoriei', 'Numele soțului/soției înainte de căsătorie', 'Dacă e cazul: informații despre divorț (instanța, anul)']}

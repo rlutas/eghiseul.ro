@@ -40,7 +40,7 @@ const DESCRIPTION =
   'Extrasul multilingv al actului de căsătorie (Convenția CIEC nr. 16) e acceptat fără traducere și ' +
   'fără apostilă în Italia, Spania, Germania, Franța și alte 19 state. 798 RON totul inclus.';
 const DATE_PUBLISHED = '2026-06-25';
-const DATE_MODIFIED = '2026-07-08';
+const DATE_MODIFIED = '2026-11-02';
 
 export const revalidate = 3600;
 
@@ -314,10 +314,11 @@ export default async function ExtrasMultilingvCasatoriePage() {
                 motivul pentru care e cerut cel mai des: e dovada oficială care leagă numele vechi de cel
                 nou, când îți schimbi numele în actele, la banca sau la angajatorul din altă țară.
               </p>
+              {/* Primăria competentă (verificat 02.11.2026): HG 255/2024, Normele metodologice de stare civilă, în vigoare 31.03.2024 — art. 158 alin. (1): certificatele de stare civilă se eliberează „de către oricare S.P.C.L.E.P. sau, după caz, primărie”; art. 171 alin. (1): la fel extrasele multilingve; art. 12 lit. o): ofițerii de stare civilă din S.P.C.L.E.P. eliberează adeverința privind statutul civil (Anexa 18); art. 28 alin. (3): un act nedigitizat se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598 — aplicat de SPCLEP: „cererea pentru certificat duplicat/extras sau formular multilingv/Adeverință cu privire la statutul civil se poate depune la oricare primărie/serviciu de stare civilă/SPCLEP din România” https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf */}
               <p>
-                Cererea se depune la <strong>primăria care deține actul de căsătorie</strong>, adică
-                acolo unde s-a încheiat căsătoria. Completezi datele online, semnezi electronic
-                împuternicirea în formular, iar avocatul partener depune cererea la primăria competentă.
+                Din 2024, cererea se poate depune la <strong>orice serviciu de stare civilă din țară</strong>,
+                nu doar la primăria unde s-a încheiat căsătoria (HG 255/2024, art. 171). Completezi datele online, semnezi electronic
+                împuternicirea în formular, iar avocatul partener depune cererea la starea civilă.
                 Primești extrasul pe email și, dacă vrei, originalul prin curier, inclusiv în afara țării.
               </p>
               <p>

@@ -81,7 +81,7 @@ export function ServiceHero({
           <div className="flex flex-col gap-1.5">
             <span className="text-[14px] font-semibold text-d-muted">{priceLabel}</span>
             <div className="flex items-baseline gap-2"><span className="text-[52px] font-extrabold leading-none tracking-[-0.05em]">{lei(price)}</span><span className="text-[18px] font-bold">lei</span></div>
-            <span className="text-[14px] text-d-muted">Onorariu avocat, taxe și TVA incluse.</span>
+            <span className="text-[14px] text-d-muted">Onorariu avocat și TVA incluse. Preț final, fără costuri ascunse.</span>
           </div>
           <div className="h-px bg-d-line" />
           {options.length > 0 && <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-d-muted">{optionsTitle}</span>}

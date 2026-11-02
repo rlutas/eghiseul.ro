@@ -17,7 +17,7 @@ const TITLE = 'Extras Multilingv Certificat de Naștere: în 23 de State, prin A
 const DESCRIPTION =
   'Extras multilingv de naștere (Convenția CIEC nr. 16), obținut prin avocat: fără traducere și apostilă în Italia, Spania, Germania, Franța și alte 19 state.';
 const DATE_PUBLISHED = '2026-09-19';
-const DATE_MODIFIED = '2026-10-06';
+const DATE_MODIFIED = '2026-11-02';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -41,6 +41,15 @@ const FAQ = [
   { q: 'Trebuie să merg la notar pentru împuternicire?', a: `Nu. Împuternicirea avocațială se semnează electronic în formular și e recunoscută de starea civilă în temeiul ${LEGAL_BASIS.shortGen}.` },
 ];
 
+/*
+ * Primăria competentă (verificat 02.11.2026): HG 255/2024, Normele metodologice de stare civilă, în vigoare
+ * 31.03.2024 — art. 158 alin. (1): certificatele de stare civilă se eliberează „de către oricare S.P.C.L.E.P. sau,
+ * după caz, primărie”; art. 171 alin. (1): la fel extrasele multilingve; art. 12 lit. o): ofițerii de stare civilă
+ * din S.P.C.L.E.P. eliberează adeverința privind statutul civil (Anexa 18); art. 28 alin. (3): un act nedigitizat
+ * se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598
+ * Aplicat de SPCLEP: https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
+ * Era „din 2023” — regula vine din HG 255/2024.
+ */
 export default async function ExtrasMultilingvPage() {
   const pN = await getServicePricing('extras-multilingv-certificat-nastere');
   const pC = await getServicePricing('extras-multilingv-certificat-casatorie');
@@ -85,7 +94,7 @@ export default async function ExtrasMultilingvPage() {
         />
 
         <QuickAnswer updated={DATE_MODIFIED}>
-          Extrasul multilingv al actului de naștere e documentul prevăzut de Convenția CIEC nr. 16 (Viena, 1976), la care România a aderat prin Legea nr. 65/2012. Îl eliberează oficiul de stare civilă care păstrează actul de naștere și are aceeași putere doveditoare ca certificatul. În cele 23 de state care aplică convenția e primit fără traducere, fără legalizare și fără apostilă; în fața autorităților române nu se folosește. Îl poate cere titularul, părintele pentru minor sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}). Termen legal de eliberare: cel mult 30 de zile. Prin noi costă {lei(pN.basePrice)} lei pentru naștere și {lei(pC.basePrice)} lei pentru căsătorie, cu onorariul avocatului inclus.
+          Extrasul multilingv al actului de naștere e documentul prevăzut de Convenția CIEC nr. 16 (Viena, 1976), la care România a aderat prin Legea nr. 65/2012. Îl eliberează orice serviciu de stare civilă din țară, pe baza actului de naștere din registru (din 2024), și are aceeași putere doveditoare ca certificatul. În cele 23 de state care aplică convenția e primit fără traducere, fără legalizare și fără apostilă; în fața autorităților române nu se folosește. Îl poate cere titularul, părintele pentru minor sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}). Termen legal de eliberare: cel mult 30 de zile. Prin noi costă {lei(pN.basePrice)} lei pentru naștere și {lei(pC.basePrice)} lei pentru căsătorie, cu onorariul avocatului inclus.
         </QuickAnswer>
 
         <Section className="mt-10">
@@ -172,11 +181,11 @@ export default async function ExtrasMultilingvPage() {
           title="Extras multilingv de naștere online: ce este, cine îl acceptă, cât costă"
           intro={[
             'Extrasul multilingv al actului de naștere e documentul prevăzut de Convenția CIEC nr. 16, semnată la Viena în 1976, la care România a aderat prin Legea nr. 65/2012. Are datele din certificatul tău de naștere, cu rubricile în română și franceză și traducerea lor pe verso. De aceea o primărie din Italia, un „Standesamt” din Germania sau un „registro civil” din Spania îl acceptă ca atare: fără traducere autorizată, fără apostilă, fără legalizare. Mulți îl caută drept „certificat de naștere multilingv” sau „certificat de naștere internațional”; e același document.',
-            `Îl eliberează oficiul de stare civilă care păstrează actul de naștere, la cerere, titularului sau unui avocat cu împuternicire (${LEGAL_BASIS.short}). Se cere de obicei împreună cu duplicatul certificatului, pentru că unele instituții străine vor amândouă. De aceea avem pachetul: extrasul și certificatul, dintr-o singură depunere, ${lei(pN.basePrice)} + ${lei(pachet)} lei.`,
+            `Îl eliberează orice serviciu de stare civilă din țară (din 2024), la cerere, titularului sau unui avocat cu împuternicire (${LEGAL_BASIS.short}). Se cere de obicei împreună cu duplicatul certificatului, pentru că unele instituții străine vor amândouă. De aceea avem pachetul: extrasul și certificatul, dintr-o singură depunere, ${lei(pN.basePrice)} + ${lei(pachet)} lei.`,
           ]}
           acte={['Act de identitate valabil (buletin sau pașaport), poză față-verso', 'Datele nașterii: data, localitatea, numele părinților', 'Țara în care folosești extrasul', 'Semnătura ta, în formular']}
           rows={[
-            ['Unde depui', 'la primăria care are actul, cu programare', 'nicăieri; depune avocatul'],
+            ['Unde depui', 'la orice primărie, cu programare', 'nicăieri; depune avocatul'],
             ['Traducere', 'nu e nevoie în statele convenției', 'nu e nevoie în statele convenției'],
             ['Apostilă', 'nu e nevoie în statele convenției', 'nu e nevoie în statele convenției; în rest îți spunem ce trebuie'],
             ['Taxă', '0 lei sau taxă locală', `${lei(pN.basePrice)} lei, tot inclus`],

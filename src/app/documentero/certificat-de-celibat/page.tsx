@@ -17,7 +17,7 @@ const TITLE = 'Certificat de Celibat Online (Anexa 18), Obținut prin Avocat';
 const DESCRIPTION =
   'Certificat de celibat (adeverința privind statutul civil, Anexa 18, fosta Anexa 9) obținut de un avocat de la starea civilă, fără să vii în țară. Pentru căsătorie, ședere sau notar în străinătate. Apostilă și traducere opționale.';
 const DATE_PUBLISHED = '2026-09-19';
-const DATE_MODIFIED = '2026-10-06';
+const DATE_MODIFIED = '2026-11-02';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -59,6 +59,15 @@ const FAQ = [
   { q: 'Cât durează?', a: `Termenul legal e de cel mult 30 de zile de la depunere. La comenzile noastre din vara lui 2026, jumătate au ajuns la client în cel mult ${PROCESSING_STATS.byService['certificat-celibat'].medianDays} zile de la plată, cu curier cu tot. Apostila și traducerea, dacă le alegi, adaugă câteva zile.` },
 ];
 
+/*
+ * Primăria competentă (verificat 02.11.2026): HG 255/2024, Normele metodologice de stare civilă, în vigoare
+ * 31.03.2024 — art. 158 alin. (1): certificatele de stare civilă se eliberează „de către oricare S.P.C.L.E.P. sau,
+ * după caz, primărie”; art. 171 alin. (1): la fel extrasele multilingve; art. 12 lit. o): ofițerii de stare civilă
+ * din S.P.C.L.E.P. eliberează adeverința privind statutul civil (Anexa 18); art. 28 alin. (3): un act nedigitizat
+ * se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598
+ * Aplicat de SPCLEP: https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
+ * Era „din 2023” — regula vine din HG 255/2024.
+ */
 export default async function CelibatPage() {
   const p = await getServicePricing('certificat-celibat');
   const apostila = optionPrice(p, 'apostila_haga', 198);
@@ -111,7 +120,7 @@ export default async function CelibatPage() {
         />
 
         <QuickAnswer updated={DATE_MODIFIED}>
-          Certificatul de celibat este, în legea română, adeverința privind statutul civil (Anexa 18 la H.G. 255/2024, fosta Anexa 9). O eliberează oficiul de stare civilă care păstrează actul tău de naștere și confirmă că în registrele din România nu figurezi căsătorit. Cererea o poate depune titularul sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}); nu e nevoie să vii în țară. Formularul nu are termen de valabilitate; statul care îl primește îl vrea, de regulă, eliberat în ultimele 3 sau 6 luni. Termen legal: cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală. Prin documentero.ro costă {lei(p.basePrice)} lei, cu onorariul avocatului și taxele incluse, iar originalul îți vine prin curier, și în străinătate.
+          Certificatul de celibat este, în legea română, adeverința privind statutul civil (Anexa 18 la H.G. 255/2024, fosta Anexa 9). O eliberează serviciul de stare civilă, iar din 2024 cererea se poate depune la oricare din țară, nu doar la cel care păstrează actul tău de naștere. Confirmă că în registrele din România nu figurezi căsătorit. Cererea o poate depune titularul sau un avocat cu împuternicire avocațială ({LEGAL_BASIS.short}); nu e nevoie să vii în țară. Formularul nu are termen de valabilitate; statul care îl primește îl vrea, de regulă, eliberat în ultimele 3 sau 6 luni. Termen legal: cel mult 30 de zile. Taxa de stat: 0 lei sau o taxă locală. Prin documentero.ro costă {lei(p.basePrice)} lei, preț final, cu onorariul avocatului inclus, iar originalul îți vine prin curier, și în străinătate.
         </QuickAnswer>
 
         <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
@@ -165,7 +174,7 @@ export default async function CelibatPage() {
             <ul className="m-0 flex list-none flex-col gap-2.5 p-0 text-[15px] leading-[1.5]">
               {['Numele, CNP-ul, data și locul nașterii', 'Starea civilă actuală, conform actului de naștere', 'Mențiunile de căsătorie sau divorț, dacă există', 'Semnătura și ștampila ofițerului de stare civilă'].map((t) => <li key={t}>{t}</li>)}
             </ul>
-            <span className="text-[13px] text-d-dark-muted">Se eliberează de primăria care păstrează actul tău de naștere.</span>
+            <span className="text-[13px] text-d-dark-muted">Din 2024 se cere la orice serviciu de stare civilă din țară.</span>
           </div>
         </Section>
 
@@ -225,13 +234,13 @@ export default async function CelibatPage() {
         <SeoBlock
           title="Certificat de celibat online: cum îl obținem și de ce prin avocat"
           intro={[
-            'Certificatul de celibat nu există sub acest nume în legea română. Ce primești este adeverința privind statutul civil, formularul Anexa 18 din Normele metodologice de stare civilă aprobate prin H.G. 255/2024 (fosta Anexa 9), eliberată de primăria care păstrează actul tău de naștere. Confirmă că în registrele din România nu figurezi căsătorit. Ambasadele și primăriile din alte țări îi spun certificat de celibat, „certificate of no impediment” sau „nulla osta”, și îl cer înainte de a oficia o căsătorie cu un cetățean român.',
+            'Certificatul de celibat nu există sub acest nume în legea română. Ce primești este adeverința privind statutul civil, formularul Anexa 18 din Normele metodologice de stare civilă aprobate prin H.G. 255/2024 (fosta Anexa 9), eliberată de serviciul de stare civilă; din 2024 cererea se poate depune la oricare din țară. Confirmă că în registrele din România nu figurezi căsătorit. Ambasadele și primăriile din alte țări îi spun certificat de celibat, „certificate of no impediment” sau „nulla osta”, și îl cer înainte de a oficia o căsătorie cu un cetățean român.',
             'Legea 119/1996, articolul 10, permite ca cererea să fie depusă și de un avocat cu împuternicire avocațială, iar Legea 51/1995 dă împuternicirii avocațiale forța unei procuri. Asta facem: tu semnezi împuternicirea pe telefon, avocatul nostru depune cererea la starea civilă competentă, ridică documentul și îl trimitem la tine. Nu trebuie să vii în țară și nu trebuie să treci pe la consulat, unde termenele ajung la 30–60 de zile fiindcă cererea se întoarce tot la primăria din România.',
             'Motivul cel mai des de refuz în străinătate nu e documentul, ci datele: data nașterii sau numele scrise altfel în pașaportul străin decât în actul de naștere românesc. Adeverința reproduce actul de naștere. Dacă știi de o diferență, spune-ne în formular; uneori soluția e un duplicat nou de naștere sau o rectificare, nu încă o adeverință.',
           ]}
           acte={['Act de identitate valabil (buletin sau pașaport), poză față-verso', 'Datele nașterii: data, localitatea, numele părinților', 'Țara și scopul: căsătorie, ședere, notar', 'Semnătura ta, în formular']}
           rows={[
-            ['Unde depui', 'la primăria care are actul de naștere, cu programare', 'nicăieri; depune avocatul'],
+            ['Unde depui', 'la orice serviciu de stare civilă, cu programare', 'nicăieri; depune avocatul'],
             ['Cine merge', 'tu, personal, sau cu procură notarială', 'avocatul, cu împuternicire semnată pe telefon'],
             ['Taxă', '0 lei sau taxă locală', `${lei(p.basePrice)} lei, tot inclus`],
             ['Termen', 'legal, până la 30 de zile', 'același termen legal; te anunțăm la fiecare pas'],

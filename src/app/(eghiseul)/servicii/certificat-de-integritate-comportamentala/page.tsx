@@ -42,9 +42,9 @@ const SCHEMA_SLUG = 'certificat-de-integritate-comportamentala';
 const TITLE = 'Certificat Integritate Comportamentală Online IGPR';
 const DESCRIPTION =
   'Obții certificatul de integritate comportamentală online, fără drum la Poliție. ' +
-  'Taxe IGPR incluse, livrare pe email în zile lucrătoare. Comandă acum.';
+  'Preț final, livrare pe email în zile lucrătoare. Comandă acum.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-06-14';
+const DATE_MODIFIED = '2026-11-02';
 
 export const revalidate = 3600;
 
@@ -199,7 +199,7 @@ export default async function CertificatIntegritatePage() {
                     {[
                       'Completezi formularul cu datele tale personale',
                       'Încarci actul de identitate și faci verificarea KYC',
-                      'Plătești securizat (taxe oficiale incluse)',
+                      'Plătești securizat, preț final',
                       `Primești certificatul pe email în ${formatEstimatedDays(service)}`,
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
@@ -217,7 +217,7 @@ export default async function CertificatIntegritatePage() {
                   <div className="relative bg-gradient-to-br from-secondary-900 via-secondary-800 to-[#0C1A2F] p-6 text-center">
                     <div className="relative">
                       <span className="inline-block px-3 py-1 bg-primary-500 text-secondary-900 text-xs font-bold rounded-full mb-3">
-                        TAXE OFICIALE INCLUSE
+                        PREȚ FINAL
                       </span>
                       <ServicePrice basePrice={service.base_price} />
                       <p className="text-white/60 text-sm mt-2">Fără taxe ascunse</p>
@@ -333,7 +333,7 @@ export default async function CertificatIntegritatePage() {
                 <p className="text-sm text-neutral-700">
                   Poți solicita <strong>certificat integritate comportamentala</strong> și personal, la ghișeul
                   IGPR sau prin platforma oficială (dacă ai cont și mijloacele de autentificare). Prin noi plătești
-                  <strong> {service.base_price} RON cu taxele oficiale incluse</strong>, 100% online, fără cont la
+                  <strong> {service.base_price} RON, preț final</strong>, 100% online, fără cont la
                   Poliție și fără deplasare — primești documentul pe email.
                 </p>
               </div>
@@ -341,11 +341,12 @@ export default async function CertificatIntegritatePage() {
                 <h3 className="font-bold text-secondary-900 mb-2">
                   Cât costă certificatul de integritate comportamentală? Este gratuit?
                 </h3>
+                {/* Taxă (verificat 02.11.2026): pagina IGPR pentru certificatul de integritate nu prevede nicio taxă https://politiaromana.ro/ro/utile/documente-eliberari-acte/obtinerea-certificatului-de-cazier-judiciar-de-integritate-comportamentala/obtinerea-certificatului-de-integritate-comportamentala1 ; Legea nr. 1/2017 art. VI a abrogat taxele extrajudiciare de timbru (Legea 117/1999) https://legislatie.just.ro/Public/DetaliiDocument/185507 . Nu plătim IGPR nimic pe aceste comenzi (fără taxa_institutie în supplier_tariffs). */}
                 <p className="text-sm text-neutral-700 leading-relaxed">
-                  Mulți caută „certificat de integritate comportamentala online gratuit”. În realitate, eliberarea{' '}
-                  <strong>nu este gratuită</strong>: IGPR percepe o <strong>taxă oficială</strong> pentru fiecare
-                  certificat. Diferența este cum o plătești. La ghișeul Poliției achiți taxa și te deplasezi personal;
-                  prin eGhișeul plătești <strong>{service.base_price} RON cu taxa IGPR inclusă</strong>, completezi
+                  Mulți caută „certificat de integritate comportamentala online gratuit”. La ghișeul Poliției nu se
+                  plătește taxă: pagina IGPR nu prevede niciuna, iar taxele extrajudiciare de timbru au fost abrogate
+                  din februarie 2017. Costul de acolo e drumul și timpul. Prin eGhișeul plătești{' '}
+                  <strong>{service.base_price} RON, preț final</strong>, adică serviciul nostru: completezi
                   totul online și primești documentul pe email — fără cont pe platforma oficială și fără drum la sediu.
                   Nu există costuri ascunse.
                 </p>
@@ -419,7 +420,7 @@ export default async function CertificatIntegritatePage() {
               {[
                 { step: 1, title: 'Completezi Formularul', desc: 'Introduci datele personale, iar avocatul colaborator depune cererea la IGPR în numele tău.', icon: FileText },
                 { step: 2, title: 'Verificare Identitate', desc: 'Încarci actul de identitate și faci un selfie pentru verificarea KYC.', icon: ScanFace },
-                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay — taxele oficiale sunt incluse în preț.', icon: CreditCard },
+                { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay. Prețul afișat e final.', icon: CreditCard },
                 { step: 4, title: 'Primești Certificatul', desc: `În ${formatEstimatedDays(service)} primești documentul pe email sau prin curier.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
@@ -594,7 +595,8 @@ export default async function CertificatIntegritatePage() {
             { q: 'Cât este valabil certificatul?', a: 'De regulă aproximativ 6 luni de la eliberare, însă valabilitatea efectivă depinde de cerințele instituției sau angajatorului care îl solicită. Verifică termenul cerut înainte de depunere.' },
             { q: 'De ce aveți nevoie de datele mele personale?', a: 'Datele personale și actul de identitate sunt necesare pentru a depune cererea la IGPR în numele tău și pentru verificarea de identitate (KYC), cerută de procedura oficială. Datele sunt prelucrate securizat.' },
             { q: 'Pot obține certificatul de integritate comportamentală online, fără să merg la Poliție?', a: 'Da. Întregul proces este online: completezi formularul, faci verificarea de identitate și plătești, iar noi depunem cererea la IGPR. Primești certificatul pe email, fără deplasare și fără cont pe platforma oficială.' },
-            { q: 'Certificatul de integritate comportamentală este gratuit?', a: 'Nu. IGPR percepe o taxă oficială pentru eliberare. Prin eGhișeul plătești prețul afișat, cu taxa oficială inclusă, fără costuri suplimentare.' },
+            // Taxă (verificat 02.11.2026): pagina IGPR pentru certificatul de integritate nu prevede nicio taxă https://politiaromana.ro/ro/utile/documente-eliberari-acte/obtinerea-certificatului-de-cazier-judiciar-de-integritate-comportamentala/obtinerea-certificatului-de-integritate-comportamentala1 ; Legea nr. 1/2017 art. VI a abrogat taxele extrajudiciare de timbru (Legea 117/1999) https://legislatie.just.ro/Public/DetaliiDocument/185507 . Nu plătim IGPR nimic pe aceste comenzi (fără taxa_institutie în supplier_tariffs).
+            { q: 'Certificatul de integritate comportamentală este gratuit?', a: 'La ghișeul Poliției nu se plătește taxă: pagina IGPR nu prevede niciuna, iar taxele extrajudiciare de timbru au fost abrogate din februarie 2017. Prin eGhișeul plătești serviciul nostru (avocat, depunere, ridicare, livrare), la prețul afișat, care e final.' },
             { q: 'Pot obține certificatul în Cluj, București sau alt oraș?', a: 'Da. Pentru că serviciul este 100% online, îl poți obține din orice județ — București, Cluj, Iași, Timișoara, Constanța sau oriunde te afli — fără să te deplasezi la un sediu IGPR local.' },
             { q: '„Adeverința de integritate comportamentală” este același lucru cu certificatul?', a: 'Da. Unele instituții folosesc denumirea de adeverință, dar se referă la același document emis de IGPR conform Legii 118/2019.' },
             { q: 'Certificatul vine pe email sau pe hârtie?', a: 'Pe hârtie: Poliția Română îl eliberează la ghișeu, iar avocatul îl ridică. Îți trimitem scanul pe email și, dacă alegi livrarea, originalul prin curier.' },

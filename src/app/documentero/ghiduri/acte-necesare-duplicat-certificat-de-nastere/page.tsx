@@ -17,7 +17,7 @@ const TITLE = 'Acte necesare pentru duplicatul certificatului de naștere (2026)
 const DESCRIPTION =
   'Lista scurtă, pe cazuri: pentru tine, pentru copil, prin avocat, din străinătate. Ce nu îți cere nimeni, ce te întoarce de la ghișeu, și unde depui în București, pe sectoare.';
 const DATE_PUBLISHED = '2026-09-21';
-const DATE_MODIFIED = '2026-09-21';
+const DATE_MODIFIED = '2026-11-02';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -56,6 +56,15 @@ function UL({ items }: { items: string[] }) {
   );
 }
 
+/*
+ * Primăria competentă (verificat 02.11.2026): HG 255/2024, Normele metodologice de stare civilă, în vigoare
+ * 31.03.2024 — art. 158 alin. (1): certificatele de stare civilă se eliberează „de către oricare S.P.C.L.E.P. sau,
+ * după caz, primărie”; art. 171 alin. (1): la fel extrasele multilingve; art. 12 lit. o): ofițerii de stare civilă
+ * din S.P.C.L.E.P. eliberează adeverința privind statutul civil (Anexa 18); art. 28 alin. (3): un act nedigitizat
+ * se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598
+ * Aplicat de SPCLEP: https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
+ * Era „din 2023” — regula vine din HG 255/2024.
+ */
 export default async function GhidActeNecesarePage() {
   const p = await getServicePricing('certificat-nastere');
   const graph = documenteroArticleGraph({
@@ -110,7 +119,7 @@ export default async function GhidActeNecesarePage() {
               'Cererea tip, completată la ghișeu sau generată de noi din formular.',
               'Semnătura ta: pe cerere, la ghișeu; în formular, la noi.',
             ]} />
-            <P>Atât. Primăria verifică datele în registrul de stare civilă, nu în hârtiile tale. De asta lista e scurtă și de asta cererea se poate depune din 2023 la orice primărie din România, nu doar la cea unde ai fost înregistrat: sistemul informatic trimite cererea acolo unde e actul.</P>
+            <P>Atât. Primăria verifică datele în registrul de stare civilă, nu în hârtiile tale. De asta lista e scurtă și de asta cererea se poate depune din 2024 la orice primărie din România, nu doar la cea unde ai fost înregistrat: actul se citește din registrul electronic de stare civilă.</P>
 
             <H id="s2">Pentru copilul minor</H>
             <UL items={[
