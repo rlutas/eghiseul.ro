@@ -3,9 +3,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useBrand } from '@/lib/brand/client';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   CONSENT_OPEN_EVENT,
   deleteAnalyticsCookies,
+  isInternalPath,
   readConsent,
   writeConsent,
   type ConsentState,
@@ -186,6 +188,15 @@ function applyConsent(state: ConsentState, brand: BrandKey) {
  */
 export function CookieConsent() {
   const brand = useBrand();
+  const pathname = usePathname();
+
+  // GA opt-out on team-only pages (admin, collaborator portal). Declared before
+  // the consent effect so the flag is set before gtag.js sends its first hit.
+  useEffect(() => {
+    const id = gaIdFor(brand.id);
+    if (!id) return;
+    (window as unknown as Record<string, unknown>)[`ga-disable-${id}`] = isInternalPath(pathname);
+  }, [brand.id, pathname]);
   const [visible, setVisible] = useState(false);
   const [customize, setCustomize] = useState(false);
   const [analytics, setAnalytics] = useState(true);

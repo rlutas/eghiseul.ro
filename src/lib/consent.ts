@@ -76,3 +76,18 @@ export function deleteAnalyticsCookies(): void {
     }
   }
 }
+
+/**
+ * Team-only areas (admin panel, collaborator portal). Google Analytics must
+ * not count them: the team inflated realtime numbers (/admin/orders showed up
+ * among the top pages, 02.11.2026). GA honours `window['ga-disable-<ID>']`
+ * on every hit, so this also covers client-side navigation into these areas.
+ */
+const INTERNAL_PATH_PREFIXES = ['/admin', '/colaborator'];
+
+export function isInternalPath(pathname: string | null | undefined): boolean {
+  if (!pathname) return false;
+  return INTERNAL_PATH_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  );
+}
