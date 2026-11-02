@@ -44,7 +44,7 @@ const DESCRIPTION =
   'Duplicat certificat de căsătorie online de la Starea Civilă, 998 RON, fără deplasare. ' +
   'Pentru act pierdut, din altă localitate sau diaspora. Email + curier.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-09-25';
+const DATE_MODIFIED = '2026-11-02';
 
 export const revalidate = 3600;
 
@@ -314,12 +314,18 @@ export default async function CertificatCasatoriePage() {
                 <h3 className="font-bold text-secondary-900 mb-2">
                   Personal la Starea Civilă vs. online prin eGhișeul
                 </h3>
+                {/* Taxe (verificat 02.11.2026): Legea nr. 1/2017, art. VI, a abrogat Legea nr. 117/1999 privind
+                    taxele extrajudiciare de timbru, de la 01.02.2017 —
+                    https://legislatie.just.ro/Public/DetaliiDocument/185507 (înainte, OUG nr. 41/2016 scutise deja
+                    duplicatele de stare civilă: https://www.primariagalati.ro/portal/act/comspclep_18072016.pdf).
+                    Unele primării percep doar o taxă locală pentru eliberarea în regim de urgență, ex.
+                    https://primariatgfrumos.ro/wp-content/uploads/2023/01/Eliberare-la-cerere-a-certificatelor-de-nastere-1.pdf */}
                 <p className="text-sm text-neutral-700">
-                  Eliberarea unui duplicat se poate face <strong>personal, gratuit (cu taxă minimă), la Starea Civilă</strong>
+                  Eliberarea unui duplicat se poate face <strong>personal și fără taxă de timbru, la Starea Civilă</strong>
                   {' '}din localitatea de înregistrare a căsătoriei. Problema apare când nu poți ajunge acolo — locuiești în
                   altă localitate sau ești în <strong>diaspora</strong>. Prin noi rezolvi totul online: depunem cererea în
-                  numele tău <strong>pe bază de împuternicire</strong>, plătești <strong>{service.base_price} RON cu taxele
-                  incluse</strong> și primești certificatul fără deplasare.
+                  numele tău <strong>pe bază de împuternicire</strong>, plătești <strong>{service.base_price} RON, preț
+                  final</strong> și primești certificatul fără deplasare.
                 </p>
               </div>
             </div>

@@ -44,7 +44,7 @@ const DESCRIPTION =
   'Duplicat certificat de naștere online de la Starea Civilă, 998 RON, fără deplasare. ' +
   'Pentru act pierdut, din altă localitate sau diaspora. Email + curier.';
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-10-06';
+const DATE_MODIFIED = '2026-11-02';
 
 export const revalidate = 3600;
 
@@ -334,9 +334,16 @@ export default async function CertificatNasterePage() {
                 <h3 className="font-bold text-secondary-900 mb-2">
                   Important: poți cere certificatul și personal la Starea Civilă
                 </h3>
+                {/* Taxe (verificat 02.11.2026): Legea nr. 1/2017, art. VI, a abrogat Legea nr. 117/1999 privind
+                    taxele extrajudiciare de timbru, de la 01.02.2017 —
+                    https://legislatie.just.ro/Public/DetaliiDocument/185507 (înainte, OUG nr. 41/2016 scutise deja
+                    duplicatele de stare civilă: https://www.primariagalati.ro/portal/act/comspclep_18072016.pdf).
+                    Unele primării percep doar o taxă locală pentru eliberarea în regim de urgență, ex.
+                    https://primariatgfrumos.ro/wp-content/uploads/2023/01/Eliberare-la-cerere-a-certificatelor-de-nastere-1.pdf */}
                 <p className="text-sm text-neutral-700">
                   Duplicatul certificatului de naștere îl poți solicita <strong>direct la ghișeul Stării Civile</strong>,
-                  unde plătești doar taxa de timbru. Prin noi plătești <strong>{service.base_price} RON</strong> pentru
+                  unde nu plătești taxă de timbru: taxele extrajudiciare de timbru au fost abrogate din februarie 2017.
+                  Unele primării cer doar o taxă locală dacă vrei certificatul în regim de urgență. Prin noi plătești <strong>{service.base_price} RON</strong> pentru
                   un serviciu <strong>100% online, fără deplasare</strong> — util mai ales <strong>din diaspora</strong> sau
                   când nu poți ajunge la ghișeu, depunând cererea <strong>prin împuternicire</strong>.
                 </p>

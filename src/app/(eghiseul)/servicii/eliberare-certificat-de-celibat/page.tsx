@@ -42,9 +42,9 @@ const PAGE_PATH = '/servicii/eliberare-certificat-de-celibat/';
 const SCHEMA_SLUG = 'eliberare-certificat-de-celibat';
 const TITLE = 'Certificat de Celibat Online România — Rapid, de la Starea Civilă';
 const DESCRIPTION =
-  "Certificat de celibat online de la Starea Civilă, 698 RON cu taxele incluse, fără drum la ghișeu. Pentru căsătorie în străinătate, cetățenie sau altă localitate. Email + curier.";
+  "Certificat de celibat online de la Starea Civilă, 698 RON preț final, fără drum la ghișeu. Pentru căsătorie în străinătate, cetățenie sau altă localitate. Email + curier.";
 const DATE_PUBLISHED = '2026-06-14';
-const DATE_MODIFIED = '2026-10-06';
+const DATE_MODIFIED = '2026-11-02';
 
 export const revalidate = 3600;
 
@@ -583,7 +583,9 @@ export default async function CertificatCelibatPage() {
             { q: 'Cât este valabil certificatul de celibat?', a: 'Reflectă situația din ziua eliberării. În practică, autoritățile (mai ales cele străine) cer un certificat emis recent — de obicei în ultimele 3-6 luni. Verifică termenul cerut de instituția unde îl depui.' },
             { q: 'Cine poate cere certificatul de celibat?', a: 'Persoana în cauză, pe baza datelor proprii de stare civilă. Prin eGhișeul completezi datele tale și noi depunem cererea în localitatea ta de domiciliu, fără să te deplasezi.' },
             { q: 'Pot obține certificatul de celibat din altă localitate sau din diaspora?', a: 'Da. Certificatul se eliberează la Starea Civilă din localitatea ta de domiciliu, dar nu trebuie să te deplasezi acolo. Completezi datele online, noi depunem cererea, iar documentul ajunge la tine pe email și prin curier, oriunde te-ai afla în țară sau în străinătate.' },
-            { q: 'Cât costă certificatul de celibat în România?', a: 'Prin eGhișeul costă 698 RON, cu taxele incluse, fără cont și fără drum la ghișeu. Apostila de la Haga și traducerea legalizată, dacă îl folosești în străinătate, se pot adăuga separat la comandă.' },
+            // Taxa de timbru: Legea nr. 1/2017 art. VI abrogă Legea nr. 117/1999 (taxe extrajudiciare de timbru),
+            // în vigoare 01.02.2017 — https://legislatie.just.ro/Public/DetaliiDocument/185507 (verificat 02.11.2026)
+            { q: 'Cât costă certificatul de celibat în România?', a: 'Prin eGhișeul costă 698 RON, preț final, fără cont și fără drum la ghișeu. La ghișeul Stării Civile nu se plătește taxă de timbru (taxele extrajudiciare de timbru au fost abrogate din februarie 2017). Apostila de la Haga și traducerea legalizată, dacă îl folosești în străinătate, se pot adăuga separat la comandă.' },
             { q: 'Cum primesc documentul?', a: 'Îl primești pe email și, în plus, originalul prin curier la adresa indicată. Astfel ai și varianta digitală rapidă, și documentul fizic oficial pentru dosar.' },
           ]}
         />

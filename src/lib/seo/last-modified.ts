@@ -82,9 +82,9 @@ export const PATH_LAST_MODIFIED: Record<string, string> = {
   '/servicii/cazier-fiscal-online/': '2026-10-06',
   '/servicii/cazier-auto-online/': '2026-09-29',
   '/servicii/rovinieta-online/': '2026-09-09',
-  '/servicii/eliberare-certificat-de-nastere/': '2026-10-06',
-  '/servicii/eliberare-certificat-de-casatorie/': '2026-10-06',
-  '/servicii/eliberare-certificat-de-celibat/': '2026-10-06',
+  '/servicii/eliberare-certificat-de-nastere/': '2026-11-02', // taxa de timbru abrogată (Legea 1/2017)
+  '/servicii/eliberare-certificat-de-casatorie/': '2026-11-02',
+  '/servicii/eliberare-certificat-de-celibat/': '2026-11-02',
   '/servicii/extras-de-carte-funciara/': '2026-10-06',
   '/servicii/identificare-imobil/': '2026-09-25',
   '/servicii/extras-plan-cadastral/': '2026-09-09',
