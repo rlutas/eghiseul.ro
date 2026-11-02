@@ -72,6 +72,16 @@ const FAQ = [
  * Aplicat de SPCLEP: https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
  * Era „din 2023” — regula vine din HG 255/2024.
  */
+/*
+ * Consulatul (verificat 02.11.2026): H.G. 255/2024, Normele metodologice de stare civilă,
+ * https://legislatie.just.ro/Public/DetaliiDocument/280598 — art. 158 alin. (1): certificatele de stare civilă
+ * se eliberează și de „misiune diplomatică sau oficiu consular de carieră a/al României în străinătate”;
+ * art. 171 alin. (1): la fel extrasele multilingve; art. 158 alin. (18): la cererea depusă la consulat,
+ * certificatul se poate livra în străinătate prin curier. Consulatul nu „trimite cererea în țară”, iar
+ * „30–60 de zile” nu avea sursă: scos. Termenul rămâne cel din art. 162 alin. (2) (pe loc / până la 30 de zile).
+ * Adeverința privind statutul civil (celibat) e în atribuțiile ofițerilor din S.P.C.L.E.P./primării (art. 12
+ * lit. o); pentru consulate normele nu o spun la fel de clar, deci nu afirmăm.
+ */
 export default async function NasterePage() {
   const p = await getServicePricing('certificat-nastere');
   const extras = optionPrice(p, 'extras_multilingv', 398);
@@ -182,12 +192,12 @@ export default async function NasterePage() {
             ['Cine merge', 'tu, personal, sau părintele pentru minor', 'avocatul, cu împuternicire semnată pe telefon'],
             ['Taxă', '0 lei sau taxă locală', `${lei(p.basePrice)} lei, tot inclus`],
             ['Termen', 'legal, până la 30 de zile', 'același termen legal; te anunțăm la fiecare pas'],
-            ['Din străinătate', 'consulat: 30–60 de zile', 'direct la primărie, curier internațional'],
+            ['Din străinătate', 'la consulatul de carieră, cu programare; poate trimite certificatul prin curier', 'avocatul depune în România, curier internațional'],
             ['Pentru statele convenției', 'extras multilingv, drum separat', 'îl adaugi în aceeași comandă'],
           ]}
           diasporaTitle="Duplicatul certificatului de naștere din străinătate"
           diaspora={[
-            'Cei mai mulți clienți ai noștri pentru naștere locuiesc în Italia, Spania, Germania sau Regatul Unit și au nevoie de certificat pentru rezidență, cetățenie, căsătorie sau pentru pașaportul copilului. Consulatul poate prelua cererea, dar o trimite tot la primăria din România, cu termene de 30–60 de zile. Prin avocat, cererea intră direct la primărie.',
+            'Cei mai mulți clienți ai noștri pentru naștere locuiesc în Italia, Spania, Germania sau Regatul Unit și au nevoie de certificat pentru rezidență, cetățenie, căsătorie sau pentru pașaportul copilului. Consulatele de carieră ale României eliberează și ele duplicatul, din același registru electronic, iar la cerere îl pot trimite prin curier la adresa ta din străinătate. Ce costă timp acolo e programarea. Prin avocat nu ai nevoie de programare: cererea intră direct la o primărie din țară.',
             `Pentru instituțiile din statele Convenției CIEC nr. 16 (Italia, Spania, Germania, Franța și altele), extrasul multilingv de naștere înlocuiește traducerea și apostila; îl adaugi în aceeași comandă, ${lei(extras)} lei, și pleacă în același plic. Pentru Regatul Unit, Irlanda, SUA sau Canada rămâne duplicatul cu traducere și, în afara UE, apostilă, pe care le facem noi, în ordinea corectă: întâi apostila pe original, apoi traducerea.`,
           ]}
           guides={[

@@ -260,9 +260,14 @@ export default async function ExtrasMultilingvCasatoriePage() {
           </div>
         </section>
 
+        {/* Notă de neafiliere (02.11.2026): extrasele multilingve se eliberează „de către oricare S.P.C.L.E.P. sau,
+            după caz, primărie […] ori misiune diplomatică sau oficiu consular de carieră” — HG 255/2024, Normele
+            metodologice, art. 171 alin. (1), https://legislatie.just.ro/Public/DetaliiDocument/280598 . Formularea
+            veche („Starea Civilă a primăriei care deține actul”) era regula dinainte de 31.03.2024; aliniat cu
+            nota de pe naștere/căsătorie. */}
         <PrivateServiceNotice
-          institutionLabel="direct la Starea Civilă a primăriei care deține actul"
-          institutionUrl="https://www.mai.gov.ro/"
+          institutionLabel="la orice serviciu de stare civilă din țară"
+          institutionUrl="https://depabd.mai.gov.ro/"
         />
 
 
@@ -687,7 +692,7 @@ export default async function ExtrasMultilingvCasatoriePage() {
             { q: 'Cât costă extrasul multilingv?', a: 'Serviciul complet costă 798 RON — totul inclus: onorariul avocatului partener, depunerea cererii prin împuternicire și livrarea. Nu există taxe ascunse.' },
             { q: 'Pot comanda și certificatul de căsătorie împreună cu extrasul?', a: 'Da, și e varianta cea mai avantajoasă: adaugi certificatul (duplicat) la pachet pentru doar +498 RON, față de 998 RON cât costă comandat separat — economisești 500 RON. Există și calea inversă: comanzi certificatul de căsătorie la 998 RON și adaugi extrasul multilingv ca opțiune, la +398 RON.' },
             { q: 'Când am nevoie de extrasul multilingv?', a: 'Când îți cere actul de căsătorie o autoritate dintr-un stat care aplică Convenția CIEC nr. 16: dovada căsătoriei, dovada regimului matrimonial, schimbarea numelui după căsătorie în actele din acel stat, permis de ședere pentru soț/soție sau alte dosare de familie.' },
-            { q: 'De unde se eliberează și cine depune cererea?', a: 'Se eliberează de serviciul de stare civilă al primăriei care deține actul de căsătorie. Prin eGhișeul, avocatul nostru partener depune cererea prin împuternicire — pe care o semnezi electronic direct în formular — fără să te deplasezi la ghișeu.' },
+            { q: 'De unde se eliberează și cine depune cererea?', a: 'Din 2024 îl eliberează orice serviciu de stare civilă sau primărie din țară, precum și consulatele de carieră ale României, nu doar primăria care deține actul de căsătorie (HG 255/2024, art. 171). Prin eGhișeul, avocatul nostru partener depune cererea prin împuternicire — pe care o semnezi electronic direct în formular — fără să te deplasezi la ghișeu.' },
             { q: 'Cât durează și cum primesc documentul?', a: `Termenul standard este de ${formatEstimatedDays(service)}, în funcție de oficiul stării civile care deține actul. Primești extrasul electronic pe email și/sau în original prin curier, inclusiv internațional prin DHL, oriunde în lume.` },
             { q: 'Ce acte îmi trebuie ca să comand?', a: 'Doar actul de identitate (îl scanezi în formular), un selfie cu actul pentru verificarea identității și datele actului de căsătorie: data, locul înregistrării și numele soților. Wizard-ul online te ghidează pas cu pas.' },
             { q: 'Mă căsătoresc în străinătate. Îmi trebuie extrasul ăsta?', a: 'Nu. Extrasul de căsătorie dovedește o căsătorie deja încheiată. Pentru o căsătorie viitoare, ofițerul de stare civilă din străinătate cere certificatul de celibat (dovada că nu ești căsătorit). Sunt două documente opuse ca sens.' },

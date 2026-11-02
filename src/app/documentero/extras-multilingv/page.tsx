@@ -50,6 +50,16 @@ const FAQ = [
  * Aplicat de SPCLEP: https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
  * Era „din 2023” — regula vine din HG 255/2024.
  */
+/*
+ * Consulatul (verificat 02.11.2026): H.G. 255/2024, Normele metodologice de stare civilă,
+ * https://legislatie.just.ro/Public/DetaliiDocument/280598 — art. 158 alin. (1): certificatele de stare civilă
+ * se eliberează și de „misiune diplomatică sau oficiu consular de carieră a/al României în străinătate”;
+ * art. 171 alin. (1): la fel extrasele multilingve; art. 158 alin. (18): la cererea depusă la consulat,
+ * certificatul se poate livra în străinătate prin curier. Consulatul nu „trimite cererea în țară”, iar
+ * „30–60 de zile” nu avea sursă: scos. Termenul rămâne cel din art. 162 alin. (2) (pe loc / până la 30 de zile).
+ * Adeverința privind statutul civil (celibat) e în atribuțiile ofițerilor din S.P.C.L.E.P./primării (art. 12
+ * lit. o); pentru consulate normele nu o spun la fel de clar, deci nu afirmăm.
+ */
 export default async function ExtrasMultilingvPage() {
   const pN = await getServicePricing('extras-multilingv-certificat-nastere');
   const pC = await getServicePricing('extras-multilingv-certificat-casatorie');
@@ -190,7 +200,7 @@ export default async function ExtrasMultilingvPage() {
             ['Apostilă', 'nu e nevoie în statele convenției', 'nu e nevoie în statele convenției; în rest îți spunem ce trebuie'],
             ['Taxă', '0 lei sau taxă locală', `${lei(pN.basePrice)} lei, tot inclus`],
             ['Termen', 'legal, până la 30 de zile', 'același termen; status la fiecare pas'],
-            ['Din străinătate', 'consulat: 30–60 de zile', 'direct la primărie, curier internațional'],
+            ['Din străinătate', 'la consulatul de carieră, cu programare', 'avocatul depune în România, curier internațional'],
           ]}
           diasporaTitle="Pentru cine e gândit extrasul: cei care locuiesc în statele convenției"
           diaspora={[

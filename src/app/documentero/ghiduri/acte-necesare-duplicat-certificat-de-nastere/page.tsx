@@ -65,6 +65,16 @@ function UL({ items }: { items: string[] }) {
  * Aplicat de SPCLEP: https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
  * Era „din 2023” — regula vine din HG 255/2024.
  */
+/*
+ * Consulatul (verificat 02.11.2026): H.G. 255/2024, Normele metodologice de stare civilă,
+ * https://legislatie.just.ro/Public/DetaliiDocument/280598 — art. 158 alin. (1): certificatele de stare civilă
+ * se eliberează și de „misiune diplomatică sau oficiu consular de carieră a/al României în străinătate”;
+ * art. 171 alin. (1): la fel extrasele multilingve; art. 158 alin. (18): la cererea depusă la consulat,
+ * certificatul se poate livra în străinătate prin curier. Consulatul nu „trimite cererea în țară”, iar
+ * „30–60 de zile” nu avea sursă: scos. Termenul rămâne cel din art. 162 alin. (2) (pe loc / până la 30 de zile).
+ * Adeverința privind statutul civil (celibat) e în atribuțiile ofițerilor din S.P.C.L.E.P./primării (art. 12
+ * lit. o); pentru consulate normele nu o spun la fel de clar, deci nu afirmăm.
+ */
 export default async function GhidActeNecesarePage() {
   const p = await getServicePricing('certificat-nastere');
   const graph = documenteroArticleGraph({
@@ -139,7 +149,7 @@ export default async function GhidActeNecesarePage() {
             <P>Diferența dintre cele trei drumuri, cu costuri și timp, e în <A href="/ghiduri/procura-din-strainatate-notar-consulat-avocat/">ghidul despre procura din străinătate</A>.</P>
 
             <H id="s4">Din străinătate</H>
-            <P>Aceleași acte. Ce se schimbă e drumul: la consulat te programezi cu săptămâni înainte, iar cererea pleacă tot la primăria din România, cu 30–60 de zile de așteptare. Prin avocat, cererea intră direct la primărie, iar tu semnezi de pe telefon. Dacă certificatul îți trebuie pentru o instituție din UE, întreabă întâi dacă nu vrea de fapt <A href="/extras-multilingv/">extrasul multilingv</A>, care se acceptă fără traducere și fără apostilă. În afara UE, cere duplicatul cu <A href="/ghiduri/apostila-acte-stare-civila/">apostilă</A> și traducere.</P>
+            <P>Aceleași acte. Ce se schimbă e drumul: la consulatul de carieră al României te programezi, iar consulatul eliberează el însuși duplicatul, din registrul electronic, și ți-l poate trimite prin curier (art. 158 din Normele metodologice). Prin avocat, cererea intră direct la primărie, iar tu semnezi de pe telefon. Dacă certificatul îți trebuie pentru o instituție din UE, întreabă întâi dacă nu vrea de fapt <A href="/extras-multilingv/">extrasul multilingv</A>, care se acceptă fără traducere și fără apostilă. În afara UE, cere duplicatul cu <A href="/ghiduri/apostila-acte-stare-civila/">apostilă</A> și traducere.</P>
 
             <H id="s5">Ce NU ți se cere</H>
             <UL items={[

@@ -55,6 +55,16 @@ function UL({ items }: { items: string[] }) {
   );
 }
 
+/*
+ * Consulatul (verificat 02.11.2026): H.G. 255/2024, Normele metodologice de stare civilă,
+ * https://legislatie.just.ro/Public/DetaliiDocument/280598 — art. 158 alin. (1): certificatele de stare civilă
+ * se eliberează și de „misiune diplomatică sau oficiu consular de carieră a/al României în străinătate”;
+ * art. 171 alin. (1): la fel extrasele multilingve; art. 158 alin. (18): la cererea depusă la consulat,
+ * certificatul se poate livra în străinătate prin curier. Consulatul nu „trimite cererea în țară”, iar
+ * „30–60 de zile” nu avea sursă: scos. Termenul rămâne cel din art. 162 alin. (2) (pe loc / până la 30 de zile).
+ * Adeverința privind statutul civil (celibat) e în atribuțiile ofițerilor din S.P.C.L.E.P./primării (art. 12
+ * lit. o); pentru consulate normele nu o spun la fel de clar, deci nu afirmăm.
+ */
 export default async function GhidProcuraPage() {
   const nastere = await getServicePricing('certificat-nastere');
   const celibat = await getServicePricing('certificat-celibat');
@@ -103,7 +113,7 @@ export default async function GhidProcuraPage() {
             </Card>
 
             <H id="s1">De ce ai nevoie de cineva în locul tău</H>
-            <P>Primăria nu trimite certificate prin poștă la cerere prin email și nu eliberează nimic unui străin de dosar. Certificatul se dă titularului, părintelui pentru minor, sau unei persoane cu împuternicire. Consulatul poate prelua cererea, dar nu o rezolvă el: o trimite la primăria din România și așteaptă răspunsul, de regulă 30–60 de zile, după o programare pe care în Italia, Spania sau Regatul Unit o prinzi cu săptămâni înainte. De aici întrebarea pe care o primim cel mai des de la diaspora: „pe cine împuternicesc și cum?”.</P>
+            <P>Primăria nu trimite certificate prin poștă la cerere prin email și nu eliberează nimic unui străin de dosar. Certificatul se dă titularului, părintelui pentru minor, sau unei persoane cu împuternicire. Consulatul de carieră al României poate elibera el însuși certificatele de naștere și de căsătorie și extrasele multilingve, dacă prinzi o programare și mergi personal. Cine nu poate merge are nevoie de un împuternicit. De aici întrebarea pe care o primim cel mai des de la diaspora: „pe cine împuternicesc și cum?”.</P>
 
             <H id="s2">Calea 1: procura la notarul din străinătate</H>
             <P>Mergi la un notar din țara unde locuiești și faci o procură specială pentru „obținerea duplicatului certificatului de naștere” (sau ce act îți trebuie), pe numele unei rude sau al unui prieten din România. Procura străină nu e valabilă în România așa cum e: are nevoie de apostilă (în statele Convenției de la Haga) sau de supralegalizare, apoi de traducere autorizată în română, făcută în România sau de un traducător recunoscut. Abia atunci persoana împuternicită merge la primărie.</P>
@@ -114,7 +124,7 @@ export default async function GhidProcuraPage() {
             ]} />
 
             <H id="s3">Calea 2: procura la consulatul României</H>
-            <P>Consulatul român face procuri notariale în română, deci sare peste apostilă și traducere. Prinzi însă programarea: în orașele mari, sistemul de programări e plin cu săptămâni înainte, iar pentru o procură trebuie să te prezinți personal, cu actul de identitate. Procura consulară pleacă apoi tot în România, la ruda sau prietenul care merge la primărie. Unele consulate primesc direct și cererea de duplicat, dar tot ele o trimit la primăria din țară, cu așteptarea de 30–60 de zile.</P>
+            <P>Consulatul român face procuri notariale în română, deci sare peste apostilă și traducere. Prinzi însă programarea: în orașele mari, sistemul de programări e plin cu săptămâni înainte, iar pentru o procură trebuie să te prezinți personal, cu actul de identitate. Procura consulară pleacă apoi tot în România, la ruda sau prietenul care merge la primărie. Dacă tot mergi la consulat și îți trebuie un certificat de naștere sau de căsătorie, poți cere direct duplicatul acolo: consulatele de carieră îl eliberează din registrul electronic și îl pot trimite prin curier.</P>
             <UL items={[
               'Costă: taxa consulară, mică sau zero pentru multe acte.',
               'Durează: programarea (săptămâni), drumul la consulat, curierul spre România, drumul rudei la primărie.',
@@ -136,10 +146,10 @@ export default async function GhidProcuraPage() {
               rows={[
                 ['Drumuri pe care le faci tu', 'notar + poștă', 'consulat, cu programare', 'niciunul; semnezi pe telefon'],
                 ['Apostilă și traducere pe procură', 'da, amândouă', 'nu', 'nu'],
-                ['Om în România care să depună', 'da, obligatoriu', 'da, sau consulatul trimite cererea', 'nu; depune avocatul'],
+                ['Om în România care să depună', 'da, obligatoriu', 'da, pentru procură; nu, dacă ceri actul direct la consulat', 'nu; depune avocatul'],
                 ['Cost estimat', '50–150 € + apostilă + traducere', 'taxă consulară mică', `${lei(nastere.basePrice)} lei, tot inclus`],
                 ['Timp până depune cineva la primărie', '2–4 săptămâni', '3–8 săptămâni (programarea)', '1–2 zile lucrătoare'],
-                ['Cine ridică și trimite', 'ruda', 'ruda sau consulatul', 'avocatul; curier oriunde'],
+                ['Cine ridică și trimite', 'ruda', 'ruda; sau consulatul, dacă îi ceri actul direct', 'avocatul; curier oriunde'],
               ]}
             />
 

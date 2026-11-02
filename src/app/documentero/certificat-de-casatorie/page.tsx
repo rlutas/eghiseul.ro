@@ -61,6 +61,16 @@ const FAQ = [
  * Aplicat de SPCLEP: https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
  * Era „din 2023” — regula vine din HG 255/2024.
  */
+/*
+ * Consulatul (verificat 02.11.2026): H.G. 255/2024, Normele metodologice de stare civilă,
+ * https://legislatie.just.ro/Public/DetaliiDocument/280598 — art. 158 alin. (1): certificatele de stare civilă
+ * se eliberează și de „misiune diplomatică sau oficiu consular de carieră a/al României în străinătate”;
+ * art. 171 alin. (1): la fel extrasele multilingve; art. 158 alin. (18): la cererea depusă la consulat,
+ * certificatul se poate livra în străinătate prin curier. Consulatul nu „trimite cererea în țară”, iar
+ * „30–60 de zile” nu avea sursă: scos. Termenul rămâne cel din art. 162 alin. (2) (pe loc / până la 30 de zile).
+ * Adeverința privind statutul civil (celibat) e în atribuțiile ofițerilor din S.P.C.L.E.P./primării (art. 12
+ * lit. o); pentru consulate normele nu o spun la fel de clar, deci nu afirmăm.
+ */
 export default async function CasatoriePage() {
   const p = await getServicePricing('certificat-casatorie');
   const ml = await getServicePricing('extras-multilingv-certificat-casatorie');
@@ -184,7 +194,7 @@ export default async function CasatoriePage() {
           ]}
           diasporaTitle="Căsătorie încheiată în România, viață în străinătate"
           diaspora={[
-            'Cel mai frecvent caz: cuplu căsătorit în România, stabilit în Italia, Spania sau Germania, care are nevoie de certificatul de căsătorie pentru rezidența partenerului, pentru schimbarea numelui în actele străine sau pentru pensia de urmaș. Consulatul preia cererea, dar o trimite tot în țară, cu termene de 30–60 de zile. Prin avocat, cererea intră direct la primărie.',
+            'Cel mai frecvent caz: cuplu căsătorit în România, stabilit în Italia, Spania sau Germania, care are nevoie de certificatul de căsătorie pentru rezidența partenerului, pentru schimbarea numelui în actele străine sau pentru pensia de urmaș. Consulatele de carieră ale României eliberează și ele duplicatul, din registrul electronic, după o programare. Prin avocat nu ai nevoie de programare: cererea intră direct la o primărie din țară.',
             `Pentru instituțiile din statele Convenției CIEC nr. 16 (Italia, Spania, Germania, Franța și altele), extrasul multilingv de căsătorie înlocuiește traducerea și apostila. Îl poți adăuga în aceeași comandă, ${lei(extrasOpt)} lei, și pleacă în același plic; separat costă ${lei(ml.basePrice)} lei. Pentru Regatul Unit, Irlanda sau SUA rămâne duplicatul cu traducere și, unde e nevoie, apostilă, pe care le facem noi în ordinea corectă.`,
           ]}
           guides={[

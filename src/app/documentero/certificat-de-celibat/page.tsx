@@ -50,7 +50,7 @@ const ROUTES = [
 
 const FAQ = [
   { q: 'Certificat de celibat, Anexa 9 sau adeverință privind statutul civil?', a: 'Același document. Numele legal actual este „adeverință privind statutul civil”, Anexa 18 la Normele metodologice aprobate prin H.G. 255/2024; înainte de 2024 era Anexa 9. Instituțiile străine îi spun „certificat de celibat”, „certificate of no impediment” sau „nulla osta”.' },
-  { q: 'Îl pot cere de la consulat?', a: 'Da, dar consulatul îl solicită tot de la primăria din România, cu termene de 30–60 de zile. Noi mergem direct la primărie.' },
+  { q: 'Îl pot cere de la consulat?', a: 'Întreabă consulatul înainte de programare. Normele de stare civilă dau explicit consulatelor de carieră eliberarea certificatelor și a extraselor multilingve, dar adeverința privind statutul civil o pun în sarcina serviciilor de stare civilă din țară. Prin noi, avocatul depune cererea direct la un serviciu de stare civilă din România.' },
   { q: 'Am fost căsătorit și am divorțat. Îl pot obține?', a: 'Da. Documentul arată starea civilă actuală, cu mențiunea divorțului. Pentru unele state ai nevoie și de certificatul de căsătorie cu mențiunea de divorț.' },
   { q: 'Cât e valabil certificatul de celibat?', a: 'Formularul din Anexa 18 nu are termen de valabilitate: arată starea civilă la data eliberării. Termenul îl pune instituția care îl primește, de obicei 3 sau 6 luni de la data eliberării (Germania, de exemplu, 6 luni). Comandă-l când știi data depunerii, nu „ca să-l ai”. Detalii pe țări în ghidul despre valabilitatea certificatului de celibat.' },
   { q: 'Cum știu ce cere statul unde mă căsătoresc?', a: 'Spune-ne țara în formular. Îți spunem dacă e nevoie de apostilă, de traducere sau de extras multilingv în locul certificatului de naștere.' },
@@ -67,6 +67,16 @@ const FAQ = [
  * se validează în 3 zile la cererea serviciului care are cererea. https://legislatie.just.ro/Public/DetaliiDocument/280598
  * Aplicat de SPCLEP: https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
  * Era „din 2023” — regula vine din HG 255/2024.
+ */
+/*
+ * Consulatul (verificat 02.11.2026): H.G. 255/2024, Normele metodologice de stare civilă,
+ * https://legislatie.just.ro/Public/DetaliiDocument/280598 — art. 158 alin. (1): certificatele de stare civilă
+ * se eliberează și de „misiune diplomatică sau oficiu consular de carieră a/al României în străinătate”;
+ * art. 171 alin. (1): la fel extrasele multilingve; art. 158 alin. (18): la cererea depusă la consulat,
+ * certificatul se poate livra în străinătate prin curier. Consulatul nu „trimite cererea în țară”, iar
+ * „30–60 de zile” nu avea sursă: scos. Termenul rămâne cel din art. 162 alin. (2) (pe loc / până la 30 de zile).
+ * Adeverința privind statutul civil (celibat) e în atribuțiile ofițerilor din S.P.C.L.E.P./primării (art. 12
+ * lit. o); pentru consulate normele nu o spun la fel de clar, deci nu afirmăm.
  */
 export default async function CelibatPage() {
   const p = await getServicePricing('certificat-celibat');
@@ -235,7 +245,7 @@ export default async function CelibatPage() {
           title="Certificat de celibat online: cum îl obținem și de ce prin avocat"
           intro={[
             'Certificatul de celibat nu există sub acest nume în legea română. Ce primești este adeverința privind statutul civil, formularul Anexa 18 din Normele metodologice de stare civilă aprobate prin H.G. 255/2024 (fosta Anexa 9), eliberată de serviciul de stare civilă; din 2024 cererea se poate depune la oricare din țară. Confirmă că în registrele din România nu figurezi căsătorit. Ambasadele și primăriile din alte țări îi spun certificat de celibat, „certificate of no impediment” sau „nulla osta”, și îl cer înainte de a oficia o căsătorie cu un cetățean român.',
-            'Legea 119/1996, articolul 10, permite ca cererea să fie depusă și de un avocat cu împuternicire avocațială, iar Legea 51/1995 dă împuternicirii avocațiale forța unei procuri. Asta facem: tu semnezi împuternicirea pe telefon, avocatul nostru depune cererea la starea civilă competentă, ridică documentul și îl trimitem la tine. Nu trebuie să vii în țară și nu trebuie să treci pe la consulat, unde termenele ajung la 30–60 de zile fiindcă cererea se întoarce tot la primăria din România.',
+            'Legea 119/1996, articolul 10, permite ca cererea să fie depusă și de un avocat cu împuternicire avocațială, iar Legea 51/1995 dă împuternicirii avocațiale forța unei procuri. Asta facem: tu semnezi împuternicirea pe telefon, avocatul nostru depune cererea la starea civilă competentă, ridică documentul și îl trimitem la tine. Nu trebuie să vii în țară și nu ai nevoie de programare la consulat.',
             'Motivul cel mai des de refuz în străinătate nu e documentul, ci datele: data nașterii sau numele scrise altfel în pașaportul străin decât în actul de naștere românesc. Adeverința reproduce actul de naștere. Dacă știi de o diferență, spune-ne în formular; uneori soluția e un duplicat nou de naștere sau o rectificare, nu încă o adeverință.',
           ]}
           acte={['Act de identitate valabil (buletin sau pașaport), poză față-verso', 'Datele nașterii: data, localitatea, numele părinților', 'Țara și scopul: căsătorie, ședere, notar', 'Semnătura ta, în formular']}
@@ -244,7 +254,7 @@ export default async function CelibatPage() {
             ['Cine merge', 'tu, personal, sau cu procură notarială', 'avocatul, cu împuternicire semnată pe telefon'],
             ['Taxă', '0 lei sau taxă locală', `${lei(p.basePrice)} lei, tot inclus`],
             ['Termen', 'legal, până la 30 de zile', 'același termen legal; te anunțăm la fiecare pas'],
-            ['Din străinătate', 'consulat: 30–60 de zile', 'direct la primărie, curier internațional'],
+            ['Din străinătate', 'procură pentru cineva din țară sau întrebi consulatul', 'avocatul depune în România, curier internațional'],
             ['Apostilă, traducere', 'alte două instituții, alte două drumuri', 'le facem noi, în ordinea corectă'],
           ]}
           diasporaTitle="Te căsătorești în Italia, Spania, Germania sau Regatul Unit"

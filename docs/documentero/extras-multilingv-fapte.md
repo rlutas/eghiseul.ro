@@ -53,4 +53,4 @@ Austria, Belgia, Bosnia și Herțegovina, Bulgaria, Capul Verde, Croația, Elve�
 
 - Formularul B (căsătorie) din 1976: apare mențiunea de divorț pe extras? Pagina documentero și anunțul X2 D3 spun că da; nu am confirmat.
 - Termenul legal de eliberare a extrasului (paginile spun „cel mult 30 de zile”, ca la certificate).
-- Dacă extrasul se poate cere de la orice primărie sau doar de la cea care are actul (articolul eghiseul din 2025 spune „de la oricare primărie”, paginile de serviciu spun „primăria care deține actul”).
+- ~~Dacă extrasul se poate cere de la orice primărie sau doar de la cea care are actul~~ **Rezolvat 02.11.2026:** de la oricare S.P.C.L.E.P./primărie și de la consulatele de carieră ale României — H.G. 255/2024, Normele metodologice, art. 171 alin. (1) (https://legislatie.just.ro/Public/DetaliiDocument/280598). Nota de neafiliere și FAQ-ul de pe eghiseul spun acum „la orice serviciu de stare civilă din țară”.

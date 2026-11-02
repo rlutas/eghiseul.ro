@@ -57,6 +57,16 @@ function A({ href, children }: { href: string; children: string }) {
  * Aplicat de SPCLEP: https://primariatgfrumos.ro/wp-content/uploads/2023/01/Extrasele-multilingve-1.pdf
  * Era „din 2023” — regula vine din HG 255/2024.
  */
+/*
+ * Consulatul (verificat 02.11.2026): H.G. 255/2024, Normele metodologice de stare civilă,
+ * https://legislatie.just.ro/Public/DetaliiDocument/280598 — art. 158 alin. (1): certificatele de stare civilă
+ * se eliberează și de „misiune diplomatică sau oficiu consular de carieră a/al României în străinătate”;
+ * art. 171 alin. (1): la fel extrasele multilingve; art. 158 alin. (18): la cererea depusă la consulat,
+ * certificatul se poate livra în străinătate prin curier. Consulatul nu „trimite cererea în țară”, iar
+ * „30–60 de zile” nu avea sursă: scos. Termenul rămâne cel din art. 162 alin. (2) (pe loc / până la 30 de zile).
+ * Adeverința privind statutul civil (celibat) e în atribuțiile ofițerilor din S.P.C.L.E.P./primării (art. 12
+ * lit. o); pentru consulate normele nu o spun la fel de clar, deci nu afirmăm.
+ */
 export default async function GhidPierdutPage() {
   const p = await getServicePricing('certificat-nastere');
   const stats = PROCESSING_STATS.byService['certificat-nastere'];
@@ -145,7 +155,7 @@ export default async function GhidPierdutPage() {
             />
 
             <H id="s7">Dacă ești în străinătate</H>
-            <P>Consulatul poate prelua cererea, dar o trimite tot la primăria din România și termenele ajung la 30–60 de zile, plus programarea la consulat, care în Italia sau Spania se ia cu săptămâni înainte. Prin avocat, cererea intră direct la primărie, iar tu semnezi împuternicirea de pe telefon, de oriunde.</P>
+            <P>Consulatele de carieră ale României eliberează și ele duplicatul, din același registru electronic, și ți-l pot trimite prin curier la adresa din străinătate. Termenul e cel din țară; în plus vine programarea la consulat. Prin avocat, cererea intră direct la primărie, iar tu semnezi împuternicirea de pe telefon, de oriunde.</P>
             <P>Înainte să comanzi, întreabă instituția străină ce vrea exact. În Italia, Spania, Germania, Franța și celelalte state ale Convenției CIEC nr. 16, de cele mai multe ori nu vrea certificatul, ci <A href="/extras-multilingv/">extrasul multilingv</A>, acceptat fără traducere și fără apostilă. În Regatul Unit, SUA sau Canada vrea certificatul cu <A href="/ghiduri/apostila-acte-stare-civila/">apostilă</A> și traducere. Amândouă se pot adăuga în aceeași comandă.</P>
 
             <H id="s8">Cât costă</H>
