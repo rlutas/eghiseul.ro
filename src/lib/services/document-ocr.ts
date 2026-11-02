@@ -18,6 +18,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { validateCNP } from '@/lib/validations/cnp';
 import { cleanNamePart } from '@/lib/format/person-name';
+import { isGeminiUnavailableError, OCR_UNAVAILABLE_MESSAGE } from './gemini-health';
 
 // Initialize Gemini AI with the 2.5 Flash Lite model for OCR
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
@@ -249,7 +250,9 @@ Răspunde în acest format JSON:
     ));
   } catch (error) {
     console.error('CI Front OCR error:', error);
-    return createErrorResult('ci_front', 'Eroare la procesarea documentului');
+    return createErrorResult('ci_front',
+      isGeminiUnavailableError(error) ? OCR_UNAVAILABLE_MESSAGE : 'Eroare la procesarea documentului'
+    );
   }
 }
 
@@ -335,7 +338,9 @@ Răspunde în acest format JSON:
     return applyCiDeterministicCorrections(parseGeminiOCRResponse(text, 'ci_back'));
   } catch (error) {
     console.error('CI Back OCR error:', error);
-    return createErrorResult('ci_back', 'Eroare la procesarea documentului');
+    return createErrorResult('ci_back',
+      isGeminiUnavailableError(error) ? OCR_UNAVAILABLE_MESSAGE : 'Eroare la procesarea documentului'
+    );
   }
 }
 
@@ -417,7 +422,9 @@ IMPORTANT FINAL: NU SCRIE ÎN "issues" "Address information not visible" sau ech
     return applyMrzCnpFallback(parseGeminiOCRResponse(text, 'ci_back')); // reuse parser, document type stays ci_back for backward compat in OCRResult
   } catch (error) {
     console.error('CI Nou Back OCR error:', error);
-    return createErrorResult('ci_back', 'Eroare la procesarea documentului');
+    return createErrorResult('ci_back',
+      isGeminiUnavailableError(error) ? OCR_UNAVAILABLE_MESSAGE : 'Eroare la procesarea documentului'
+    );
   }
 }
 
@@ -522,7 +529,9 @@ Răspunde în acest format JSON:
     return correctNamesFromMrz(applyMrzCnpFallback(parseGeminiOCRResponse(text, 'passport')));
   } catch (error) {
     console.error('Passport Opened OCR error:', error);
-    return createErrorResult('passport', 'Eroare la procesarea documentului');
+    return createErrorResult('passport',
+      isGeminiUnavailableError(error) ? OCR_UNAVAILABLE_MESSAGE : 'Eroare la procesarea documentului'
+    );
   }
 }
 
@@ -630,7 +639,9 @@ Răspunde în acest format JSON:
     return parseGeminiOCRResponse(text, 'passport'); // fallback DocumentType — we'll set isAuthenticated via extraData
   } catch (error) {
     console.error('RO CEI Reader PDF OCR error:', error);
-    return createErrorResult('passport', 'Eroare la procesarea PDF-ului RO CEI Reader');
+    return createErrorResult('passport',
+      isGeminiUnavailableError(error) ? OCR_UNAVAILABLE_MESSAGE : 'Eroare la procesarea PDF-ului RO CEI Reader'
+    );
   }
 }
 
@@ -1280,7 +1291,9 @@ Răspunde în acest format JSON:
     return correctNamesFromMrz(applyMrzCnpFallback(parseGeminiOCRResponse(text, 'passport')));
   } catch (error) {
     console.error('Passport OCR error:', error);
-    return createErrorResult('passport', 'Eroare la procesarea documentului');
+    return createErrorResult('passport',
+      isGeminiUnavailableError(error) ? OCR_UNAVAILABLE_MESSAGE : 'Eroare la procesarea documentului'
+    );
   }
 }
 
@@ -1340,7 +1353,9 @@ Răspunde cu UN SINGUR CUVÂNT.`;
     }
   } catch (error) {
     console.error('Document detection error:', error);
-    return createErrorResult('unknown', 'Eroare la detectarea tipului de document');
+    return createErrorResult('unknown',
+      isGeminiUnavailableError(error) ? OCR_UNAVAILABLE_MESSAGE : 'Eroare la detectarea tipului de document'
+    );
   }
 }
 

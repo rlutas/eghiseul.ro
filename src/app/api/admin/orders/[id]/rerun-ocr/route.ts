@@ -19,6 +19,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { OCR_UNAVAILABLE_MESSAGE } from '@/lib/services/gemini-health';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
@@ -144,6 +145,19 @@ export async function POST(
         ocr = await extractFromROCEIReaderPDF(imageBase64);
         mimeType = 'application/pdf';
         break;
+    }
+
+    // Provider down (credit epuizat, cotă, cheie): spune asta și NU suprascrie
+    // rezultatul vechi cu unul gol (incident 23.10–02.11.2026).
+    if (!ocr.success && ocr.issues?.includes(OCR_UNAVAILABLE_MESSAGE)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            'Serviciul de citire a actelor (Google AI) nu răspunde — probabil creditul e epuizat. Anunță-l pe Raul și completează manual.',
+        },
+        { status: 503 }
+      );
     }
 
     // ── Patch the order: replace the result row for this docType ────────────

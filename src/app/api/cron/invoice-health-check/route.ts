@@ -24,6 +24,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ensureInvoiceForPaidOrder } from '@/lib/oblio';
 import type { ZeroVatInvoice } from '@/lib/oblio/vat';
+import { checkGeminiAndAlert } from '@/lib/services/gemini-health';
+import { sendEmail } from '@/lib/email/resend';
 
 const MIN_AGE_MS = 30 * 60 * 1000;
 const MAX_LOOKBACK_MS = 7 * 24 * 60 * 60 * 1000; // don't keep alerting on ancient orders
@@ -128,6 +130,16 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = createAdminClient();
+
+  // OCR provider (Gemini) — one key for all four sites; an exhausted credit
+  // silently broke ID extraction for 10 days (23.10–02.11.2026). Rides this
+  // hourly cron; emails at most once a day. Never blocks the invoice checks.
+  const gemini = await checkGeminiAndAlert(supabase, sendEmail).catch((err) => {
+    console.error('[invoice-health-check] gemini probe failed:', err);
+    return null;
+  });
+  if (gemini && !gemini.ok) console.error('[invoice-health-check] Gemini unavailable:', gemini.status, gemini.message);
+
   const now = Date.now();
   const cutoffNewIso = new Date(now - MIN_AGE_MS).toISOString();
   const cutoffOldIso = new Date(now - MAX_LOOKBACK_MS).toISOString();

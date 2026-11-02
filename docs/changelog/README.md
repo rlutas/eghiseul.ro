@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-02 | 🔴 **Citirea actelor (Gemini) oprită 23.10–02.11 pe toate site-urile: credit AI Studio epuizat (402); acum mesaj clar în admin + email de alertă orar** — `gemini-health.ts` (`checkGeminiAndAlert` în `invoice-health-check`), `OCR_UNAVAILABLE_MESSAGE` în `document-ocr`, `rerun-ocr`/CJO `extract-ci` 503 | [2026-11-02-citire-acte-gemini-credit.md](2026-11-02-citire-acte-gemini-credit.md) |
 | 2026-11-02 | 🔴 **Împuternicirea de apostilă Haga la stare civilă iese pe modelul de la caziere (antet Barou, Prefectură, fără filiație/stare civilă)** — `resolveTemplateSlug` → `shared/imputernicire.docx` pentru `apostila_haga` pe serviciile de stare civilă | [2026-11-02-imputernicire-apostila-stare-civila.md](2026-11-02-imputernicire-apostila-stare-civila.md) |
 | 2026-10-21 | 🔴 **Prețul comenzii recalculat integral pe server la submit (bază, opțiuni, traducere pe limbă, livrare, cupon); corecția traducerii pe limbă reparată** — `computeServerPricing` în `lib/orders/server-pricing.ts`, folosit de `/api/orders/[id]/submit` | [2026-10-21-pret-calculat-pe-server.md](2026-10-21-pret-calculat-pe-server.md) |
 | 2026-10-21 | ✅ **Viteză: funcțiile Vercel mutate din Washington (iad1) la Londra (lhr1), lângă Supabase; contractul la submit generat în `after()`; cotațiile de curier cache-uite 5 min la CDN** — `vercel.json` `regions`, `submit/route.ts`, `courier/quote/route.ts` | [2026-10-21-viteza-plata-curier-regiune.md](2026-10-21-viteza-plata-curier-regiune.md) |
