@@ -46,6 +46,17 @@ cazierul-judiciar-online.ro, infocazier.ro).
 | Țara pe factură: clienții din străinătate nu mai primesc județ românesc | CJO + eghiseul | ✅ live |
 | Raportarea anunțurilor concurenților, a doua rundă (6 anunțuri) | Google Ads | ✅ vezi `docs/ads/registru-demersuri.md` (G4b) |
 
+## Ce s-a mai făcut după-amiază (02.11)
+
+| Ce | Site | Stare |
+|---|---|---|
+| Fapte corectate cu surse oficiale (taxe, anexe, primărie, consulat, Hub MAI, SPV, străini, împuternicire) | toate 4 | ✅ live |
+| Homepage = hub cazier (39 orașe pe regiuni, 23 ghiduri), vecini pe paginile de oraș, „document oficial” 74 → 0 | CJO | ✅ live |
+| Primul ghid util: cât durează duplicatul certificatului de naștere | documentero | ✅ live |
+| Monitorizare SEO lunară (GSC, 4 site-uri) + checklist concurență | toate | ✅ [monitorizare](../monitorizare/README.md) |
+| Curățenie șabloane imobiliare + certificat constatator | eghiseul | 🔄 în lucru |
+| Decizie: fără pagini noi pe eghiseul până la revenire | eghiseul | ✅ |
+
 ## Ce urmează (din planul din 00-sinteza.md)
 
 - **Azi / săptămâna asta:**
