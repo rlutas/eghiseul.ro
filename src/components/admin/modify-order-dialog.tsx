@@ -185,6 +185,14 @@ export function ModifyOrderDialog({
       }
       // Adding from catalog — make sure the row we send to the API has the
       // canonical shape (optionId + optionName + priceModifier + quantity).
+      // An apostille added next to one already on the order inherits its
+      // country: the country select is shared and shows that value already,
+      // so the admin had no way to "pick" it again (E-260918-SGXMY, 20.10).
+      const isApostila = opt.code === 'apostila_haga' || opt.code === 'apostila_notari';
+      const inheritedCountry = isApostila
+        ? prev.find((o) => (o.code === 'apostila_haga' || o.code === 'apostila_notari') && o.metadata?.country)
+            ?.metadata?.country
+        : undefined;
       return [
         ...prev,
         {
@@ -193,6 +201,7 @@ export function ModifyOrderDialog({
           optionName: opt.optionName ?? opt.option_name,
           priceModifier: opt.priceModifier ?? opt.price_modifier ?? 0,
           quantity: opt.quantity ?? 1,
+          ...(inheritedCountry ? { metadata: { country: inheritedCountry } } : {}),
         },
       ];
     });

@@ -211,3 +211,16 @@ export function computeAddedTermShiftDays(
   }
   return days;
 }
+
+/**
+ * Country shared by the apostilles on an order (Haga + Notari use one value,
+ * as in the wizard). First non-empty country wins; '' when none is set.
+ */
+export function sharedApostilleCountry(options: OrderOptionForDiff[]): string {
+  for (const o of options) {
+    if ((o.code === 'apostila_haga' || o.code === 'apostila_notari') && o.metadata?.country) {
+      return o.metadata.country;
+    }
+  }
+  return '';
+}

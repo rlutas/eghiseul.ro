@@ -3,6 +3,7 @@ import {
   computeModifyDiff,
   computeAddedTermShiftDays,
   describeChanges,
+  sharedApostilleCountry,
   type OrderForDiff,
   type OrderOptionForDiff,
 } from '@/lib/orders/modify-diff';
@@ -381,5 +382,20 @@ describe('computeAddedTermShiftDays', () => {
         { code: 'custom_extra', priceModifier: 99, quantity: 1 },
       ])
     ).toBe(0);
+  });
+});
+
+describe('sharedApostilleCountry — Haga + Notari au o singură țară (E-260918-SGXMY)', () => {
+  it('ia țara de pe apostila Haga existentă pentru Notari adăugată', () => {
+    expect(
+      sharedApostilleCountry([
+        { code: 'apostila_notari', priceModifier: 0 },
+        { code: 'apostila_haga', priceModifier: 198, metadata: { country: 'Paraguay' } },
+      ] as never)
+    ).toBe('Paraguay');
+  });
+
+  it('gol când nicio apostilă nu are țară', () => {
+    expect(sharedApostilleCountry([{ code: 'apostila_notari' }, { code: 'traducere', metadata: { language: 'Engleză (UK)' } }] as never)).toBe('');
   });
 });

@@ -29,6 +29,7 @@ import {
   computeModifyDiff,
   computeAddedTermShiftDays,
   describeChanges,
+  sharedApostilleCountry,
   type CustomExtraForDiff,
   type OrderForDiff,
   type OrderOptionForDiff,
@@ -187,6 +188,23 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .map((o) => o.code)
       .filter(Boolean) as string[]
   );
+  // Haga + Notari share one country (same as the wizard). A new apostille
+  // next to an existing one takes the country already on the order — older
+  // dialogs sent it without metadata and the team got stuck on
+  // „Selectează țara" with the country visibly selected (E-260918-SGXMY).
+  const sharedApostilaCountry = sharedApostilleCountry([
+    ...(body.selectedOptions as OrderOptionForDiff[]),
+    ...((orderForDiff.selected_options ?? []) as OrderOptionForDiff[]),
+  ]);
+  for (const o of body.selectedOptions) {
+    if (
+      (o.code === 'apostila_haga' || o.code === 'apostila_notari') &&
+      !o.metadata?.country &&
+      sharedApostilaCountry
+    ) {
+      o.metadata = { ...(o.metadata ?? {}), country: sharedApostilaCountry };
+    }
+  }
   for (const o of body.selectedOptions) {
     if (!o.code || oldCodesSet.has(o.code)) continue;
     if (o.code === 'traducere' && !o.metadata?.language) {
