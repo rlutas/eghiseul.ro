@@ -154,14 +154,14 @@ export default async function GhidActeNecesarePage() {
             <H id="s6">Ce te întoarce de la ghișeu</H>
             <P>Din cererile care ni se întorc, motivele sunt aceleași, în ordinea asta:</P>
             <UL items={[
-              'Buletin expirat. Primăria nu primește cereri cu act de identitate expirat. Reînnoiește-l întâi; pentru asta ai nevoie tot de certificatul de naștere, deci e cercul vicios clasic. Ieșirea: cere duplicatul cu pașaportul valabil, dacă îl ai, sau cu cartea de identitate provizorie.',
+              'Buletin expirat și poză care nu mai seamănă. Cu actul expirat, ofițerul te verifică în evidența persoanelor și poate elibera certificatul; dacă fizionomia nu mai corespunde cu poza din evidență, îți cere întâi act de identitate nou (art. 158 alin. 5 din Normele metodologice). Ieșirea cea mai simplă: depune cu pașaportul valabil, dacă îl ai.',
               'Cerere de duplicat pentru un act care nu există în România. Cine s-a născut în străinătate și nu a avut niciodată certificat românesc are nevoie de transcriere, altă procedură.',
               'Solicitant fără calitate: fratele, soțul, prietenul care „are certificatul vechi la el”. Fără împuternicire, nu primește nimic.',
               'Datele nașterii scrise greșit în cerere: alt an, altă comună. Verifică-le cu pașaportul înainte.',
             ]} />
 
             <H id="s7">În București: sectoarele</H>
-            <P>Actul de naștere e păstrat de sectorul în care a fost înregistrată nașterea, de obicei sectorul maternității. Din 2023 poți depune cererea la oricare dintre cele șase direcții, sau prin avocat, fără să te intereseze care. Dacă vrei să mergi singur, instituțiile sunt acestea:</P>
+            <P>Actul de naștere e păstrat de sectorul în care a fost înregistrată nașterea, de obicei sectorul maternității. Din 2024 poți depune cererea la oricare dintre cele șase direcții, sau prin avocat, fără să te intereseze care. Dacă vrei să mergi singur, instituțiile sunt acestea:</P>
             <InfoTable
               head={['Sectorul', 'Instituția', 'Site']}
               rows={[
@@ -176,7 +176,7 @@ export default async function GhidActeNecesarePage() {
             <P>Toate șase lucrează cu programare online și cu ghișee aglomerate dimineața. Sectoarele 2 și 5 au calendare separate pentru stare civilă. Direcția Generală de Evidență a Persoanelor a Municipiului București (dgepmb.ro) coordonează, dar nu eliberează certificate.</P>
 
             <H id="s8">Cât costă și cât durează</H>
-            <P>La ghișeu: 0 lei sau o taxă locală de câțiva lei, hotărâtă de consiliul local. Termenul legal e de cel mult 30 de zile; actele scanate ies în câteva zile, cele vechi se apropie de termen. Prin documentero.ro plătești {lei(p.basePrice)} lei cu TVA, pentru avocat, împuternicire, depunere, ridicare, scan pe email și pregătirea pentru curier. Cifrele noastre reale de termen sunt pe <A href="/certificat-de-nastere/">pagina duplicatului certificatului de naștere</A>.</P>
+            <P>La ghișeu: 0 lei sau o taxă locală de câțiva lei, hotărâtă de consiliul local. Termenul legal e de cel mult 30 de zile; actele scanate ies în câteva zile, cele vechi se apropie de termen. Prin documentero.ro plătești {lei(p.basePrice)} lei cu TVA, pentru avocat, împuternicire, depunere, ridicare, scan pe email și pregătirea pentru curier. Cifrele noastre reale de termen sunt pe <A href="/certificat-de-nastere/">pagina duplicatului certificatului de naștere</A>, iar de ce variază termenul și unde există regim de urgență, în ghidul <A href="/ghiduri/cat-dureaza-duplicat-certificat-de-nastere/">cât durează duplicatul certificatului de naștere</A>.</P>
           </article>
 
           <aside className="flex flex-col gap-5 self-start lg:sticky lg:top-24 lg:col-span-3 lg:col-start-10">

@@ -56,21 +56,28 @@ export const LEGAL_BASIS = {
 
 /**
  * Our own delivery figures: paid civil-status orders on this platform,
- * 07.07.2026 → 21.09.2026, days from payment to completion (courier
- * included). Median and 80th percentile; the sample is small and says so on
- * the page. Recompute by hand when the numbers move (query in
- * docs/documentero/analiza-competitori-seo.md §6.B).
+ * 07.07.2026 → asOf, days from payment to completion (courier included).
+ * Median and 80th percentile (percentile_cont, rounded); the sample is small
+ * and says so on the page. Recompute by hand when the numbers move (query in
+ * docs/documentero/analiza-competitori-seo.md §6.B). Recomputed 02.11.2026.
  */
 export const PROCESSING_STATS = {
-  asOf: '2026-09-21',
+  asOf: '2026-11-02',
   since: '7 iulie 2026',
   byService: {
-    'certificat-nastere': { done: 11, medianDays: 19, p80Days: 23 },
-    'certificat-casatorie': { done: 4, medianDays: 22, p80Days: 30 },
-    'certificat-celibat': { done: 5, medianDays: 19, p80Days: 24 },
-    'extras-multilingv-certificat-nastere': { done: 12, medianDays: 19, p80Days: 24 },
-    'extras-multilingv-certificat-casatorie': { done: 3, medianDays: 12, p80Days: 12 },
+    'certificat-nastere': { done: 14, medianDays: 19, p80Days: 24 },
+    'certificat-casatorie': { done: 6, medianDays: 18, p80Days: 24 },
+    'certificat-celibat': { done: 7, medianDays: 15, p80Days: 22 },
+    'extras-multilingv-certificat-nastere': { done: 17, medianDays: 18, p80Days: 22 },
+    'extras-multilingv-certificat-casatorie': { done: 5, medianDays: 12, p80Days: 13 },
   },
+  /**
+   * Where the time goes, birth-certificate duplicates only (same 14 orders):
+   * order_history status_changed events. Filing = paid → first
+   * submitted_to_institution; institution = submitted → first shipped (the
+   * primărie issues, the lawyer picks it up, we scan and hand to courier).
+   */
+  phasesNastere: { fileMaxDays: 1, institutionMinDays: 4, institutionMedianDays: 12.5, institutionMaxDays: 21 },
 } as const;
 
 const RO_MONTHS = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
@@ -94,6 +101,7 @@ export interface GuideMeta {
 export const GUIDES: GuideMeta[] = [
   { slug: 'certificat-de-nastere-pierdut', title: 'Certificat de naștere pierdut: ce faci în 2026', desc: 'Fără declarație la poliție, fără drum la primăria natală. Pașii, actele, termenul real.', category: 'Naștere', minutes: 7, published: true },
   { slug: 'acte-necesare-duplicat-certificat-de-nastere', title: 'Acte necesare pentru duplicatul certificatului de naștere (2026)', desc: 'Lista scurtă, pe cazuri: pentru tine, pentru copil, prin avocat, din străinătate. Plus sectoarele din București.', category: 'Naștere', minutes: 6, published: true },
+  { slug: 'cat-dureaza-duplicat-certificat-de-nastere', title: 'Cât durează duplicatul certificatului de naștere și se poate mai repede?', desc: 'Pe loc sau până la 30 de zile: de ce depinde, ce primării au urgență și cât au durat comenzile noastre, pe etape.', category: 'Naștere', minutes: 7, published: true },
   { slug: 'certificat-de-nastere-vechi-tipizat', title: 'Certificat de naștere vechi (model tipizat): mai e valabil în 2026?', desc: 'Da, H.G. 255/2024 o spune expres. Când trebuie totuși schimbat și de unde ceri modelul nou.', category: 'Naștere', minutes: 7, published: true },
   { slug: 'procura-din-strainatate-notar-consulat-avocat', title: 'Procură din străinătate pentru acte de stare civilă: notar, consulat sau avocat', desc: 'Trei căi ca să ceară cineva în locul tău: ce costă, cât durează, ce poate merge prost.', category: 'Diaspora', minutes: 7, published: true },
   { slug: 'transcriere-certificat-de-nastere-strainatate', title: 'Transcrierea certificatului de naștere emis în străinătate', desc: 'Copil născut în Italia sau Spania: cum intră în registrele din România.', category: 'Diaspora', minutes: 8, published: false },

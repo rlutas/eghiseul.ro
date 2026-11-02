@@ -17,7 +17,7 @@ const TITLE = 'Certificat de naștere vechi (model tipizat): mai e valabil în 2
 const DESCRIPTION =
   'Da, legea din 2024 spune expres că certificatele vechi rămân valabile. Când trebuie totuși schimbat, ce aduce modelul nou, de unde îl ceri și cum procedezi dacă locuiești în străinătate.';
 const DATE_PUBLISHED = '2026-10-05';
-const DATE_MODIFIED = '2026-10-05';
+const DATE_MODIFIED = '2026-11-02';
 const IMAGE = '/images/documentero/certificat-pe-masa.webp';
 
 export const metadata = buildPageMetadata({
@@ -162,7 +162,7 @@ export default async function GhidCertificatVechiPage() {
               <li>Certificatul vechi, dacă îl mai ai, ca să se vadă de ce ceri unul nou</li>
               <li>Cererea, completată la ghișeu, cu motivul: deteriorat, plastifiat, reținut</li>
             </ul>
-            <P>Termenul: certificatul se tipărește pe loc sau, dacă sunt necesare verificări, în cel mult 30 de zile (art. 162 alin. 2). La acte vechi, nescanate, verificarea înseamnă căutarea în registrul de hârtie al primăriei care l-a întocmit. Asta lungește lucrurile, nu modelul.</P>
+            <P>Termenul: certificatul se tipărește pe loc sau, dacă sunt necesare verificări, în cel mult 30 de zile (art. 162 alin. 2). La acte vechi, nescanate, verificarea înseamnă căutarea în registrul de hârtie al primăriei care l-a întocmit. Asta lungește lucrurile, nu modelul. Termenele pe cazuri și regimul de urgență: <A href="/ghiduri/cat-dureaza-duplicat-certificat-de-nastere/">cât durează duplicatul certificatului de naștere</A>.</P>
 
             <H id="s6">Dacă locuiești în străinătate</H>
             <P>Ai trei variante. Prima e consulatul: Normele pun misiunile diplomatice și oficiile consulare de carieră printre emitenții de certificate. Rămâne de văzut cât de repede găsești o programare acolo unde locuiești.</P>

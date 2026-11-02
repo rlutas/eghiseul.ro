@@ -17,7 +17,7 @@ const TITLE = 'Cât e valabil certificatul de celibat? Termenele cerute în Germ
 const DESCRIPTION =
   'Formularul românesc nu are termen de valabilitate. Termenul îl pune instituția care îl primește. Ce cer Germania, Franța, Spania, Italia și Regatul Unit, în ce ordine faci apostila și traducerea și când să-l comanzi.';
 const DATE_PUBLISHED = '2026-10-05';
-const DATE_MODIFIED = '2026-10-05';
+const DATE_MODIFIED = '2026-11-02';
 const IMAGE = '/images/documentero/cuplu-certificat-casatorie.webp';
 
 export const metadata = buildPageMetadata({

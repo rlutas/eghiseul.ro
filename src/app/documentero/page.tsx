@@ -246,7 +246,8 @@ export default async function DocumenteroHome() {
               pentru Uniunea Europeană. Cererile le depune{' '}
               <Link href="/despre/" className="font-semibold underline underline-offset-2 hover:text-d-acc">av. {LAWYER.name}, Baroul Satu Mare</Link>, cu împuternicirea avocațială pe care o semnezi pe telefon, în temeiul Legii 119/1996 și al Legii 51/1995. Dacă ai pierdut certificatul, citește întâi{' '}
               <Link href="/ghiduri/certificat-de-nastere-pierdut/" className="font-semibold underline underline-offset-2 hover:text-d-acc">ce faci când ai pierdut certificatul de naștere</Link>; dacă ai nevoie de el în afara UE,{' '}
-              <Link href="/ghiduri/apostila-acte-stare-civila/" className="font-semibold underline underline-offset-2 hover:text-d-acc">când e nevoie de apostilă și când nu</Link>. Toate ghidurile sunt la{' '}
+              <Link href="/ghiduri/apostila-acte-stare-civila/" className="font-semibold underline underline-offset-2 hover:text-d-acc">când e nevoie de apostilă și când nu</Link>; iar dacă te grăbești,{' '}
+              <Link href="/ghiduri/cat-dureaza-duplicat-certificat-de-nastere/" className="font-semibold underline underline-offset-2 hover:text-d-acc">cât durează duplicatul și unde se poate mai repede</Link>. Toate ghidurile sunt la{' '}
               <Link href="/ghiduri/" className="font-semibold underline underline-offset-2 hover:text-d-acc">Ghiduri</Link>.
             </p>
           </Card>

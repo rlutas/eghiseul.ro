@@ -17,7 +17,7 @@ const TITLE = 'Procură din străinătate pentru acte de stare civilă: notar, c
 const DESCRIPTION =
   'Ești plecat și ai nevoie de certificatul de naștere, de căsătorie sau de celibat din România. Trei căi ca să ceară cineva în locul tău: procura la notarul de acolo, procura la consulat, împuternicirea avocațială. Ce costă, cât durează, ce poate merge prost.';
 const DATE_PUBLISHED = '2026-09-21';
-const DATE_MODIFIED = '2026-10-05';
+const DATE_MODIFIED = '2026-11-02';
 
 export const metadata = buildPageMetadata({
   brand: 'documentero',
@@ -128,7 +128,7 @@ export default async function GhidProcuraPage() {
               'Durează: semnezi în 5 minute; depunerea a doua zi lucrătoare; termenul legal de eliberare de cel mult 30 de zile; curier 3–7 zile în UE.',
               'Depinde de: un act de identitate valabil și de datele corecte ale actului.',
             ]} />
-            <P>Fiecare împuternicire și fiecare contract primesc un număr din registrul Baroului, deci primăria vede exact cine depune și în ce temei. Cine depune pentru tine: <A href="/despre/">avocata noastră, Tarța Ana Gabriela, Baroul Satu Mare</A>.</P>
+            <P>Fiecare împuternicire și fiecare contract primesc un număr din registrul Baroului, deci primăria vede exact cine depune și în ce temei. Cine depune pentru tine: <A href="/despre/">avocata noastră, Tarța Ana Gabriela, Baroul Satu Mare</A>. Cât stă cererea la primărie după depunere, pe etape: <A href="/ghiduri/cat-dureaza-duplicat-certificat-de-nastere/">cât durează duplicatul certificatului de naștere</A>.</P>
 
             <H id="s5">Comparația, pe scurt</H>
             <InfoTable

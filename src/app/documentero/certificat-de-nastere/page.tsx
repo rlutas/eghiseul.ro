@@ -194,6 +194,7 @@ export default async function NasterePage() {
             { title: 'Certificat de naștere pierdut: ce faci în 2026', desc: 'Pașii, actele, termenul real.', href: '/ghiduri/certificat-de-nastere-pierdut/' },
             { title: 'Apostila pe acte de stare civilă: când e nevoie și când nu', desc: 'În UE nu; în afara UE, pe original.', href: '/ghiduri/apostila-acte-stare-civila/' },
             { title: 'Acte necesare pentru duplicatul certificatului de naștere', desc: 'Lista scurtă, pe cazuri, plus sectoarele din București.', href: '/ghiduri/acte-necesare-duplicat-certificat-de-nastere/' },
+            { title: 'Cât durează duplicatul și se poate mai repede?', desc: 'Pe loc sau până la 30 de zile; urgența la primărie; etapele noastre.', href: '/ghiduri/cat-dureaza-duplicat-certificat-de-nastere/' },
           ]}
         />
 

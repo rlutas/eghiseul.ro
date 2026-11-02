@@ -123,11 +123,11 @@ export default async function GhidPierdutPage() {
               <li>Pentru minor: actul de identitate al părintelui care depune; peste 14 ani, copilul semnează și el</li>
               <li>Prin avocat: împuternicirea avocațială, generată automat în <A href="/certificat-de-nastere/">comanda noastră</A></li>
             </ul>
-            <P>Nu ai nevoie de certificatul vechi, de o copie a lui, de certificatul de căsătorie sau de vreo adeverință. Dacă buletinul ți-a expirat, întâi îl reînnoiești; primăria nu primește cereri cu act de identitate expirat, și e motivul cel mai des pentru care o cerere se întoarce.</P>
+            <P>Nu ai nevoie de certificatul vechi, de o copie a lui, de certificatul de căsătorie sau de vreo adeverință. Dacă buletinul ți-a expirat, ofițerul de stare civilă te verifică în evidența persoanelor și îți poate elibera totuși certificatul; dacă fizionomia ta nu mai corespunde cu poza din evidență, ți se cere întâi act de identitate nou (art. 158 alin. 5 din Normele metodologice).</P>
 
             <H id="s5">Cât durează, de fapt</H>
             <P>Termenul legal maxim este de 30 de zile de la depunere. Ce vezi tu, ca om care așteaptă, e undeva între: dacă actul e digitalizat, duplicatul iese în câteva zile; pentru acte vechi, nescanate, primăria de origine caută în registrul de hârtie și se apropie de termenul maxim.</P>
-            <P>Cifrele noastre: din comenzile de duplicat plătite de la {PROCESSING_STATS.since}, {stats.done} au fost finalizate până la {fmtDateRo(PROCESSING_STATS.asOf)}. Jumătate au ajuns la client în cel mult {stats.medianDays} zile de la plată, 8 din 10 în cel mult {stats.p80Days} zile, cu curier cu tot. E un eșantion mic și îl actualizăm pe măsură ce crește; nu promitem „3 zile” ca să vindem.</P>
+            <P>Cifrele noastre: din comenzile de duplicat plătite de la {PROCESSING_STATS.since}, {stats.done} au fost finalizate până la {fmtDateRo(PROCESSING_STATS.asOf)}. Jumătate au ajuns la client în cel mult {stats.medianDays} zile de la plată, 8 din 10 în cel mult {stats.p80Days} zile, cu curier cu tot. E un eșantion mic și îl actualizăm pe măsură ce crește; nu promitem „3 zile” ca să vindem. Ce spune legea despre tipărirea pe loc, unde există regim de urgență și pe ce etape se duc zilele: <A href="/ghiduri/cat-dureaza-duplicat-certificat-de-nastere/">cât durează duplicatul certificatului de naștere</A>.</P>
 
             <H id="s6">Cazuri particulare</H>
             <InfoTable
