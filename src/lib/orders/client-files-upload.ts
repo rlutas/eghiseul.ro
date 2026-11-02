@@ -1,7 +1,12 @@
 /**
- * Browser side of `POST /api/orders/[id]/client-files`: compress photos (a
- * 5 MB phone photo of an old CF extract becomes ~400 KB and stays readable),
- * ask for a presigned URL, PUT the bytes to S3, return the stored entry.
+ * Browser side of the presigned order-file uploads: compress photos (a 5 MB
+ * phone photo of an old CF extract becomes ~400 KB and stays readable), ask
+ * for a presigned URL, PUT the bytes to S3, return the stored entry.
+ *
+ * - `uploadClientFile`: the client (wizard / status page) →
+ *   `POST /api/orders/[id]/client-files`.
+ * - `uploadOrderFile`: any presign endpoint with the same contract, e.g. the
+ *   team's / topograph's message attachments (`…/messages/files`).
  */
 
 import { compressImage, ImageCompressionError } from '@/lib/images/compress';
@@ -29,6 +34,18 @@ export async function uploadClientFile(
   file: File,
   auth: ClientFileAuth
 ): Promise<ClientFile> {
+  return uploadOrderFile(`/api/orders/${orderId}/client-files`, file, {
+    email: auth.email,
+    resumeToken: auth.resumeToken || undefined,
+    token: auth.token || undefined,
+  });
+}
+
+export async function uploadOrderFile(
+  presignEndpoint: string,
+  file: File,
+  extraBody: Record<string, unknown> = {}
+): Promise<ClientFile> {
   if (file.size === 0) {
     throw new Error('Fișierul este gol. Dacă ai ales poza din galerie, fă-o direct cu camera.');
   }
@@ -51,16 +68,14 @@ export async function uploadClientFile(
     throw new Error('Fișierul are peste 10 MB. Trimite o poză sau un PDF mai mic.');
   }
 
-  const presign = await fetch(`/api/orders/${orderId}/client-files`, {
+  const presign = await fetch(presignEndpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      ...extraBody,
       contentType: mimeType,
       fileSize: body.size,
       filename: file.name,
-      email: auth.email,
-      resumeToken: auth.resumeToken || undefined,
-      token: auth.token || undefined,
     }),
   });
   const json = await presign.json().catch(() => ({}));

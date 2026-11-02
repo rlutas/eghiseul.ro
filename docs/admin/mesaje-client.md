@@ -25,6 +25,22 @@ clientul răspunde echipei → echipa îi spune lui Mircea”.
    și butonul „Vezi mesajul și răspunde”.
 3. Vedeți sub mesaj dacă l-a deschis („văzut de client” / „nevăzut încă”).
 
+## Atașați o poză sau un PDF (din 02.11.2026)
+
+- În fereastra „Mesaj către client” (și în portalul topografului), sub casetă,
+  apăsați **„Atașează poză sau PDF”**. Puteți alege până la **5 fișiere** de
+  maximum **10 MB** fiecare: PDF, JPG, PNG sau WebP.
+- Fișierele apar în listă sub casetă; cu **X** scoateți unul înainte de trimitere.
+- Textul e opțional când atașați ceva. Dacă trimiteți doar fișierul, clientul
+  vede „Vă trimitem atașat un document legat de comanda dumneavoastră.” — mai
+  bine scrieți o propoziție care spune ce e (ex. „Extrasul primit de la OCPI nu
+  poate fi folosit, vedeți poza atașată.”).
+- Emailul către client spune câte fișiere are mesajul și îl trimite în pagina
+  comenzii; fișierele NU sunt atașate la email. Clientul le deschide din fir.
+- Le vedeți și voi în fir, sub mesaj, cu link de deschidere.
+- Nu trimiteți așa documentul final al comenzii: acela se livrează în continuare
+  cu „Încarcă PDF și trimite clientului”.
+
 ## Când răspunde clientul
 
 - Poate scrie text și poate atașa până la 5 poze sau PDF-uri (de exemplu un act
@@ -39,6 +55,7 @@ clientul răspunde echipei → echipa îi spune lui Mircea”.
   (admin) sau „Notă pentru echipă” (portal).
 - Firul nu apare pe comenzile neplătite sau abandonate.
 - Documentele finale se livrează ca până acum („Încarcă PDF și trimite
-  clientului”), nu prin mesaje.
+  clientului”), nu prin mesaje. Atașamentele din mesaje sunt pentru explicații
+  (o poză cu problema, un act de completat).
 - Clientul poate trimite cel mult 30 de mesaje pe zi pe o comandă; pentru urgențe
   îl îndrumați pe WhatsApp.

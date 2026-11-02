@@ -6,9 +6,9 @@
  * email and on the status page; internal notes stay in the notes card.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { AlertTriangle, FileText, ImageIcon, MessageSquare, Send } from 'lucide-react';
+import { AlertTriangle, FileText, ImageIcon, Loader2, MessageSquare, Paperclip, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -17,6 +17,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import type { ClientFile } from '@/lib/orders/client-files';
+import { uploadOrderFile } from '@/lib/orders/client-files-upload';
+import {
+  MESSAGE_FILE_ACCEPT,
+  MESSAGE_FILES_MAX_COUNT,
+  messageFilesEndpoint,
+} from '@/lib/orders/message-files';
 
 interface Attachment {
   key: string;
@@ -72,6 +79,9 @@ export function OrderMessagesPanel({ endpoint, readOnly, templates, className, b
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
+  const [files, setFiles] = useState<ClientFile[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     try {
@@ -87,14 +97,38 @@ export function OrderMessagesPanel({ endpoint, readOnly, templates, className, b
     load();
   }, [load]);
 
+  // Files go straight to S3 (presigned); the message only carries the keys.
+  const addFiles = async (list: FileList | null) => {
+    if (!list?.length) return;
+    setUploading(true);
+    let next = [...files];
+    try {
+      for (const file of Array.from(list)) {
+        if (next.length >= MESSAGE_FILES_MAX_COUNT) {
+          toast.error(`Se pot atașa cel mult ${MESSAGE_FILES_MAX_COUNT} fișiere la un mesaj.`);
+          break;
+        }
+        next = [...next, await uploadOrderFile(messageFilesEndpoint(endpoint), file)];
+        setFiles(next);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Încărcarea a eșuat.');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const canSend = !!draft.trim() || files.length > 0;
+
   const send = async () => {
-    if (!draft.trim()) return;
+    if (!canSend) return;
     setSending(true);
     try {
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body: draft.trim() }),
+        body: JSON.stringify({ body: draft.trim(), attachments: files }),
       });
       const json = await res.json();
       if (!json.success) throw new Error(json.error || 'Mesajul nu a fost trimis');
@@ -104,6 +138,7 @@ export function OrderMessagesPanel({ endpoint, readOnly, templates, className, b
           : 'Mesaj salvat pe comandă (emailul nu a plecat — verificați adresa clientului).'
       );
       setDraft('');
+      setFiles([]);
       await load();
       onSent?.();
     } catch (e) {
@@ -122,8 +157,9 @@ export function OrderMessagesPanel({ endpoint, readOnly, templates, className, b
             Mesaje cu clientul
           </h2>
           <p className="mb-3 text-xs text-slate-500">
-            Ce scrieți aici ajunge la client pe email și în pagina comenzii; el poate răspunde, cu
-            poze atașate. Pentru observații interne folosiți notele.
+            Ce scrieți (și ce atașați: poză sau PDF) ajunge la client pe email și în pagina
+            comenzii; el poate răspunde, tot cu poze atașate. Pentru observații interne folosiți
+            notele.
           </p>
         </>
       )}
@@ -205,8 +241,57 @@ export function OrderMessagesPanel({ endpoint, readOnly, templates, className, b
         placeholder="Scrie clientului..."
         className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
       />
-      <div className="mt-2 flex justify-end">
-        <Button onClick={send} disabled={readOnly || sending || !draft.trim()} size="sm">
+      {files.length > 0 && (
+        <ul className="mt-2 space-y-1">
+          {files.map((f) => (
+            <li
+              key={f.key}
+              className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-700"
+            >
+              {f.mimeType === 'application/pdf' ? (
+                <FileText className="h-3.5 w-3.5 flex-shrink-0 text-slate-400" />
+              ) : (
+                <ImageIcon className="h-3.5 w-3.5 flex-shrink-0 text-slate-400" />
+              )}
+              <span className="min-w-0 flex-1 truncate">{f.name}</span>
+              <span className="text-slate-400">{Math.max(1, Math.round(f.size / 1024))} KB</span>
+              <button
+                type="button"
+                onClick={() => setFiles(files.filter((x) => x.key !== f.key))}
+                disabled={sending}
+                aria-label={`Scoate ${f.name}`}
+                className="text-slate-400 hover:text-red-600"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={MESSAGE_FILE_ACCEPT}
+        multiple
+        className="hidden"
+        onChange={(e) => addFiles(e.target.files)}
+      />
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+        {!readOnly ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading || sending || files.length >= MESSAGE_FILES_MAX_COUNT}
+          >
+            {uploading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Paperclip className="mr-1.5 h-4 w-4" />}
+            {uploading ? 'Se încarcă...' : 'Atașează poză sau PDF'}
+          </Button>
+        ) : (
+          <span />
+        )}
+        <Button onClick={send} disabled={readOnly || sending || uploading || !canSend} size="sm">
           <Send className="mr-1.5 h-4 w-4" />
           {sending ? 'Se trimite...' : 'Trimite clientului'}
         </Button>
@@ -305,8 +390,8 @@ export function OrderMessagesLauncher({ endpoint, templates }: { endpoint: strin
               <div className="flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 p-2.5 text-xs text-amber-900">
                 <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
                 <span>
-                  Clientul primește mesajul pe email și îl vede în pagina comenzii. Observațiile
-                  interne se scriu în „Note echipă”, nu aici.
+                  Clientul primește mesajul pe email și îl vede în pagina comenzii, împreună cu
+                  fișierele atașate. Observațiile interne se scriu în „Note echipă”, nu aici.
                 </span>
               </div>
             </DialogDescription>

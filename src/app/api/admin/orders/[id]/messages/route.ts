@@ -6,7 +6,9 @@
  * POST /api/admin/orders/[id]/messages — the team writes to the client
  *      (`orders.manage`); the client gets an email with the message.
  *
- * Body (POST): `{ body: string }`. Everything posted here is visible to the
+ * Body (POST): `{ body: string, attachments?: ClientFile[] }` — files already
+ * uploaded through `/messages/files` (≤ 5; the text may be empty when files
+ * are attached). Everything posted here is visible to the
  * client — internal notes go through `/notes`.
  */
 
@@ -85,6 +87,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     authorId: auth.user.id,
     authorName,
     body: typeof payload?.body === 'string' ? payload.body : '',
+    attachments: payload?.attachments,
   });
   if (!result.ok) {
     return NextResponse.json({ success: false, error: result.error }, { status: result.status });

@@ -21,8 +21,13 @@ import {
 import { appBaseForOrder, brandForOrder } from '@/lib/brand/for-order';
 import { identifiableName } from '@/lib/orders/abandoned-progress';
 import { formatPersonName } from '@/lib/format/person-name';
-import { getDownloadUrl } from '@/lib/aws/s3';
+import { getDownloadUrl, getFileInfo } from '@/lib/aws/s3';
 import { sanitizeClientFiles, type ClientFile } from '@/lib/orders/client-files';
+import {
+  MESSAGE_FILE_MAX_BYTES,
+  checkStaffAttachments,
+  defaultBodyForAttachments,
+} from '@/lib/orders/message-files';
 
 export type MessageAuthorType = 'client' | 'team' | 'collaborator';
 export type MessageViewer = 'client' | 'staff';
@@ -99,6 +104,30 @@ export async function withAttachmentUrls(
   );
 }
 
+/**
+ * The browser PUTs staff files straight to S3 with a presigned URL, which
+ * does not enforce the size. Before the message references them: each file
+ * must exist and be within the limit; the stored size is the real one.
+ */
+async function verifyUploaded(
+  files: ClientFile[]
+): Promise<{ ok: true; files: ClientFile[] } | { ok: false; error: string }> {
+  const out: ClientFile[] = [];
+  for (const f of files) {
+    let size: number;
+    try {
+      size = (await getFileInfo(f.key)).size;
+    } catch {
+      return { ok: false, error: `Fișierul „${f.name}” nu s-a încărcat. Atașați-l din nou.` };
+    }
+    if (size > MESSAGE_FILE_MAX_BYTES) {
+      return { ok: false, error: `Fișierul „${f.name}” are peste 10 MB` };
+    }
+    out.push({ ...f, size, uploadedAt: f.uploadedAt ?? new Date().toISOString() });
+  }
+  return { ok: true, files: out };
+}
+
 interface PostInput {
   orderId: string;
   authorType: MessageAuthorType;
@@ -117,14 +146,26 @@ export type PostResult =
  * the message — it is on the order either way.
  */
 export async function postOrderMessage(input: PostInput): Promise<PostResult> {
-  const body = input.body.trim();
+  // The client attaches acts (`acte-client/`); the team / topograph attach
+  // files for the client to see (`mesaje-echipa/`, e.g. an unusable extract).
+  let attachments: ClientFile[];
+  if (input.authorType === 'client') {
+    attachments = sanitizeClientFiles(input.orderId, input.attachments);
+  } else {
+    const checked = checkStaffAttachments(input.orderId, input.attachments);
+    if (!checked.ok) return { ok: false, error: checked.error, status: 400 };
+    const verified = await verifyUploaded(checked.files);
+    if (!verified.ok) return { ok: false, error: verified.error, status: 400 };
+    attachments = verified.files;
+  }
+
+  // Files alone are a valid message: the body column is NOT NULL, so a
+  // neutral sentence stands in for the text.
+  const body = input.body.trim() || (attachments.length ? defaultBodyForAttachments(attachments.length) : '');
   if (!body) return { ok: false, error: 'Scrie mesajul', status: 400 };
   if (body.length > MESSAGE_MAX_LENGTH) {
     return { ok: false, error: `Mesajul are maxim ${MESSAGE_MAX_LENGTH} caractere`, status: 400 };
   }
-  // Only the client attaches files (acts); the team delivers documents
-  // through the normal upload.
-  const attachments = input.authorType === 'client' ? sanitizeClientFiles(input.orderId, input.attachments) : [];
 
   const admin: Admin = createAdminClient();
   const { data: order } = await admin
@@ -165,7 +206,7 @@ export async function postOrderMessage(input: PostInput): Promise<PostResult> {
     notes:
       input.authorType === 'client'
         ? `Mesaj de la client${attachments.length ? ` (${attachments.length} atașament${attachments.length > 1 ? 'e' : ''})` : ''}: ${body.slice(0, 300)}`
-        : `Mesaj trimis clientului: ${body.slice(0, 300)}`,
+        : `Mesaj trimis clientului${attachments.length ? ` (${attachments.length} atașament${attachments.length > 1 ? 'e' : ''})` : ''}: ${body.slice(0, 300)}`,
   });
 
   const emailed = await notify(admin, order, message as OrderMessage).catch((e) => {
@@ -194,6 +235,7 @@ async function notify(admin: Admin, order: any, message: OrderMessage): Promise<
       serviceName,
       authorLabel: clientFacingAuthor(message, brand.name),
       body: message.body,
+      attachmentCount: message.attachments?.length ?? 0,
       viewUrl: `${appUrl}/comanda/status/?order=${encodeURIComponent(friendly)}&email=${encodeURIComponent(email)}#mesaje`,
     });
     const result = await sendEmail({

@@ -52,6 +52,7 @@ deschide fereastra direct.
 Ce scrieți în fereastră ajunge la client pe email și în pagina comenzii; el
 răspunde de acolo, cu poze atașate, iar răspunsul vine pe email la contact@
 și la topograf. Vedeți „văzut de client” sub fiecare mesaj.
+Din 02.11 puteți atașa la mesaj până la 5 poze sau PDF-uri (butonul „Atașează poză sau PDF”).
 Notele interne rămân în „Note Echipă”. Detalii: [Mesajele cu clientul](mesaje-client.md).
 
 ## Documente încărcate de client
