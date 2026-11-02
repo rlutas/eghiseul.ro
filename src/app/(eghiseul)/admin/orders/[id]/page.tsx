@@ -39,6 +39,7 @@ import {
   type ExtractedROCEIReader,
 } from '@/lib/services/document-ocr';
 import { ModifyOrderDialog } from '@/components/admin/modify-order-dialog';
+import { ChangeServiceDialog } from '@/components/admin/change-service-dialog';
 import { AncpiCreateJob } from '@/app/(eghiseul)/admin/ancpi/AncpiCreateJob';
 import { QuickStatusSelect } from '@/components/admin/update-status-card';
 import {
@@ -85,6 +86,7 @@ import {
   Coins,
   Plus,
   Trash2,
+  Shuffle,
 } from 'lucide-react';
 import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
 import { hasDeliveryAddressData, isEmailOnlyDelivery } from '@/lib/delivery/address';
@@ -690,6 +692,7 @@ export default function AdminOrderDetailPage() {
   // AWB state
   const [generating, setGenerating] = useState(false);
   const [modifyDialogOpen, setModifyDialogOpen] = useState(false);
+  const [changeServiceOpen, setChangeServiceOpen] = useState(false);
   const [awbError, setAwbError] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -1211,6 +1214,19 @@ export default function AdminOrderDetailPage() {
             >
               <Pencil className="h-4 w-4" />
               Modifică
+            </Button>
+          )}
+          {/* „Schimbă serviciul" — același preț, alt serviciu (ex. cazier
+              judiciar → cazier fiscal). Eligibilitatea o decide serverul. */}
+          {order.payment_status === 'paid' && !['cancelled', 'refunded', 'completed', 'shipped'].includes(order.status ?? '') && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setChangeServiceOpen(true)}
+              title="Mută comanda pe alt serviciu la același preț"
+            >
+              <Shuffle className="h-4 w-4" />
+              Schimbă serviciul
             </Button>
           )}
           {/* Storno + Reemite — available only when there's already an
@@ -2921,6 +2937,14 @@ export default function AdminOrderDetailPage() {
         initialOptions={(order.selected_options ?? []) as Parameters<typeof ModifyOrderDialog>[0]['initialOptions']}
         initialDeliveryPrice={Number(order.delivery_price ?? 0)}
         serviceName={order.services?.name ?? null}
+        onApplied={refreshSilent}
+      />
+
+      <ChangeServiceDialog
+        open={changeServiceOpen}
+        onOpenChange={setChangeServiceOpen}
+        orderId={order.id}
+        orderNumber={displayOrderNumber}
         onApplied={refreshSilent}
       />
 

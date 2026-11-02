@@ -8,6 +8,7 @@ import { AlertTriangle, ArrowRight, FileText, ImagePlus, Loader2, MessageSquareW
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { REPORT_GUIDES, canPrefill, reportWarnings } from '@/lib/knowledge/report-template';
 import {
   REPORT_SHOT_MAX,
   REPORT_SHOT_MAX_BYTES,
@@ -85,6 +86,8 @@ export function GhidAsk({ audience, page }: { audience: Audience; page: string }
   const [shots, setShots] = useState<Shot[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [sending, setSending] = useState(false);
+  /** Avertismentele de la „Trimite" (soft): al doilea click trimite oricum. */
+  const [reportWarns, setReportWarns] = useState<string[]>([]);
   const shotInputRef = useRef<HTMLInputElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -176,12 +179,21 @@ export function GhidAsk({ audience, page }: { audience: Audience; page: string }
 
   function openReport(kind: 'problema' | 'sugestie', ctx?: { question: string; answer: string }) {
     setReport({ open: true, kind, question: ctx?.question, answer: ctx?.answer });
-    setReportMsg(ctx ? `Răspunsul la „${ctx.question}” nu m-a ajutat: ` : '');
+    setReportMsg(ctx ? `Răspunsul la „${ctx.question}” nu m-a ajutat: ` : REPORT_GUIDES[kind].template);
+    setReportWarns([]);
+  }
+
+  /** Schimbă tipul; șablonul se schimbă doar dacă nu s-a scris nimic în el. */
+  function changeReportKind(kind: 'problema' | 'sugestie') {
+    setReport((r) => ({ ...r, kind }));
+    setReportMsg((m) => (canPrefill(m) ? REPORT_GUIDES[kind].template : m));
+    setReportWarns([]);
   }
 
   function resetReport() {
     setReport({ open: false, kind: 'problema' });
     setReportMsg('');
+    setReportWarns([]);
     setReportOrder('');
     setReportSites([]);
     shots.forEach((s) => URL.revokeObjectURL(s.preview));
@@ -237,9 +249,24 @@ export function GhidAsk({ audience, page }: { audience: Audience; page: string }
 
   const shotsUploading = shots.some((s) => !s.key && !s.error);
 
-  async function sendReport() {
+  async function sendReport(force = false) {
     const message = reportMsg.trim();
     if (message.length < 5 || sending || shotsUploading) return;
+    // Verificare „moale": arată ce lipsește; „Trimite oricum" trece mai departe.
+    // „Nu m-a ajutat" (întrebare la chatbot) n-are comandă — nu verificăm.
+    if (!force && !report.question) {
+      const warns = reportWarnings({
+        kind: report.kind,
+        message,
+        orderNumber: reportOrder,
+        screenshots: shots.filter((s) => s.key).length,
+      });
+      if (warns.length) {
+        setReportWarns(warns);
+        return;
+      }
+    }
+    setReportWarns([]);
     setSending(true);
     try {
       const res = await fetch(`${apiBase}/reports${qs}`, {
@@ -439,7 +466,7 @@ export function GhidAsk({ audience, page }: { audience: Audience; page: string }
             <p className="text-sm font-semibold">Raportează</p>
             <select
               value={report.kind}
-              onChange={(e) => setReport((r) => ({ ...r, kind: e.target.value as 'problema' | 'sugestie' }))}
+              onChange={(e) => changeReportKind(e.target.value as 'problema' | 'sugestie')}
               className="h-7 rounded border bg-white px-2 text-xs"
             >
               <option value="problema">o problemă</option>
@@ -449,9 +476,13 @@ export function GhidAsk({ audience, page }: { audience: Audience; page: string }
               <X className="h-4 w-4" />
             </button>
           </div>
+          {!report.question && <p className="text-xs text-neutral-600">{REPORT_GUIDES[report.kind].hint}</p>}
           <Textarea
             value={reportMsg}
-            onChange={(e) => setReportMsg(e.target.value)}
+            onChange={(e) => {
+              setReportMsg(e.target.value);
+              if (reportWarns.length) setReportWarns([]);
+            }}
             onPaste={(e) => {
               const files = Array.from(e.clipboardData.files);
               if (files.some((f) => f.type.startsWith('image/'))) {
@@ -460,7 +491,7 @@ export function GhidAsk({ audience, page }: { audience: Audience; page: string }
               }
             }}
             placeholder="Ce nu merge sau ce lipsește? Ce ai apăsat, ce te așteptai, ce s-a întâmplat… Poți lipi aici o captură de ecran (Ctrl+V / Cmd+V)."
-            rows={3}
+            rows={report.question ? 3 : 6}
             className="bg-white"
             autoFocus
           />
@@ -517,7 +548,7 @@ export function GhidAsk({ audience, page }: { audience: Audience; page: string }
                 Adaugă poză
               </button>
             )}
-            <span className="text-[11px] text-neutral-500">sau lipește (Ctrl+V) / trage poza aici</span>
+            <span className="text-[11px] text-neutral-500">sau lipește (Ctrl+V) / trage poza aici. Poza trebuie să arate eroarea, nu altă pagină.</span>
             <input
               ref={shotInputRef}
               type="file"
@@ -542,6 +573,37 @@ export function GhidAsk({ audience, page }: { audience: Audience; page: string }
               Trimite lui Raul
             </Button>
           </div>
+          {reportWarns.length > 0 && (
+            <div role="alert" className="space-y-1.5 rounded border border-amber-400 bg-white px-3 py-2 text-xs text-amber-900">
+              <p className="flex items-center gap-1 font-semibold">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                Raportul e incomplet — trimiți oricum?
+              </p>
+              <ul className="ml-4 list-disc">
+                {reportWarns.map((w) => (
+                  <li key={w}>{w}</li>
+                ))}
+              </ul>
+              <div className="flex gap-2 pt-1">
+                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setReportWarns([])}>
+                  Completez
+                </Button>
+                <Button size="sm" className="h-7 text-xs" onClick={() => void sendReport(true)} disabled={sending || shotsUploading}>
+                  Trimite oricum
+                </Button>
+              </div>
+            </div>
+          )}
+          {!report.question && (
+            <div className="space-y-0.5 border-t border-amber-200 pt-2 text-[11px] text-neutral-600">
+              <p>
+                <span className="font-semibold text-green-800">Exemplu bun:</span> {REPORT_GUIDES[report.kind].good}
+              </p>
+              <p>
+                <span className="font-semibold text-red-800">Exemplu slab:</span> {REPORT_GUIDES[report.kind].bad}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </section>

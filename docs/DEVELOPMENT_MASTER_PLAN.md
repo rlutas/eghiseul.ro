@@ -686,8 +686,9 @@ Rapoartele echipei din `/admin/ghid/rapoarte`, închise azi (detalii în changel
 - ✅ Link de continuare refolosit (nu se mai anulează); seria SM pe contracte + 0 în față la intervale; apostila Notari lângă Haga nu mai blochează plata extra; termenul la transfer pornește la „Dovadă verificată”.
 - ✅ „Nu a răspuns” ×2 în Recuperare (eGhișeul + CJO, migrările 196 / CJO 043); extras multilingv fără „pierdut” (197); „CF Individuală” (198); traducere pe limbă pe CJO.
 - 🟡 În lucru: atașamente la „Mesaj către client”.
+- ✅ „Schimbă serviciul” pe comanda plătită, la același preț (E-261007-K59HB) + formularul „Raportează” cu șablon și avertizare la lipsa codului de comandă. [changelog](changelog/2026-11-02-schimba-serviciu-si-ghid-raportare.md)
 
-Rămase deschise: cazier fiscal E-261007-K59HB și eroarea E-261021-2446F (așteptăm lămuriri de la echipă), termen București 30–45 zile, ascundere completă din Abandonuri după apel, alerte Slack moarte (`SLACK_WEBHOOK_URL` nesetat).
+Rămase deschise: eroarea E-261021-2446F (așteptăm lămuriri de la echipă), termen București 30–45 zile, ascundere completă din Abandonuri după apel, alerte Slack moarte (`SLACK_WEBHOOK_URL` nesetat).
 
 ### RAPOARTE DIN GHID REZOLVATE — 29.09.2026
 

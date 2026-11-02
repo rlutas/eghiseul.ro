@@ -61,6 +61,25 @@ ce s-a întâmplat, numărul comenzii. „Nu merge AWB-ul” nu spune nimic;
 „la E-260921-ABCDE, Generează AWB dă eroare roșie după 5 secunde, easybox
 Satu Mare” spune tot.
 
+Din 02.11.2026 formularul vine **gata completat cu un șablon**, pe rânduri:
+
+- la **Problemă**: codul comenzii, ce ați făcut (pașii), ce s-a întâmplat
+  (mesajul exact de pe ecran), ce vă așteptați să se întâmple, și o
+  amintire că poza trebuie să arate eroarea;
+- la **Sugestie**: ce vreți să puteți face, unde (pagina / butonul), de ce
+  și cât de des apare, un exemplu concret cu codul comenzii.
+
+Completați după fiecare „:”. Dacă schimbați tipul înainte să scrieți ceva,
+șablonul se schimbă și el; după ce ați scris, textul rămâne. Sub formular
+stau un exemplu bun și unul slab.
+
+La **„Trimite lui Raul”**, dacă la o problemă lipsește codul comenzii (în
+text sau în căsuța „Nr. comandă”), mesajul erorii sau poza, ori dacă ați
+lăsat rânduri goale, apare o casetă galbenă „Raportul e incomplet — trimiți
+oricum?”, cu lista lipsurilor. **„Completez”** vă întoarce în formular,
+**„Trimite oricum”** îl trimite așa. Nu e blocat: unele probleme chiar nu țin
+de o comandă.
+
 ## Pentru Raul: pagina de rapoarte
 
 `/admin/ghid/rapoarte`: trei liste (Nou, În lucru, Rezolvat), fiecare raport
