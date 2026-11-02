@@ -12,8 +12,11 @@ import { randomBytes } from 'crypto';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
+import { appBaseForOrder } from '@/lib/brand/for-order';
 
 const TOKEN_TTL_HOURS = 48;
+/** A token with less life left than this is replaced instead of reused. */
+const MIN_REMAINING_MS = 2 * 60 * 60 * 1000;
 
 export async function POST(
   _request: NextRequest,
@@ -38,7 +41,7 @@ export async function POST(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: order } = await (adminClient as any)
       .from('orders')
-      .select('id, friendly_order_id, status, services(slug)')
+      .select('id, friendly_order_id, status, platform, resume_token, resume_token_expires_at, services(slug)')
       .eq('id', orderId)
       .single();
     if (!order) {
@@ -51,7 +54,18 @@ export async function POST(
       );
     }
 
-    const token = randomBytes(24).toString('base64url');
+    // Reuse the live token: every click used to mint a new one and kill the
+    // link already sent to the customer. E-261007-WQHZJ (07.10.2026): five
+    // links in four minutes, only the last one opened — team reported „nu
+    // merge link de continuare". The expiry is still pushed to +48h.
+    const currentExpiry = order.resume_token_expires_at
+      ? new Date(order.resume_token_expires_at).getTime()
+      : 0;
+    const reuse =
+      typeof order.resume_token === 'string' &&
+      order.resume_token.length > 0 &&
+      currentExpiry - Date.now() > MIN_REMAINING_MS;
+    const token: string = reuse ? order.resume_token : randomBytes(24).toString('base64url');
     const expiresAt = new Date(Date.now() + TOKEN_TTL_HOURS * 60 * 60 * 1000);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -66,7 +80,8 @@ export async function POST(
     }
 
     const slug = (Array.isArray(order.services) ? order.services[0]?.slug : order.services?.slug) || 'cazier-judiciar';
-    const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://eghiseul.ro';
+    // documentero drafts resume on documentero.ro, not eghiseul.ro.
+    const base = appBaseForOrder(order);
     const resumeUrl = `${base}/comanda/${slug}?resume=${token}`;
 
     // Audit
@@ -75,7 +90,9 @@ export async function POST(
       order_id: orderId,
       changed_by: user.id,
       event_type: 'resume_link_generated',
-      notes: `Link de continuare generat (valabil ${TOKEN_TTL_HOURS}h)`,
+      notes: reuse
+        ? `Link de continuare retrimis (același link, valabil ${TOKEN_TTL_HOURS}h)`
+        : `Link de continuare generat (valabil ${TOKEN_TTL_HOURS}h)`,
     });
 
     return NextResponse.json({
