@@ -664,6 +664,19 @@ Changelog: `docs/changelog/2026-09-25-identificare-acte-mesaje-client.md`.
   [changelog](changelog/2026-10-01-portal-colaborator-limita-200.md)
 - Backlog: paginare pe „Livrate” când trec de 300.
 
+### SEO PE 4 SITE-URI + DECONTĂRI — 02.11.2026
+
+- ✅ Audit /seo pe eghiseul, CJO, ecazier, documentero cu GSC prin API. Plan unic de 15 puncte. [docs/seo/2026-11-02-audit-4-site-uri/](seo/2026-11-02-audit-4-site-uri/README.md)
+- ✅ CJO: recenzii inventate scoase (recenzii reale eGhișeul), prețuri ca pe eghiseul (fără ONLINE10 automat), Iași/Brașov/Timișoara refăcute. [changelog](changelog/2026-11-02-cjo-preturi-recenzii-orase.md)
+- ✅ Țara pe factură la clienți străini (CJO + eghiseul). Decontările din sep/oct sunt verificate față de extras. [changelog](changelog/2026-11-02-tara-factura-si-verificare-decontari.md)
+- ✅ Ads: a doua rundă de raportări (G4b), `docs/ads/registru-demersuri.md`.
+- ⬜ ecazier: recenzii inventate, ONLINE10 automat în text, termen unic, „documente oficiale” (sinteza #1, 2, 6, 11).
+- ⬜ CJO `llms.txt` (#4) și titlul paginii principale (#9). Reindexare în GSC pe 8 URL-uri (#3).
+- ⬜ eghiseul: termenele de pe pagina principală (#5); pagina principală ca pagină de marcă (#7).
+- ⬜ CJO: orașele următoare, 1–2/săpt. (#10). Formularele începute pe Iași/Brașov/Timișoara, urmărite 2 săpt.
+- ⬜ Dispută EGI2024-24278: Stripe spune `lost`, deci storno 79,99 lei după verificare.
+- ⬜ 09.11: reverificare anunțuri raportate (G4b).
+
 ### RAPOARTE DIN GHID REZOLVATE — 02.11.2026
 
 Rapoartele echipei din `/admin/ghid/rapoarte`, închise azi (detalii în changelog, 02.11):

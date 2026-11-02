@@ -278,11 +278,21 @@ export function resolveInvoiceAddress(
     .trim();
 
   if (foreign) {
+    // The foreign region stays on the invoice, but inside the locality: Oblio
+    // reads `state` as a Romanian county.
+    const foreignCity = (block.city || '').trim();
+    const region = (block.county || '').trim();
+    const cityWithRegion =
+      region && normalizeCounty(region) !== normalizeCounty(foreignCity)
+        ? [foreignCity, region].filter(Boolean).join(', ')
+        : foreignCity;
     return {
       address: street,
-      city: (block.city || '').trim(),
-      // Oblio acceptă '-' ca județ pentru clienți străini.
-      state: (block.county || '').trim() || '-',
+      city: cityWithRegion,
+      // Always '-' for foreign clients (Oblio's convention). A foreign region
+      // typed in the county field („RC” for Reggio Calabria) went to Oblio as
+      // a Romanian county: EGH-0625 (Italia) reached SPV as RO / RO-CT.
+      state: '-',
       country,
       usedFallback,
     };

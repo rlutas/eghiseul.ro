@@ -184,13 +184,20 @@ describe('resolveInvoiceAddress', () => {
     expect(r.state).toBe('-');
   });
 
-  it('client străin păstrează regiunea când e completată', () => {
+  it('client străin: regiunea trece în localitate, județul rămâne „-"', () => {
+    // EGH-0625: „RC” (Reggio Calabria) trimis ca județ → factura a plecat în SPV ca România / RO-CT.
     const r = resolveInvoiceAddress(
       { street: 'Via Roma 1', city: 'Stezzano', county: 'Lombardia', country: 'Italia' },
       null
     );
-    expect(r.state).toBe('Lombardia');
+    expect(r.state).toBe('-');
+    expect(r.city).toBe('Stezzano, Lombardia');
     expect(r.country).toBe('Italia');
+    const rc = resolveInvoiceAddress(
+      { street: 'Via Nicola 14', city: 'Reggio Calabria ', county: 'RC', country: 'Italia' },
+      null
+    );
+    expect(rc).toMatchObject({ state: '-', city: 'Reggio Calabria, RC', country: 'Italia' });
   });
 
   it('sectorul din adresa KYC (câmp separat) ajunge în localitate', () => {

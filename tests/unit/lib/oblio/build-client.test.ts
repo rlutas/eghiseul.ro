@@ -82,9 +82,10 @@ describe('buildOblioClient — foreign billing country (facturare pe altă țar�
     expect(c.city).toBe('Töpen');
   });
 
-  it('uses the region as state when provided', () => {
+  it('puts the region in the locality and keeps state „-” (Oblio reads state as a RO county)', () => {
     const c = buildOblioClient({ billing: { ...foreignBilling, county: 'Bavaria' } });
-    expect(c.state).toBe('Bavaria');
+    expect(c.state).toBe('-');
+    expect(c.city).toContain('Bavaria');
   });
 
   it('does NOT inherit the buyer\'s KYC CNP for a foreign person without CNP', () => {

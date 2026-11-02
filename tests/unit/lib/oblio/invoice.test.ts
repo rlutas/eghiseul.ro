@@ -172,7 +172,7 @@ describe('createInvoiceFromOrder — PF (individual)', () => {
     await createInvoiceFromOrder(order, 'Card');
     const payload = oblioRequest.mock.calls[0][0].body;
     expect(payload.client.country).toBe('Regatul Unit (UK)');
-    expect(payload.client.city).toBe('Slough');
+    expect(payload.client.city).toBe('Slough, Berkshire');
   });
 
   it('falls back to "N/A" when no name available', async () => {

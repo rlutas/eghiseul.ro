@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-02 | 🔴 **Țara pe factură la clienți străini + decontări sep/oct verificate** — CJO: țara prima, fără județ românesc la adresă străină; eghiseul + CJO: `state: '-'` la străini; payout-uri 44/44 pe extras, plata dublă 89 lei mutată pe comanda nouă | [2026-11-02-tara-factura-si-verificare-decontari.md](2026-11-02-tara-factura-si-verificare-decontari.md) |
 | 2026-11-02 | ✅ **CJO: prețuri ca pe eghiseul, recenzii reale, Iași/Brașov/Timișoara** — fără ONLINE10 automat (198/278/298), testimoniale inventate + schema Review scoase, pagini de oraș cu „Pe scurt” și toate ghișeele | [2026-11-02-cjo-preturi-recenzii-orase.md](2026-11-02-cjo-preturi-recenzii-orase.md) |
 | 2026-11-02 | ✅ **CJO: traducere cu preț pe limbă + supliment la apostilă, ca pe eGhișeul (20 de limbi)** — `translation-prices.ts` în checkout, total, contract, factură | [2026-11-02-cjo-traducere-pret-pe-limba.md](2026-11-02-cjo-traducere-pret-pe-limba.md) |
 | 2026-11-02 | ✅ **Extras multilingv fără întrebarea „certificat pierdut”; „Extras de Carte Funciară Individuală”** — migrările 197 + 198 aplicate | [2026-11-02-extras-multilingv-si-cf-individuala.md](2026-11-02-extras-multilingv-si-cf-individuala.md) |
