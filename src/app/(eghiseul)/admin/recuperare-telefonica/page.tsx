@@ -15,6 +15,10 @@
  * rând sau pe toate bifate, fără cupon, semnat cu prenumele colegei. Pasul 3
  * al secvenței automate nu mai trimite cupon — după 2 emailuri fără răspuns
  * comanda apare aici marcată „2 emailuri fără răspuns".
+ *
+ * „Nu a răspuns" (cerere echipă 07.10.2026, livrat 02.11): două căsuțe înaintea
+ * numelui, bifate când clientul nu răspunde. Debifarea scoate ultima încercare.
+ * După a doua, clientul iese din „De sunat" la următoarea reîncărcare.
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -32,6 +36,7 @@ import {
 import { Phone, RefreshCw, Ticket, ExternalLink, CheckCircle2, Globe, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { isPhoneCaller, PHONE_CALLERS, type PhoneCaller } from '@/lib/orders/phone-recovery-wins';
+import { NO_ANSWER_LIMIT, type NoAnswerAction, type NoAnswerAttempt } from '@/lib/orders/phone-no-answer';
 import { PaymentSignalNote } from '@/components/admin/payment-signal-note';
 
 interface PriorityRow {
@@ -63,6 +68,8 @@ interface PriorityRow {
   paymentLastError: string | null;
   manualRecoveryEmailAt: string | null;
   manualRecoveryEmailBy: string | null;
+  noAnswerAttempts: NoAnswerAttempt[];
+  noAnswerClosed: boolean;
 }
 
 interface RecoveredRow {
@@ -93,6 +100,11 @@ interface Kpi {
 const fmtLei = (n: number) => n.toLocaleString('ro-RO', { maximumFractionDigits: 0 });
 const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', timeZone: 'Europe/Bucharest' });
+
+const fmtDateTime = (iso: string) =>
+  new Date(iso).toLocaleString('ro-RO', {
+    day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Bucharest',
+  });
 
 function timeAgo(iso: string): string {
   const ms = Date.now() - new Date(iso).getTime();
@@ -144,6 +156,9 @@ export default function RecuperareTelefonicaPage() {
   const [emailTargets, setEmailTargets] = useState<PriorityRow[] | null>(null);
   const [emailMessage, setEmailMessage] = useState('');
   const [sendingEmail, setSendingEmail] = useState(false);
+  /** No-answer tick waiting for the caller to be picked (nobody picked on this computer yet). */
+  const [noAnswerPending, setNoAnswerPending] = useState<{ row: PriorityRow; action: NoAnswerAction } | null>(null);
+  const [noAnswerSaving, setNoAnswerSaving] = useState<string | null>(null);
 
   const fetchRows = useCallback(async () => {
     setLoading(true);
@@ -240,6 +255,58 @@ export default function RecuperareTelefonicaPage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const submitNoAnswer = async (row: PriorityRow, action: NoAnswerAction, who: PhoneCaller) => {
+    setNoAnswerSaving(row.id);
+    try {
+      const res = await fetch(`/api/admin/orders/${row.id}/phone-no-answer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, caller: who }),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        toast.error(json.error?.message || 'Eroare la salvare');
+        return;
+      }
+      const attempts = json.data.attempts as NoAnswerAttempt[];
+      const closed = attempts.length >= NO_ANSWER_LIMIT;
+      // Local update: the row stays visible (dimmed) until the next reload, so
+      // a mis-click on the second box can still be undone from here.
+      setRows((prev) => prev.map((r) => (r.id === row.id ? { ...r, noAnswerAttempts: attempts, noAnswerClosed: closed } : r)));
+      if (action === 'undo') toast.success('Bifa „nu a răspuns" a fost anulată');
+      else if (closed) toast.success(`Nu a răspuns de ${NO_ANSWER_LIMIT} ori: clientul iese din „De sunat" la reîncărcare`);
+      else toast.success(`Nu a răspuns (${attempts.length}/${NO_ANSWER_LIMIT}) · ${who}`);
+    } catch {
+      toast.error('Eroare de rețea');
+    } finally {
+      setNoAnswerSaving(null);
+    }
+  };
+
+  /** Box `index` (0-based): the next empty one adds an attempt, the last ticked one undoes it. */
+  const onNoAnswerBox = (row: PriorityRow, index: number) => {
+    const count = row.noAnswerAttempts.length;
+    const action: NoAnswerAction | null = index === count ? 'add' : index === count - 1 ? 'undo' : null;
+    if (!action) return;
+    if (!caller) {
+      setNoAnswerPending({ row, action });
+      return;
+    }
+    void submitNoAnswer(row, action, caller);
+  };
+
+  const pickNoAnswerCaller = (who: PhoneCaller) => {
+    setCaller(who);
+    try {
+      localStorage.setItem(CALLER_STORAGE_KEY, who);
+    } catch {
+      // ignore
+    }
+    const pending = noAnswerPending;
+    setNoAnswerPending(null);
+    if (pending) void submitNoAnswer(pending.row, pending.action, who);
   };
 
   const toggleSelected = (id: string) =>
@@ -461,7 +528,7 @@ export default function RecuperareTelefonicaPage() {
               </tr>
             ) : (
               rows.map((r) => (
-                <tr key={r.id} className="border-b last:border-0 hover:bg-slate-50">
+                <tr key={r.id} className={`border-b last:border-0 hover:bg-slate-50 ${r.noAnswerClosed ? 'opacity-60' : ''}`}>
                   <td className="px-3 py-2">
                     <input
                       type="checkbox"
@@ -474,8 +541,33 @@ export default function RecuperareTelefonicaPage() {
                   </td>
                   <td className="px-3 py-2">{tierBadge(r.tier)}</td>
                   <td className="px-3 py-2">
-                    <div className="font-medium text-slate-900">
-                      {[r.firstName, r.lastName].filter(Boolean).join(' ') || '—'}
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1" aria-label="Nu a răspuns">
+                        {Array.from({ length: NO_ANSWER_LIMIT }).map((_, i) => {
+                          const attempt = r.noAnswerAttempts[i];
+                          const count = r.noAnswerAttempts.length;
+                          const clickable = i === count || i === count - 1;
+                          return (
+                            <input
+                              key={i}
+                              type="checkbox"
+                              className="h-4 w-4 accent-amber-600"
+                              checked={!!attempt}
+                              disabled={!clickable || noAnswerSaving === r.id}
+                              onChange={() => onNoAnswerBox(r, i)}
+                              aria-label={`Nu a răspuns (${i + 1})`}
+                              title={
+                                attempt
+                                  ? `Nu a răspuns (${i + 1}) · ${fmtDateTime(attempt.at)}${attempt.caller ? ` · ${attempt.caller}` : ''}${i === count - 1 ? ' — debifează dacă a fost greșeală' : ''}`
+                                  : `Nu a răspuns (${i + 1}) — bifează dacă ai sunat și nu a răspuns`
+                              }
+                            />
+                          );
+                        })}
+                      </span>
+                      <div className="font-medium text-slate-900">
+                        {[r.firstName, r.lastName].filter(Boolean).join(' ') || '—'}
+                      </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
                       {r.phone && (
@@ -540,6 +632,13 @@ export default function RecuperareTelefonicaPage() {
                       </div>
                     ) : r.recoveryEmailStep >= 3 ? (
                       <div className="mt-0.5 text-xs font-medium text-amber-700">2 emailuri fără răspuns</div>
+                    ) : null}
+                    {r.noAnswerClosed ? (
+                      <div className="mt-0.5 text-xs font-semibold text-red-700">Nu răspunde ×{NO_ANSWER_LIMIT}</div>
+                    ) : r.noAnswerAttempts.length > 0 ? (
+                      <div className="mt-0.5 text-xs text-amber-700">
+                        nu a răspuns {r.noAnswerAttempts.length}× · {fmtDateTime(r.noAnswerAttempts[r.noAnswerAttempts.length - 1].at)}
+                      </div>
                     ) : null}
                   </td>
                   <td className="px-3 py-2">
@@ -620,6 +719,29 @@ export default function RecuperareTelefonicaPage() {
               {sendingEmail ? 'Se trimite...' : 'Trimite'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!noAnswerPending} onOpenChange={(o) => !o && setNoAnswerPending(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Cine a sunat?</DialogTitle>
+            <DialogDescription>
+              {noAnswerPending && (
+                <>
+                  {noAnswerPending.action === 'add' ? 'Nu a răspuns' : 'Anulezi bifa „nu a răspuns"'} ·{' '}
+                  {[noAnswerPending.row.firstName, noAnswerPending.row.lastName].filter(Boolean).join(' ') || 'Client'}
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2">
+            {PHONE_CALLERS.map((name) => (
+              <Button key={name} type="button" variant="outline" onClick={() => pickNoAnswerCaller(name)}>
+                {name}
+              </Button>
+            ))}
+          </div>
         </DialogContent>
       </Dialog>
 

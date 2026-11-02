@@ -24,6 +24,11 @@
  *
  * Authentication: requires `orders.view` permission.
  * Query: `?includeContacted=1` arată și comenzile deja sunate (implicit ascunse).
+ *
+ * „Nu a răspuns" (02.11.2026): clientul cu 2 încercări fără răspuns
+ * (`phone_no_answer_attempts`, pe oricare comandă a lui — potrivire pe email
+ * sau telefon) iese din coadă ca și cei sunați; comenzile începute DUPĂ a doua
+ * încercare revin. Cu `includeContacted=1` apare marcat `noAnswerClosed`.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -43,6 +48,12 @@ import {
   summarizeCalls,
   type PaidOrderRef,
 } from '@/lib/orders/phone-recovery-wins';
+import {
+  buildNoAnswerIndex,
+  isClosedByNoAnswer,
+  parseNoAnswerAttempts,
+  type NoAnswerAttempt,
+} from '@/lib/orders/phone-no-answer';
 
 const MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 /** Recovered calls are looked up this far back (calls started 16.09.2026). */
@@ -93,6 +104,10 @@ interface PriorityRow {
   paymentLastError: string | null;
   manualRecoveryEmailAt: string | null;
   manualRecoveryEmailBy: string | null;
+  /** Bifele „Nu a răspuns" de pe această comandă (cel mult 2), cele mai vechi primele. */
+  noAnswerAttempts: NoAnswerAttempt[];
+  /** Clientul are 2 încercări fără răspuns (pe oricare comandă a lui): scos din „De sunat". */
+  noAnswerClosed: boolean;
 }
 
 interface RecoveredRow {
@@ -148,7 +163,7 @@ export async function GET(request: NextRequest) {
   const ordersTable = admin.from('orders') as any;
   let query = ordersTable
     .select(
-      'id, order_number, friendly_order_id, status, total_price, customer_data:customer_data_list, created_at, updated_at, phone_contacted_at, phone_contacted_by, phone_contact_notes, recovery_email_step, current_step, stripe_checkout_session_id, payment_failed_count, payment_last_error, manual_recovery_email_at, manual_recovery_email_by, services(name, slug)'
+      'id, order_number, friendly_order_id, status, total_price, customer_data:customer_data_list, created_at, updated_at, phone_contacted_at, phone_contacted_by, phone_contact_notes, recovery_email_step, current_step, stripe_checkout_session_id, payment_failed_count, payment_last_error, manual_recovery_email_at, manual_recovery_email_by, phone_no_answer_attempts, services(name, slug)'
     )
     .in('status', ['abandoned', 'draft'])
     .gte('created_at', minIso)
@@ -206,6 +221,17 @@ export async function GET(request: NextRequest) {
     })) as PaidOrderRef[]
   );
 
+  // Clients closed by two no-answers, over every order of the window (the
+  // attempts may sit on an older order than the one shown for that email).
+  const noAnswerIndex = buildNoAnswerIndex(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((data ?? []) as any[]).map((o) => ({
+      email: o.customer_data?.contact?.email ?? null,
+      phone: o.customer_data?.contact?.phone ?? null,
+      attempts: parseNoAnswerAttempts(o.phone_no_answer_attempts),
+    }))
+  );
+
   const rows: PriorityRow[] = [];
   for (const order of data ?? []) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -234,6 +260,10 @@ export async function GET(request: NextRequest) {
       continue;
     }
     const phone = (cd.contact?.phone ?? null) as string | null;
+    const noAnswerClosed = isClosedByNoAnswer(noAnswerIndex, email, phone, order.created_at);
+    if (noAnswerClosed && !includeContacted) {
+      continue; // 2 încercări fără răspuns: recuperarea s-a închis
+    }
     const foreign = isForeignPhone(phone);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const slug = ((order as any).services?.slug ?? null) as string | null;
@@ -273,6 +303,8 @@ export async function GET(request: NextRequest) {
       paymentLastError: order.payment_last_error ?? null,
       manualRecoveryEmailAt: order.manual_recovery_email_at ?? null,
       manualRecoveryEmailBy: order.manual_recovery_email_by ?? null,
+      noAnswerAttempts: parseNoAnswerAttempts(order.phone_no_answer_attempts),
+      noAnswerClosed,
     });
   }
 
@@ -379,7 +411,7 @@ export async function GET(request: NextRequest) {
   );
   const weekAgo = Date.now() - 7 * 86_400_000;
   const unpaidNoCall7 = rows.filter(
-    (r) => !r.phoneContactedAt && new Date(r.createdAt).getTime() >= weekAgo
+    (r) => !r.phoneContactedAt && !r.noAnswerClosed && new Date(r.createdAt).getTime() >= weekAgo
   ).length;
 
   return NextResponse.json({
