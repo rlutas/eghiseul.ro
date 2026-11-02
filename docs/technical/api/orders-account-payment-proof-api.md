@@ -122,3 +122,13 @@ vizibil clientului; notele interne rămân în `order_history`.
 - **Depunere OCPI**: `POST /api/collaborator/orders/[id]/depunere` acceptă
   `termenOcpi` (`YYYY-MM-DD`, azi … +120 zile) → `customer_data.ocpi_submission.termen_ocpi`
   + `estimated_completion_date`; pagina de status îl arată ca „Termen dat de OCPI”.
+
+## Admin — comportament schimbat 02.11.2026
+
+| Rută | Metodă | Acces | Ce face |
+|---|---|---|---|
+| `/api/admin/orders/[id]/resume-link` | POST | `orders.manage` | Link de continuare pe draft. Refolosește `resume_token` dacă mai are peste 2 h; altfel generează unul. Expirarea se mută mereu la +48 h. URL pe domeniul brandului comenzii (`appBaseForOrder`). Istoric `resume_link_generated` („generat” / „retrimis”). |
+| `/api/admin/orders/[id]/phone-no-answer` | POST | `orders.manage` | Body `{ action: 'add' \| 'undo', caller: 'Maria' \| 'Carla' }`. Scrie `orders.phone_no_answer_attempts` (max 2, migrarea 196); 400 date invalide, 404 comandă lipsă, 409 a treia bifă / undo fără bifă. Nu atinge `phone_contacted_at`. Istoric `phone_contact_logged`. Vezi [changelog](../../changelog/2026-11-02-recuperare-nu-raspunde.md). |
+| `/api/admin/orders/priority-calls` | GET | `orders.view` | Rânduri cu `noAnswerAttempts`; clientul (email / ultimele 9 cifre) cu 2 bife iese din coadă pentru comenzile create până la a doua bifă; `includeContacted=1` îl păstrează cu `noAnswerClosed: true`. |
+| `/api/admin/orders/[id]/modify` | POST | `orders.manage` | Apostila Haga/Notari adăugată fără țară primește țara apostilei de pe comandă (`sharedApostilleCountry`) înainte de validarea `MISSING_COUNTRY`. |
+| „Dovadă verificată — pornește lucrul” (`startWorkOnVerifiedProof`) | — | `payments.verify` | Recalculează `estimated_completion_date` din momentul pornirii; „Confirmă plata” (`fulfilManuallyPaidOrder`) ancorează termenul pe `proof_verified_at`. |

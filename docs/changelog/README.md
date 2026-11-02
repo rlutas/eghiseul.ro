@@ -4,6 +4,8 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-02 | ✅ **CJO: traducere cu preț pe limbă + supliment la apostilă, ca pe eGhișeul (20 de limbi)** — `translation-prices.ts` în checkout, total, contract, factură | [2026-11-02-cjo-traducere-pret-pe-limba.md](2026-11-02-cjo-traducere-pret-pe-limba.md) |
+| 2026-11-02 | ✅ **Extras multilingv fără întrebarea „certificat pierdut”; „Extras de Carte Funciară Individuală”** — migrările 197 + 198 aplicate | [2026-11-02-extras-multilingv-si-cf-individuala.md](2026-11-02-extras-multilingv-si-cf-individuala.md) |
 | 2026-11-02 | 🔴 **Transfer bancar: termenul pornește la „Dovadă verificată”** — `startWorkOnVerifiedProof` recalculează `estimated_completion_date`; `fulfil-paid` ancorează pe `proof_verified_at` | [2026-11-02-termen-transfer-de-la-dovada.md](2026-11-02-termen-transfer-de-la-dovada.md) |
 | 2026-11-02 | 🔴 **Modifică comanda: Apostilă Notari lângă Haga nu mai blochează plata extra** — țara comună moștenită în dialog și pe server (`sharedApostilleCountry`) | [2026-11-02-modifica-comanda-apostila-tara.md](2026-11-02-modifica-comanda-apostila-tara.md) |
 | 2026-11-02 | ✅ **Contractele de asistență au seria SM** — `CONTRACT_SERIA` în 3 șabloane, Registru afișează SM pe contracte, intervale cu 0 în față | [2026-11-02-contracte-seria-sm.md](2026-11-02-contracte-seria-sm.md) |

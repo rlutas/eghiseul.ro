@@ -664,6 +664,18 @@ Changelog: `docs/changelog/2026-09-25-identificare-acte-mesaje-client.md`.
   [changelog](changelog/2026-10-01-portal-colaborator-limita-200.md)
 - Backlog: paginare pe „Livrate” când trec de 300.
 
+### RAPOARTE DIN GHID REZOLVATE — 02.11.2026
+
+Rapoartele echipei din `/admin/ghid/rapoarte`, închise azi (detalii în changelog, 02.11):
+- ✅ Împuternicire apostilă Haga la stare civilă pe șablonul Barou (3 rapoarte); datele pe documente = ziua generării.
+- ✅ OCR mort 23.10–02.11 (credit Gemini epuizat): mesaj clar + alertă email zilnică; prefix MRZ (IDRO/PEROU) în nume; poza actului pe iPhone vechi.
+- ✅ Integritate CJO 198/278; Sameday 1–2 zile; emailul de recuperare fără numele colegei.
+- ✅ Link de continuare refolosit (nu se mai anulează); seria SM pe contracte + 0 în față la intervale; apostila Notari lângă Haga nu mai blochează plata extra; termenul la transfer pornește la „Dovadă verificată”.
+- ✅ „Nu a răspuns” ×2 în Recuperare (eGhișeul + CJO, migrările 196 / CJO 043); extras multilingv fără „pierdut” (197); „CF Individuală” (198); traducere pe limbă pe CJO.
+- 🟡 În lucru: atașamente la „Mesaj către client”.
+
+Rămase deschise: cazier fiscal E-261007-K59HB și eroarea E-261021-2446F (așteptăm lămuriri de la echipă), termen București 30–45 zile, ascundere completă din Abandonuri după apel, alerte Slack moarte (`SLACK_WEBHOOK_URL` nesetat).
+
 ### RAPOARTE DIN GHID REZOLVATE — 29.09.2026
 
 Două rapoarte ale echipei din `/admin/ghid/rapoarte`, închise în aceeași zi:

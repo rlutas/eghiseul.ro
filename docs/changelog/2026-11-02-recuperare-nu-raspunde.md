@@ -13,7 +13,7 @@
 
 Cerere echipă din 07.10.2026: „fă gen 2 căsuțe și le bifăm când nu răspunde. și abia după 2 încercări o să închidem complet recuperarea”.
 
-**Schema.** `orders.phone_no_answer_attempts jsonb NOT NULL DEFAULT '[]'` = `[{ at, caller }]`, max 2 (eGhiseul `196_phone_no_answer_attempts.sql`, CJO `043_orders_phone_no_answer.sql`; pe CJO coada listează doar comenzi, deci coloana e doar pe `orders`, nu pe `abandoned_sessions`). Migrările NU sunt aplicate încă: codul citește coloana în coada de recuperare, deci se aplică înainte de deploy.
+**Schema.** `orders.phone_no_answer_attempts jsonb NOT NULL DEFAULT '[]'` = `[{ at, caller }]`, max 2 (eGhiseul `196_phone_no_answer_attempts.sql`, CJO `043_orders_phone_no_answer.sql`; pe CJO coada listează doar comenzi, deci coloana e doar pe `orders`, nu pe `abandoned_sessions`). Migrările sunt aplicate pe ambele baze (02.11.2026), înainte de deploy.
 
 **API.**
 - eGhiseul: `POST /api/admin/orders/[id]/phone-no-answer`, `orders.manage`, body `{ action: 'add' | 'undo', caller }`, răspuns `{ success, data: { id, attempts } }`; 409 la a treia bifă sau la `undo` fără încercări. Audit `order_history.event_type='phone_contact_logged'` (valoare deja permisă de CHECK).
