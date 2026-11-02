@@ -6,24 +6,35 @@
  * serviciul corect fără bani: dacă prețul diferă, NU e treaba acestei rute
  * (anulare / comandă nouă / „Modifică" pentru opțiuni).
  *
- * Reguli (decise 02.11.2026):
- *  - doar comenzi plătite, ne-anulate, ne-rambursate, ne-finalizate;
- *  - doar între serviciile prin avocat (LAWYER_SERVICE_SLUGS): au același
- *    flux de documente (contract asistență + împuternicire cu nr. Barou),
- *    fără colaborator și fără joburi ONRC/ANCPI. Serviciile automate și cele
- *    imobiliare sunt refuzate;
- *  - serviciul țintă e activ, se vinde pe brandul comenzii și nu e pagina-hub
- *    (`cazier-judiciar`, care are doar variantele PF/PJ);
- *  - prețul de bază al țintei = prețul de bază PLĂTIT (`orders.base_price`).
- *    Comparăm baza, nu totalul, ca un cupon de reducere să nu blocheze fals
- *    o schimbare la același preț; opțiunile și livrarea rămân cum au fost
- *    plătite;
+ * Reguli (prima versiune 02.11.2026, extinse de Raul în aceeași zi):
+ *  - doar comenzi plătite; anulate, rambursate și cu anulare cerută sunt
+ *    blocate. Finalizate / expediate / livrate SE POT schimba (corectarea
+ *    evidenței după fapt): avertisment clar, termenul rămâne neatins, statusul
+ *    nu se schimbă niciodată din acțiunea asta;
+ *  - două familii, fără treceri între ele:
+ *      • serviciile prin avocat (LAWYER_SERVICE_SLUGS): același flux de
+ *        documente (contract asistență + împuternicire cu nr. Barou);
+ *      • serviciile imobiliare prin topograf (modulul de imobil activ, fără
+ *        emitere automată): copii OCPI, certificate, identificări;
+ *    serviciile emise automat (extras CF, plan cadastral, constatator) sunt
+ *    refuzate: documentul pleacă pe loc;
+ *  - serviciul țintă e activ, se vinde pe brandul comenzii și nu e pagina-hub;
+ *  - prețul: comparăm prețurile ACTUALE din catalog (serviciul curent vs
+ *    țintă), nu prețul plătit — o comandă plătită la un preț vechi se poate
+ *    muta dacă azi cele două servicii costă la fel. Banii nu se mișcă,
+ *    prețurile salvate pe comandă rămân cele plătite;
  *  - fiecare opțiune din catalog de pe comandă trebuie să existe activă și
- *    la țintă (urgența nu există la Cazier Fiscal, „cetățean străin" nu
- *    există la Cazier Auto etc.);
- *  - forma datelor: firmă ↔ persoană fizică e refuzată (cazierul s-ar emite
- *    pe alt subiect); stare civilă cere datele actului; cazier auto cere
- *    confirmarea că permisul e românesc (cel străin are alt preț și termen).
+ *    la țintă;
+ *  - forma datelor: firmă ↔ persoană fizică e refuzată; stare civilă cere
+ *    datele actului; cazier auto cere confirmarea permisului românesc;
+ *    imobiliarele cer câmpurile de imobil obligatorii la țintă (CF, adresă)
+ *    și datele proprietarului pentru convenția cu topograful;
+ *  - imobiliare: odată ce topograful a început lucrul (depunere OCPI,
+ *    identificare raportată, document încărcat, status de la depunere
+ *    încolo) sau robotul ANCPI a pornit jobul → blocat. Un job ANCPI doar în
+ *    coadă (PENDING, fără comandă ePay) se șterge la aplicare: serviciul nou
+ *    nu se emite automat. Colaboratorul care are comanda trebuie să vadă și
+ *    serviciul nou (altfel dispare din portalul lui) → altfel blocat;
  *  - ce se poate completa DUPĂ schimbare (semnătură, poza permisului,
  *    prenumele părinților) apare ca „de făcut", nu blochează.
  */
@@ -32,11 +43,17 @@ import { isLawyerService } from '@/lib/documents/no-lawyer-services';
 import { SERVICES_WITHOUT_CERERE } from '@/lib/documents/cerere-items';
 import { instantPlatformProvider } from '@/lib/services/platform-services';
 import { reuploadDocLabel } from '@/lib/reupload/doc-types';
+import { statusLabel } from '@/lib/admin/status-badges';
 
-/** Statusuri pe care schimbarea nu mai are sens. */
+/** Statusuri pe care schimbarea nu are sens (banii sunt întorși / pe drum înapoi). */
 export const CHANGE_SERVICE_LOCKED_STATUSES: ReadonlySet<string> = new Set([
   'cancelled',
   'refunded',
+  'cancellation_requested',
+]);
+
+/** Lucrarea e încheiată: schimbarea corectează doar evidența, termenul rămâne. */
+export const CHANGE_SERVICE_FINISHED_STATUSES: ReadonlySet<string> = new Set([
   'completed',
   'shipped',
   'delivered',
@@ -45,8 +62,13 @@ export const CHANGE_SERVICE_LOCKED_STATUSES: ReadonlySet<string> = new Set([
 /** Statusuri la care actul pentru serviciul vechi poate fi deja depus. */
 export const CHANGE_SERVICE_LATE_STATUSES: ReadonlySet<string> = new Set([
   'submitted_to_institution',
+  'identification_pending_ocpi',
   'document_received',
   'extras_in_progress',
+  'la_tradus',
+  'la_legalizat',
+  'la_apostila_notari',
+  'eliberat_apostila_haga',
   'document_ready',
 ]);
 
@@ -60,6 +82,19 @@ export const REGENERABLE_DOC_LABELS: Readonly<Record<string, string>> = {
   imputernicire: 'Împuternicire avocațială',
   cerere_eliberare_pf: 'Cerere de eliberare (PF)',
   cerere_eliberare_pj: 'Cerere de eliberare (PJ)',
+  conventie: 'Convenția cu topograful',
+};
+
+/** Documentul încărcat de topograf în portal = lucrarea e făcută. */
+export const COLLABORATOR_DOC_TYPE = 'collaborator-document';
+
+/** Câmpurile imobilului, cu eticheta pentru echipă. */
+const PROPERTY_FIELD_LABELS: Readonly<Record<string, string>> = {
+  county: 'județul',
+  locality: 'localitatea (UAT)',
+  carteFunciara: 'numărul de carte funciară',
+  cadastral: 'numărul cadastral',
+  topografic: 'numărul topografic',
 };
 
 export interface ServiceForSwitch {
@@ -88,16 +123,26 @@ export interface SelectedOptionForSwitch {
 export interface OrderForSwitch {
   status: string;
   payment_status: string | null;
+  /** Prețul de bază PLĂTIT (doar informativ: comparația e pe catalogul actual). */
   base_price: number | string | null;
   selected_options?: SelectedOptionForSwitch[] | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   customer_data?: any;
+  /** Alocare manuală pe comandă (portalul colaboratorului o vede oricum). */
+  assigned_collaborator_id?: string | null;
 }
 
 export interface TargetOptionForSwitch {
   id: string;
   code: string;
   is_active: boolean;
+}
+
+/** Jobul robotului ANCPI pentru comandă (ancpi_jobs, unul per comandă). */
+export interface AncpiJobForSwitch {
+  id: string;
+  status: string;
+  ancpi_order_id?: string | null;
 }
 
 export interface SwitchEvaluationInput {
@@ -110,7 +155,16 @@ export interface SwitchEvaluationInput {
   brandSellsTarget: boolean;
   /** Echipa a confirmat cu clientul că permisul e emis în România. */
   licenseConfirmedRomanian?: boolean;
+  /** Tipurile documentelor deja atașate comenzii (order_documents.type). */
+  existingDocTypes?: string[];
+  /** Jobul ANCPI al comenzii, dacă există. */
+  ancpiJob?: AncpiJobForSwitch | null;
+  /** Colaboratorii alocați pe serviciul curent / pe ținta (collaborator_service_assignments). */
+  sourceCollaboratorIds?: string[];
+  targetCollaboratorIds?: string[];
 }
+
+export type ServiceFamily = 'lawyer' | 'property' | 'instant' | 'other';
 
 export interface SwitchEvaluation {
   eligible: boolean;
@@ -120,10 +174,17 @@ export interface SwitchEvaluation {
   todo: string[];
   /** Avertismente (nu blochează). */
   warnings: string[];
+  /** Ce se schimbă concret pe comandă (previzualizare). */
+  changes: string[];
   /** Ținta cere confirmarea permisului românesc (afișează bifa). */
   needsLicenseConfirmation: boolean;
-  /** Diferența de preț pe serviciu (țintă − plătit), RON. */
+  /** Diferența de preț în catalogul ACTUAL (țintă − serviciul curent), RON. */
   basePriceDelta: number;
+  /** Comanda e încheiată: termenul (estimated_completion_date) nu se atinge. */
+  keepEstimate: boolean;
+  /** La aplicare: jobul ANCPI din coadă (nepornit) se șterge. */
+  deletePendingAncpiJobId: string | null;
+  family: ServiceFamily;
 }
 
 const toNum = (v: unknown): number => {
@@ -159,6 +220,8 @@ function uploadedDocTypes(cd: Record<string, unknown> | null | undefined): Set<s
   return out;
 }
 
+const filled = (v: unknown): boolean => typeof v === 'string' ? v.trim().length > 0 : v !== null && v !== undefined && v !== false;
+
 export function isCompanyService(svc: ServiceForSwitch): boolean {
   return svc.verification_config?.companyKyc?.enabled === true;
 }
@@ -167,9 +230,39 @@ export function isHubService(svc: ServiceForSwitch): boolean {
   return HUB_SERVICE_SLUGS.has(svc.slug) || svc.config?.is_hub_page === true;
 }
 
+/**
+ * Familia serviciului pentru schimbare. Imobiliarele sunt recunoscute după
+ * modulul de imobil activ (date, nu listă de slug-uri: catalogul topografului
+ * crește), minus cele emise automat de robot.
+ */
+export function serviceFamily(svc: Pick<ServiceForSwitch, 'slug' | 'verification_config'>): ServiceFamily {
+  if (instantPlatformProvider(svc.slug)) return 'instant';
+  if (isLawyerService(svc.slug)) return 'lawyer';
+  if (svc.verification_config?.propertyVerification?.enabled === true) return 'property';
+  return 'other';
+}
+
 function needsLicenseConfirmation(target: ServiceForSwitch): boolean {
   const vv = target.verification_config?.vehicleVerification;
   return vv?.enabled === true && vv?.foreignLicense?.enabled === true;
+}
+
+/** Semnele că topograful a început deja lucrul pe comandă. */
+function collaboratorWorkStarted(order: OrderForSwitch, docTypes: string[]): string | null {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cd = (order.customer_data ?? {}) as any;
+  const sub = cd.ocpi_submission;
+  if (sub && (sub.registration_number || sub.submitted_at)) {
+    const nr = sub.registration_number ? ` (nr. ${sub.registration_number})` : '';
+    return `Topograful a depus deja cererea la OCPI${nr}`;
+  }
+  if (cd.identified_property) return 'Topograful a raportat deja identificarea imobilului';
+  if (cd.identification_result) return 'Topograful a raportat deja rezultatul identificării';
+  if (docTypes.includes(COLLABORATOR_DOC_TYPE)) return 'Topograful a încărcat deja documentul lucrării';
+  if (CHANGE_SERVICE_LATE_STATUSES.has(order.status) || CHANGE_SERVICE_FINISHED_STATUSES.has(order.status)) {
+    return `Lucrarea e deja „${statusLabel(order.status)}"`;
+  }
+  return null;
 }
 
 export function evaluateServiceSwitch(input: SwitchEvaluationInput): SwitchEvaluation {
@@ -177,20 +270,29 @@ export function evaluateServiceSwitch(input: SwitchEvaluationInput): SwitchEvalu
   const blockers: string[] = [];
   const todo: string[] = [];
   const warnings: string[] = [];
+  const changes: string[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const cd = (order.customer_data ?? {}) as any;
+  const docTypes = input.existingDocTypes ?? [];
 
   const paidBase = toNum(order.base_price);
+  const sourceBase = toNum(source.base_price);
   const targetBase = toNum(target.base_price);
-  const basePriceDelta = Math.round((targetBase - paidBase) * 100) / 100;
+  const basePriceDelta = Math.round((targetBase - sourceBase) * 100) / 100;
+
+  const srcFamily = serviceFamily(source);
+  const tgtFamily = serviceFamily(target);
+  const family: ServiceFamily = srcFamily === tgtFamily ? srcFamily : 'other';
 
   // ── Comanda ────────────────────────────────────────────────────────────
   if (order.payment_status !== 'paid') {
     blockers.push('Comanda nu e plătită: serviciul se schimbă doar pe comenzi plătite (înainte de plată îl alege clientul).');
   }
   if (CHANGE_SERVICE_LOCKED_STATUSES.has(order.status)) {
-    blockers.push(`Comanda e închisă sau deja trimisă (status: ${order.status}); serviciul nu se mai schimbă.`);
+    blockers.push(`Comanda e „${statusLabel(order.status)}": serviciul nu se mai schimbă.`);
   }
+  const finished = CHANGE_SERVICE_FINISHED_STATUSES.has(order.status);
+  const late = CHANGE_SERVICE_LATE_STATUSES.has(order.status);
 
   // ── Serviciul țintă ───────────────────────────────────────────────────
   if (target.slug === source.slug) {
@@ -203,17 +305,25 @@ export function evaluateServiceSwitch(input: SwitchEvaluationInput): SwitchEvalu
   if (!input.brandSellsTarget) {
     blockers.push(`${target.name} nu se vinde pe site-ul pe care a fost plasată comanda.`);
   }
-  if (instantPlatformProvider(source.slug) || instantPlatformProvider(target.slug)) {
+  if (srcFamily === 'instant' || tgtFamily === 'instant') {
     blockers.push('Serviciile emise automat (extras CF, plan cadastral, certificat constatator) nu se schimbă: documentul pleacă pe loc.');
-  } else if (!isLawyerService(source.slug) || !isLawyerService(target.slug)) {
-    blockers.push('Schimbarea serviciului merge doar între serviciile prin avocat (caziere, certificat de integritate, stare civilă). Pentru restul: anulare și comandă nouă.');
+  } else if (srcFamily !== tgtFamily || family === 'other') {
+    blockers.push(
+      'Serviciul se schimbă doar în aceeași familie: între serviciile prin avocat (caziere, certificat de integritate, stare civilă) ' +
+        'sau între serviciile imobiliare prin topograf. Fluxurile sunt diferite: anulare și comandă nouă.'
+    );
   }
 
-  // ── Bani ──────────────────────────────────────────────────────────────
+  // ── Bani (catalogul ACTUAL, nu prețul plătit) ─────────────────────────
   if (basePriceDelta !== 0) {
     blockers.push(
-      `Prețul diferă: clientul a plătit ${lei(paidBase)} pe serviciu, ${target.name} costă ${lei(targetBase)}. ` +
+      `Prețul diferă: azi ${source.name} costă ${lei(sourceBase)}, iar ${target.name} costă ${lei(targetBase)}. ` +
         'Aici se schimbă doar la același preț; diferențele de bani se fac din „Modifică" (sau anulare și comandă nouă).'
+    );
+  } else if (paidBase > 0 && paidBase !== sourceBase) {
+    changes.push(
+      `Clientul a plătit ${lei(paidBase)} pe serviciu (preț vechi); azi ambele servicii costă ${lei(sourceBase)}. ` +
+        'Banii nu se mișcă: prețurile comenzii rămân cele plătite.'
     );
   }
 
@@ -253,6 +363,69 @@ export function evaluateServiceSwitch(input: SwitchEvaluationInput): SwitchEvalu
     }
   }
 
+  // ── Imobiliare: datele imobilului, topograful, robotul ANCPI ───────────
+  if (tgtFamily === 'property') {
+    const pv = tvc.propertyVerification ?? {};
+    const p = (cd.property ?? {}) as Record<string, unknown>;
+    for (const [field, label] of Object.entries(PROPERTY_FIELD_LABELS)) {
+      if (pv.fields?.[field]?.required === true && !filled(p[field])) {
+        blockers.push(`Comanda nu are ${label} imobilului, cerut de ${target.name}. Anulare și comandă nouă (sau completează întâi datele imobilului).`);
+      }
+    }
+    const hasIdentifier = filled(p.carteFunciara) || filled(p.cadastral);
+    if (pv.identificationService?.enabled === true) {
+      if (!hasIdentifier && !filled(p.propertyAddress)) {
+        blockers.push(`${target.name} cere adresa imobilului sau un număr de CF / cadastral; comanda nu are niciunul.`);
+      }
+    } else if (!hasIdentifier && pv.fields?.carteFunciara?.required !== true) {
+      blockers.push(`${target.name} cere numărul de carte funciară sau cadastral; comanda are doar adresa (era o identificare). Anulare și comandă nouă.`);
+    }
+    if (tvc.conventie?.enabled === true) {
+      const conventieOk = ['beneficiaryName', 'beneficiaryCnp', 'beneficiaryAddress', 'beneficiaryIdSeries', 'beneficiaryIdNumber'].every(
+        (k) => filled(p[k])
+      );
+      if (!conventieOk) {
+        blockers.push(`Lipsesc datele proprietarului pentru convenția cu topograful, cerute de ${target.name} (nume, CNP, adresă, act de identitate).`);
+      }
+    }
+  }
+
+  let deletePendingAncpiJobId: string | null = null;
+  if (srcFamily === 'property' || tgtFamily === 'property') {
+    const started = collaboratorWorkStarted(order, docTypes);
+    if (started) {
+      blockers.push(`${started}: cererea e pentru ${source.name} și nu se mai schimbă. Anulare și comandă nouă.`);
+    }
+
+    const assigned = order.assigned_collaborator_id ?? null;
+    const handlers = new Set([...(input.sourceCollaboratorIds ?? []), ...(assigned ? [assigned] : [])]);
+    const visibleAfter = new Set([...(input.targetCollaboratorIds ?? []), ...(assigned ? [assigned] : [])]);
+    const lost = [...handlers].filter((c) => !visibleAfter.has(c));
+    if (lost.length > 0) {
+      blockers.push(
+        `Topograful care are comanda nu lucrează pe ${target.name}: comanda ar dispărea din portalul lui. ` +
+          'Alocă-i întâi serviciul din Colaboratori, sau anulare și comandă nouă.'
+      );
+    } else if (handlers.size > 0) {
+      changes.push(`Comanda rămâne la același topograf; în portalul lui apare cu serviciul ${target.name}.`);
+    } else if (visibleAfter.size > 0) {
+      changes.push(`Comanda intră în portalul topografului (lucrează pe ${target.name}).`);
+    }
+  }
+
+  const job = input.ancpiJob ?? null;
+  if (job) {
+    if (job.status === 'PENDING' && !job.ancpi_order_id) {
+      deletePendingAncpiJobId = job.id;
+      changes.push(`Jobul robotului ANCPI din coadă (încă nepornit) se șterge: ${target.name} nu se emite automat.`);
+    } else {
+      blockers.push(
+        `Robotul ANCPI a pornit deja comanda (job: ${job.status}${job.ancpi_order_id ? `, comanda ePay ${job.ancpi_order_id}` : ''}): ` +
+          'serviciul nu se mai schimbă. Verifică în pagina ANCPI și, la nevoie, anulare și comandă nouă.'
+      );
+    }
+  }
+
   // ── De făcut după schimbare ───────────────────────────────────────────
   if (tvc.signature?.required === true && !cd.signature_s3_key) {
     todo.push('Lipsește semnătura clientului pe contract: trimite-i „Cere completare" după schimbare.');
@@ -268,17 +441,29 @@ export function evaluateServiceSwitch(input: SwitchEvaluationInput): SwitchEvalu
     todo.push(`${target.name} cere prenumele părinților: completează-le din „Corectează datele clientului".`);
   }
 
-  if (CHANGE_SERVICE_LATE_STATUSES.has(order.status)) {
-    warnings.push(`Comanda e deja la instituție sau după (status: ${order.status}): verifică ce s-a depus pentru ${source.name} înainte să schimbi.`);
+  // ── Comandă deja la instituție sau încheiată ──────────────────────────
+  if (finished || late) {
+    warnings.push(
+      `Comanda e deja „${statusLabel(order.status)}": schimbarea corectează doar evidența; ` +
+        'documentele deja depuse/livrate nu se schimbă.'
+    );
   }
+  if (finished) {
+    changes.push('Termenul rămâne cel de acum (comanda e încheiată).');
+  }
+  changes.push(`Statusul rămâne „${statusLabel(order.status)}".`);
 
   return {
     eligible: blockers.length === 0,
     blockers,
     todo,
     warnings,
+    changes,
     needsLicenseConfirmation: licenseConfirm && cd.vehicle?.licenseIssuedAbroad !== false,
     basePriceDelta,
+    keepEstimate: finished,
+    deletePendingAncpiJobId,
+    family,
   };
 }
 
@@ -324,16 +509,21 @@ export function describeDocumentImpact(
     seen.add(t);
     toRegenerate.push({ type: t, label: REGENERABLE_DOC_LABELS[t] });
   }
-  const sourceHasCerere = !SERVICES_WITHOUT_CERERE.has(source.slug);
-  const targetHasCerere = !SERVICES_WITHOUT_CERERE.has(target.slug);
+  const lawyer = isLawyerService(source.slug) && isLawyerService(target.slug);
+  const sourceHasCerere = lawyer && !SERVICES_WITHOUT_CERERE.has(source.slug);
+  const targetHasCerere = lawyer && !SERVICES_WITHOUT_CERERE.has(target.slug);
   const hadCerere = existingDocTypes.some((t) => t.startsWith('cerere_eliberare'));
 
   const notes: string[] = [];
   if (toRegenerate.length) {
     notes.push('Documentele generate au numele serviciului vechi: regenerează-le din „Procesare comandă". Cele vechi nu se șterg singure.');
   }
-  notes.push('Numerele de Barou (contract și împuternicire) rămân aceleași: se mută pe serviciul nou în registru.');
-  if (sourceHasCerere && !targetHasCerere) {
+  if (lawyer) {
+    notes.push('Numerele de Barou (contract și împuternicire) rămân aceleași: se mută pe serviciul nou în registru.');
+  } else {
+    notes.push('Serviciu prin topograf: fără numere de Barou.');
+  }
+  if (sourceHasCerere && !targetHasCerere && lawyer) {
     notes.push(
       `${target.name} nu are cerere de eliberare (doar împuternicire)` +
         (hadCerere ? `: cererea generată pentru ${source.name} nu se mai folosește.` : '.')

@@ -64,6 +64,90 @@ const extrasCF: ServiceForSwitch = {
   verification_config: {},
 };
 
+const propVc = (over: Record<string, unknown> = {}) => ({
+  signature: { required: true },
+  personalKyc: { enabled: false },
+  conventie: { enabled: true },
+  propertyVerification: {
+    enabled: true,
+    fields: {
+      county: { required: true },
+      locality: { required: true },
+      carteFunciara: { required: true },
+      cadastral: { required: false },
+      topografic: { required: false },
+    },
+    identificationService: { enabled: false },
+  },
+  ...over,
+});
+const copieIntabulare: ServiceForSwitch = {
+  id: 'svc-ci',
+  slug: 'copie-intabulare',
+  name: 'Copie Încheiere Intabulare',
+  base_price: '216.59',
+  is_active: true,
+  verification_config: propVc(),
+};
+const copieContract: ServiceForSwitch = {
+  id: 'svc-ccv',
+  slug: 'copie-contract-vanzare',
+  name: 'Copie Contract Vânzare',
+  base_price: '216.59',
+  is_active: true,
+  verification_config: propVc(),
+};
+const identProprietar: ServiceForSwitch = {
+  id: 'svc-idp',
+  slug: 'identificare-imobile-proprietar',
+  name: 'Identificare imobile după proprietar',
+  base_price: '298.00',
+  is_active: true,
+  verification_config: propVc({
+    conventie: undefined,
+    signature: { required: false },
+    propertyVerification: {
+      enabled: true,
+      fields: { county: { required: true }, locality: { required: true }, carteFunciara: { required: false } },
+      identificationService: { enabled: true, extraFields: ['ownerName', 'address'] },
+    },
+  }),
+};
+const identImobil: ServiceForSwitch = { ...identProprietar, id: 'svc-idi', slug: 'identificare-imobil', name: 'Identificare imobil' };
+
+const property = {
+  county: 'Cluj',
+  locality: 'Cluj-Napoca',
+  imobilLocality: 'Cluj-Napoca',
+  carteFunciara: '123456',
+  beneficiaryName: 'Pop Ion',
+  beneficiaryCnp: '0000000000000',
+  beneficiaryAddress: 'Str. X 1',
+  beneficiaryIdSeries: 'CJ',
+  beneficiaryIdNumber: '123456',
+};
+
+const imobOrder = (over: Partial<SwitchEvaluationInput['order']> = {}, cdOver: Record<string, unknown> = {}): SwitchEvaluationInput['order'] => ({
+  status: 'processing',
+  payment_status: 'paid',
+  base_price: '216.59',
+  selected_options: [],
+  customer_data: { property, signature_s3_key: 'signatures/x.png', ...cdOver },
+  ...over,
+});
+
+const evaluateImob = (over: Partial<SwitchEvaluationInput> = {}) =>
+  evaluateServiceSwitch({
+    order: imobOrder(),
+    source: copieIntabulare,
+    target: copieContract,
+    targetOptions: [],
+    brandSellsTarget: true,
+    sourceCollaboratorIds: ['mircea'],
+    targetCollaboratorIds: ['mircea'],
+    ...over,
+  });
+
 const opts = (svc: string, codes: Array<[string, boolean?]>): TargetOptionForSwitch[] =>
   codes.map(([code, active = true]) => ({ id: `${svc}-${code}`, code, is_active: active }));
 
@@ -97,30 +181,57 @@ describe('evaluateServiceSwitch', () => {
     expect(ev.basePriceDelta).toBe(0);
   });
 
-  it('blocks a different base price and points the team to Modifică', () => {
+  it('blocks when CURRENT catalogue prices differ and points the team to Modifică', () => {
     const ev = evaluate({ target: { ...fiscal, base_price: 219 } });
     expect(ev.eligible).toBe(false);
     expect(ev.basePriceDelta).toBe(21);
     expect(ev.blockers.join(' ')).toContain('Modifică');
   });
 
-  it('compares the paid base, not the total — a coupon does not block', () => {
-    // Coupons live in discount_amount/total_price; base_price stays the list price.
-    const ev = evaluate({ order: paidOrder({ base_price: 198 }) });
+  it('compares current catalogue prices: equal today → allowed', () => {
+    const ev = evaluate({ source: { ...judiciarPF, base_price: 250 }, target: { ...fiscal, base_price: '250.00' } });
     expect(ev.eligible).toBe(true);
+    expect(ev.basePriceDelta).toBe(0);
   });
 
-  it('blocks unpaid, cancelled, refunded and completed orders', () => {
+  it('an order paid at an OLD price is allowed when both services cost the same today', () => {
+    const ev = evaluate({ order: paidOrder({ base_price: '179.00' }) });
+    expect(ev.eligible).toBe(true);
+    expect(ev.changes.join(' ')).toContain('preț vechi');
+    expect(ev.changes.join(' ')).toContain('Banii nu se mișcă');
+  });
+
+  it('the paid price never unblocks a current-price difference', () => {
+    // paid 219 = target today, but the current service costs 198 today → still blocked
+    const ev = evaluate({ order: paidOrder({ base_price: 219 }), target: { ...fiscal, base_price: 219 } });
+    expect(ev.eligible).toBe(false);
+  });
+
+  it('blocks unpaid, cancelled, refunded and cancellation-requested orders', () => {
     expect(evaluate({ order: paidOrder({ payment_status: 'unpaid' }) }).eligible).toBe(false);
-    for (const status of ['cancelled', 'refunded', 'completed', 'shipped']) {
-      expect(evaluate({ order: paidOrder({ status }) }).eligible).toBe(false);
+    for (const status of ['cancelled', 'refunded', 'cancellation_requested']) {
+      const ev = evaluate({ order: paidOrder({ status }) });
+      expect(ev.eligible).toBe(false);
     }
   });
 
-  it('warns (does not block) once the request may already be filed', () => {
+  it('allows completed / shipped / delivered with a warning and keeps the deadline', () => {
+    for (const status of ['completed', 'shipped', 'delivered']) {
+      const ev = evaluate({ order: paidOrder({ status }) });
+      expect(ev.eligible).toBe(true);
+      expect(ev.keepEstimate).toBe(true);
+      expect(ev.warnings[0]).toMatch(/^Comanda e deja „.+": schimbarea corectează doar evidența; documentele deja depuse\/livrate nu se schimbă\.$/);
+      expect(ev.changes.join(' ')).toContain('Statusul rămâne');
+    }
+    expect(evaluate({ order: paidOrder({ status: 'completed' }) }).warnings[0]).toContain('Finalizată');
+  });
+
+  it('warns (does not block) once the request may already be filed, and recomputes the term', () => {
     const ev = evaluate({ order: paidOrder({ status: 'submitted_to_institution' }) });
     expect(ev.eligible).toBe(true);
     expect(ev.warnings).toHaveLength(1);
+    expect(ev.warnings[0]).toContain('corectează doar evidența');
+    expect(ev.keepEstimate).toBe(false);
   });
 
   it('blocks inactive, hub, same and other-brand targets', () => {
@@ -130,14 +241,25 @@ describe('evaluateServiceSwitch', () => {
     expect(evaluate({ brandSellsTarget: false }).eligible).toBe(false);
   });
 
-  it('blocks instant automated services and non-lawyer services', () => {
+  it('blocks instant automated services (extras CF, plan cadastral, constatator)', () => {
     const toCf = evaluate({ target: extrasCF });
     expect(toCf.eligible).toBe(false);
     expect(toCf.blockers.join(' ')).toContain('emise automat');
-    const fromCf = evaluate({ source: extrasCF });
-    expect(fromCf.eligible).toBe(false);
-    const imob = evaluate({ target: { ...extrasCF, slug: 'copie-intabulare' } });
-    expect(imob.blockers.join(' ')).toContain('prin avocat');
+    expect(evaluate({ source: extrasCF }).eligible).toBe(false);
+    // even from an imobiliare service at the same price
+    const fromCopie = evaluateImob({ target: { ...extrasCF, base_price: '216.59', verification_config: propVc() } });
+    expect(fromCopie.eligible).toBe(false);
+    expect(fromCopie.family).toBe('other');
+    expect(fromCopie.blockers.join(' ')).toContain('emise automat');
+  });
+
+  it('blocks lawyer ↔ imobiliare cross switches in both directions', () => {
+    const toImob = evaluate({ target: { ...copieIntabulare, base_price: '198.00' }, targetOptions: [] });
+    expect(toImob.eligible).toBe(false);
+    expect(toImob.blockers.join(' ')).toContain('aceeași familie');
+    const toLawyer = evaluateImob({ target: { ...fiscal, base_price: '216.59' } });
+    expect(toLawyer.eligible).toBe(false);
+    expect(toLawyer.blockers.join(' ')).toContain('aceeași familie');
   });
 
   it('blocks an option the target does not offer (inactive urgență at fiscal)', () => {
@@ -206,6 +328,92 @@ describe('evaluateServiceSwitch', () => {
   });
 });
 
+describe('evaluateServiceSwitch — imobiliare prin topograf', () => {
+  it('allows copie intabulare → copie contract vânzare at the same price, same topograf', () => {
+    const ev = evaluateImob();
+    expect(ev.blockers).toEqual([]);
+    expect(ev.eligible).toBe(true);
+    expect(ev.family).toBe('property');
+    expect(ev.changes.join(' ')).toContain('același topograf');
+  });
+
+  it('allows identificare imobil ↔ identificare după proprietar with only an address', () => {
+    const ev = evaluateImob({
+      source: identImobil,
+      target: identProprietar,
+      order: imobOrder({ base_price: 298 }, { property: { county: 'Cluj', locality: 'Dej', propertyAddress: 'Str. Y 2' } }),
+    });
+    expect(ev.blockers).toEqual([]);
+  });
+
+  it('blocks an identificare → copie switch when the order has no CF number', () => {
+    const ev = evaluateImob({
+      source: { ...identImobil, base_price: '216.59' },
+      order: imobOrder({}, { property: { ...property, carteFunciara: '' , propertyAddress: 'Str. Y 2' } }),
+    });
+    expect(ev.eligible).toBe(false);
+    expect(ev.blockers.join(' ')).toContain('carte funciară');
+  });
+
+  it('blocks when the convention owner data is missing at the target', () => {
+    const ev = evaluateImob({ order: imobOrder({}, { property: { county: 'Cluj', locality: 'Dej', carteFunciara: '1' } }) });
+    expect(ev.eligible).toBe(false);
+    expect(ev.blockers.join(' ')).toContain('convenția');
+  });
+
+  it('blocks once the topograf filed at OCPI', () => {
+    const ev = evaluateImob({ order: imobOrder({}, { ocpi_submission: { registration_number: '69000', submitted_at: '2026-10-30' } }) });
+    expect(ev.eligible).toBe(false);
+    expect(ev.blockers.join(' ')).toContain('depus deja cererea la OCPI (nr. 69000)');
+  });
+
+  it('blocks once the topograf reported an identification or uploaded the document', () => {
+    expect(evaluateImob({ order: imobOrder({}, { identified_property: { cf: '1' } }) }).eligible).toBe(false);
+    expect(evaluateImob({ existingDocTypes: ['contract_prestari', 'collaborator-document'] }).eligible).toBe(false);
+  });
+
+  it('blocks a completed imobiliare order (the work at OCPI is done)', () => {
+    const ev = evaluateImob({ order: imobOrder({ status: 'completed' }) });
+    expect(ev.eligible).toBe(false);
+    expect(ev.blockers.join(' ')).toContain('Finalizată');
+  });
+
+  it('blocks when an ANCPI job already started', () => {
+    for (const job of [
+      { id: 'j1', status: 'PROCESSING', ancpi_order_id: null },
+      { id: 'j1', status: 'PENDING', ancpi_order_id: '10054451' },
+      { id: 'j1', status: 'NEEDS_OPERATOR', ancpi_order_id: null },
+    ]) {
+      const ev = evaluateImob({ ancpiJob: job });
+      expect(ev.eligible).toBe(false);
+      expect(ev.blockers.join(' ')).toContain('Robotul ANCPI');
+      expect(ev.deletePendingAncpiJobId).toBeNull();
+    }
+  });
+
+  it('a queued, never-started ANCPI job is deleted on apply', () => {
+    const ev = evaluateImob({ ancpiJob: { id: 'j1', status: 'PENDING', ancpi_order_id: null } });
+    expect(ev.eligible).toBe(true);
+    expect(ev.deletePendingAncpiJobId).toBe('j1');
+    expect(ev.changes.join(' ')).toContain('se șterge');
+  });
+
+  it('blocks when the topograf handling the order does not work on the target', () => {
+    const ev = evaluateImob({ targetCollaboratorIds: [] });
+    expect(ev.eligible).toBe(false);
+    expect(ev.blockers.join(' ')).toContain('portalul lui');
+  });
+
+  it('a per-order collaborator assignment survives the switch', () => {
+    const ev = evaluateImob({
+      order: imobOrder({ assigned_collaborator_id: 'mircea' }),
+      sourceCollaboratorIds: [],
+      targetCollaboratorIds: [],
+    });
+    expect(ev.eligible).toBe(true);
+  });
+});
+
 describe('remapSelectedOptions', () => {
   it('points catalog options at the target ids and keeps paid prices', () => {
     const out = remapSelectedOptions(
@@ -226,6 +434,13 @@ describe('describeDocumentImpact', () => {
     expect(imp.toRegenerate.map((d) => d.type)).toEqual(['contract_prestari', 'imputernicire', 'cerere_eliberare_pf']);
     expect(imp.targetHasCerere).toBe(false);
     expect(imp.notes.join(' ')).toContain('nu se mai folosește');
+  });
+
+  it('imobiliare: the convention is regenerated, no Barou numbers', () => {
+    const imp = describeDocumentImpact(copieIntabulare, copieContract, ['contract_prestari', 'conventie', 'collaborator-document']);
+    expect(imp.toRegenerate.map((d) => d.type)).toEqual(['contract_prestari', 'conventie']);
+    expect(imp.notes.join(' ')).toContain('fără numere de Barou');
+    expect(imp.notes.join(' ')).not.toContain('cerere de eliberare');
   });
 
   it('auto → fiscal: a cerere is now needed', () => {

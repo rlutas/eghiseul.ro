@@ -1217,8 +1217,9 @@ export default function AdminOrderDetailPage() {
             </Button>
           )}
           {/* „Schimbă serviciul" — același preț, alt serviciu (ex. cazier
-              judiciar → cazier fiscal). Eligibilitatea o decide serverul. */}
-          {order.payment_status === 'paid' && !['cancelled', 'refunded', 'completed', 'shipped'].includes(order.status ?? '') && (
+              judiciar → cazier fiscal). Eligibilitatea o decide serverul;
+              finalizatele rămân deschise (corectarea evidenței, 02.11). */}
+          {order.payment_status === 'paid' && !['cancelled', 'refunded'].includes(order.status ?? '') && (
             <Button
               variant="outline"
               size="sm"

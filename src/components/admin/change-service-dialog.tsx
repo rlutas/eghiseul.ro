@@ -2,7 +2,8 @@
 
 /**
  * „Schimbă serviciul" — mută o comandă plătită pe alt serviciu la același
- * preț (ex. Cazier Judiciar PF → Cazier Fiscal, 198 lei). Trei pași:
+ * preț în catalogul actual (ex. Cazier Judiciar PF → Cazier Fiscal, 198 lei;
+ * Copie intabulare → Copie contract vânzare, 216,59 lei). Trei pași:
  *   1. lista serviciilor (eligibile sus, celelalte cu motivul);
  *   2. previzualizare: ce lipsește, ce documente se regenerează, factura;
  *   3. motiv + confirmare → apply.
@@ -41,12 +42,21 @@ interface Consequences {
   blockers: string[];
   todo: string[];
   warnings: string[];
+  changes: string[];
+  paidBasePrice: number;
   needsLicenseConfirmation: boolean;
   documents: { toRegenerate: Array<{ type: string; label: string }>; notes: string[] };
   invoiceNote: string;
   reissueAvailable: boolean;
-  estimate: { old: string | null; new: string | null };
+  estimate: { old: string | null; new: string | null; kept: boolean };
   registry?: { moved: number; error: string | null };
+}
+
+interface Current {
+  name: string;
+  paidBasePrice: number;
+  currentBasePrice: number;
+  status: string;
 }
 
 interface Props {
@@ -62,7 +72,8 @@ const fmtDate = (iso: string | null) =>
 
 export function ChangeServiceDialog({ open, onOpenChange, orderId, orderNumber, onApplied }: Props) {
   const [loading, setLoading] = useState(false);
-  const [current, setCurrent] = useState<{ name: string; paidBasePrice: number } | null>(null);
+  const [current, setCurrent] = useState<Current | null>(null);
+  const [familyNote, setFamilyNote] = useState<string | null>(null);
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [listError, setListError] = useState<string | null>(null);
   const [target, setTarget] = useState<string>('');
@@ -99,7 +110,8 @@ export function ChangeServiceDialog({ open, onOpenChange, orderId, orderNumber, 
           setListError(json.error || 'Nu am putut încărca serviciile.');
           return;
         }
-        setCurrent(json.data.current as { name: string; paidBasePrice: number });
+        setCurrent(json.data.current as Current);
+        setFamilyNote((json.data.familyNote as string | null) ?? null);
         setCandidates(json.data.candidates as Candidate[]);
       })
       .catch(() => setListError('Nu am putut încărca serviciile.'))
@@ -158,8 +170,8 @@ export function ChangeServiceDialog({ open, onOpenChange, orderId, orderNumber, 
         <DialogHeader>
           <DialogTitle>Schimbă serviciul — {orderNumber}</DialogTitle>
           <DialogDescription>
-            Pentru clientul care a plătit alt serviciu decât voia, la același preț. Banii nu se mișcă de aici:
-            pentru diferențe de preț folosește „Modifică”.
+            Pentru clientul care a plătit alt serviciu decât voia, când azi cele două servicii costă la fel. Banii
+            nu se mișcă de aici și statusul nu se schimbă: pentru diferențe de preț folosește „Modifică”.
           </DialogDescription>
         </DialogHeader>
 
@@ -171,7 +183,11 @@ export function ChangeServiceDialog({ open, onOpenChange, orderId, orderNumber, 
                 <p className="font-medium">
                   Comanda e acum pe {result.to.name}.
                 </p>
-                <p>Termen nou: {fmtDate(result.estimate.new)}.</p>
+                <p>
+                  {result.estimate.kept
+                    ? `Termenul a rămas ${fmtDate(result.estimate.old)}.`
+                    : `Termen nou: ${fmtDate(result.estimate.new)}.`}
+                </p>
                 {result.registry?.error && <p className="text-amber-800">{result.registry.error}</p>}
               </div>
             </div>
@@ -187,15 +203,19 @@ export function ChangeServiceDialog({ open, onOpenChange, orderId, orderNumber, 
             {listError && <p className="text-sm text-red-700">{listError}</p>}
             {current && (
               <p className="text-sm">
-                Acum: <span className="font-medium">{current.name}</span> · plătit pe serviciu{' '}
-                {current.paidBasePrice.toFixed(2)} lei
+                Acum: <span className="font-medium">{current.name}</span> · azi costă{' '}
+                {current.currentBasePrice.toFixed(2)} lei
+                {current.paidBasePrice > 0 && current.paidBasePrice !== current.currentBasePrice && (
+                  <span className="text-muted-foreground"> (plătit {current.paidBasePrice.toFixed(2)} lei, preț vechi)</span>
+                )}
               </p>
             )}
+            {familyNote && <p className="text-sm text-red-700">{familyNote}</p>}
 
             {!loading && !listError && (
               <div className="space-y-2">
                 <Label>Serviciul corect</Label>
-                {eligible.length === 0 && (
+                {eligible.length === 0 && !familyNote && (
                   <p className="text-sm text-muted-foreground">
                     Niciun serviciu la același preț nu se potrivește acestei comenzi. Motivele sunt mai jos.
                   </p>
@@ -279,8 +299,9 @@ export function ChangeServiceDialog({ open, onOpenChange, orderId, orderNumber, 
                 <ConsequenceLists data={preview} />
 
                 <p className="text-xs text-muted-foreground">
-                  Termen: {fmtDate(preview.estimate.old)} → {fmtDate(preview.estimate.new)} (calculat de la data plății,
-                  cu regulile serviciului nou).
+                  {preview.estimate.kept
+                    ? `Termen: rămâne ${fmtDate(preview.estimate.old)} (comanda e încheiată).`
+                    : `Termen: ${fmtDate(preview.estimate.old)} → ${fmtDate(preview.estimate.new)} (calculat de la data plății, cu regulile serviciului nou).`}
                 </p>
 
                 {preview.eligible && (
@@ -328,6 +349,16 @@ function ConsequenceLists({ data, done }: { data: Consequences; done?: boolean }
           <ul className="space-y-1">
             {data.warnings.map((w) => (
               <li key={w}>{w}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {data.changes.length > 0 && (
+        <div>
+          <p className="font-medium">{done ? 'Ce s-a schimbat:' : 'Ce se schimbă:'}</p>
+          <ul className="ml-4 list-disc">
+            {data.changes.map((c) => (
+              <li key={c}>{c}</li>
             ))}
           </ul>
         </div>

@@ -4,7 +4,11 @@
 ## Pentru echipă
 
 - **Schimbă serviciul**: buton nou în bara de sus a comenzii plătite. Clientul a plătit Cazier Judiciar dar voia Cazier Fiscal sau Cazier Auto, la același preț? Alegeți serviciul corect, citiți ce lipsește și ce documente trebuie regenerate, scrieți motivul și confirmați.
-- Merge doar la **același preț** și doar între serviciile prin avocat (caziere, certificat de integritate, stare civilă). Diferențele de bani rămân la „Modifică” sau la anulare și comandă nouă.
+- Merge doar la **același preț de azi** (contează prețul de pe site acum, nu cel plătit: o comandă plătită la un preț vechi se poate muta dacă azi cele două servicii costă la fel). Diferențele de bani rămân la „Modifică” sau la anulare și comandă nouă.
+- **Actualizare 02.11 (deciziile lui Raul):**
+  - comenzile **finalizate, expediate sau livrate se pot schimba**, ca să corectați evidența (de exemplu E-261007-K59HB). Apare avertismentul „schimbarea corectează doar evidența; documentele deja depuse/livrate nu se schimbă”, iar termenul rămâne cel vechi. Statusul nu se schimbă niciodată din buton. Anulate și rambursate rămân blocate;
+  - merge și între **serviciile imobiliare prin topograf** la același preț (de exemplu Copie intabulare ↔ Copie contract de vânzare ↔ Copie plan cadastral). Comanda rămâne la același topograf. Blocat dacă topograful a depus deja la OCPI, a raportat identificarea sau a încărcat documentul, ori dacă robotul ANCPI a pornit comanda;
+  - extrasul CF, planul cadastral și constatatorul (emise automat) nu se schimbă. Nici de la avocat la imobiliare sau invers.
 - La Cazier Auto bifați că permisul e emis în România (l-ați confirmat cu clientul). Poza permisului lipsă se cere cu „Solicită documente”.
 - După schimbare **regenerați** contractele, împuternicirea și, unde e cazul, cererea. Numerele de Barou rămân aceleași.
 - **Factura nu se schimbă**: rămâne cu numele serviciului vechi. Dacă trebuie refăcută, o face Raul sau contabila.
@@ -38,7 +42,49 @@
   ca regenerarea să refolosească aceleași numere (best-effort; eroarea apare în UI și log).
 - Factura Oblio nu se atinge; documentele din `order_documents` nu se șterg (lista de regenerat
   e în răspuns). UI: `src/components/admin/change-service-dialog.tsx`, buton în pagina comenzii.
-- Nu acoperă: CJO (alt repo), servicii imobiliare/automate, diferențe de preț, reemiterea facturii.
+- Nu acoperă: CJO (alt repo), servicii automate, diferențe de preț, reemiterea facturii.
+
+### Extindere 02.11.2026 (deciziile lui Raul, după prima livrare)
+
+- **Statusuri**: `CHANGE_SERVICE_LOCKED_STATUSES` = cancelled, refunded, cancellation_requested.
+  `completed`/`shipped`/`delivered` (`CHANGE_SERVICE_FINISHED_STATUSES`) sunt permise:
+  avertisment „Comanda e deja „<status>”: schimbarea corectează doar evidența; documentele
+  deja depuse/livrate nu se schimbă.” (și pe statusurile de după depunere,
+  `CHANGE_SERVICE_LATE_STATUSES`), `keepEstimate=true` → apply NU scrie
+  `estimated_completion_date`, preview arată `estimate.kept`. Statusul nu e scris niciodată.
+  Butonul din pagina comenzii ascuns doar pe cancelled/refunded.
+- **Preț**: `basePriceDelta = target.base_price − source.base_price` (catalogul ACTUAL,
+  ambele din `services`), nu `orders.base_price`. Dacă prețul plătit diferă de cel curent,
+  preview-ul spune „preț vechi”, banii nu se mișcă, `orders.*_price` rămân neatinse.
+- **Familii** (`serviceFamily`): `instant` (`instantPlatformProvider`), `lawyer`
+  (`LAWYER_SERVICE_SLUGS`), `property` (`verification_config.propertyVerification.enabled`,
+  restul serviciilor imobiliare), `other`. Doar lawyer↔lawyer și property↔property; lista de
+  candidați e filtrată pe familia serviciului curent (catalogul citit integral, ~30 rânduri).
+- **Imobiliare — date**: câmpurile `propertyVerification.fields.*.required` ale țintei trebuie
+  să existe în `customer_data.property`; fără `identificationService` trebuie CF sau cadastral;
+  cu `identificationService` ajunge adresa (aceeași regulă ca `PropertyDataStep`);
+  `conventie.enabled` cere `beneficiaryName/Cnp/Address/IdSeries/IdNumber`.
+- **Imobiliare — lucru început = blocat**: `customer_data.ocpi_submission`
+  (`registration_number`/`submitted_at`), `identified_property`, `identification_result`,
+  document `collaborator-document`, sau status de la depunere încolo / încheiat. Practic o
+  comandă imobiliară finalizată rămâne blocată (lucrarea la OCPI e făcută).
+- **ANCPI**: `ensureAncpiJobForPaidOrder` creează joburi doar pentru `extras-carte-funciara`
+  (exclus, instant) și e oprit oricum (`HANDED_OVER_TO_COLLABORATOR`), deci un job pe o comandă
+  schimbabilă e excepție. Regula: job `PENDING` fără `ancpi_order_id` → șters la apply,
+  ÎNAINTE de update-ul comenzii, cu gardă `.eq('status','PENDING').is('ancpi_order_id', null)`;
+  0 rânduri șterse = robotul l-a luat între timp → 409, nimic scris. `ancpi_jobs` nu are status
+  de anulare (CHECK din migrarea 065), iar ținta nu se emite automat, deci nu se re-creează.
+  Orice alt status de job → blocat.
+- **Colaborator**: vizibilitatea în portal = `collaborator_service_assignments` pe
+  `service_id` SAU `orders.assigned_collaborator_id` (rămâne neatins). Cine vede comanda acum
+  (asignați pe serviciul vechi + alocarea pe comandă) trebuie să vadă și ținta, altfel blocat.
+  Costurile interne (`order_supplier_costs`) și decontul topografului sunt pe comandă, nu pe
+  serviciu: nu se ating.
+- **Documente**: `conventie` intră în lista de regenerat (pct. 1 din convenție poartă numele
+  serviciului). Numerele de Barou se mută doar pe familia `lawyer`.
+- Răspunsul are în plus `changes[]` (ce se schimbă: preț vechi, topograf, job ANCPI, termen,
+  status), `family`, `paidBasePrice`; lista are `current.currentBasePrice`, `current.status`,
+  `familyNote`.
 
 ## Formularul „Raportează” cu ghid
 

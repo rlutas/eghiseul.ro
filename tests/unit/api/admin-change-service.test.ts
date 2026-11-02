@@ -24,6 +24,10 @@ const { POST } = await import('@/app/api/admin/orders/[id]/change-service/route'
 function chain(result: { data: unknown; error: unknown }, onUpdate?: (patch: unknown) => void) {
   const c: Record<string, unknown> = {};
   for (const m of ['select', 'eq', 'in', 'is', 'order', 'limit']) c[m] = vi.fn(() => c);
+  c.delete = vi.fn(() => {
+    deletes.push(true);
+    return c;
+  });
   c.single = vi.fn(() => Promise.resolve(result));
   c.update = vi.fn((patch: unknown) => {
     onUpdate?.(patch);
@@ -42,11 +46,21 @@ const source = { id: 'svc-jpf', slug: 'cazier-judiciar-persoana-fizica', name: '
 const fiscal = { id: 'svc-fiscal', slug: 'cazier-fiscal', name: 'Cazier Fiscal', base_price: '198.00', is_active: true, verification_config: vcPerson, config: {} };
 
 let updates: unknown[];
+let deletes: unknown[];
 let inserts: Array<Record<string, unknown>>;
 
-function setup(orderOver: Record<string, unknown> = {}, target = fiscal) {
+interface SetupExtra {
+  src?: Record<string, unknown>;
+  ancpiJobs?: unknown[];
+  assignments?: unknown[];
+  docs?: unknown[];
+}
+
+function setup(orderOver: Record<string, unknown> = {}, target: Record<string, unknown> = fiscal, extra: SetupExtra = {}) {
   updates = [];
   inserts = [];
+  deletes = [];
+  const src = extra.src ?? source;
   const order = {
     id: 'o1',
     friendly_order_id: 'E-000000-TEST1',
@@ -60,7 +74,7 @@ function setup(orderOver: Record<string, unknown> = {}, target = fiscal) {
     created_at: '2026-11-01T09:00:00Z',
     invoice_number: 'EGH-TEST-1',
     estimated_completion_date: null,
-    services: source,
+    services: src,
     ...orderOver,
   };
   from.mockImplementation((table: string) => {
@@ -70,7 +84,9 @@ function setup(orderOver: Record<string, unknown> = {}, target = fiscal) {
     }
     if (table === 'services') return chain({ data: [target], error: null });
     if (table === 'service_options') return chain({ data: [], error: null });
-    if (table === 'order_documents') return chain({ data: [{ type: 'contract_prestari' }, { type: 'imputernicire' }], error: null });
+    if (table === 'order_documents') return chain({ data: extra.docs ?? [{ type: 'contract_prestari' }, { type: 'imputernicire' }], error: null });
+    if (table === 'ancpi_jobs') return chain({ data: extra.ancpiJobs ?? [], error: null });
+    if (table === 'collaborator_service_assignments') return chain({ data: extra.assignments ?? [], error: null });
     return chain({ data: null, error: null });
   });
   registryFrom.mockImplementation(() =>
@@ -145,5 +161,102 @@ describe('POST /api/admin/orders/[id]/change-service — preview & apply', () =>
     expect(json.data.registry.moved).toBe(2);
     expect(inserts[0]).toMatchObject({ order_id: 'o1', event_type: 'modified' });
     expect(String(inserts[0].notes)).toContain('Serviciu schimbat: Cazier Judiciar PF → Cazier Fiscal (clientul voia fiscal)');
+  });
+});
+
+describe('POST /api/admin/orders/[id]/change-service — decizii 02.11', () => {
+  it('completed order: allowed, warning in preview, deadline and status untouched on apply', async () => {
+    setup({ status: 'completed', estimated_completion_date: '2026-10-10T15:00:00.000Z' });
+    const pv = await call({ action: 'preview', targetServiceSlug: 'cazier-fiscal' });
+    expect(pv.json.data.eligible).toBe(true);
+    expect(pv.json.data.warnings[0]).toContain('schimbarea corectează doar evidența');
+    expect(pv.json.data.estimate).toEqual({ old: '2026-10-10T15:00:00.000Z', new: '2026-10-10T15:00:00.000Z', kept: true });
+
+    const { status } = await call({ action: 'apply', targetServiceSlug: 'cazier-fiscal', note: 'corectare evidență' });
+    expect(status).toBe(200);
+    expect(updates[0]).toMatchObject({ service_id: 'svc-fiscal' });
+    expect(updates[0]).not.toHaveProperty('estimated_completion_date');
+    expect(updates[0]).not.toHaveProperty('status');
+  });
+
+  it('order paid at an older price: allowed when current catalogue prices match', async () => {
+    setup({ base_price: '179.00' });
+    const { status, json } = await call({ action: 'preview', targetServiceSlug: 'cazier-fiscal' });
+    expect(status).toBe(200);
+    expect(json.data.eligible).toBe(true);
+    expect(json.data.changes.join(' ')).toContain('preț vechi');
+  });
+
+  const propVc = {
+    signature: { required: true },
+    conventie: { enabled: true },
+    propertyVerification: {
+      enabled: true,
+      fields: { county: { required: true }, locality: { required: true }, carteFunciara: { required: true } },
+      identificationService: { enabled: false },
+    },
+  };
+  const copieIntabulare = { id: 'svc-ci', slug: 'copie-intabulare', name: 'Copie intabulare', base_price: '216.59', is_active: true, verification_config: propVc, config: {} };
+  const copieContract = { id: 'svc-ccv', slug: 'copie-contract-vanzare', name: 'Copie contract vânzare', base_price: '216.59', is_active: true, verification_config: propVc, config: {} };
+  const imobCd = {
+    property: {
+      county: 'Cluj', locality: 'Dej', carteFunciara: '123', beneficiaryName: 'Pop Ion', beneficiaryCnp: '0000000000000',
+      beneficiaryAddress: 'Str. X', beneficiaryIdSeries: 'CJ', beneficiaryIdNumber: '1',
+    },
+    signature_s3_key: 'k',
+  };
+  const mircea = [
+    { collaborator_id: 'mircea', service_id: 'svc-ci' },
+    { collaborator_id: 'mircea', service_id: 'svc-ccv' },
+  ];
+
+  it('imobiliare same price: switches, deletes a queued ANCPI job first, no Barou move', async () => {
+    setup({ base_price: '216.59', customer_data: imobCd }, copieContract, {
+      src: copieIntabulare,
+      assignments: mircea,
+      ancpiJobs: [{ id: 'job-1', status: 'PENDING', ancpi_order_id: null }],
+      docs: [{ type: 'contract_prestari' }, { type: 'conventie' }],
+    });
+    registryFrom.mockClear();
+    const { status, json } = await call({ action: 'apply', targetServiceSlug: 'copie-contract-vanzare', note: 'clientul voia contractul' });
+    expect(status).toBe(200);
+    expect(deletes).toHaveLength(1);
+    expect(updates[0]).toMatchObject({ service_id: 'svc-ccv' });
+    expect(registryFrom).not.toHaveBeenCalled();
+    expect(json.data.documents.toRegenerate.map((d: { type: string }) => d.type)).toEqual(['contract_prestari', 'conventie']);
+    expect(String(inserts[0].notes)).toContain('jobul ANCPI');
+  });
+
+  it('imobiliare: an ANCPI job already started blocks, nothing written', async () => {
+    setup({ base_price: '216.59', customer_data: imobCd }, copieContract, {
+      src: copieIntabulare,
+      assignments: mircea,
+      ancpiJobs: [{ id: 'job-1', status: 'PROCESSING', ancpi_order_id: '10054451' }],
+    });
+    const { status, json } = await call({ action: 'apply', targetServiceSlug: 'copie-contract-vanzare', note: 'motiv' });
+    expect(status).toBe(409);
+    expect(json.error).toContain('Robotul ANCPI');
+    expect(updates).toHaveLength(0);
+    expect(deletes).toHaveLength(0);
+  });
+
+  it('lawyer → imobiliare is blocked', async () => {
+    setup({}, { ...copieContract, base_price: '198.00' });
+    const { status, json } = await call({ action: 'apply', targetServiceSlug: 'copie-contract-vanzare', note: 'motiv' });
+    expect(status).toBe(409);
+    expect(json.error).toContain('aceeași familie');
+  });
+
+  it('candidate list stays inside the family of the current service', async () => {
+    setup({ base_price: '216.59', customer_data: imobCd }, copieContract, { src: copieIntabulare, assignments: mircea });
+    from.mockImplementation((table: string) => {
+      if (table === 'orders') return chain({ data: { id: 'o1', platform: 'eghiseul', status: 'processing', payment_status: 'paid', base_price: '216.59', customer_data: imobCd, services: copieIntabulare }, error: null });
+      if (table === 'services') return chain({ data: [copieIntabulare, copieContract, fiscal], error: null });
+      if (table === 'collaborator_service_assignments') return chain({ data: mircea, error: null });
+      return chain({ data: [], error: null });
+    });
+    const { json } = await call({ action: 'preview' });
+    expect(json.data.candidates.map((c: { slug: string }) => c.slug)).toEqual(['copie-contract-vanzare']);
+    expect(json.data.candidates[0].eligible).toBe(true);
   });
 });

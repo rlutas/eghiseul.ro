@@ -1,21 +1,34 @@
 /**
  * POST /api/admin/orders/[id]/change-service
  *
- * „Schimbă serviciul" pe o comandă PLĂTITĂ, la același preț (cerere echipă,
- * E-261007-K59HB: client care a plătit Cazier Judiciar PF și voia Cazier
- * Fiscal). Banii NU se mișcă aici — pentru diferențe de preț există
- * „Modifică" (opțiuni) sau anulare + comandă nouă.
+ * „Schimbă serviciul" pe o comandă PLĂTITĂ, la același preț în catalogul
+ * ACTUAL (cerere echipă, E-261007-K59HB: client care a plătit Cazier Judiciar
+ * PF și voia Cazier Fiscal). Banii NU se mișcă aici — pentru diferențe de
+ * preț există „Modifică" (opțiuni) sau anulare + comandă nouă.
+ *
+ * Familii (fără treceri între ele): servicii prin avocat ↔ servicii prin
+ * avocat; imobiliare prin topograf ↔ imobiliare prin topograf. Regulile sunt
+ * în `@/lib/orders/change-service` (decizii Raul, 02.11.2026).
  *
  * Body: { action: 'preview' | 'apply', targetServiceSlug?, note?, licenseConfirmedRomanian? }
  *  - preview fără țintă → lista serviciilor candidate, fiecare cu eligibilitate;
  *  - preview cu țintă → consecințe: ce lipsește, documente de regenerat,
  *    numere Barou, factură, termen nou;
  *  - apply → schimbă service_id + opțiunile legate de catalogul nou,
- *    recalculează termenul, mută numerele Barou pe serviciul nou, scrie istoric.
+ *    recalculează termenul, mută numerele Barou pe serviciul nou (doar
+ *    avocat), șterge un job ANCPI rămas în coadă nepornit, scrie istoric.
+ *    Statusul comenzii NU se schimbă niciodată de aici.
  *
  * Termenul (`estimated_completion_date`) se recalculează cu regulile
  * serviciului NOU, pornind tot de la `paid_at` (clientul a plătit atunci;
- * schimbarea e greșeala noastră de încadrare, nu o comandă nouă).
+ * schimbarea e greșeala noastră de încadrare, nu o comandă nouă). Excepție:
+ * comenzile finalizate / expediate / livrate își păstrează termenul — acolo
+ * schimbarea doar corectează evidența.
+ *
+ * Imobiliare: colaboratorul vede comenzile după serviciu
+ * (`collaborator_service_assignments`) sau după alocarea pe comandă
+ * (`assigned_collaborator_id`, care rămâne). Dacă topograful care are comanda
+ * nu lucrează pe ținta, schimbarea e blocată (ar dispărea din portalul lui).
  *
  * Factura NU se atinge (regula lui Raul): rămâne cu denumirea veche, iar
  * refacerea o decide Raul / contabila („Storno + Reemite" există separat).
@@ -31,7 +44,6 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
 import { brandForOrder } from '@/lib/brand/for-order';
 import { brandSellsService } from '@/lib/brand/brands';
-import { LAWYER_SERVICE_SLUGS } from '@/lib/documents/no-lawyer-services';
 import { computeEstimatedCompletionISOForOrder } from '@/lib/orders/order-estimate';
 import { getRegistryClient } from '@/lib/registry/client';
 import {
@@ -40,6 +52,8 @@ import {
   invoiceNote,
   isHubService,
   remapSelectedOptions,
+  serviceFamily,
+  type AncpiJobForSwitch,
   type ServiceForSwitch,
   type TargetOptionForSwitch,
 } from '@/lib/orders/change-service';
@@ -170,23 +184,42 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     base_price: order.base_price,
     selected_options: order.selected_options,
     customer_data: order.customer_data,
+    assigned_collaborator_id: (order.assigned_collaborator_id as string | null) ?? null,
   };
 
-  // ── Candidați (servicii prin avocat) + opțiunile lor ──────────────────
-  const slugs = targetSlug ? [targetSlug] : (LAWYER_SERVICE_SLUGS as readonly string[]).filter((s) => s !== source.slug);
-  const { data: svcRows } = await db.from('services').select(SERVICE_COLUMNS).in('slug', slugs);
-  const services = ((svcRows ?? []) as ServiceRow[]).filter((s) => targetSlug || (s.is_active && !isHubService(s)));
+  // ── Candidați: aceeași familie (avocat / imobiliare prin topograf) ─────
+  // Catalogul e mic (~30 de servicii): îl citim tot și filtrăm aici.
+  const sourceFamily = serviceFamily(source);
+  const { data: svcRows } = await db.from('services').select(SERVICE_COLUMNS);
+  const allServices = (svcRows ?? []) as ServiceRow[];
+  const services = targetSlug
+    ? allServices.filter((s) => s.slug === targetSlug)
+    : allServices.filter(
+        (s) => s.slug !== source.slug && s.is_active && !isHubService(s) && serviceFamily(s) === sourceFamily
+      );
   if (targetSlug && services.length === 0) return fail(404, 'Serviciul ales nu există.');
 
-  const { data: optRows } = await db
-    .from('service_options')
-    .select('id, code, is_active, service_id')
-    .in('service_id', services.map((s) => s.id));
+  const serviceIds = services.map((s) => s.id);
+  const [{ data: optRows }, { data: docRows }, { data: jobRows }, { data: csaRows }] = await Promise.all([
+    db.from('service_options').select('id, code, is_active, service_id').in('service_id', serviceIds),
+    db.from('order_documents').select('type').eq('order_id', id),
+    db.from('ancpi_jobs').select('id, status, ancpi_order_id').eq('order_id', id),
+    db
+      .from('collaborator_service_assignments')
+      .select('collaborator_id, service_id')
+      .in('service_id', [source.id, ...serviceIds]),
+  ]);
   const optionsBySvc = new Map<string, TargetOptionForSwitch[]>();
   for (const o of (optRows ?? []) as Array<TargetOptionForSwitch & { service_id: string }>) {
     const list = optionsBySvc.get(o.service_id) ?? [];
     list.push({ id: o.id, code: o.code, is_active: o.is_active });
     optionsBySvc.set(o.service_id, list);
+  }
+  const docTypes = ((docRows ?? []) as Array<{ type: string | null }>).map((d) => d.type).filter((t): t is string => !!t);
+  const ancpiJob = (((jobRows ?? []) as AncpiJobForSwitch[])[0] ?? null) as AncpiJobForSwitch | null;
+  const collabsBySvc = new Map<string, string[]>();
+  for (const r of (csaRows ?? []) as Array<{ collaborator_id: string; service_id: string }>) {
+    collabsBySvc.set(r.service_id, [...(collabsBySvc.get(r.service_id) ?? []), r.collaborator_id]);
   }
 
   const evaluate = (target: ServiceRow) =>
@@ -197,6 +230,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       targetOptions: optionsBySvc.get(target.id) ?? [],
       brandSellsTarget: brandSellsService(brand, target.slug),
       licenseConfirmedRomanian,
+      existingDocTypes: docTypes,
+      ancpiJob,
+      sourceCollaboratorIds: collabsBySvc.get(source.id) ?? [],
+      targetCollaboratorIds: collabsBySvc.get(target.id) ?? [],
     });
 
   // ── Preview fără țintă: lista ─────────────────────────────────────────
@@ -214,10 +251,23 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         };
       })
       .sort((a, b) => Number(b.eligible) - Number(a.eligible) || a.name.localeCompare(b.name, 'ro'));
+    const familyNote =
+      sourceFamily === 'instant'
+        ? 'Serviciile emise automat (extras CF, plan cadastral, certificat constatator) nu se schimbă: documentul pleacă pe loc.'
+        : sourceFamily === 'other'
+          ? 'Serviciul acestei comenzi nu se poate schimba de aici: anulare și comandă nouă.'
+          : null;
     return NextResponse.json({
       success: true,
       data: {
-        current: { slug: source.slug, name: source.name, paidBasePrice: Number(order.base_price ?? 0) },
+        current: {
+          slug: source.slug,
+          name: source.name,
+          paidBasePrice: Number(order.base_price ?? 0),
+          currentBasePrice: Number(source.base_price ?? 0),
+          status: orderRow.status,
+        },
+        familyNote,
         candidates,
       },
     });
@@ -227,8 +277,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   const target = services[0];
   const evaluation = evaluate(target);
 
-  const { data: docRows } = await db.from('order_documents').select('type').eq('order_id', id);
-  const docTypes = ((docRows ?? []) as Array<{ type: string | null }>).map((d) => d.type).filter((t): t is string => !!t);
   const documents = describeDocumentImpact(source, target, docTypes);
   const invoice = invoiceNote(order.invoice_number as string | null, source.name);
 
@@ -243,13 +291,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   }
   const newOptions = remapSelectedOptions(order.selected_options, optionsBySvc.get(target.id) ?? []);
 
-  const placedAt = order.paid_at ? new Date(order.paid_at as string) : new Date(order.created_at as string);
-  const newEstimate = await computeEstimatedCompletionISOForOrder(
-    admin,
-    { customer_data: customerData, selected_options: newOptions, delivery_method: order.delivery_method },
-    target,
-    placedAt
-  );
+  const oldEstimate = (order.estimated_completion_date as string | null) ?? null;
+  let newEstimate: string | null = oldEstimate;
+  if (!evaluation.keepEstimate) {
+    const placedAt = order.paid_at ? new Date(order.paid_at as string) : new Date(order.created_at as string);
+    newEstimate = await computeEstimatedCompletionISOForOrder(
+      admin,
+      { customer_data: customerData, selected_options: newOptions, delivery_method: order.delivery_method },
+      target,
+      placedAt
+    );
+  }
 
   const consequences = {
     from: { slug: source.slug, name: source.name },
@@ -258,11 +310,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     blockers: evaluation.blockers,
     todo: evaluation.todo,
     warnings: evaluation.warnings,
+    changes: evaluation.changes,
+    family: evaluation.family,
+    paidBasePrice: Number(order.base_price ?? 0),
     needsLicenseConfirmation: evaluation.needsLicenseConfirmation,
     documents,
     invoiceNote: invoice,
     reissueAvailable: !!order.invoice_number,
-    estimate: { old: (order.estimated_completion_date as string | null) ?? null, new: newEstimate },
+    estimate: { old: oldEstimate, new: newEstimate, kept: evaluation.keepEstimate },
   };
 
   if (body.action === 'preview') {
@@ -284,7 +339,27 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     updated_at: nowIso,
   };
   if (customerDataChanged) update.customer_data = customerData;
-  if (newEstimate) update.estimated_completion_date = newEstimate;
+  if (!evaluation.keepEstimate && newEstimate) update.estimated_completion_date = newEstimate;
+
+  // Job ANCPI rămas în coadă, nepornit: îl ștergem ÎNAINTE de schimbare, cu
+  // gardă pe PENDING + fără comandă ePay. Dacă robotul l-a luat între timp,
+  // ștergerea nu prinde nimic și oprim totul (altfel s-ar plăti la ANCPI un
+  // document pentru serviciul vechi). ancpi_jobs nu are status „anulat".
+  let ancpiJobDeleted = false;
+  if (evaluation.deletePendingAncpiJobId) {
+    const { data: delRows, error: delErr } = await db
+      .from('ancpi_jobs')
+      .delete()
+      .eq('id', evaluation.deletePendingAncpiJobId)
+      .eq('status', 'PENDING')
+      .is('ancpi_order_id', null)
+      .select('id');
+    if (delErr || !delRows || delRows.length === 0) {
+      if (delErr) console.error('[change-service] ancpi job delete failed:', delErr);
+      return fail(409, 'Robotul ANCPI a pornit jobul între timp: serviciul nu se mai schimbă. Reîncarcă pagina.');
+    }
+    ancpiJobDeleted = true;
+  }
 
   // Gardă de concurență: aplicăm doar dacă serviciul e tot cel citit.
   const { data: updated, error: updErr } = await db
@@ -294,19 +369,23 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     .eq('service_id', source.id)
     .select('id');
   if (updErr) {
-    console.error('[change-service] update failed:', updErr);
+    console.error('[change-service] update failed:', updErr, ancpiJobDeleted ? '(ancpi job already deleted)' : '');
     return fail(500, 'Nu am putut schimba serviciul.');
   }
   if (!updated || updated.length === 0) {
     return fail(409, 'Serviciul comenzii s-a schimbat între timp. Reîncarcă pagina.');
   }
 
-  const registry = await moveRegistryNumbers({
-    platform: brand.registryPlatform,
-    orderRef: (order.friendly_order_id as string | null) || id,
-    source,
-    target,
-  });
+  // Numere de Barou există doar pe serviciile prin avocat.
+  const registry =
+    evaluation.family === 'lawyer'
+      ? await moveRegistryNumbers({
+          platform: brand.registryPlatform,
+          orderRef: (order.friendly_order_id as string | null) || id,
+          source,
+          target,
+        })
+      : { moved: 0, error: null };
   if (registry.error) console.error('[change-service] registry move failed:', registry.error);
 
   const notes = [
@@ -316,13 +395,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     registry.moved ? `numere Barou mutate: ${registry.moved}` : null,
     registry.error ? 'numerele Barou NU s-au putut muta automat' : null,
     order.invoice_number ? `factura ${order.invoice_number} neschimbată` : null,
+    evaluation.keepEstimate ? `comanda era ${orderRow.status}: termen și status neschimbate` : null,
+    ancpiJobDeleted ? 'jobul ANCPI nepornit a fost șters din coadă' : null,
   ].filter(Boolean) as string[];
 
   const { error: histErr } = await db.from('order_history').insert({
     order_id: id,
     event_type: 'modified',
     changed_by: adminEmail,
-    old_value: { service_slug: source.slug, service_name: source.name, estimated_completion_date: order.estimated_completion_date ?? null },
+    old_value: { service_slug: source.slug, service_name: source.name, estimated_completion_date: oldEstimate, status: orderRow.status },
     new_value: { service_slug: target.slug, service_name: target.name, estimated_completion_date: newEstimate, reason: note },
     notes: notes.join(' · '),
   });

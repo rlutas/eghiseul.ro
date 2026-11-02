@@ -10,29 +10,76 @@ e fiecare card cu butoanele lui, ce fac și când le folosiți. Scris pe
 - **Statusul** cu badge (și „Anulare solicitată”, „documentero”, „test”).
 - **Copiază linkul de status**: linkul pe care îl trimiteți clientului (pre-completat, vede stadiul, primește email la fiecare pas). **Deschide pagina de status** ca s-o vedeți ca el.
 - **Modifică**: schimbă opțiuni / curier / limbă / țară după plată; refund automat sau link de plată extra ([procedura](modify-order.md)).
-- **Schimbă serviciul** (din 02.11.2026): clientul a plătit alt serviciu decât voia, la același preț (ex. Cazier Judiciar în loc de Cazier Fiscal sau Cazier Auto). Pașii sunt în secțiunea „Schimbă serviciul” de mai jos.
+- **Schimbă serviciul** (din 02.11.2026): clientul a plătit alt serviciu decât voia, când azi ambele costă la fel (ex. Cazier Judiciar în loc de Cazier Fiscal, sau Copie intabulare în loc de Copie contract de vânzare). Merge și pe comenzi finalizate, ca să corectați evidența. Pașii sunt în secțiunea „Schimbă serviciul” de mai jos.
 - **Marchează comanda urgentă**: trece prima în lista lui Mircea (doar pe serviciile lui).
 
 ## Schimbă serviciul
 
-Butonul din bara de sus, pe comenzile plătite care nu sunt anulate,
-rambursate, finalizate sau expediate. Pentru clientul care a plătit, de
-exemplu, Cazier Judiciar Persoană Fizică (198 lei) și voia Cazier Fiscal sau
-Cazier Auto (tot 198 lei).
+Butonul din bara de sus, pe orice comandă plătită care nu e anulată sau
+rambursată. Pentru clientul care a plătit, de exemplu, Cazier Judiciar
+Persoană Fizică și voia Cazier Fiscal sau Cazier Auto (toate 198 lei), sau a
+plătit Copie încheiere intabulare și voia Copie contract de vânzare (ambele
+216,59 lei).
 
-1. Apăsați **„Schimbă serviciul”**. Sus apar serviciile la același preț în care
-   se poate muta comanda. Sub ele, „De ce nu apar celelalte servicii” arată
-   motivul pentru fiecare serviciu care nu se poate alege.
+**Cu ce se poate schimba** (regulile lui Raul, 02.11.2026):
+
+- **Același preț de azi.** Contează cât costă azi cele două servicii pe site,
+  nu cât a plătit clientul. Dacă a plătit la un preț mai vechi, dar azi
+  serviciul lui și cel corect costă la fel, schimbarea merge. Banii nu se
+  mișcă, iar prețul de pe comandă rămâne cel plătit. Dacă azi prețurile
+  diferă: „Modifică” sau anulare și comandă nouă.
+- **În aceeași familie:**
+  - serviciile prin avocat între ele (caziere, certificat de integritate,
+    stare civilă);
+  - serviciile imobiliare prin topograf între ele (copii OCPI, certificate,
+    identificări), de exemplu Copie intabulare ↔ Copie contract de vânzare ↔
+    Copie plan cadastral.
+
+  Nu se trece de la avocat la imobiliare sau invers: fluxurile sunt diferite.
+- **Nu** se schimbă serviciile emise automat (extras CF, extras de plan
+  cadastral, certificat constatator): documentul pleacă pe loc.
+
+**Comenzi finalizate, expediate sau livrate** se pot schimba, ca să corectați
+evidența după fapt (exemplu: E-261007-K59HB, finalizată). Fereastra arată
+„Comanda e deja …: schimbarea corectează doar evidența; documentele deja
+depuse/livrate nu se schimbă”. La acestea termenul rămâne cel de acum.
+Statusul comenzii nu se schimbă niciodată din acest buton.
+
+**La imobiliare, schimbarea e blocată când:**
+
+- topograful a început deja lucrul: a depus cererea la OCPI (are număr de
+  înregistrare), a raportat identificarea, a încărcat documentul sau comanda e
+  de la „Depus la instituție” încolo (inclusiv finalizată);
+- robotul ANCPI a pornit deja comanda. Dacă era doar pus în coadă și nu
+  pornise, se șterge singur din coadă la schimbare;
+- topograful care are comanda nu lucrează pe serviciul nou (ar dispărea din
+  portalul lui);
+- serviciului nou îi lipsesc date: numărul de carte funciară (de exemplu, de
+  la o identificare după adresă la o copie) sau datele proprietarului pentru
+  convenția cu topograful.
+
+Dacă trece, comanda rămâne la același topograf și apare în portalul lui cu
+serviciul nou.
+
+**Pașii:**
+
+1. Apăsați **„Schimbă serviciul”**. Sus apar serviciile din aceeași familie
+   în care se poate muta comanda. Sub ele, „De ce nu apar celelalte servicii”
+   arată motivul pentru fiecare serviciu care nu se poate alege.
 2. Alegeți serviciul corect. Fereastra arată:
-   - **ce blochează** (roșu), de exemplu alt preț, o opțiune care nu există la
-     serviciul nou (urgența nu există la Cazier Fiscal) sau trecerea de la
-     firmă la persoană fizică;
+   - **ce blochează** (roșu), de exemplu alt preț azi, o opțiune care nu
+     există la serviciul nou (urgența nu există la Cazier Fiscal), trecerea de
+     la firmă la persoană fizică sau lucrul deja început de topograf;
+   - **avertismentul** (galben), dacă comanda e deja la instituție sau
+     încheiată;
+   - **ce se schimbă**: prețul vechi plătit (dacă e cazul), topograful,
+     coada robotului ANCPI, termenul, statusul (rămâne același);
    - **ce trebuie făcut după** schimbare: semnătura lipsă („Cere completare”),
      poza permisului la Cazier Auto („Solicită documente”), prenumele
      părinților („Corectează datele clientului”);
-   - **documentele de regenerat** și ce se întâmplă cu cererea de eliberare
-     (Cazier Auto și Certificatul de integritate nu au cerere, doar
-     împuternicire);
+   - **documentele de regenerat** (contracte, împuternicire, convenția cu
+     topograful) și ce se întâmplă cu cererea de eliberare (Cazier Auto și
+     Certificatul de integritate nu au cerere, doar împuternicire);
    - **factura**: rămâne cu denumirea serviciului vechi. Dacă trebuie refăcută,
      o face Raul sau contabila. Nu apăsați „Storno + Reemite” fără acordul
      lor.
@@ -40,19 +87,18 @@ Cazier Auto (tot 198 lei).
    România**. Permisul străin are alt preț și alt termen, deci acolo se face
    anulare și comandă nouă.
 4. Scrieți motivul (apare în istoric) și apăsați **„Schimbă serviciul”**.
-5. După schimbare: din „Procesare comandă” **regenerați** contractele și
-   împuternicirea (și cererea, dacă serviciul nou o are). Documentele vechi nu
-   se șterg singure. Numerele de Barou rămân aceleași: se mută pe serviciul
-   nou în registru.
+5. După schimbare: din „Procesare comandă” **regenerați** documentele (la
+   avocat: contractele, împuternicirea și cererea, dacă serviciul nou o are;
+   la imobiliare: contractul și convenția). Documentele vechi nu se șterg
+   singure. La serviciile prin avocat, numerele de Barou rămân aceleași: se
+   mută pe serviciul nou în registru. La imobiliare nu există numere de Barou.
 
 Termenul se recalculează cu regulile serviciului nou, pornind tot de la data
-plății.
+plății. Excepție: la comenzile finalizate, expediate sau livrate rămâne cel
+vechi.
 
-Ce **nu** face butonul: nu mută bani (diferențele de preț se fac din
-„Modifică” sau prin anulare și comandă nouă), nu schimbă factura, nu merge pe
-serviciile automate (extras CF, constatator) și nici pe cele imobiliare, ci
-doar între serviciile prin avocat (caziere, certificat de integritate, stare
-civilă). Pe cazierjudiciaronline.com nu există încă.
+Ce **nu** face butonul: nu mută bani, nu schimbă statusul, nu schimbă
+factura. Pe cazierjudiciaronline.com nu există încă.
 
 ## Detalii serviciu
 
