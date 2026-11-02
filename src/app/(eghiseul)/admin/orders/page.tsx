@@ -140,7 +140,6 @@ const PAGE_SIZE = 25;
 interface RecoveryHidden {
   total: number;
   queue: number;
-  called: number;
   noAnswer: number;
   /** True when the toggle shows them anyway. */
   shown: boolean;
@@ -531,8 +530,9 @@ export default function AdminOrdersPage() {
         )}
       </div>
 
-      {/* Neplătite fără clienții din Recuperare telefonică (cerere echipă
-          12.10.2026: același client era sunat din ambele liste). */}
+      {/* Neplătite fără clienții care așteaptă în „De sunat" sau au „Nu a
+          răspuns" (cerere echipă 12.10.2026; din 02.11 cei deja sunați rămân
+          în listă, cu „Sunat"). */}
       {urlStatus === 'abandoned' && recoveryHidden && recoveryHidden.total > 0 && (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sm text-sky-900">
           <Phone className="h-4 w-4 shrink-0" />
@@ -546,8 +546,7 @@ export default function AdminOrdersPage() {
             <span className="text-sky-700">
               {' '}
               ({[
-                recoveryHidden.queue ? `${recoveryHidden.queue} în coadă` : null,
-                recoveryHidden.called ? `${recoveryHidden.called} deja sunați` : null,
+                recoveryHidden.queue ? `${recoveryHidden.queue} de sunat în coadă` : null,
                 recoveryHidden.noAnswer ? `${recoveryHidden.noAnswer} fără răspuns` : null,
               ]
                 .filter(Boolean)

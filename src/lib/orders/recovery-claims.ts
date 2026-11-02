@@ -2,16 +2,20 @@
  * Who belongs to „Recuperare telefonică", so „Abandonuri" does not show them.
  *
  * Team request 12.10.2026: „ce intră la recuperare telefonică să dispară de la
- * abandonuri, deoarece așa am sunat pe aceiași clienți". The 13.10 „Sunat"
- * badge did not stop it: both lists still showed the same client, and two
- * people called them. Since 02.11.2026 the unpaid list hides, by default,
- * every unpaid order of a client (same email, or same last 9 phone digits)
- * who is:
- *  - `queue`     — in the phone recovery queue (open or already handled);
- *  - `called`    — called in the last CLAIM_DAYS days, from either list;
- *  - `no_answer` — ticked „Nu a răspuns" in the last CLAIM_DAYS days.
- * A toggle shows them again (marked), and the list says how many are hidden.
- * The same rule runs on cazierjudiciaronline.com (src/lib/recovery-claims.ts).
+ * abandonuri, deoarece așa am sunat pe aceiași clienți". Since 02.11.2026 the
+ * unpaid list hides, by default, every unpaid order of a client (same email,
+ * or same last 9 phone digits) who is:
+ *  - `queue`     — waiting in „De sunat" (in the phone recovery queue and not
+ *                  called yet: someone else calls them from there);
+ *  - `no_answer` — ticked „Nu a răspuns" in the last CLAIM_DAYS days (they are
+ *                  retried from the queue).
+ * A client already called (`called`, last CLAIM_DAYS days, from either list)
+ * stays VISIBLE with the „Sunat" badge (owner decision 02.11.2026: a row that
+ * vanished on reload right after logging a call confused the team, and the
+ * badge already stops a second call). `called` beats the other two reasons.
+ * A toggle shows the hidden ones again (marked), and the list says how many
+ * are hidden. The same rule runs on cazierjudiciaronline.com
+ * (src/lib/recovery-claims.ts).
  *
  * Pure functions only; the loader is in recovery-claims-loader.ts.
  */
@@ -80,6 +84,15 @@ export function findClaim(
   const byPhone = p ? index.get(`p:${p}`) ?? null : null;
   if (byEmail && byPhone) return REASON_RANK[byEmail] >= REASON_RANK[byPhone] ? byEmail : byPhone;
   return byEmail ?? byPhone;
+}
+
+/**
+ * Does this claim keep the client out of Abandonuri by default? Only clients
+ * still to be called from the queue, or retried there after a no-answer; a
+ * client already called stays in the list, marked „Sunat".
+ */
+export function hidesFromAbandoned(reason: ClaimReason | null | undefined): boolean {
+  return reason === 'queue' || reason === 'no_answer';
 }
 
 /**

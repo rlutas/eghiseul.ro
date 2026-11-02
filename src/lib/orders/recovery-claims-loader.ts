@@ -1,7 +1,8 @@
 /**
  * Loads the clients that belong to „Recuperare telefonică" (see
  * recovery-claims.ts for the rule). Used by the unpaid orders list
- * („Abandonuri" / „Neplătite") to keep them out of it.
+ * („Abandonuri" / „Neplătite"): clients waiting in „De sunat" or with a
+ * „Nu a răspuns" are kept out of it, clients already called stay marked.
  */
 
 import type { createAdminClient } from '@/lib/supabase/admin';

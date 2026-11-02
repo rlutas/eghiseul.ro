@@ -9,7 +9,7 @@ import { LAWYER_SERVICE_SLUGS } from '@/lib/documents/no-lawyer-services';
 import { applyQuickOrStage } from '@/lib/admin/order-quick-filters';
 import { getOpenOutages } from '@/lib/services/platform-services';
 import { buildCallIndex, findCall, type CalledOrderRef } from '@/lib/orders/phone-recovery-wins';
-import { findClaim, MATCH_WINDOW_DAYS, pickVisibleIds, type ClaimReason } from '@/lib/orders/recovery-claims';
+import { findClaim, hidesFromAbandoned, MATCH_WINDOW_DAYS, pickVisibleIds, type ClaimReason } from '@/lib/orders/recovery-claims';
 import { loadRecoveryClaimIndex } from '@/lib/orders/recovery-claims-loader';
 
 // Calls logged in „Recuperare telefonică" within this window are shown on the
@@ -175,8 +175,11 @@ export async function GET(request: NextRequest) {
 
     // „Abandonuri" / „Neplătite" without the clients of „Recuperare
     // telefonică" (team request 12.10.2026: the same client was called from
-    // both lists). Hidden by default; `?includeRecovery=1` shows them, marked.
-    // A search shows everything (looking a client up must find them).
+    // both lists). Hidden by default: clients waiting in „De sunat" and those
+    // with a „Nu a răspuns" (retried from the queue). A client already called
+    // stays visible with „Sunat" (owner decision 02.11.2026).
+    // `?includeRecovery=1` shows the hidden ones, marked. A search shows
+    // everything (looking a client up must find them).
     const isUnpaidTab = status === 'abandoned';
     const includeRecovery = searchParams.get('includeRecovery') === '1';
     let claimIndex: Map<string, ClaimReason> | null = null;
@@ -200,7 +203,7 @@ export async function GET(request: NextRequest) {
           const batch = (res.data ?? []) as Array<{ id: string; contact: { email?: string | null; phone?: string | null } | null }>;
           for (const row of batch) {
             const reason = findClaim(claimIndex, row.contact?.email, row.contact?.phone);
-            if (reason) hiddenReasons.set(row.id, reason);
+            if (hidesFromAbandoned(reason)) hiddenReasons.set(row.id, reason!);
           }
           if (batch.length < 1000) break;
         }
@@ -256,7 +259,6 @@ export async function GET(request: NextRequest) {
       ? {
           total: hiddenReasons.size,
           queue: [...hiddenReasons.values()].filter((r) => r === 'queue').length,
-          called: [...hiddenReasons.values()].filter((r) => r === 'called').length,
           noAnswer: [...hiddenReasons.values()].filter((r) => r === 'no_answer').length,
           shown: !hideRecovery,
         }

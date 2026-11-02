@@ -40,17 +40,18 @@ Sub numele serviciului, în Recuperare telefonică, și sub status, în **Comenz
 
 Refuzurile se văd doar pentru încercările de după 14.10.2026. Fiecare refuz apare și în istoricul comenzii.
 
-## Abandonuri nu mai arată clienții din Recuperare telefonică (din 02.11.2026)
+## Abandonuri ascunde clienții care urmează să fie sunați din Recuperare telefonică (din 02.11.2026)
 
-Un client se sună dintr-un singur loc. Pe ambele site-uri, lista de abandonuri (pe eGhiseul **Abandonuri**, adică Comenzi → Neplătite; pe CazierJudiciarOnline **Abandonuri**) **ascunde** clienții care țin de Recuperare telefonică:
+Un client se sună dintr-un singur loc. Pe ambele site-uri, lista de abandonuri (pe eGhiseul **Abandonuri**, adică Comenzi → Neplătite; pe CazierJudiciarOnline **Abandonuri**) **ascunde** doar clienții pe care îi sună colegele din Recuperare telefonică:
 
-- sunt acum în coada **Recuperare telefonică**;
-- au fost **sunați** în ultimele 60 de zile, din oricare listă;
-- au bifă **„Nu a răspuns”** în ultimele 60 de zile.
+- așteaptă în **„De sunat”** (sunt în coadă și nu i-a sunat încă nimeni);
+- au bifă **„Nu a răspuns”** în ultimele 60 de zile (se reîncearcă tot din coadă).
 
-Clientul e recunoscut după **email sau telefon**, deci dispar toate comenzile (pe CazierJudiciarOnline, toate sesiunile) lui, nu doar cea sunată. Când marcați un apel din Abandonuri, rândul dispare din listă la reîncărcare.
+**Clienții deja sunați rămân în Abandonuri**, cu eticheta albastră **„📞 Sunat 12.10 · Maria”**. Când marcați un apel din Abandonuri, rândul **nu mai dispare** la reîncărcare: rămâne pe loc, cu eticheta. Dacă vedeți eticheta „Sunat”, nu-l mai sunați: citiți nota (țineți mouse-ul pe etichetă) și treceți la următorul.
 
-Deasupra listei scrie câte sunt ascunse, de exemplu **„Ascunse: 179 comenzi ale clienților din Recuperare telefonică (179 deja sunați)”**. Ca să le vedeți, bifați **„Arată și cele din recuperare telefonică”** în aceeași bară. Apar cu eticheta albastră **„Sunat”** sau cu eticheta galbenă **„În Recuperare telefonică”**. Pe ăștia nu-i sunați din Abandonuri: îi sună colegele din Recuperare telefonică.
+Clientul e recunoscut după **email sau telefon**, deci regula se aplică pe toate comenzile lui (pe CazierJudiciarOnline, pe toate sesiunile), nu doar pe cea din coadă. Un apel pe oricare comandă contează: dacă un client din coadă a fost sunat deja pe altă comandă, nu mai e „de sunat” și apare în Abandonuri cu „Sunat”.
+
+Deasupra listei scrie câte sunt ascunse, de exemplu **„Ascunse: 12 comenzi ale clienților din Recuperare telefonică (8 de sunat în coadă, 4 fără răspuns)”**. Ca să le vedeți, bifați **„Arată și cele din recuperare telefonică”** în aceeași bară. Apar cu eticheta galbenă **„În Recuperare telefonică”** sau **„Nu a răspuns”**. Pe ăștia nu-i sunați din Abandonuri: îi sună colegele din Recuperare telefonică. Când nu e nimeni de ascuns, bara nu apare.
 
 Când **căutați** un client (email, telefon, număr de comandă), lista arată tot, cu etichete, ca să-l găsiți. Comenzile mai vechi de 90 de zile nu se ascund. Pe CazierJudiciarOnline, sesiunile **convertite** (clientul a plătit) nu se ascund niciodată. Cifra de pe tabul „Neplătite” numără în continuare toate comenzile neplătite, și pe cele ascunse.
 
@@ -58,7 +59,7 @@ Când **căutați** un client (email, telefon, număr de comandă), lista arată
 
 Puteți marca apelul și **direct din listă**, cu butonul cu telefon de pe rând: pe eGhiseul în Comenzi → Neplătite, pe CazierJudiciarOnline în Abandonuri. Pe CazierJudiciarOnline asta contează pentru clienții care s-au oprit înainte de plată: ei nu apar în Recuperare telefonică. Apelul marcat din Abandonuri apare și în Recuperare telefonică, iar clientul nu mai e în lista „De sunat”.
 
-Eticheta **„📞 Sunat 12.10 · Maria”** (din 13.10.2026) rămâne: o vedeți pe CazierJudiciarOnline în Comenzi și, cu bifa de mai sus, în Abandonuri. Pe eGhiseul scrie „· altă comandă” când apelul s-a marcat pe o altă comandă a aceluiași client. Țineți mouse-ul pe etichetă ca să vedeți nota. Apelurile marcate înainte de 13.10 arată emailul contului comun în loc de nume.
+Eticheta „Sunat” se vede și pe CazierJudiciarOnline în Comenzi, la Status. Pe eGhiseul scrie „· altă comandă” când apelul s-a marcat pe o altă comandă a aceluiași client. Apelurile marcate înainte de 13.10 arată emailul contului comun în loc de nume.
 
 ## Email în loc de apel (doar pe eGhiseul, din 07.10.2026)
 
@@ -83,5 +84,5 @@ Aici apar clienții care au plătit după apelul vostru, cu suma și numărul co
 - Nu sunăm clienții ecazier: sunt clienții cabinetului de avocatură, nu ai noștri.
 - Nu sunăm de mai multe ori pe zi același client. Dacă nu răspunde, bifați căsuța „nu a răspuns”; un mesaj pe WhatsApp e suficient.
 - Nu mai sunăm clienții cu două căsuțe bifate.
-- Nu sunăm din Abandonuri clienții cu etichetă „Sunat” sau „În Recuperare telefonică”.
+- Nu sunăm din Abandonuri clienții cu etichetă „Sunat”, „În Recuperare telefonică” sau „Nu a răspuns”.
 - Nu promitem termene mai scurte decât cele de pe pagina serviciului.

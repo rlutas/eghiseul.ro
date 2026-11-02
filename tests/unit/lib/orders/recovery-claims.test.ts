@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   buildClaimIndex,
   findClaim,
+  hidesFromAbandoned,
   isRecoveryQueueCandidate,
   pickVisibleIds,
 } from '@/lib/orders/recovery-claims';
@@ -41,6 +42,35 @@ describe('buildClaimIndex / findClaim', () => {
   it('null for clients outside recovery', () => {
     expect(findClaim(index, 'nimeni@x.ro', '0700000000')).toBeNull();
     expect(findClaim(index, null, null)).toBeNull();
+  });
+});
+
+describe('hidesFromAbandoned (owner decision 02.11.2026)', () => {
+  it('hides clients waiting in „De sunat" and clients with „Nu a răspuns"', () => {
+    expect(hidesFromAbandoned('queue')).toBe(true);
+    expect(hidesFromAbandoned('no_answer')).toBe(true);
+  });
+
+  it('keeps a client already called visible (marked „Sunat")', () => {
+    expect(hidesFromAbandoned('called')).toBe(false);
+  });
+
+  it('keeps clients outside recovery visible', () => {
+    expect(hidesFromAbandoned(null)).toBe(false);
+    expect(hidesFromAbandoned(undefined)).toBe(false);
+  });
+
+  it('a queue client called on any order (email or phone) is no longer hidden', () => {
+    const index = buildClaimIndex([
+      { email: 'ana@x.ro', phone: '0712345678', reason: 'queue' },
+      { email: null, phone: '+40712345678', reason: 'called' },
+      { email: 'dan@x.ro', phone: null, reason: 'no_answer' },
+      { email: 'dan@x.ro', phone: null, reason: 'queue' },
+    ]);
+    expect(hidesFromAbandoned(findClaim(index, 'ana@x.ro', null))).toBe(true);
+    expect(hidesFromAbandoned(findClaim(index, 'ana@x.ro', '0712345678'))).toBe(false);
+    expect(findClaim(index, 'dan@x.ro', null)).toBe('no_answer');
+    expect(hidesFromAbandoned(findClaim(index, 'dan@x.ro', null))).toBe(true);
   });
 });
 
