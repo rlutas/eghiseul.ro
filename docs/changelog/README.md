@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-02 | ✅ **Contractele de asistență au seria SM** — `CONTRACT_SERIA` în 3 șabloane, Registru afișează SM pe contracte, intervale cu 0 în față | [2026-11-02-contracte-seria-sm.md](2026-11-02-contracte-seria-sm.md) |
 | 2026-11-02 | 🔴 **Linkul de continuare nu se mai anulează la regenerare** — resume-link refolosește tokenul valabil și folosește domeniul brandului comenzii | [2026-11-02-link-continuare-acelasi-link.md](2026-11-02-link-continuare-acelasi-link.md) |
 | 2026-11-02 | ✅ **Sameday: livrare 1–2 zile (era 1), ca Fan; integritate pe CJO 198 lei / urgent 278 (era 250 / 330)** — `delivery-calculator` pe ambele, `sameday.ts` `estimatedDays: 2`, CJO `integritate.config.ts` + pagină | [2026-11-02-sameday-2-zile-integritate-cjo.md](2026-11-02-sameday-2-zile-integritate-cjo.md) |
 | 2026-11-02 | ✅ **Emailul după apelul de recuperare nu mai scrie numele colegei: „discuția de azi cu reprezentantul eGhișeul.ro”** — `phone-followup.ts` fără `agentName` în text | [2026-11-02-email-recuperare-fara-nume.md](2026-11-02-email-recuperare-fara-nume.md) |

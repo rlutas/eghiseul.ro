@@ -191,6 +191,10 @@ function NumberRegistryContent() {
     series: 'SM',
     notes: '',
   });
+  // Text brut pentru capetele intervalului: un <input type="number"> mânca
+  // zeroul din față (021651 → 21651), iar echipa copiază numerele de pe hârtie.
+  const [rangeStartText, setRangeStartText] = useState('');
+  const [rangeEndText, setRangeEndText] = useState('');
   const [manualEntry, setManualEntry] = useState({
     type: 'contract_delegatie' as string,
     client_name: '',
@@ -269,6 +273,12 @@ function NumberRegistryContent() {
   // Numerele se afișează EXACT ca pe documente: padded la 6 cifre (005771).
   const fmtNr = (n: number | null | undefined) =>
     n === null || n === undefined ? '-' : String(n).padStart(6, '0');
+  // Contractele Baroului poartă seria SM ca delegațiile (cerere echipă,
+  // 02.11.2026). Intervalele de contracte n-au serie în registru, deci SM implicit.
+  const fmtContract = (n: number | null | undefined, series?: string | null) =>
+    n === null || n === undefined ? '-' : `${series || 'SM'}${fmtNr(n)}`;
+  const fmtDelegation = (n: number | null | undefined, series?: string | null) =>
+    n === null || n === undefined ? '-' : `${series || 'SM'}${fmtNr(n)}`;
 
   // ── Group entries by order for display ─────────────────────
 
@@ -435,6 +445,8 @@ function NumberRegistryContent() {
         toast.success('Interval adaugat cu succes');
         setAddRangeOpen(false);
         setNewRange({ type: 'contract', year: new Date().getFullYear(), range_start: 0, range_end: 0, series: 'SM', notes: '' });
+        setRangeStartText('');
+        setRangeEndText('');
         fetchRanges();
       } else {
         toast.error(json.error || 'Eroare la adaugarea intervalului');
@@ -464,9 +476,9 @@ function NumberRegistryContent() {
         const pad = (n: number) => String(n).padStart(6, '0');
         if (manualEntry.type === 'contract_delegatie' && json.delegation?.[0]) {
           const d = json.delegation[0];
-          toast.success(`Alocate: Contract ${pad(nr.allocated_number)} + Delegatie ${d.allocated_series || 'SM'}${pad(d.allocated_number)}`);
+          toast.success(`Alocate: Contract ${nr.allocated_series || 'SM'}${pad(nr.allocated_number)} + Delegatie ${d.allocated_series || 'SM'}${pad(d.allocated_number)}`);
         } else {
-          toast.success(`Numar alocat: ${manualEntry.type === 'contract' ? 'Contract' : 'Delegatie'} ${nr.allocated_series || ''}${pad(nr.allocated_number)}`);
+          toast.success(`Numar alocat: ${manualEntry.type === 'contract' ? 'Contract' : 'Delegatie'} ${nr.allocated_series || 'SM'}${pad(nr.allocated_number)}`);
         }
         setAddManualOpen(false);
         setManualEntry({ type: 'contract_delegatie', client_name: '', client_email: '', client_cnp: '', client_cui: '', service_type: '', description: '', amount: '', date: new Date().toISOString().split('T')[0], platform: '', order_ref: '', linked_contract_number: '' });
@@ -739,7 +751,7 @@ function NumberRegistryContent() {
                     <div className="flex items-center gap-2">
                       <span className="font-medium">
                         {range.type === 'contract' ? 'Contracte Asistenta' : 'Delegatii'} {range.year}
-                        {range.series ? ` (Seria ${range.series})` : ''}
+                        {` (Seria ${range.series || 'SM'})`}
                       </span>
                       <Badge variant={range.status === 'active' ? 'default' : range.status === 'exhausted' ? 'destructive' : 'secondary'}>
                         {range.status === 'active' ? 'Activ' : range.status === 'exhausted' ? 'Epuizat' : 'Arhivat'}
@@ -868,14 +880,14 @@ function NumberRegistryContent() {
                       if (group.contractEntryId) {
                         allEntries.push({
                           id: group.contractEntryId,
-                          label: `Contract ${fmtNr(group.contractNumber)}`,
+                          label: `Contract ${fmtContract(group.contractNumber)}`,
                           voided: group.voidedEntryIds.includes(group.contractEntryId),
                         });
                       }
                       for (const d of group.delegationNumbers) {
                         allEntries.push({
                           id: d.id,
-                          label: `Delegatie ${d.series || ''}${fmtNr(d.number)}`,
+                          label: `Delegatie ${fmtDelegation(d.number, d.series)}`,
                           voided: group.voidedEntryIds.includes(d.id),
                         });
                       }
@@ -908,7 +920,7 @@ function NumberRegistryContent() {
                             )}
                           </td>
                           <td className="py-2 px-2 font-mono">
-                            {fmtNr(group.contractNumber)}
+                            {group.contractNumber ? fmtContract(group.contractNumber) : '-'}
                             {group.contractDocS3Key && (
                               <button
                                 onClick={() => handleDocDownload(group.contractDocS3Key!)}
@@ -923,7 +935,7 @@ function NumberRegistryContent() {
                             {group.delegationNumbers.length > 0
                               ? group.delegationNumbers.map((d) => (
                                   <div key={d.id} className="whitespace-nowrap">
-                                    <span title={d.serviceType || undefined}>{fmtNr(d.number)}</span>
+                                    <span title={d.serviceType || undefined}>{fmtDelegation(d.number, d.series)}</span>
                                     {d.serviceType && (
                                       <span className="ml-1 font-sans text-[10px] text-muted-foreground">
                                         {d.serviceType.startsWith('apostila-haga')
@@ -1002,7 +1014,7 @@ function NumberRegistryContent() {
                       >
                         <td className="py-2 px-2 text-xs text-muted-foreground">-</td>
                         <td className="py-2 px-2 font-mono">
-                          {entry.type === 'contract' ? fmtNr(entry.number) : '-'}
+                          {entry.type === 'contract' ? fmtContract(entry.number, entry.series) : '-'}
                           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                           {entry.type === 'contract' && (entry as any).document_s3_key && (
                             <button
@@ -1016,7 +1028,7 @@ function NumberRegistryContent() {
                           )}
                         </td>
                         <td className="py-2 px-2 font-mono">
-                          {entry.type === 'delegation' ? fmtNr(entry.number) : '-'}
+                          {entry.type === 'delegation' ? fmtDelegation(entry.number, entry.series) : '-'}
                           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                           {entry.type === 'delegation' && (entry as any).document_s3_key && (
                             <button
@@ -1044,7 +1056,7 @@ function NumberRegistryContent() {
                         <td className="py-2 px-2">
                           <EntryActions
                             entryId={entry.id}
-                            label={`${entry.type === 'contract' ? 'Contract' : 'Delegatie'} ${entry.series || ''}${fmtNr(entry.number)}`}
+                            label={`${entry.type === 'contract' ? 'Contract' : 'Delegatie'} ${entry.series || 'SM'}${fmtNr(entry.number)}`}
                             voided={!!entry.voided_at}
                             showLabel={false}
                             onEdit={openEditDialog}
@@ -1111,16 +1123,16 @@ function NumberRegistryContent() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Numar start</Label>
-                <Input type="number" value={newRange.range_start || ''} onChange={e => setNewRange({...newRange, range_start: parseInt(e.target.value) || 0})} />
+                <Input inputMode="numeric" placeholder="ex: 021651" value={rangeStartText} onChange={e => { const v = e.target.value.replace(/\D/g, ''); setRangeStartText(v); setNewRange({...newRange, range_start: parseInt(v, 10) || 0}); }} />
               </div>
               <div>
                 <Label>Numar sfarsit</Label>
-                <Input type="number" value={newRange.range_end || ''} onChange={e => setNewRange({...newRange, range_end: parseInt(e.target.value) || 0})} />
+                <Input inputMode="numeric" placeholder="ex: 023150" value={rangeEndText} onChange={e => { const v = e.target.value.replace(/\D/g, ''); setRangeEndText(v); setNewRange({...newRange, range_end: parseInt(v, 10) || 0}); }} />
               </div>
             </div>
             {newRange.range_start > 0 && newRange.range_end >= newRange.range_start && (
               <p className="text-sm text-muted-foreground">
-                Interval: {newRange.range_start} - {newRange.range_end} ({newRange.range_end - newRange.range_start + 1} numere)
+                Interval: {newRange.series || 'SM'}{fmtNr(newRange.range_start)} - {newRange.series || 'SM'}{fmtNr(newRange.range_end)} ({newRange.range_end - newRange.range_start + 1} numere)
               </p>
             )}
             {newRange.type === 'delegation' && (

@@ -1214,6 +1214,9 @@ export function buildPlaceholderData(ctx: DocumentContext) {
 
     // Document numbers
     NRCONTRACT: contractNum ? String(contractNum).padStart(6, '0') : '',
+    // Barou contracts carry the series like delegations (SM021651). Team
+    // request from Ghid, 02.11.2026: the number printed without „SM".
+    CONTRACT_SERIA: contractNum ? (ctx.document_numbers?.contract_series || 'SM') : '',
     IMPUTERNICIRE_NR: impNum ? String(impNum).padStart(6, '0') : '',
     IMPUTERNICIRE_SERIA: ctx.document_numbers?.imputernicire_series || ctx.lawyer?.imputernicire_series || 'SM',
 
