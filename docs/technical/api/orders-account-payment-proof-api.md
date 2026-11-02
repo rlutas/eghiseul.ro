@@ -101,10 +101,13 @@ vizibil clientului; notele interne rămân în `order_history`.
 
 | Rută | Metodă | Acces | Ce face |
 |---|---|---|---|
-| `/api/admin/orders/[id]/messages` | GET / POST | `orders.view` / `orders.manage` | firul complet + URL-uri semnate pe atașamente; GET marchează răspunsurile clientului citite (`read_by_staff_at`); POST `{ body }` → email „ai un mesaj nou” către client |
+| `/api/admin/orders/[id]/messages` | GET / POST | `orders.view` / `orders.manage` | firul complet + URL-uri semnate pe atașamente; GET marchează răspunsurile clientului citite (`read_by_staff_at`); POST `{ body, attachments? }` (≤ 5 fișiere din `mesaje-echipa/`, verificate cu HEAD; textul poate lipsi dacă există fișiere) → email „ai un mesaj nou” cu numărul de atașamente |
 | `/api/collaborator/orders/[id]/messages` | GET / POST | colaboratorul comenzii (`requireCollaboratorForOrder`); preview admin = read-only, nu marchează citit | la fel, `author_type='collaborator'` |
 | `/api/orders/[id]/messages` | GET / POST | proprietarul (sesiune) sau `token` (order-client) | vederea clientului: autor mascat („Echipa …” / „Topograful care lucrează comanda”), fără nume de angajați; POST `{ body, attachments[], token }`, max 30/zi/comandă; email către brand `contactEmail` + colaboratorii comenzii (`assigned_collaborator_id` + `collaborator_service_assignments`), `replyTo` = clientul |
 | `/api/orders/[id]/client-files` | POST | draft: `canUpdateDraft` + email existent pe draft; după: sesiune proprietar sau `token` | presigned PUT S3 sub `orders/<id>/acte-client/` (JPG/PNG/WebP/PDF ≤ 10 MB), contor `count_proof_presign` (20/oră) |
+| `/api/admin/orders/[id]/messages/files` | POST | `orders.manage` | (02.11) presigned PUT S3 sub `orders/<id>/mesaje-echipa/` pentru atașamentele echipei (PDF/JPG/PNG/WebP ≤ 10 MB); body `{ contentType, fileSize, filename? }` |
+| `/api/collaborator/orders/[id]/messages/files` | POST | colaboratorul comenzii; preview = 403 | (02.11) idem, pentru topograf |
+| `/api/orders/[id]/messages/file` | GET | ca `/api/orders/[id]/messages` (`authorizeOrderClient`) | (02.11) `?m=<messageId>&i=<index>[&token=]` → 302 spre URL S3 semnat 5 min; cheia citită din mesajul comenzii, reverificată (`isOrderMessageFileKey`) |
 
 - **Token client** (`src/lib/orders/order-client-token.ts`): HMAC
   `order-client:<orderId>:<exp>`, TTL 24 h, audiență separată de

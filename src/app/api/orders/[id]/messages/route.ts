@@ -7,13 +7,14 @@
  * public status API issues after checking order code + email. Staff names are
  * not exposed: the client sees „Echipa …” / „Topograful care lucrează comanda”.
  *
- * Query/body: `token` for guests.
+ * Query/body: `token` for guests. Attachments (from either side) download
+ * through GET `/api/orders/[id]/messages/file?m=<messageId>&i=<index>`, which
+ * runs the same access check — no S3 key ever reaches the browser.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { verifyOrderClientToken } from '@/lib/orders/order-client-token';
+import { authorizeOrderClient } from '@/lib/orders/message-access';
 import {
   clientFacingAuthor,
   listOrderMessages,
@@ -30,36 +31,9 @@ interface RouteParams {
 /** Client replies per order per 24h — a thread, not a chat room. */
 const MAX_CLIENT_MESSAGES_PER_DAY = 30;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function authorize(orderId: string, token: unknown): Promise<{ order: any } | { error: NextResponse }> {
-  if (!/^[0-9a-f-]{36}$/i.test(orderId)) {
-    return { error: NextResponse.json({ success: false, error: 'Comandă invalidă' }, { status: 400 }) };
-  }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const admin = createAdminClient() as any;
-  const { data: order } = await admin
-    .from('orders')
-    .select('id, user_id, platform, customer_data')
-    .eq('id', orderId)
-    .maybeSingle();
-  if (!order) {
-    return { error: NextResponse.json({ success: false, error: 'Comanda nu există' }, { status: 404 }) };
-  }
-  if (verifyOrderClientToken(token, orderId)) return { order };
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user && order.user_id && order.user_id === user.id) return { order };
-  return {
-    error: NextResponse.json(
-      { success: false, error: 'Sesiunea a expirat. Redeschide pagina comenzii.' },
-      { status: 403 }
-    ),
-  };
-}
-
 export async function GET(request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
-  const auth = await authorize(id, request.nextUrl.searchParams.get('token'));
+  const auth = await authorizeOrderClient(id, request.nextUrl.searchParams.get('token'));
   if ('error' in auth) return auth.error;
 
   const admin = createAdminClient();
@@ -85,7 +59,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function POST(request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
   const payload = await request.json().catch(() => ({}));
-  const auth = await authorize(id, payload?.token);
+  const auth = await authorizeOrderClient(id, payload?.token);
   if ('error' in auth) return auth.error;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

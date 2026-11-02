@@ -28,6 +28,8 @@ export interface OrderMessageToClientInput {
   /** „Echipa eGhișeul" / „Topograful" — who wrote, as the client sees it. */
   authorLabel: string;
   body: string;
+  /** Files attached to the message — listed in the thread, not in the email. */
+  attachmentCount?: number;
   /** Status page, pre-filled, anchored on the thread. */
   viewUrl: string;
   brand?: Brand;
@@ -40,11 +42,17 @@ export function renderOrderMessageToClientEmail(input: OrderMessageToClientInput
 } {
   const b = input.brand ?? BRANDS.eghiseul;
   const subject = `Comanda ${input.friendlyOrderId}: ai un mesaj nou`;
+  const files = input.attachmentCount ?? 0;
+  const filesLine =
+    files > 0
+      ? `Mesajul are ${files === 1 ? 'un fișier atașat' : `${files} fișiere atașate`} (poză sau PDF). ${files === 1 ? 'Îl găsești' : 'Le găsești'} în pagina comenzii, la mesaje.`
+      : '';
   const content = `        <h1 style="margin:0 0 6px;font-size:20px;color:#0f172a;">Ai un mesaj nou despre comanda ta</h1>
         <p style="margin:0 0 18px;color:#475569;font-size:14px;line-height:1.6;">${escHtml(input.authorLabel)} ți-a scris despre comanda ${escHtml(input.friendlyOrderId)} (${escHtml(input.serviceName)}):</p>
         ${quoteHtml(input.body)}
+        ${filesLine ? `<p style="margin:0 0 18px;color:#0f172a;font-size:14px;line-height:1.6;font-weight:600;">&#128206; ${escHtml(filesLine)}</p>` : ''}
         <p style="margin:0 0 18px;color:#475569;font-size:14px;line-height:1.6;">Poți răspunde direct din pagina comenzii. Dacă ți se cere un act, îl poți atașa acolo ca poză sau PDF.</p>
-        ${ctaButton('Vezi mesajul și răspunde', input.viewUrl, b)}`;
+        ${ctaButton(files > 0 ? 'Vezi mesajul și fișierele' : 'Vezi mesajul și răspunde', input.viewUrl, b)}`;
   const html = brandedEmailHtml({
     brand: input.brand,
     preheader: input.body.slice(0, 140),
@@ -54,6 +62,7 @@ export function renderOrderMessageToClientEmail(input: OrderMessageToClientInput
     `${input.authorLabel} ți-a scris despre comanda ${input.friendlyOrderId} (${input.serviceName}):`,
     '',
     input.body,
+    ...(filesLine ? ['', filesLine] : []),
     '',
     `Răspunde din pagina comenzii: ${input.viewUrl}`,
     '',

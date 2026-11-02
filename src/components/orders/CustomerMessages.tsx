@@ -4,7 +4,9 @@
  * Client side of the order message thread (status page / account order page).
  * The team or the topograph asks something → the client reads it here (and in
  * the email that pointed here), answers, and can attach a photo or PDF of an
- * act. Auth: the order-client token from the status API, or the session.
+ * act. Files in the thread (theirs or the team's) open through
+ * `/api/orders/[id]/messages/file`, which re-checks the same access.
+ * Auth: the order-client token from the status API, or the session.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -154,8 +156,19 @@ export function CustomerMessages({ orderId, token }: Props) {
                   <ul className="mt-1.5 space-y-0.5">
                     {m.attachments.map((a, i) => (
                       <li key={i} className="flex items-center gap-1.5 text-xs text-neutral-600">
-                        <Paperclip className="h-3 w-3" />
-                        {a.name}
+                        {a.mimeType === 'application/pdf' ? (
+                          <FileText className="h-3.5 w-3.5 flex-shrink-0" />
+                        ) : (
+                          <ImageIcon className="h-3.5 w-3.5 flex-shrink-0" />
+                        )}
+                        <a
+                          href={`/api/orders/${orderId}/messages/file?m=${m.id}&i=${i}${token ? `&token=${encodeURIComponent(token)}` : ''}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="min-w-0 truncate font-medium text-primary-700 underline-offset-2 hover:underline"
+                        >
+                          {a.name}
+                        </a>
                       </li>
                     ))}
                   </ul>

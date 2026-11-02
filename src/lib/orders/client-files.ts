@@ -46,12 +46,17 @@ export function isClientFileKey(orderId: string, key: unknown): key is string {
  * the list comes from the browser (draft save, submit, message post).
  */
 export function sanitizeClientFiles(orderId: string, list: unknown): ClientFile[] {
+  return sanitizeFileList(list, (key) => isClientFileKey(orderId, key));
+}
+
+/** Shared by client files and staff message files: same shape, different namespace check. */
+export function sanitizeFileList(list: unknown, acceptKey: (key: unknown) => key is string): ClientFile[] {
   if (!Array.isArray(list)) return [];
   const out: ClientFile[] = [];
   for (const raw of list) {
     if (!raw || typeof raw !== 'object') continue;
     const f = raw as Record<string, unknown>;
-    if (!isClientFileKey(orderId, f.key)) continue;
+    if (!acceptKey(f.key)) continue;
     const mimeType = typeof f.mimeType === 'string' ? f.mimeType : '';
     if (!(CLIENT_FILE_TYPES as readonly string[]).includes(mimeType)) continue;
     out.push({

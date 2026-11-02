@@ -75,6 +75,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     authorId: auth.collaboratorId,
     authorName,
     body: typeof payload?.body === 'string' ? payload.body : '',
+    attachments: payload?.attachments,
   });
   if (!result.ok) {
     return NextResponse.json({ success: false, error: result.error }, { status: result.status });

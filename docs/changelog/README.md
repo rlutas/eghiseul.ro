@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-02 | 🟣 **Mesaj către client: echipa și topograful pot atașa poze sau PDF-uri (max. 5 × 10 MB)** — presign `POST /api/admin/orders/[id]/messages/files` + `/api/collaborator/…/messages/files` (S3 `orders/<id>/mesaje-echipa/`), verificare HEAD la trimitere, descărcare client prin `GET /api/orders/[id]/messages/file` (același acces ca firul), emailul spune câte fișiere | [2026-11-02-mesaj-client-atasamente.md](2026-11-02-mesaj-client-atasamente.md) |
 | 2026-11-02 | 🔴 **Transfer bancar: termenul pornește la „Dovadă verificată”** — `startWorkOnVerifiedProof` recalculează `estimated_completion_date`; `fulfil-paid` ancorează pe `proof_verified_at` | [2026-11-02-termen-transfer-de-la-dovada.md](2026-11-02-termen-transfer-de-la-dovada.md) |
 | 2026-11-02 | 🔴 **Modifică comanda: Apostilă Notari lângă Haga nu mai blochează plata extra** — țara comună moștenită în dialog și pe server (`sharedApostilleCountry`) | [2026-11-02-modifica-comanda-apostila-tara.md](2026-11-02-modifica-comanda-apostila-tara.md) |
 | 2026-11-02 | ✅ **Contractele de asistență au seria SM** — `CONTRACT_SERIA` în 3 șabloane, Registru afișează SM pe contracte, intervale cu 0 în față | [2026-11-02-contracte-seria-sm.md](2026-11-02-contracte-seria-sm.md) |
