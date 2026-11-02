@@ -11,6 +11,7 @@ Index al documentației SEO. Status curent al expansiunii: [`SEO-STATUS-2026-06-
 | [`stare-civila/`](stare-civila/) | 8 ghiduri (celibat/naștere/căsătorie) |
 | [`rovinieta/`](rovinieta/) | tool verificare + pagină cumpărare (afiliere) |
 | [`keywords/`](keywords/) | keyword research per serviciu |
+| [`monitorizare/`](monitorizare/README.md) | raport lunar GSC pe 4 site-uri (`scripts/seo/monitor-lunar.py`): interogări urmărite, pagini-cheie, top 10 schimbări, praguri de acțiune, concurenți de completat manual |
 | [`gsc-data/`](gsc-data/) | exporturi Google Search Console (interogări, pagini) |
 
 ## Planuri & referințe (vii)
