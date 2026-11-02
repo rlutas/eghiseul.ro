@@ -1,7 +1,7 @@
 /**
  * JSON-LD for documentero.ro. Same company (ORGANIZATION), other brand:
  * `Organization` node named documentero.ro with `parentOrganization` eghiseul.ro,
- * a `WebSite` node, and Service/Product/Article graphs anchored on the
+ * a `WebSite` node, and Service/Article graphs anchored on the
  * documentero base URL. No aggregateRating, no invented authors
  * (.claude/rules/content-and-seo.md §3).
  */
@@ -90,25 +90,15 @@ export function documenteroServiceGraph(input: DocumenteroServiceInput) {
         url,
         provider: { '@id': `${BASE}/#organization` },
         areaServed: { '@type': 'Country', name: 'România' },
-      },
-      {
-        '@type': 'Product',
-        '@id': `${url}#product`,
-        name: input.name,
-        description: input.description,
-        image: `${BASE}${brand.ogDefault}`,
-        url,
-        brand: { '@type': 'Brand', name: brand.name },
+        // Service + Offer only (02.11.2026): the Product node carried a false
+        // free-shipping detail and pulled the page into Merchant listings.
         offers: {
           '@type': 'AggregateOffer',
           lowPrice: Math.min(...prices),
           highPrice: Math.max(...prices),
           priceCurrency: 'RON',
           offerCount: input.offers.length,
-          availability: 'https://schema.org/InStock',
           url,
-          hasMerchantReturnPolicy: { '@type': 'MerchantReturnPolicy', applicableCountry: 'RO', returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted' },
-          shippingDetails: { '@type': 'OfferShippingDetails', shippingRate: { '@type': 'MonetaryAmount', value: 0, currency: 'RON' }, shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'RO' } },
         },
       },
       {

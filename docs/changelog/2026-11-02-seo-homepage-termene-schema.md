@@ -33,3 +33,5 @@ Valori la livrare (DB): cazier judiciar/auto/integritate 3-5 zile lucrătoare (u
 Teste: `tests/unit/lib/services/public-facts.test.ts` (nou: termen din `processing_config`, fără „24-48”/„instant”/„oficial” în FAQ, termen omis când lipsește DB-ul), `tests/unit/lib/seo/schema.test.ts` (graf de 4 noduri, fără `shippingRate`).
 
 De urmărit (indicatori din audit): `query,page` pe „cazier judiciar online” după 4 săptămâni (azi `/` 474 impresii vs serviciu 20); Rich Results fără Merchant listings.
+
+- **documentero** (urmare): `documenteroServiceGraph` (`src/lib/seo/documentero-schema.ts`) nu mai emite `Product` cu `shippingRate 0`; prețul stă ca `AggregateOffer` pe nodul `Service`.
