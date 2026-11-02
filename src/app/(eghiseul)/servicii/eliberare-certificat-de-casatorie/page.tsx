@@ -265,8 +265,8 @@ export default async function CertificatCasatoriePage() {
         </section>
 
         <PrivateServiceNotice
-          institutionLabel="la orice serviciu de stare civilă din țară sau pe hub.mai.gov.ro"
-          institutionUrl="https://hub.mai.gov.ro"
+          institutionLabel="la orice serviciu de stare civilă din țară"
+          institutionUrl="https://depabd.mai.gov.ro/"
         />
 
         {/* Trust strip */}

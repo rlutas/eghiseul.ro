@@ -11,7 +11,7 @@ export function PrivateServiceNotice({
   institutionLabel,
   institutionUrl,
 }: {
-  /** Cum numim canalul direct, ex. „la Starea Civilă sau pe hub.mai.gov.ro". */
+  /** Cum numim canalul direct, ex. „la orice serviciu de stare civilă din țară". */
   institutionLabel: string;
   institutionUrl: string;
 }) {

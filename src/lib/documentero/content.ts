@@ -44,8 +44,7 @@ export const LAWYER = {
 
 /**
  * Legal basis, spelled the same way on every page (and in the FAQ answer
- * about the lawyer). Hub MAI cites the same three when it says a request may
- * be filed by "avocați împuterniciți".
+ * about the lawyer).
  */
 export const LEGAL_BASIS = {
   short: 'Legea 119/1996, Legea 51/1995 și H.G. 255/2024',

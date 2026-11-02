@@ -233,7 +233,7 @@ export default async function CazierFiscalOnlinePage() {
                       </div>
                       <div>
                         <p className="font-semibold text-secondary-900 text-sm">Livrare</p>
-                        <p className="text-xs text-neutral-500">Scan pe email, originalul prin curier</p>
+                        <p className="text-xs text-neutral-500">Scan pe email; originalul prin curier, la cerere</p>
                       </div>
                     </div>
 
@@ -285,7 +285,7 @@ export default async function CazierFiscalOnlinePage() {
               {[
                 { icon: Landmark, value: 'ANAF', label: 'Eliberează certificatul' },
                 { icon: Clock, value: formatEstimatedDays(service), label: 'Livrare estimată' },
-                { icon: Mail, value: 'Scan + original', label: 'Email și curier' },
+                { icon: Mail, value: 'Scan pe email', label: 'Originalul, la cerere' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
               ].map((t) => (
                 <div key={t.label} className="flex flex-col items-center gap-1.5">

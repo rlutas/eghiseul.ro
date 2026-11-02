@@ -23,7 +23,7 @@ export const PAGE_LAST_MODIFIED: Record<string, string> = {
   'acte-necesare-casatorie': '2026-09-09',
   'acte-necesare-certificat-de-nastere': '2026-09-09',
   'amenda-rovinieta-2025-tarife-plata-online-ghid-complet': '2026-10-13',
-  'cazier-fiscal-fara-spv': '2026-09-09',
+  'cazier-fiscal-fara-spv': '2026-11-02',
   'ancpi-nu-functioneaza': '2026-08-21',
   'anii-lucrati-in-strainatate-se-pun-la-pensie-in-romania': '2026-08-28',
   'cat-costa-cadastrul-si-intabularea': '2026-09-09',
@@ -78,7 +78,7 @@ export const PATH_LAST_MODIFIED: Record<string, string> = {
   '/gdpr/': '2026-06-27',
   '/politica-cookies/': '2026-09-09',
   '/politica-de-anulare/': '2026-07-15',
-  '/servicii/cazier-judiciar-online/': '2026-10-06',
+  '/servicii/cazier-judiciar-online/': '2026-11-02', // originalul prin curier, la cerere
   '/servicii/cazier-fiscal-online/': '2026-11-02', // fără „taxe ANAF”, SPV fără semnătură
   '/servicii/cazier-auto-online/': '2026-09-29',
   '/servicii/rovinieta-online/': '2026-09-09',

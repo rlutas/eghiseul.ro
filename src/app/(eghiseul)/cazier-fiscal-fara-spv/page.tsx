@@ -12,7 +12,7 @@ const DESCRIPTION =
   'reactivare), PF vs firmă, de ce nu poți verifica cazierul altcuiva, formularele 502 și 504 și cele trei ' +
   'căi: SPV, orice ghișeu ANAF sau împuternicit.';
 const DATE_PUBLISHED = '2026-08-07';
-const DATE_MODIFIED = '2026-09-09';
+const DATE_MODIFIED = '2026-11-02';
 
 export const revalidate = 86400;
 
@@ -33,13 +33,13 @@ export default function Page() {
       datePublished={DATE_PUBLISHED}
       dateModified={DATE_MODIFIED}
       publishedLabel="august 2026"
-      updatedLabel="9 septembrie 2026"
+      updatedLabel="2 noiembrie 2026"
       imageAlt="Bărbat la masa din bucătărie, seara, comparând buletinul cu ecranul telefonului în fața laptopului, blocat la activarea contului SPV"
       relatedServices={[
         {
           href: '/servicii/cazier-fiscal-online/',
           label: 'Cazier Fiscal Online',
-          desc: 'Îl obținem noi de la ANAF, cu împuternicire, fără cont SPV. 198 RON, 1–3 zile lucrătoare.',
+          desc: 'Îl obținem noi de la ANAF, cu împuternicire avocațială semnată la distanță, fără cont SPV. 198 RON, 1–3 zile lucrătoare.',
         },
         {
           href: '/servicii/certificat-constatator-online/',
@@ -432,8 +432,8 @@ export default function Page() {
         reprezentant legal dar are mandat de la acesta, și pentru cine nu vrea să se ocupe de drum
         și de coadă. Asta facem noi: prin serviciul de{' '}
         <Link href="/servicii/cazier-fiscal-online/">cazier fiscal online</Link> depunem cererea
-        cu împuternicire, avocatul ridică certificatul pe hârtie, iar tu primești scanul pe email și
-        originalul prin curier, în 1–3 zile lucrătoare, pentru 198 RON cu TVA. Plătești munca, nu documentul; certificatul în sine nu costă nimic la nicio cale.
+        cu împuternicire avocațială semnată la distanță, avocatul ridică certificatul pe hârtie, iar tu
+        primești scanul pe email și, dacă îl ceri, originalul prin curier, în 1–3 zile lucrătoare, pentru 198 RON cu TVA. Plătești munca, nu documentul; certificatul în sine nu costă nimic la nicio cale.
         Dacă ești în țară, ai act valabil și un ghișeu în apropiere, varianta 2 e mai rapidă și
         gratuită.
       </p>

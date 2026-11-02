@@ -203,7 +203,7 @@ export default async function NasterePage() {
             <H2 className="sm:text-[36px]">Cât durează, de fapt?</H2>
             <Prose
               paras={[
-                'Legea spune „cel mult 30 de zile” de la depunere. Hub-ul MAI dă ca medie 3 zile lucrătoare. Amândouă sunt adevărate și niciuna nu spune cât așteaptă omul, fiindcă depinde de un singur lucru: dacă actul tău de naștere e deja scanat în sistemul informatic sau stă într-un registru de hârtie, într-o arhivă de primărie.',
+                'Legea spune „cel mult 30 de zile” de la depunere. Nu spune însă cât așteaptă omul, fiindcă depinde de un singur lucru: dacă actul tău de naștere e deja scanat în sistemul informatic sau stă într-un registru de hârtie, într-o arhivă de primărie.',
                 `Cifrele noastre, nu ale altora: din comenzile de duplicat plătite pe documentero.ro și eghiseul.ro de la ${PROCESSING_STATS.since}, ${stats.done} au fost finalizate până la ${PROCESSING_STATS.asOf.split('-').reverse().join('.')}. Jumătate au ajuns la client în cel mult ${stats.medianDays} zile de la plată, 8 din 10 în cel mult ${stats.p80Days} zile. Timpul include depunerea, așteptarea la primărie și curierul. Eșantionul e mic și îl actualizăm pe măsură ce crește.`,
                 'Ce nu putem controla: primăria care caută un act din 1962 într-un registru legat cu sfoară. Ce controlăm: depunerea în ziua următoare semnării și un mesaj la fiecare schimbare de stare, ca să nu suni tu să întrebi.',
               ]}

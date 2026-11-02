@@ -200,7 +200,7 @@ export default async function CertificatIntegritatePage() {
                       'Completezi formularul cu datele tale personale',
                       'Încarci actul de identitate și faci verificarea KYC',
                       'Plătești securizat, preț final',
-                      `Primești certificatul pe email în ${formatEstimatedDays(service)}`,
+                      `Primești certificatul scanat pe email în ${formatEstimatedDays(service)}`,
                     ].map((step) => (
                       <li key={step} className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary-500 flex-shrink-0" aria-hidden="true" />
@@ -252,7 +252,7 @@ export default async function CertificatIntegritatePage() {
                       </div>
                       <div>
                         <p className="font-semibold text-secondary-900 text-sm">Livrare pe Email</p>
-                        <p className="text-xs text-neutral-500">Scan pe email, originalul prin curier</p>
+                        <p className="text-xs text-neutral-500">Scan pe email; originalul prin curier, la cerere</p>
                       </div>
                     </div>
 
@@ -290,7 +290,7 @@ export default async function CertificatIntegritatePage() {
               {[
                 { icon: Landmark, value: 'IGPR', label: 'Document al Poliției' },
                 { icon: Clock, value: formatEstimatedDays(service), label: 'Livrare estimată' },
-                { icon: Mail, value: 'Scan + original', label: 'Email și curier' },
+                { icon: Mail, value: 'Scan pe email', label: 'Originalul, la cerere' },
                 { icon: CheckCircle, value: '4.9/5', label: 'Peste 450 recenzii' },
               ].map((t) => (
                 <div key={t.label} className="flex flex-col items-center gap-1.5">
@@ -421,7 +421,7 @@ export default async function CertificatIntegritatePage() {
                 { step: 1, title: 'Completezi Formularul', desc: 'Introduci datele personale, iar avocatul colaborator depune cererea la IGPR în numele tău.', icon: FileText },
                 { step: 2, title: 'Verificare Identitate', desc: 'Încarci actul de identitate și faci un selfie pentru verificarea KYC.', icon: ScanFace },
                 { step: 3, title: 'Plătești Securizat', desc: 'Card, Apple Pay, Google Pay. Prețul afișat e final.', icon: CreditCard },
-                { step: 4, title: 'Primești Certificatul', desc: `În ${formatEstimatedDays(service)} primești documentul pe email sau prin curier.`, icon: CheckCircle },
+                { step: 4, title: 'Primești Certificatul', desc: `În ${formatEstimatedDays(service)} primești documentul scanat pe email; originalul prin curier, dacă îl ceri.`, icon: CheckCircle },
               ].map((item) => (
                 <div key={item.step} className="relative text-center">
                   <div className="relative z-10 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-600 text-secondary-900 shadow-[0_8px_24px_rgba(236,185,95,0.35)]">
@@ -447,8 +447,8 @@ export default async function CertificatIntegritatePage() {
                 Cum Arată Certificatul de Integritate Comportamentală — Specimen
               </h2>
               <p className="text-neutral-600 max-w-2xl mx-auto">
-                Certificatul îl eliberează Poliția Română, conform Legii 118/2019, pe hârtie. Îl ridică avocatul;
-                primești scanul pe email și, dacă alegi livrarea, originalul prin curier.
+                Certificatul îl eliberează Poliția Română, conform Legii 118/2019, pe hârtie, iar avocatul îl ridică de la ghișeu.
+                Ți-l trimitem scanat pe email; originalul ajunge la tine prin curier doar dacă îl ceri.
               </p>
             </div>
 
@@ -479,7 +479,7 @@ export default async function CertificatIntegritatePage() {
                 </h3>
                 <p className="text-neutral-600 leading-relaxed mb-6">
                   Certificatul pe care îl primești este <strong>identic cu cel eliberat la ghișeul IGPR</strong> —
-                  doar că îl primești pe email, fără drum și fără cont pe platforma oficială.
+                  doar că îl primești scanat pe email, fără drum și fără cont pe platforma oficială.
                 </p>
                 <ul className="space-y-4">
                   {[
@@ -594,12 +594,12 @@ export default async function CertificatIntegritatePage() {
             { q: 'În cât timp primesc certificatul de integritate?', a: `${formatEstimatedDays(service)} în mod standard. Există și opțiunea Urgent, în ${formatUrgentDays(service)}.` },
             { q: 'Cât este valabil certificatul?', a: 'De regulă aproximativ 6 luni de la eliberare, însă valabilitatea efectivă depinde de cerințele instituției sau angajatorului care îl solicită. Verifică termenul cerut înainte de depunere.' },
             { q: 'De ce aveți nevoie de datele mele personale?', a: 'Datele personale și actul de identitate sunt necesare pentru a depune cererea la IGPR în numele tău și pentru verificarea de identitate (KYC), cerută de procedura oficială. Datele sunt prelucrate securizat.' },
-            { q: 'Pot obține certificatul de integritate comportamentală online, fără să merg la Poliție?', a: 'Da. Întregul proces este online: completezi formularul, faci verificarea de identitate și plătești, iar noi depunem cererea la IGPR. Primești certificatul pe email, fără deplasare și fără cont pe platforma oficială.' },
+            { q: 'Pot obține certificatul de integritate comportamentală online, fără să merg la Poliție?', a: 'Da. Întregul proces este online: completezi formularul, faci verificarea de identitate și plătești, iar noi depunem cererea la IGPR. Primești certificatul scanat pe email, fără deplasare și fără cont pe platforma oficială.' },
             // Taxă (verificat 02.11.2026): pagina IGPR pentru certificatul de integritate nu prevede nicio taxă https://politiaromana.ro/ro/utile/documente-eliberari-acte/obtinerea-certificatului-de-cazier-judiciar-de-integritate-comportamentala/obtinerea-certificatului-de-integritate-comportamentala1 ; Legea nr. 1/2017 art. VI a abrogat taxele extrajudiciare de timbru (Legea 117/1999) https://legislatie.just.ro/Public/DetaliiDocument/185507 . Nu plătim IGPR nimic pe aceste comenzi (fără taxa_institutie în supplier_tariffs).
             { q: 'Certificatul de integritate comportamentală este gratuit?', a: 'La ghișeul Poliției nu se plătește taxă: pagina IGPR nu prevede niciuna, iar taxele extrajudiciare de timbru au fost abrogate din februarie 2017. Prin eGhișeul plătești serviciul nostru (avocat, depunere, ridicare, livrare), la prețul afișat, care e final.' },
             { q: 'Pot obține certificatul în Cluj, București sau alt oraș?', a: 'Da. Pentru că serviciul este 100% online, îl poți obține din orice județ — București, Cluj, Iași, Timișoara, Constanța sau oriunde te afli — fără să te deplasezi la un sediu IGPR local.' },
             { q: '„Adeverința de integritate comportamentală” este același lucru cu certificatul?', a: 'Da. Unele instituții folosesc denumirea de adeverință, dar se referă la același document emis de IGPR conform Legii 118/2019.' },
-            { q: 'Certificatul vine pe email sau pe hârtie?', a: 'Pe hârtie: Poliția Română îl eliberează la ghișeu, iar avocatul îl ridică. Îți trimitem scanul pe email și, dacă alegi livrarea, originalul prin curier.' },
+            { q: 'Certificatul vine pe email sau pe hârtie?', a: 'Îl primești scanat pe email. Poliția Română îl eliberează pe hârtie, la ghișeu; avocatul îl ridică și ți-l scanăm. Originalul ți-l trimitem prin curier doar dacă îl ceri.' },
           ]}
         />
 

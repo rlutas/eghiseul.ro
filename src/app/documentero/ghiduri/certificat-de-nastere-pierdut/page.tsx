@@ -126,7 +126,7 @@ export default async function GhidPierdutPage() {
             <P>Nu ai nevoie de certificatul vechi, de o copie a lui, de certificatul de căsătorie sau de vreo adeverință. Dacă buletinul ți-a expirat, întâi îl reînnoiești; primăria nu primește cereri cu act de identitate expirat, și e motivul cel mai des pentru care o cerere se întoarce.</P>
 
             <H id="s5">Cât durează, de fapt</H>
-            <P>Termenul legal maxim este de 30 de zile de la depunere. Hub-ul MAI dă ca medie 3 zile lucrătoare. Ce vezi tu, ca om care așteaptă, e undeva între: dacă actul e digitalizat, duplicatul iese în câteva zile; pentru acte vechi, nescanate, primăria de origine caută în registrul de hârtie și se apropie de termenul maxim.</P>
+            <P>Termenul legal maxim este de 30 de zile de la depunere. Ce vezi tu, ca om care așteaptă, e undeva între: dacă actul e digitalizat, duplicatul iese în câteva zile; pentru acte vechi, nescanate, primăria de origine caută în registrul de hârtie și se apropie de termenul maxim.</P>
             <P>Cifrele noastre: din comenzile de duplicat plătite de la {PROCESSING_STATS.since}, {stats.done} au fost finalizate până la {fmtDateRo(PROCESSING_STATS.asOf)}. Jumătate au ajuns la client în cel mult {stats.medianDays} zile de la plată, 8 din 10 în cel mult {stats.p80Days} zile, cu curier cu tot. E un eșantion mic și îl actualizăm pe măsură ce crește; nu promitem „3 zile” ca să vindem.</P>
 
             <H id="s6">Cazuri particulare</H>

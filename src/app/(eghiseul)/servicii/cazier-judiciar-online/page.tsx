@@ -50,11 +50,11 @@ const PAGE_PATH = '/servicii/cazier-judiciar-online/';
 const TITLE = 'Cazier Judiciar Online: 198 lei, 3-5 Zile';
 const DESCRIPTION =
   'Poliția eliberează cazierul, noi îl obținem prin avocat. Persoane fizice, firme, străini. ' +
-  'Scan pe email, originalul prin curier, și în diaspora.';
+  'Scan pe email, originalul prin curier la cerere, și în diaspora.';
 
 const DATE_PUBLISHED = '2026-04-16';
-const DATE_MODIFIED = '2026-10-06';
-const DATE_MODIFIED_DISPLAY = '6 octombrie 2026';
+const DATE_MODIFIED = '2026-11-02';
+const DATE_MODIFIED_DISPLAY = '2 noiembrie 2026';
 
 export const metadata: Metadata = buildPageMetadata({
   title: TITLE,
@@ -436,7 +436,7 @@ export default function CazierJudiciarHubPage() {
             { label: 'Cine îl eliberează', value: 'Poliția Română (IPJ / DCPI)' },
             { label: 'Preț', value: '198 lei cu TVA; urgent 278 lei' },
             { label: 'Termen', value: '3-5 zile lucrătoare; urgent 1-2' },
-            { label: 'Primești', value: 'Scan pe email, originalul prin curier' },
+            { label: 'Primești', value: 'Scan pe email; originalul prin curier, la cerere' },
           ]}
         >
           Certificatul de cazier judiciar îl eliberează Poliția Română, gratuit la ghișeu sau online pe hub.mai.gov.ro.
