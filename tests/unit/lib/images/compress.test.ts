@@ -83,3 +83,26 @@ describe('compressedToFile', () => {
     expect(out.size).toBe(expectedBytes);
   });
 });
+
+describe('compressImage — decode fallback (iOS Safari ≤16, raport E-261005-MCFAQ)', () => {
+  it('createImageBitmap that rejects the options object no longer ends in DECODE_FAILED', async () => {
+    const original = (globalThis as { createImageBitmap?: unknown }).createImageBitmap;
+    const calls: unknown[] = [];
+    (globalThis as { createImageBitmap?: unknown }).createImageBitmap = async (_f: unknown, opts?: unknown) => {
+      calls.push(opts);
+      if (opts) throw new TypeError('options not supported');
+      return { width: 3000, height: 2000, close() {} };
+    };
+    try {
+      const file = new File([new Uint8Array([0xff, 0xd8, 0xff])], 'ci.jpg', { type: 'image/jpeg' });
+      // jsdom has no 2d canvas, so the run stops AFTER decoding — the point is
+      // that decoding succeeded on the second strategy.
+      const err = await compressImage(file).catch((e) => e);
+      expect(calls).toEqual([{ imageOrientation: 'from-image' }, undefined]);
+      expect(err).toBeInstanceOf(ImageCompressionError);
+      expect(err.code).not.toBe('DECODE_FAILED');
+    } finally {
+      (globalThis as { createImageBitmap?: unknown }).createImageBitmap = original;
+    }
+  });
+});

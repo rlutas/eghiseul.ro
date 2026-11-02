@@ -45,6 +45,56 @@ export class ImageCompressionError extends Error {
   }
 }
 
+interface DecodedImage {
+  source: CanvasImageSource;
+  width: number;
+  height: number;
+  close?: () => void;
+}
+
+/**
+ * Decode with fallbacks. `createImageBitmap(file, { imageOrientation })`
+ * throws on older iOS Safari (≤16) even for a normal JPEG — the wizard showed
+ * the preview (an <img> decodes it fine) next to „Imaginea nu a putut fi
+ * decodificată" (raport echipă E-261005-MCFAQ, iPhone). Order:
+ *   1. createImageBitmap with EXIF orientation (modern browsers);
+ *   2. createImageBitmap without options;
+ *   3. <img> from an object URL — browsers apply EXIF orientation to <img>.
+ */
+async function decodeImage(file: File): Promise<DecodedImage> {
+  if (typeof createImageBitmap === 'function') {
+    for (const opts of [{ imageOrientation: 'from-image' } as ImageBitmapOptions, undefined]) {
+      try {
+        const bmp = opts ? await createImageBitmap(file, opts) : await createImageBitmap(file);
+        return { source: bmp, width: bmp.width, height: bmp.height, close: () => bmp.close() };
+      } catch {
+        // next strategy
+      }
+    }
+  }
+  if (typeof document !== 'undefined') {
+    const url = URL.createObjectURL(file);
+    try {
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = url;
+      await img.decode();
+      if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+        return {
+          source: img,
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+          close: () => URL.revokeObjectURL(url),
+        };
+      }
+    } catch {
+      // fall through
+    }
+    URL.revokeObjectURL(url);
+  }
+  throw new ImageCompressionError('DECODE_FAILED', 'Imaginea nu a putut fi decodificată. Încearcă altă poză.');
+}
+
 export async function compressImage(file: File, opts: CompressOptions = {}): Promise<CompressedImage> {
   const maxEdge = opts.maxEdge ?? DEFAULT_MAX_EDGE;
   const quality = opts.quality ?? DEFAULT_QUALITY;
@@ -68,12 +118,7 @@ export async function compressImage(file: File, opts: CompressOptions = {}): Pro
     );
   }
 
-  let bitmap: ImageBitmap;
-  try {
-    bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
-  } catch {
-    throw new ImageCompressionError('DECODE_FAILED', 'Imaginea nu a putut fi decodificată. Încearcă altă poză.');
-  }
+  const bitmap = await decodeImage(file);
 
   const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
   const width = Math.max(1, Math.round(bitmap.width * scale));
@@ -87,7 +132,7 @@ export async function compressImage(file: File, opts: CompressOptions = {}): Pro
       const canvas = new OffscreenCanvas(width, height);
       const ctx = canvas.getContext('2d', { alpha: false });
       if (!ctx) throw new Error('no 2d ctx');
-      ctx.drawImage(bitmap, 0, 0, width, height);
+      ctx.drawImage(bitmap.source, 0, 0, width, height);
       blob = await canvas.convertToBlob({ type: 'image/jpeg', quality });
     } else {
       const canvas = document.createElement('canvas');
@@ -95,7 +140,7 @@ export async function compressImage(file: File, opts: CompressOptions = {}): Pro
       canvas.height = height;
       const ctx = canvas.getContext('2d', { alpha: false });
       if (!ctx) throw new Error('no 2d ctx');
-      ctx.drawImage(bitmap, 0, 0, width, height);
+      ctx.drawImage(bitmap.source, 0, 0, width, height);
       blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob(
           (b) => (b ? resolve(b) : reject(new Error('toBlob returned null'))),
@@ -108,7 +153,6 @@ export async function compressImage(file: File, opts: CompressOptions = {}): Pro
       canvas.height = 0;
     }
   } catch (e) {
-    bitmap.close();
     throw new ImageCompressionError(
       e instanceof Error && e.message.includes('no 2d ctx') ? 'CANVAS_UNAVAILABLE' : 'ENCODE_FAILED',
       'Nu am putut procesa imaginea. Încearcă din nou sau folosește alt browser.'
