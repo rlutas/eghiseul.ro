@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-02 | ✅ **Sameday: livrare 1–2 zile (era 1), ca Fan; integritate pe CJO 198 lei / urgent 278 (era 250 / 330)** — `delivery-calculator` pe ambele, `sameday.ts` `estimatedDays: 2`, CJO `integritate.config.ts` + pagină | [2026-11-02-sameday-2-zile-integritate-cjo.md](2026-11-02-sameday-2-zile-integritate-cjo.md) |
 | 2026-11-02 | ✅ **Emailul după apelul de recuperare nu mai scrie numele colegei: „discuția de azi cu reprezentantul eGhișeul.ro”** — `phone-followup.ts` fără `agentName` în text | [2026-11-02-email-recuperare-fara-nume.md](2026-11-02-email-recuperare-fara-nume.md) |
 | 2026-11-02 | 🔴 **Poza actului dădea „Imaginea nu a putut fi decodificată” pe iPhone-uri vechi (iOS ≤16)** — `decodeImage()` în `compress.ts`: `createImageBitmap` cu/fără opțiuni, apoi `<img>` | [2026-11-02-poza-act-iphone-vechi.md](2026-11-02-poza-act-iphone-vechi.md) |
 | 2026-11-02 | 🔴 **Numele din act nu mai primește prefixul MRZ lipit (IDRO cu U sărit, PEROU tăiat pe jumătate)** — `recoverNamesFromMrz` (`IDRO(?!U)`, `P[<A-Z]ROU` = 5 caractere), port `IDRO` pe CJO | [2026-11-02-nume-prefix-mrz-idro-perou.md](2026-11-02-nume-prefix-mrz-idro-perou.md) |

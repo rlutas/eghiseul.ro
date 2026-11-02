@@ -636,7 +636,9 @@ export class SamedayProvider implements CourierProvider {
     quotes.push({
       provider: 'sameday', providerName: 'Sameday', service: 'STANDARD_24H',
       serviceName: 'Standard 24H', price: round2(stdCost), priceWithVAT: round2(stdCost * 1.21),
-      vat: round2(stdCost * 0.21), currency: 'RON', estimatedDays: 1, pickupAvailable: true,
+      // 2, nu 1: în practică Sameday nu ajunge mai repede decât Fan Courier
+      // (raport echipă 07.10.2026, CJO-20261001-73026 încă pe drum).
+      vat: round2(stdCost * 0.21), currency: 'RON', estimatedDays: 2, pickupAvailable: true,
     });
 
     // EasyBox locker — estimated for the chosen locker, else for a locker in
@@ -659,7 +661,7 @@ export class SamedayProvider implements CourierProvider {
     quotes.push({
       provider: 'sameday', providerName: 'Sameday', service: 'LOCKER_NEXTDAY',
       serviceName: 'EasyBox (Locker)', price: round2(lockerCost), priceWithVAT: round2(lockerCost * 1.21),
-      vat: round2(lockerCost * 0.21), currency: 'RON', estimatedDays: 1,
+      vat: round2(lockerCost * 0.21), currency: 'RON', estimatedDays: 2,
       pickupAvailable: false, lockerAvailable: true,
     });
 
@@ -696,7 +698,7 @@ export class SamedayProvider implements CourierProvider {
         priceWithVAT: standardPrice + standardVat,
         vat: standardVat,
         currency: 'RON',
-        estimatedDays: 1,
+        estimatedDays: 2,
         pickupAvailable: true,
         breakdown: {
           basePrice,
@@ -712,7 +714,7 @@ export class SamedayProvider implements CourierProvider {
         priceWithVAT: lockerPriceTotal + lockerVat,
         vat: lockerVat,
         currency: 'RON',
-        estimatedDays: 1,
+        estimatedDays: 2,
         pickupAvailable: false,
         lockerAvailable: true,
         breakdown: {

@@ -340,7 +340,8 @@ function getCourierStep(code: string | null | undefined): DeliveryStep | null {
     case 'fan':
       return { step: 'Fan Courier', minDays: 1, maxDays: 3 }
     case 'sameday':
-      return { step: 'Sameday', minDays: 1, maxDays: 1 }
+      // 1-2, nu 1: Sameday nu ajunge mai repede decât Fan (raport echipă 07.10.2026).
+      return { step: 'Sameday', minDays: 1, maxDays: 2 }
     case 'posta':
       return { step: 'Poșta Română', minDays: 7, maxDays: 15 }
     default:

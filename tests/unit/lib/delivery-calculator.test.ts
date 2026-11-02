@@ -249,8 +249,8 @@ describe('calculateEstimatedCompletion — courier leg', () => {
     ['fan',           1, 3, 'Fan Courier'],
     ['fancourier',    1, 3, 'Fan Courier'],
     ['fan_courier',   1, 3, 'Fan Courier'],
-    ['sameday',       1, 1, 'Sameday'],
-    ['easybox',       1, 1, 'Sameday'],
+    ['sameday',       1, 2, 'Sameday'],
+    ['easybox',       1, 2, 'Sameday'],
     ['dhl',           1, 3, 'DHL Express'],
     ['posta',         7, 15, 'Poșta Română'],
     ['posta_romana',  7, 15, 'Poșta Română'],
@@ -310,7 +310,7 @@ describe('calculateEstimatedCompletion — full integration scenarios', () => {
     });
 
     expect(result.minDays).toBe(4); // 3 + 1
-    expect(result.maxDays).toBe(4);
+    expect(result.maxDays).toBe(5); // 3 + 2 (Sameday 1-2 since 02.11.2026)
     expect(result.startDate).toBe('2026-05-11');
     // Start day counts as day 1: Mon(1) Tue(2) Wed(3) Thu(4)
     expect(result.minDate).toBe('2026-05-14'); // Thu
