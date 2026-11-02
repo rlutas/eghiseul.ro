@@ -10,6 +10,7 @@ import {
   buildStareCivilaLabel,
   buildActivitatiStareCivila,
   buildPlaceholderData,
+  resolveTemplateSlug,
 } from '@/lib/documents/generator';
 
 // These helpers produce the actual TEXT that ends up in legal contracts.
@@ -660,5 +661,47 @@ describe('CLIENT_COMPANY_REG — instituții publice fără Registrul Comerțulu
   it('stays empty for PF — the tag is not on their forms', () => {
     const data = buildPlaceholderData(ctx({ is_pj: false, company_reg: '' }));
     expect(data.CLIENT_COMPANY_REG).toBe('');
+  });
+});
+
+
+describe('împuternicire de apostilă pe stare civilă — șablonul (rapoarte 14–27.10.2026)', () => {
+  const ctx = (over: Record<string, unknown> = {}) =>
+    ({
+      order: {
+        total_price: 0,
+        service_price: 0,
+        order_number: 'E-TEST',
+        service_name: 'Certificat de celibat',
+        service_slug: 'certificat-celibat',
+        created_at: '2026-10-16T10:00:00Z',
+      },
+      company: {},
+      lawyer: {},
+      client: { name: 'TEST CLIENT', email: 'test@example.com', phone: '+40740000000' },
+      ...over,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any;
+
+  it('apostila pe stare civilă folosește șablonul shared (model echipă E-260825-W5B63)', () => {
+    expect(
+      resolveTemplateSlug('certificat-casatorie', 'imputernicire', ctx({ delegation_service_type: 'apostila_haga' }))
+    ).toBe('shared');
+    expect(
+      resolveTemplateSlug(
+        'certificat-celibat',
+        'imputernicire',
+        ctx({ delegation_service_type: 'bundled:p-1:certificat-celibat:apostila_haga' })
+      )
+    ).toBe('shared');
+  });
+
+  it('împuternicirea principală de stare civilă rămâne pe șablonul UNBR al serviciului', () => {
+    expect(
+      resolveTemplateSlug('certificat-casatorie', 'imputernicire', ctx({ delegation_service_type: 'certificat-casatorie' }))
+    ).toBe('certificat-casatorie');
+    expect(resolveTemplateSlug('certificat-celibat', 'cerere-eliberare-pf', ctx({ delegation_service_type: 'apostila_haga' }))).toBe(
+      'certificat-celibat'
+    );
   });
 });

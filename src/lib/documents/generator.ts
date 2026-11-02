@@ -284,6 +284,31 @@ function resolveTemplateName(
   return templateName;
 }
 
+/**
+ * Template folder for this document.
+ *
+ * The apostille delegation on a civil-status service is NOT the UNBR Anexa II
+ * model of the base document (filiation, „Stare Status Civil", „în faţa
+ * OFICIUL…"): the lawyer goes to the Prefecture, so it is the same delegation
+ * as on the caziere — shared/imputernicire.docx, header UNBR / Baroul Satu
+ * Mare, „să se prezinte la … în vederea aplicării Apostilei de la Haga pe …".
+ * Model corrected by the team on E-260825-W5B63 (raport 14.10.2026).
+ */
+export function resolveTemplateSlug(
+  serviceSlug: string,
+  templateName: string,
+  ctx: DocumentContext
+): string {
+  if (
+    templateName === 'imputernicire' &&
+    CIVIL_STATUS_DOCUMENT_MAP[serviceSlug] &&
+    extractDelegationCode(ctx.delegation_service_type) === 'apostila_haga'
+  ) {
+    return 'shared';
+  }
+  return serviceSlug;
+}
+
 // ──────────────────────────────────────────────────────────────
 // Placeholder Building
 // ──────────────────────────────────────────────────────────────
@@ -1467,7 +1492,7 @@ export function generateDocument(
   options?: GenerateDocumentOptions
 ): Buffer {
   const templateBuffer = loadTemplate(
-    serviceSlug,
+    resolveTemplateSlug(serviceSlug, templateName, context),
     resolveTemplateName(serviceSlug, templateName, context)
   );
   const zip = new PizZip(templateBuffer);
