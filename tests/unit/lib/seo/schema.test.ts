@@ -5,7 +5,6 @@ import {
   breadcrumbNode,
   organizationNode,
   serviceNode,
-  productNode,
   articleNode,
 } from '@/lib/seo/schema';
 import { BASE_URL } from '@/lib/seo/constants';
@@ -78,55 +77,8 @@ describe('serviceNode', () => {
   });
 });
 
-describe('productNode', () => {
-  it('returns null without offers (nothing to price)', () => {
-    expect(
-      productNode({
-        slug: 'x',
-        name: 'X',
-        description: 'x',
-        breadcrumb: [],
-        offers: [],
-      })
-    ).toBeNull();
-  });
-
-  it('carries the AggregateOffer price range, NEVER a rating', () => {
-    const node = productNode({
-      slug: 'cazier-judiciar-online',
-      name: 'Cazier Judiciar Online',
-      description: 'd',
-      breadcrumb: [],
-      offers: [
-        { name: 'Standard', price: 198 },
-        { name: 'Urgent', price: 278 },
-      ],
-    });
-    expect(node?.['@type']).toBe('Product');
-    expect(node?.['@id']).toBe(`${BASE_URL}/servicii/cazier-judiciar-online/#product`);
-    // Merchant-listing requirements (GSC 2026-07-15): Brand type + return
-    // policy + shipping details on the offer.
-    expect(node?.brand).toEqual({ '@type': 'Brand', name: 'eGhișeul.ro' });
-    expect(node?.offers).toMatchObject({
-      '@type': 'AggregateOffer',
-      lowPrice: 198,
-      highPrice: 278,
-      priceCurrency: 'RON',
-      offerCount: 2,
-      hasMerchantReturnPolicy: {
-        '@type': 'MerchantReturnPolicy',
-        returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
-      },
-      shippingDetails: { '@type': 'OfferShippingDetails' },
-    });
-    // Recenziile sunt despre FIRMĂ, nu despre serviciul ăsta — marcajul de
-    // rating a fost scos de peste tot pe 09.09.2026 (vezi nota din schema.ts).
-    expect((node as Record<string, unknown>).aggregateRating).toBeUndefined();
-  });
-});
-
 describe('buildServicePageGraph', () => {
-  it('wraps a 5-node @graph (Org + Website + Breadcrumb + Service + Product)', () => {
+  it('wraps a 4-node @graph (Org + Website + Breadcrumb + Service), no Product', () => {
     const graph = buildServicePageGraph({
       slug: 'cazier-judiciar-online',
       name: 'Cazier Judiciar',
@@ -139,10 +91,15 @@ describe('buildServicePageGraph', () => {
     });
 
     expect(graph['@context']).toBe('https://schema.org');
-    // Product-ul e emis mereu acum (poartă prețul), nu doar când exista rating.
-    expect(graph['@graph']).toHaveLength(5);
+    // Product scos 02.11.2026: purta un shippingRate 0 fals; prețul stă pe Service › Offer.
+    expect(graph['@graph']).toHaveLength(4);
     const types = graph['@graph'].map((n) => n['@type']);
-    expect(types).toEqual(['Organization', 'WebSite', 'BreadcrumbList', 'Service', 'Product']);
+    expect(types).toEqual(['Organization', 'WebSite', 'BreadcrumbList', 'Service']);
+    const json = JSON.stringify(graph);
+    expect(json).not.toContain('shippingRate');
+    expect(json).not.toContain('aggregateRating');
+    const service = graph['@graph'][3] as { offers: { price: number; priceCurrency: string }[] };
+    expect(service.offers[0]).toMatchObject({ price: 198, priceCurrency: 'RON' });
   });
 });
 
@@ -280,8 +237,8 @@ describe('buildServicePageGraph — editorial metadata (E-E-A-T / GEO)', () => {
     const types = graph['@graph'].map((n) => n['@type']);
     expect(types).not.toContain('WebPage');
     expect(types).not.toContain('Person');
-    // Graph stays at 5 nodes (Org + Website + Breadcrumb + Service + Product)
-    expect(graph['@graph']).toHaveLength(5);
+    // Graph stays at 4 nodes (Org + Website + Breadcrumb + Service), no WebPage/Person.
+    expect(graph['@graph']).toHaveLength(4);
   });
 
   it('Breadcrumb gets a stable @id when included in service graph', () => {

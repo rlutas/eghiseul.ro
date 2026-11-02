@@ -6,7 +6,7 @@ const BENEFITS = [
   {
     icon: Zap,
     title: 'Livrare prin curier sau pe email',
-    desc: 'După ce instituția eliberează documentul, curierul îl aduce în 24-48 de ore. Cele digitale vin pe email.',
+    desc: 'După ce instituția eliberează documentul, îl trimitem prin curier, cu tracking. Extrasul de carte funciară și certificatul constatator vin pe email.',
   },
   {
     icon: ShieldCheck,
@@ -83,8 +83,8 @@ export function WhyUsSection() {
             <p className="text-base lg:text-[17px] leading-relaxed text-neutral-600 mb-8">
               Din 2023, oferim asistență profesională românilor din țară și din diaspora. Avocatul nostru colaborator,
               înscris în Barou, te reprezintă în fața autorităților pentru obținerea <strong className="text-secondary-900">cazierului
-              judiciar</strong>, a <strong className="text-secondary-900">certificatelor de stare civilă</strong> și a altor documente
-              oficiale — fără deplasări la ghișee.
+              judiciar</strong>, a <strong className="text-secondary-900">certificatelor de stare civilă</strong> și a altor documente,
+              fără deplasări la ghișee.
             </p>
 
             <div className="space-y-3">

@@ -130,64 +130,15 @@ export function serviceNode(input: ServiceSchemaInput) {
 }
 
 /**
- * Product node: preț + condiții de livrare/retur. NU poartă `aggregateRating`.
+ * No `Product` node on service pages (removed 02.11.2026, SEO audit M1).
  *
- * ⚠️ Nu re-adăuga ratingul aici. Cele 464 de recenzii (4,9) sunt despre FIRMĂ,
- * strânse pe Google — nu despre fiecare dintre cele 31 de servicii. Marcajul de
- * recenzii pe un Product cere recenzii pentru ACEL produs, vizibile pe pagină;
- * pe Organization/LocalBusiness e „self-serving" și la fel de neeligibil. Am
- * avut ambele forme greșite simultan (4,8/64 pe 29 de servicii, 4,8/89 pe
- * rovinietă, 4,9/457 nefolosit) — scoase pe 09.09.2026.
- *
- * Dovada socială reală se afișează VIZIBIL în pagină, cu link către profilul
- * Google — `SOCIAL_PROOF` din `constants.ts`.
+ * It existed for Merchant listings and carried `shippingRate: 0 RON`, which is
+ * false: delivery by courier is charged (Poșta Română 100 lei, DHL 250 lei,
+ * domestic courier by address). These are services, so `Service` + `Offer`
+ * (serviceNode) carries the price. Never add `aggregateRating`/`Review`: the
+ * Google reviews are about the COMPANY, not each service (removed 09.09.2026);
+ * social proof stays visible in the page via `SOCIAL_PROOF` in `constants.ts`.
  */
-/**
- * Merchant-listing fields Google flags as missing on Product offers (GSC email
- * 2026-07-15: „Lipsește hasMerchantReturnPolicy/shippingDetails", „Tip de
- * obiect nevalid pentru brand"). Documents are personalized services: no
- * returns after processing starts (T&C / OUG 34/2014 art. 16), delivered
- * digitally at no extra cost — the courier add-on is priced separately.
- */
-export const PRODUCT_BRAND = { '@type': 'Brand', name: 'eGhișeul.ro' } as const;
-
-export const MERCHANT_RETURN_POLICY = {
-  '@type': 'MerchantReturnPolicy',
-  applicableCountry: 'RO',
-  returnPolicyCategory: 'https://schema.org/MerchantReturnNotPermitted',
-} as const;
-
-export const OFFER_SHIPPING_DETAILS = {
-  '@type': 'OfferShippingDetails',
-  shippingRate: { '@type': 'MonetaryAmount', value: 0, currency: 'RON' },
-  shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'RO' },
-} as const;
-
-export function productNode(input: ServiceSchemaInput) {
-  if (input.offers.length === 0) return null;
-  const url = `${BASE_URL}/servicii/${input.slug}/`;
-  const prices = input.offers.map((o) => o.price);
-  return {
-    '@type': 'Product',
-    '@id': `${url}#product`,
-    name: input.name,
-    description: input.description,
-    image: `${BASE_URL}/og/default.png`,
-    url,
-    brand: PRODUCT_BRAND,
-    offers: {
-      '@type': 'AggregateOffer',
-      lowPrice: Math.min(...prices),
-      highPrice: Math.max(...prices),
-      priceCurrency: input.offers[0]?.priceCurrency ?? 'RON',
-      offerCount: input.offers.length,
-      availability: 'https://schema.org/InStock',
-      url,
-      hasMerchantReturnPolicy: MERCHANT_RETURN_POLICY,
-      shippingDetails: OFFER_SHIPPING_DETAILS,
-    },
-  };
-}
 
 function personNode(input: NonNullable<ServiceSchemaInput['reviewedBy']>) {
   const slug = input.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -237,10 +188,6 @@ export function buildServicePageGraph(input: ServiceSchemaInput) {
     { ...breadcrumbNode(input.breadcrumb), '@id': `${BASE_URL}/servicii/${input.slug}/#breadcrumb` },
     serviceNode(input),
   ];
-  const product = productNode(input);
-  if (product) {
-    graph.push(product);
-  }
   // Add WebPage node when we have editorial metadata to expose
   if (input.dateModified || input.datePublished || input.reviewedBy) {
     graph.push(webPageNode(input));

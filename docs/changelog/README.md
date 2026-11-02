@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-02 | ✅ **Homepage: termene din setări, hub de servicii, fără schema Product** — termen/preț pe `/` și `llms.txt` (acum rută ISR) din `services` prin `getPublicServiceFacts` (fără „24-48”/„instant”); title/H1 fără „cazier”, bloc de linkuri cu ancoră exactă spre 10 servicii; `Product` cu `shippingRate 0` scos, rămâne `Service`+`Offer` | [2026-11-02-seo-homepage-termene-schema.md](2026-11-02-seo-homepage-termene-schema.md) |
 | 2026-11-02 | 🟣 **Corectarea datelor clientului pe comenzi plătite** — `edit-draft` acceptă statusuri după plată (fără billing dacă e facturată, `admin_action`, `documentsToRegenerate`), buton nou în pagina comenzii | [2026-11-02-corectare-date-client-dupa-plata.md](2026-11-02-corectare-date-client-dupa-plata.md) |
 | 2026-11-02 | 🔴 **Țara pe factură la clienți străini + decontări sep/oct verificate** — CJO: țara prima, fără județ românesc la adresă străină; eghiseul + CJO: `state: '-'` la străini; payout-uri 44/44 pe extras, plata dublă 89 lei mutată pe comanda nouă | [2026-11-02-tara-factura-si-verificare-decontari.md](2026-11-02-tara-factura-si-verificare-decontari.md) |
 | 2026-11-02 | ✅ **CJO: prețuri ca pe eghiseul, recenzii reale, Iași/Brașov/Timișoara** — fără ONLINE10 automat (198/278/298), testimoniale inventate + schema Review scoase, pagini de oraș cu „Pe scurt” și toate ghișeele | [2026-11-02-cjo-preturi-recenzii-orase.md](2026-11-02-cjo-preturi-recenzii-orase.md) |

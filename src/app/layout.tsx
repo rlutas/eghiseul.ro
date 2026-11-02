@@ -9,14 +9,21 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+// Homepage = hub de brand (audit SEO 02.11.2026, C1): title-ul nu mai începe cu
+// „cazier", ca homepage-ul să nu concureze cu /servicii/cazier-judiciar-online/.
+// Fără termene aici: „24-48 ore" contrazicea paginile de serviciu (H1); termenul
+// stă doar în tabela `services` și pe pagina fiecărui serviciu.
+const HOME_TITLE = "eGhișeul.ro — Servicii de obținere a documentelor, fără ghișeu";
+const HOME_DESCRIPTION =
+  "Obținem cazier judiciar, fiscal și auto, acte de stare civilă, extras de carte funciară și certificat constatator, fără să mergi la ghișeu.";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://eghiseul.ro"),
   title: {
-    default: "eGhișeul.ro — Documente Online: Cazier, Carte Funciară",
+    default: HOME_TITLE,
     template: "%s | eGhiseul.ro",
   },
-  description:
-    "Obține cazier judiciar, cazier fiscal, certificat constatator, extras de carte funciară și alte documente online — rapid, legal, fără cozi. Livrare pe email sau curier în 24-48 ore.",
+  description: HOME_DESCRIPTION,
   // `keywords` scos (09.09.2026): Google îl ignoră de ~15 ani, iar la noi era
   // IDENTIC pe 231 din 233 de pagini — inclusiv pe /gdpr/ și pe calculatoare.
   // Ca semnal nu valora nimic; ca amprentă era semnătura de generare la scară.
@@ -34,18 +41,16 @@ export const metadata: Metadata = {
     locale: "ro_RO",
     url: "https://eghiseul.ro/",
     siteName: "eGhiseul.ro",
-    title: "eGhișeul.ro — Documente Online: Cazier, Carte Funciară",
-    description:
-      "Obține documente online — cazier judiciar, cazier fiscal, certificat constatator, extras de carte funciară — rapid, legal, fără cozi. Livrare 24-48 ore.",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
     images: [
       { url: "/og/default.png", width: 1200, height: 630, alt: "eGhiseul.ro — documente online" },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "eGhișeul.ro — Documente Online: Cazier, Carte Funciară",
-    description:
-      "Documente online, rapid și legal. Livrare pe email sau curier în 24-48 ore.",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
     images: ["/og/default.png"],
   },
   robots: {

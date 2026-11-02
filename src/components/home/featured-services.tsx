@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Ticket, MessageCircle } from 'lucide-react';
+import type { PublicServiceFacts } from '@/lib/services/public-facts';
 
 type Badge = 'popular' | 'nou' | null;
 interface ServiceItem {
@@ -9,33 +10,35 @@ interface ServiceItem {
   img: string | null; // null → fallback icon (specimen lipsă)
   desc: string;
   badge: Badge;
+  /** DB slug: the card shows the term from the `services` row (never hardcoded). */
+  slug?: string;
 }
 
 const PF_SERVICES: ServiceItem[] = [
-  { name: 'Cazier Judiciar Online', href: '/servicii/cazier-judiciar-online/', img: '/images/specimens/cazier-judiciar.png', badge: 'popular', desc: 'Cazier judiciar online pentru angajare, permis auto sau viză. Termen 3-5 zile lucrătoare, fără deplasare la ghișeu.' },
-  { name: 'Certificat de Integritate Comportamentală', href: '/servicii/certificat-de-integritate-comportamentala/', img: '/images/specimens/certificat-integritate.png', badge: null, desc: 'Certificat de integritate comportamentală online pentru profesori, medici și personal care lucrează cu minori.' },
-  { name: 'Cazier Fiscal Online', href: '/servicii/cazier-fiscal-online/', img: '/images/specimens/cazier-fiscal.png', badge: null, desc: 'Cazier fiscal online de la ANAF. Necesar pentru licitații publice, contracte cu statul și acte notariale.' },
-  { name: 'Cazier Auto Online', href: '/servicii/cazier-auto-online/', img: '/images/specimens/cazier-auto.png', badge: null, desc: 'Cazier auto online cu istoricul sancțiunilor rutiere. Pentru angajare șofer profesionist, Uber, Bolt sau taxi.' },
-  { name: 'Certificat de Naștere', href: '/servicii/eliberare-certificat-de-nastere/', img: '/images/specimens/certificat-nastere.webp', badge: 'popular', desc: 'Eliberare certificat de naștere online — duplicat original trimis prin curier în România și străinătate.' },
-  { name: 'Extras Multilingv Certificat Naștere', href: '/servicii/extras-multilingv-certificat-nastere/', img: '/images/specimens/extras-multilingv-nastere.webp', badge: null, desc: 'Extras multilingv naștere, fără traducere și apostilă în 23 de state. Ideal pentru căsătorie sau muncă în străinătate.' },
-  { name: 'Certificat de Căsătorie', href: '/servicii/eliberare-certificat-de-casatorie/', img: '/images/specimens/certificat-casatorie.webp', badge: null, desc: 'Eliberare certificat de căsătorie online — duplicat oficial cu livrare prin curier oriunde în lume.' },
-  { name: 'Extras Multilingv Certificat Căsătorie', href: '/servicii/extras-multilingv-certificat-casatorie/', img: '/images/specimens/extras-multilingv-casatorie.webp', badge: null, desc: 'Extras multilingv căsătorie, acceptat în 23 de state fără traducere legalizată sau apostilă Haga.' },
-  { name: 'Certificat de Celibat', href: '/servicii/eliberare-certificat-de-celibat/', img: '/images/specimens/certificat-celibat.webp', badge: 'popular', desc: 'Certificat de celibat online pentru căsătorie în străinătate. Eliberare rapidă, livrare internațională.' },
-  { name: 'Extras Carte Funciară', href: '/servicii/extras-de-carte-funciara/', img: '/images/specimens/extras-cf-anonim.png', badge: null, desc: 'Extras de carte funciară online de la ANCPI. Verifici proprietatea instant, livrare pe email în câteva minute.' },
-  { name: 'Certificat Constatator Persoană Fizică', href: '/servicii/certificat-constatator-online/', img: '/images/specimens/certificat-constatator.png', badge: null, desc: 'Verifică, după CNP, dacă o persoană este asociat sau administrator în firme înregistrate la Registrul Comerțului.' },
+  { name: 'Cazier Judiciar Online', slug: 'cazier-judiciar', href: '/servicii/cazier-judiciar-online/', img: '/images/specimens/cazier-judiciar.png', badge: 'popular', desc: 'Cazier judiciar online pentru angajare, permis auto sau viză. Fără deplasare la ghișeu: cererea o depune avocatul.' },
+  { name: 'Certificat de Integritate Comportamentală', slug: 'certificat-integritate', href: '/servicii/certificat-de-integritate-comportamentala/', img: '/images/specimens/certificat-integritate.png', badge: null, desc: 'Certificat de integritate comportamentală online pentru profesori, medici și personal care lucrează cu minori.' },
+  { name: 'Cazier Fiscal Online', slug: 'cazier-fiscal', href: '/servicii/cazier-fiscal-online/', img: '/images/specimens/cazier-fiscal.png', badge: null, desc: 'Cazier fiscal online de la ANAF. Necesar pentru licitații publice, contracte cu statul și acte notariale.' },
+  { name: 'Cazier Auto Online', slug: 'cazier-auto', href: '/servicii/cazier-auto-online/', img: '/images/specimens/cazier-auto.png', badge: null, desc: 'Cazier auto online cu istoricul sancțiunilor rutiere. Pentru angajare șofer profesionist, Uber, Bolt sau taxi.' },
+  { name: 'Certificat de Naștere', slug: 'certificat-nastere', href: '/servicii/eliberare-certificat-de-nastere/', img: '/images/specimens/certificat-nastere.webp', badge: 'popular', desc: 'Eliberare certificat de naștere online — duplicat original trimis prin curier în România și străinătate.' },
+  { name: 'Extras Multilingv Certificat Naștere', slug: 'extras-multilingv-certificat-nastere', href: '/servicii/extras-multilingv-certificat-nastere/', img: '/images/specimens/extras-multilingv-nastere.webp', badge: null, desc: 'Extras multilingv naștere, fără traducere și apostilă în 23 de state. Ideal pentru căsătorie sau muncă în străinătate.' },
+  { name: 'Certificat de Căsătorie', slug: 'certificat-casatorie', href: '/servicii/eliberare-certificat-de-casatorie/', img: '/images/specimens/certificat-casatorie.webp', badge: null, desc: 'Eliberare certificat de căsătorie online — duplicat eliberat de starea civilă, trimis prin curier oriunde în lume.' },
+  { name: 'Extras Multilingv Certificat Căsătorie', slug: 'extras-multilingv-certificat-casatorie', href: '/servicii/extras-multilingv-certificat-casatorie/', img: '/images/specimens/extras-multilingv-casatorie.webp', badge: null, desc: 'Extras multilingv căsătorie, acceptat în 23 de state fără traducere legalizată sau apostilă Haga.' },
+  { name: 'Certificat de Celibat', slug: 'certificat-celibat', href: '/servicii/eliberare-certificat-de-celibat/', img: '/images/specimens/certificat-celibat.webp', badge: 'popular', desc: 'Certificat de celibat online pentru căsătorie în străinătate. Eliberare rapidă, livrare internațională.' },
+  { name: 'Extras Carte Funciară', slug: 'extras-carte-funciara', href: '/servicii/extras-de-carte-funciara/', img: '/images/specimens/extras-cf-anonim.png', badge: null, desc: 'Extras de carte funciară online de la ANCPI. Vezi proprietarul și sarcinile imobilului; îl primești pe email.' },
+  { name: 'Certificat Constatator Persoană Fizică', slug: 'certificat-constatator', href: '/servicii/certificat-constatator-online/', img: '/images/specimens/certificat-constatator.png', badge: null, desc: 'Verifică, după CNP, dacă o persoană este asociat sau administrator în firme înregistrate la Registrul Comerțului.' },
   { name: 'Rovinieta Online', href: '/servicii/rovinieta-online/', img: '/images/specimens/rovinieta.webp', badge: 'nou', desc: 'Cumpără rovinieta online rapid și simplu. Valabilă imediat după plată, fără așteptare.' },
 ];
 
 const PJ_SERVICES: ServiceItem[] = [
-  { name: 'Certificat Constatator ONRC', href: '/servicii/certificat-constatator-online/', img: '/images/specimens/certificat-constatator.png', badge: null, desc: 'Certificat constatator online de la Registrul Comerțului. Date oficiale firmă pentru licitații și contracte.' },
-  { name: 'Cazier Judiciar pentru Firme', href: '/servicii/cazier-judiciar-online/', img: '/images/specimens/cazier-judiciar.png', badge: null, desc: 'Cazier judiciar online pentru administratori, asociați și reprezentanți legali ai firmei.' },
-  { name: 'Extras Carte Funciară', href: '/servicii/extras-de-carte-funciara/', img: '/images/specimens/extras-cf-anonim.png', badge: null, desc: 'Extras CF online pentru verificări imobiliare, due diligence și tranzacții comerciale.' },
+  { name: 'Certificat Constatator ONRC', slug: 'certificat-constatator', href: '/servicii/certificat-constatator-online/', img: '/images/specimens/certificat-constatator.png', badge: null, desc: 'Certificat constatator online de la Registrul Comerțului. Datele înregistrate ale firmei, pentru licitații și contracte.' },
+  { name: 'Cazier Judiciar pentru Firme', slug: 'cazier-judiciar-persoana-juridica', href: '/servicii/cazier-judiciar-online/', img: '/images/specimens/cazier-judiciar.png', badge: null, desc: 'Cazier judiciar online pentru administratori, asociați și reprezentanți legali ai firmei.' },
+  { name: 'Extras Carte Funciară', slug: 'extras-carte-funciara', href: '/servicii/extras-de-carte-funciara/', img: '/images/specimens/extras-cf-anonim.png', badge: null, desc: 'Extras CF online pentru verificări imobiliare, due diligence și tranzacții comerciale.' },
   { name: 'Rovinieta pentru Flote Auto', href: '/servicii/rovinieta-online/', img: '/images/specimens/rovinieta.webp', badge: 'nou', desc: 'Rovinieta online pentru flote auto. Gestionează rovinietele pentru toate vehiculele companiei.' },
 ];
 
 const WHATSAPP = 'https://wa.me/40757708181?text=' + encodeURIComponent('Bună ziua! Am o întrebare despre serviciile eGhișeul.ro.');
 
-function ServiceCard({ s }: { s: ServiceItem }) {
+function ServiceCard({ s, term }: { s: ServiceItem; term?: string }) {
   return (
     <Link
       href={s.href}
@@ -64,6 +67,7 @@ function ServiceCard({ s }: { s: ServiceItem }) {
       <div className="flex flex-1 flex-col p-5">
         <h4 className="text-[15px] font-bold text-secondary-900 leading-snug mb-2">{s.name}</h4>
         <p className="flex-1 text-xs leading-relaxed text-neutral-500 mb-3">{s.desc}</p>
+        {term && <p className="text-xs font-semibold text-secondary-900 mb-3">Termen: {term}</p>}
         <span className="inline-flex items-center gap-1.5 text-[13px] font-bold text-primary-600 group-hover:gap-2.5 transition-all">
           Aplică acum <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </span>
@@ -72,7 +76,17 @@ function ServiceCard({ s }: { s: ServiceItem }) {
   );
 }
 
-function Category({ num, title, items }: { num: string; title: string; items: ServiceItem[] }) {
+function Category({
+  num,
+  title,
+  items,
+  facts,
+}: {
+  num: string;
+  title: string;
+  items: ServiceItem[];
+  facts: PublicServiceFacts;
+}) {
   return (
     <div className="mb-12 last:mb-0">
       <div className="flex items-center gap-4 mb-6">
@@ -81,14 +95,14 @@ function Category({ num, title, items }: { num: string; title: string; items: Se
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
         {items.map((s) => (
-          <ServiceCard key={s.name + s.href} s={s} />
+          <ServiceCard key={s.name + s.href} s={s} term={s.slug ? facts[s.slug]?.term : undefined} />
         ))}
       </div>
     </div>
   );
 }
 
-export function FeaturedServices() {
+export function FeaturedServices({ facts }: { facts: PublicServiceFacts }) {
   return (
     <section className="bg-white py-16 lg:py-20">
       <div className="container mx-auto px-4 max-w-[1200px]">
@@ -104,9 +118,9 @@ export function FeaturedServices() {
               <strong>extras carte funciară</strong>, <strong>certificat constatator</strong> și alte documente — indiferent dacă ești în România sau în străinătate.
             </p>
             <p className="text-base leading-relaxed text-neutral-600 max-w-[650px]">
-              Serviciile noastre sunt 100% online și elimină deplasările la ghișee. Documentele fizice ajung prin
-              curier în 24-48 de ore, oriunde în lume, iar cele digitale (extras CF, certificat constatator,
-              rovinietă) le primești instant pe email.
+              Serviciile noastre sunt 100% online și elimină deplasările la ghișee. Documentele pe hârtie ajung
+              prin curier, oriunde în lume, iar extrasul de carte funciară și certificatul constatator le primești
+              pe email. Termenul fiecărui document e trecut pe card, la fel ca pe pagina serviciului.
             </p>
           </div>
           <div className="w-full max-w-[280px] mx-auto lg:mx-0 flex-shrink-0">
@@ -120,8 +134,8 @@ export function FeaturedServices() {
           </div>
         </div>
 
-        <Category num="01." title="Servicii pentru Persoane Fizice" items={PF_SERVICES} />
-        <Category num="02." title="Servicii pentru Persoane Juridice" items={PJ_SERVICES} />
+        <Category num="01." title="Servicii pentru Persoane Fizice" items={PF_SERVICES} facts={facts} />
+        <Category num="02." title="Servicii pentru Persoane Juridice" items={PJ_SERVICES} facts={facts} />
 
         {/* CTA WhatsApp */}
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6 rounded-3xl bg-gradient-to-br from-secondary-900 to-[#0C1A2F] p-8 sm:p-10 text-center sm:text-left">

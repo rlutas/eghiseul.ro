@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createPublicClient } from '@/lib/supabase/public';
-import { PRODUCT_BRAND, MERCHANT_RETURN_POLICY, OFFER_SHIPPING_DETAILS } from '@/lib/seo/schema';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -265,29 +264,9 @@ export default async function ServiceDetailPage({ params }: PageProps) {
     },
   };
 
-  // Rating on a Product node — Google review snippets don't accept Service
-  // as parent type (see src/lib/seo/schema.ts productNode).
-  const productLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: service.name,
-    description:
-      service.description ||
-      service.short_description ||
-      `${service.name} online, livrare rapidă.`,
-    image: 'https://eghiseul.ro/og/default.png',
-    url: `https://eghiseul.ro/servicii/${service.slug}`,
-    brand: PRODUCT_BRAND,
-    offers: {
-      '@type': 'Offer',
-      price: basePrice.toString(),
-      priceCurrency: service.currency || 'RON',
-      availability: 'https://schema.org/InStock',
-      url: `https://eghiseul.ro/servicii/${service.slug}`,
-      hasMerchantReturnPolicy: MERCHANT_RETURN_POLICY,
-      shippingDetails: OFFER_SHIPPING_DETAILS,
-    },
-  };
+  // No Product node: these are services, and the Product carried a false
+  // `shippingRate: 0` (delivery is charged). Service + Offer above is enough
+  // (SEO audit 02.11.2026, M1).
 
   const breadcrumbLd = {
     '@context': 'https://schema.org',
@@ -319,10 +298,6 @@ export default async function ServiceDetailPage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }}
       />
       <script
         type="application/ld+json"

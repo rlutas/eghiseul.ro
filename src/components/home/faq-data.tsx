@@ -1,11 +1,17 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import type { PublicServiceFacts } from '@/lib/services/public-facts';
 
 /**
  * Homepage FAQ — rich answers (lists + internal links) for display + a `plain`
  * string for the FAQPage JSON-LD (schema text must match the visible meaning).
  * `HOMEPAGE_FAQS` (derived) keeps the {question, answer} shape used by
  * buildHomepageGraph. Internal links boost the service hub pages (SEO).
+ *
+ * Terms are NOT written here: they come from the `services` row through
+ * `getPublicServiceFacts()` (same text as the service pages). Hardcoded
+ * „24-48 de ore" / „instant pe email" contradicted the service pages (SEO
+ * audit 02.11.2026, H1). A term missing from the DB is left out, not guessed.
  */
 export interface HomepageFaqItem {
   question: string;
@@ -15,21 +21,38 @@ export interface HomepageFaqItem {
 
 const A = 'text-primary-600 font-medium underline hover:text-primary-700';
 
-export const HOMEPAGE_FAQ_ITEMS: HomepageFaqItem[] = [
+/** „ în 3-5 zile lucrătoare" when the term is known, else empty. */
+function inTerm(facts: PublicServiceFacts, slug: string): string {
+  const t = facts[slug]?.term;
+  return t ? ` în ${t}` : '';
+}
+
+export function buildHomepageFaqItems(facts: PublicServiceFacts): HomepageFaqItem[] {
+  const cazierTerm = facts['cazier-judiciar']?.term;
+  const cazierUrgent = facts['cazier-judiciar']?.urgentTerm;
+  const cazierSentence = cazierTerm
+    ? `Cazierul judiciar online îl obținem în ${cazierTerm} de la plată${cazierUrgent ? `, sau în ${cazierUrgent} cu procesare urgentă` : ''}.`
+    : 'Termenul cazierului judiciar online e afișat pe pagina serviciului.';
+  const cfTerm = facts['extras-carte-funciara']?.term;
+  const constatatorTerm = facts['certificat-constatator']?.term;
+  return [
   {
     question: 'Cât durează obținerea unui cazier judiciar online?',
     answer: (
       <>
-        <p><Link href="/servicii/cazier-judiciar-online/" className={A}><strong>Cazierul judiciar online</strong></Link> se obține în 24-48 de ore de la validarea cererii. Procesul este simplu:</p>
+        <p>{cazierTerm ? (
+          <><Link href="/servicii/cazier-judiciar-online/" className={A}><strong>Cazierul judiciar online</strong></Link> îl obținem în {cazierTerm} de la plată{cazierUrgent ? `, sau în ${cazierUrgent} cu procesare urgentă` : ''}.</>
+        ) : cazierSentence} Pașii:</p>
         <ul>
           <li>Completezi formularul online (2 minute)</li>
           <li>Efectuezi plata securizată</li>
-          <li>Primești documentul prin curier la adresa dorită</li>
+          <li>Avocatul depune cererea, iar poliția eliberează certificatul</li>
+          <li>Primești scanul pe email, iar originalul prin curier, dacă l-ai ales</li>
         </ul>
         <p>Livrăm în România și internațional, inclusiv în UE, SUA, Canada și alte țări.</p>
       </>
     ),
-    plain: 'Cazierul judiciar online se obține în 24-48 de ore de la validarea cererii. Completezi formularul online, efectuezi plata securizată și primești documentul prin curier la adresa dorită. Livrăm în România și internațional.',
+    plain: `${cazierSentence} Completezi formularul online și plătești securizat; avocatul depune cererea, iar poliția eliberează certificatul. Primești scanul pe email, iar originalul prin curier, dacă l-ai ales. Livrăm în România și internațional.`,
   },
   {
     question: 'Pot obține documente dacă sunt în străinătate?',
@@ -42,16 +65,16 @@ export const HOMEPAGE_FAQ_ITEMS: HomepageFaqItem[] = [
           <li><Link href="/servicii/extras-multilingv-certificat-nastere/" className={A}>Extras multilingv</Link> pentru acte de stare civilă</li>
           <li>Extras carte funciară, certificat constatator</li>
         </ul>
-        <p>Documentele fizice ajung prin curier internațional, iar cele digitale instant pe email.</p>
+        <p>Documentele pe hârtie ajung prin curier internațional, iar extrasul de carte funciară și certificatul constatator vin pe email.</p>
       </>
     ),
-    plain: 'Da, serviciile noastre sunt create special pentru românii din diaspora. Poți obține cazier judiciar, cazier fiscal, cazier auto, certificate de naștere, căsătorie, celibat, extras carte funciară și certificat constatator. Documentele fizice ajung prin curier internațional, iar cele digitale instant pe email.',
+    plain: 'Da, serviciile noastre sunt create special pentru românii din diaspora. Poți obține cazier judiciar, cazier fiscal, cazier auto, certificate de naștere, căsătorie, celibat, extras carte funciară și certificat constatator. Documentele pe hârtie ajung prin curier internațional, iar extrasul de carte funciară și certificatul constatator vin pe email.',
   },
   {
-    question: 'Documentele obținute prin eGhișeul sunt legale și oficiale?',
+    question: 'Documentele obținute prin eGhișeul sunt valabile?',
     answer: (
       <>
-        <p><strong>Da, 100% legale și oficiale.</strong> Toate documentele sunt eliberate de instituțiile statului român:</p>
+        <p><strong>Da.</strong> Noi doar depunem cererea; documentele le eliberează instituțiile competente ale statului român:</p>
         <ul>
           <li>Cazierul judiciar — de la Inspectoratul General al Poliției Române</li>
           <li>Certificatele de stare civilă — de la primăriile competente</li>
@@ -61,7 +84,7 @@ export const HOMEPAGE_FAQ_ITEMS: HomepageFaqItem[] = [
         <p>Avocatul nostru colaborator, înscris în Barou, depune cererea în numele clientului în baza unui contract de mandat (împuternicire avocațială). Documentele sunt emise de autorități — noi oferim asistență juridică profesională pentru facilitarea procedurii.</p>
       </>
     ),
-    plain: 'Da, 100% legale și oficiale. Documentele sunt eliberate de instituțiile statului român: cazierul judiciar de la Poliția Română, certificatele de stare civilă de la primării, cazierul fiscal de la ANAF, extrasul CF de la ANCPI. Avocatul colaborator, înscris în Barou, depune cererea în numele clientului în baza unui contract de mandat. Noi oferim asistență juridică pentru facilitarea procedurii.',
+    plain: 'Da. Noi doar depunem cererea; documentele le eliberează instituțiile competente ale statului român: cazierul judiciar de la Poliția Română, certificatele de stare civilă de la primării, cazierul fiscal de la ANAF, extrasul CF de la ANCPI. Avocatul colaborator, înscris în Barou, depune cererea în numele clientului în baza unui contract de mandat. Noi oferim asistență juridică pentru facilitarea procedurii.',
   },
   {
     question: 'Cine procesează cererile și ce înseamnă „avocat colaborator"?',
@@ -89,12 +112,12 @@ export const HOMEPAGE_FAQ_ITEMS: HomepageFaqItem[] = [
     answer: (
       <>
         <p>Avem două tipuri de livrare, în funcție de document.</p>
-        <p><strong>Livrare fizică prin curier (24-48h):</strong> cazier judiciar, cazier fiscal, cazier auto, certificate de naștere/căsătorie/celibat, extras multilingv.</p>
-        <p><strong>Livrare instant pe email:</strong> extras carte funciară, certificat constatator ONRC, rovinietă online.</p>
-        <p>Primești notificare și tracking pentru livrările fizice.</p>
+        <p><strong>Pe hârtie, prin curier:</strong> cazier judiciar, cazier fiscal, cazier auto, certificate de naștere/căsătorie/celibat, extras multilingv. La caziere primești și scanul pe email.</p>
+        <p><strong>Pe email:</strong> extras de carte funciară{inTerm(facts, 'extras-carte-funciara')}, certificat constatator ONRC{inTerm(facts, 'certificat-constatator')}.</p>
+        <p>Termenul fiecărui document e cel afișat pe pagina serviciului. Pentru livrările prin curier primești notificare și tracking.</p>
       </>
     ),
-    plain: 'Avem două tipuri de livrare: fizică prin curier (24-48h) pentru cazier judiciar, cazier fiscal, cazier auto și certificate de stare civilă; și instant pe email pentru extras carte funciară, certificat constatator ONRC și rovinieta online.',
+    plain: `Avem două tipuri de livrare: pe hârtie, prin curier, pentru cazier judiciar, cazier fiscal, cazier auto și certificate de stare civilă; și pe email pentru extras de carte funciară${inTerm(facts, 'extras-carte-funciara')} și certificat constatator ONRC${inTerm(facts, 'certificat-constatator')}. Termenul fiecărui document e cel afișat pe pagina serviciului.`,
   },
   {
     question: 'Ce fac dacă am nevoie de traducere legalizată?',
@@ -168,10 +191,10 @@ export const HOMEPAGE_FAQ_ITEMS: HomepageFaqItem[] = [
           <li>Moșteniri și partaje</li>
           <li>Închiriere sau autorizații de construire</li>
         </ul>
-        <p>Îl primești în format digital pe email în maxim 24 de ore.</p>
+        <p>{cfTerm ? <>Îl primești în format digital pe email, în {cfTerm}.</> : <>Îl primești în format digital pe email.</>}</p>
       </>
     ),
-    plain: 'Extrasul de carte funciară este documentul de la ANCPI care arată situația juridică a unui imobil. Este necesar pentru vânzare sau cumpărare proprietate, credit ipotecar, verificare sarcini și ipoteci, moșteniri sau autorizații de construire.',
+    plain: `Extrasul de carte funciară este documentul de la ANCPI care arată situația juridică a unui imobil. Este necesar pentru vânzare sau cumpărare proprietate, credit ipotecar, verificare sarcini și ipoteci, moșteniri sau autorizații de construire.${cfTerm ? ` Îl primești în format digital pe email, în ${cfTerm}.` : ''}`,
   },
   {
     question: 'Ce este cazierul fiscal și cine are nevoie de el?',
@@ -226,19 +249,22 @@ export const HOMEPAGE_FAQ_ITEMS: HomepageFaqItem[] = [
     question: 'Ce este certificatul constatator și când este necesar?',
     answer: (
       <>
-        <p><strong><Link href="/servicii/certificat-constatator-online/" className={A}>Certificatul constatator</Link></strong> este emis de Registrul Comerțului (ONRC) și conține informații oficiale despre o firmă:</p>
+        <p><strong><Link href="/servicii/certificat-constatator-online/" className={A}>Certificatul constatator</Link></strong> este emis de Registrul Comerțului (ONRC) și conține datele înregistrate despre o firmă:</p>
         <ul>
           <li>Denumire, sediu social, CUI</li>
           <li>Asociați și administratori</li>
           <li>Capital social și obiect de activitate</li>
           <li>Puncte de lucru și sucursale</li>
         </ul>
-        <p>Este necesar pentru licitații, contracte, verificări due-diligence și orice situație în care trebuie să dovedești existența legală a unei firme.</p>
+        <p>Este necesar pentru licitații, contracte, verificări due-diligence și orice situație în care trebuie să dovedești existența legală a unei firme.{constatatorTerm ? ` Îl primești pe email, în ${constatatorTerm}.` : ''}</p>
       </>
     ),
-    plain: 'Certificatul constatator este emis de Registrul Comerțului (ONRC) și conține informații oficiale despre o firmă: denumire, sediu, asociați, administratori, capital social. Este necesar pentru licitații, contracte și verificări due-diligence.',
+    plain: `Certificatul constatator este emis de Registrul Comerțului (ONRC) și conține datele înregistrate despre o firmă: denumire, sediu, asociați, administratori, capital social. Este necesar pentru licitații, contracte și verificări due-diligence.${constatatorTerm ? ` Îl primești pe email, în ${constatatorTerm}.` : ''}`,
   },
-];
+  ];
+}
 
 /** Plain {question, answer} pairs for FAQPage JSON-LD. */
-export const HOMEPAGE_FAQS = HOMEPAGE_FAQ_ITEMS.map((i) => ({ question: i.question, answer: i.plain }));
+export function toFaqSchemaPairs(items: HomepageFaqItem[]) {
+  return items.map((i) => ({ question: i.question, answer: i.plain }));
+}

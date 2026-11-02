@@ -31,8 +31,9 @@ const STEPS = [
     desc: (
       <>
         <strong>Cazierul judiciar</strong>, <strong>certificatele de naștere</strong>, <strong>căsătorie</strong>,{' '}
-        <strong>celibat</strong> și <strong>cazierul fiscal/auto</strong> ajung la tine prin curier în 24-48h.
-        Extrasul de carte funciară, certificatul constatator și rovinieta le primești instant pe email.
+        <strong>celibat</strong> și <strong>cazierul fiscal/auto</strong> ajung la tine prin curier.
+        Extrasul de carte funciară și certificatul constatator le primești pe email, în termenul afișat pe
+        pagina fiecărui serviciu.
       </>
     ),
     benefits: ['Livrare națională și internațională', 'Tracking și notificare email'],

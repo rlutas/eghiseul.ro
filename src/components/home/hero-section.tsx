@@ -23,8 +23,11 @@ export function HeroSection() {
           {/* Left Column - Text */}
           <div className="flex-1 min-w-[280px] max-w-[680px] text-center lg:text-left px-1 sm:px-0">
             <h1 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl lg:text-5xl leading-[1.2]">
-              Cazier Judiciar și Documente Online –{' '}
-              <span className="text-primary-500">Prin Avocat, Fără Cozi, Livrare prin Curier</span>
+              {/* Hub de brand, nu pagină de cazier: H1-ul vechi („Cazier Judiciar și
+                  Documente Online…") făcea homepage-ul să concureze cu pagina de
+                  serviciu pe „cazier judiciar online" (audit SEO 02.11.2026, C1). */}
+              eGhișeul.ro: servicii de obținere a documentelor –{' '}
+              <span className="text-primary-500">noi depunem cererea, tu primești actul</span>
             </h1>
 
             <p className="mt-4 sm:mt-6 text-base sm:text-lg text-white/85 leading-relaxed">

@@ -59,8 +59,8 @@ export function buildHomepageGraph(faqs: HomepageFaq[]) {
         },
         // NO aggregateRating here — Organization self-ratings are
         // "self-serving" per Google review-snippet policy and get the whole
-        // page flagged invalid in GSC (2026-07-13). Ratings live on the
-        // per-service Product nodes instead (see schema.ts productNode).
+        // page flagged invalid in GSC (2026-07-13). No rating anywhere until a
+        // service has its own visible reviews (see the note in schema.ts).
       },
       {
         '@type': 'WebSite',
@@ -74,7 +74,7 @@ export function buildHomepageGraph(faqs: HomepageFaq[]) {
         '@type': 'WebPage',
         '@id': `${BASE_URL}/#webpage`,
         url: `${BASE_URL}/`,
-        name: 'Cazier Judiciar, Cazier Fiscal & Documente Online — eGhiseul.ro',
+        name: 'eGhișeul.ro — Servicii de obținere a documentelor, fără ghișeu',
         inLanguage: 'ro-RO',
         isPartOf: { '@id': `${BASE_URL}/#website` },
         about: { '@id': `${BASE_URL}/#organization` },

@@ -292,6 +292,6 @@ export const SOCIAL_PROOF = {
  *
  * Recenziile sunt despre FIRMĂ (profilul Google), nu despre fiecare serviciu în
  * parte — deci nu au ce căuta ca `aggregateRating` pe 31 de noduri `Product`.
- * Vezi nota din `schema.ts` (`productNode`). Dovada socială se afișează vizibil
+ * Vezi nota din `schema.ts` (deasupra lui `personNode`). Dovada socială se afișează vizibil
  * în pagină din `SOCIAL_PROOF`, cu link către profilul Google.
  */

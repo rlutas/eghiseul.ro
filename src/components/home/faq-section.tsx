@@ -1,6 +1,6 @@
 import { ChevronDown, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { HOMEPAGE_FAQ_ITEMS } from './faq-data';
+import type { HomepageFaqItem } from './faq-data';
 
 const WHATSAPP =
   'https://wa.me/40757708181?text=' +
@@ -21,7 +21,7 @@ const ANSWER_PROSE =
  *
  * `name="homepage-faq"` dă acordeon exclusiv nativ, fără JS.
  */
-export function FAQSection() {
+export function FAQSection({ items }: { items: HomepageFaqItem[] }) {
 
   return (
     <section id="intrebari" className="bg-white py-16 lg:py-20">
@@ -39,7 +39,7 @@ export function FAQSection() {
 
         {/* FAQ List */}
         <div className="space-y-4">
-          {HOMEPAGE_FAQ_ITEMS.map((faq, index) => (
+          {items.map((faq, index) => (
             <details
               key={faq.question}
               name="homepage-faq"
