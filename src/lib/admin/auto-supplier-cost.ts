@@ -79,7 +79,12 @@ async function amountFromReceipt(chitantaKey: string): Promise<number | null> {
   try {
     const { GoogleGenerativeAI } = await import('@google/generative-ai');
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
+    const { trackGeminiModel } = await import('@/lib/ai/usage-log');
+    const model = trackGeminiModel(
+      genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' }),
+      'gemini-2.5-flash-lite',
+      'ancpi_receipt_amount'
+    );
 
     const buf = await downloadFile(chitantaKey);
     const result = await model.generateContent([

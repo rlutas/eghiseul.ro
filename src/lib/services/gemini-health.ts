@@ -10,6 +10,8 @@
  * single probe here covers all four sites.
  */
 
+import { buildUsageRow, logAiUsage, type GeminiUsageMetadata } from '@/lib/ai/usage-log';
+
 /** Message shown instead of the generic OCR error when the provider is down.
  *  Neutral wording: the wizard shows it to customers too. */
 export const OCR_UNAVAILABLE_MESSAGE =
@@ -44,10 +46,25 @@ export async function probeGemini(model = 'gemini-2.5-flash-lite'): Promise<Gemi
         signal: AbortSignal.timeout(15_000),
       }
     );
-    if (res.ok) return { ok: true, status: res.status, message: 'OK' };
+    if (res.ok) {
+      const body = (await res.json().catch(() => null)) as { usageMetadata?: GeminiUsageMetadata } | null;
+      await logAiUsage(buildUsageRow({ feature: 'health_probe', model, usage: body?.usageMetadata, ok: true, httpStatus: res.status }));
+      return { ok: true, status: res.status, message: 'OK' };
+    }
     const body = (await res.json().catch(() => null)) as { error?: { message?: string } } | null;
-    return { ok: false, status: res.status, message: body?.error?.message?.slice(0, 300) || res.statusText };
+    const message = body?.error?.message?.slice(0, 300) || res.statusText;
+    await logAiUsage(
+      buildUsageRow({
+        feature: 'health_probe',
+        model,
+        ok: false,
+        httpStatus: res.status,
+        errorCode: /credits are depleted|prepayment/i.test(message) ? `${res.status}:credit_depleted` : String(res.status),
+      })
+    );
+    return { ok: false, status: res.status, message };
   } catch (err) {
+    await logAiUsage(buildUsageRow({ feature: 'health_probe', model, ok: false, httpStatus: null, errorCode: 'network' }));
     return { ok: false, status: null, message: err instanceof Error ? err.message : String(err) };
   }
 }

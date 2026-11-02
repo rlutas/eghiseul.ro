@@ -65,6 +65,8 @@ import { uploadToS3, getS3DownloadUrl, isS3Url } from '@/lib/aws/upload-client';
 import type { ExtractedIdData } from '@/components/shared/IdScanner';
 import { compressImage, compressedToFile, ImageCompressionError, type CompressedImage } from '@/lib/images/compress';
 import { runFaceMatch, fetchImageAsBase64 } from '@/lib/kyc/face-match';
+import { reportClientError } from '@/lib/client-errors/report';
+import { sizeBucket } from '@/lib/client-errors/schema';
 
 interface KYCTabProps {
   className?: string;
@@ -310,6 +312,13 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
         if (e instanceof ImageCompressionError) {
           // HEIC or decode failure: fall through with raw file (server-side fallback can normalize)
           console.warn('Image compression skipped:', e.code);
+          reportClientError({
+            kind: e.code === 'DECODE_FAILED' ? 'image_decode' : 'image_compress',
+            code: e.code,
+            message: e.message,
+            step: 'account_kyc',
+            meta: { docType: type, mime: (file.type || 'unknown').slice(0, 40), sizeBucket: sizeBucket(file.size), fallback: 'original' },
+          });
         } else {
           throw e;
         }
@@ -459,10 +468,19 @@ export default function KYCTab({ className, serviceInterests }: KYCTabProps) {
               issues: faceMatch.issues,
             };
             if (!faceMatch.matched) {
-              setUploadError('Fața din selfie nu corespunde cu cea din actul de identitate încărcat. Te rugăm să încerci o selfie clară, ținând actul lângă față.');
+              const msg = 'Fața din selfie nu corespunde cu cea din actul de identitate încărcat. Te rugăm să încerci o selfie clară, ținând actul lângă față.';
+              setUploadError(msg);
+              reportClientError({ kind: 'kyc_failed', code: 'FACE_NO_MATCH', message: msg, step: 'account_kyc', meta: { docType: 'selfie' } });
             }
           } else {
             console.warn('[KYC] face match unavailable:', faceMatch.error);
+            reportClientError({
+              kind: 'kyc_failed',
+              code: String(faceMatch.error || 'unavailable').replace(/[^A-Za-z0-9_\-]/g, '_').slice(0, 40),
+              message: 'Verificarea automată selfie ↔ act indisponibilă (clientul nu vede eroare)',
+              step: 'account_kyc',
+              meta: { docType: 'selfie' },
+            });
           }
         }
 

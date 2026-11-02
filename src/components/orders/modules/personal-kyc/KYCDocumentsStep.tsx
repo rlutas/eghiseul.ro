@@ -37,7 +37,10 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PersonalKYCConfig, DocumentType, UploadedDocumentState } from '@/types/verification-modules';
-import { compressImage } from '@/lib/images/compress';
+import { ImageCompressionError } from '@/lib/images/compress';
+import { prepareImageForUpload } from '@/lib/images/prepare-upload';
+import { reportClientError } from '@/lib/client-errors/report';
+import { sizeBucket } from '@/lib/client-errors/schema';
 import { randomId } from '@/lib/random-id';
 import { findDuplicateUpload } from '@/lib/kyc/duplicate-upload';
 import { SelfieLegalNotice } from './SelfieLegalNotice';
@@ -167,6 +170,10 @@ const ACCEPTED_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 
 export default function KYCDocumentsStep({ config, onValidChange }: KYCDocumentsStepProps) {
   const { state, updatePersonalKyc, isPrefilled, prefillData, validationAttempt } = useModularWizard();
+  // Context for client error reports, read inside memoized handlers (a ref,
+  // so stale closures still see the current step / order).
+  const errorCtxRef = useRef({ step: state.currentStepId as string, serviceSlug: state.serviceSlug, orderRef: state.friendlyOrderId });
+  errorCtxRef.current = { step: state.currentStepId, serviceSlug: state.serviceSlug, orderRef: state.friendlyOrderId };
   const personalKyc = state.personalKyc;
 
   // handleFileSelect has empty deps (stable identity), so it permanently calls
@@ -357,7 +364,19 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
   const handleFileSelect = useCallback(
     async (type: KYCDocType, file: File) => {
       // Validate file type
+      const reportRejected = (code: string, message: string) =>
+        reportClientError({
+          kind: 'upload_failed',
+          code,
+          message,
+          step: errorCtxRef.current.step,
+          serviceSlug: errorCtxRef.current.serviceSlug ?? undefined,
+          orderRef: errorCtxRef.current.orderRef ?? undefined,
+          meta: { docType: type, mime: (file.type || 'unknown').slice(0, 40), sizeBucket: sizeBucket(file.size) },
+        });
+
       if (!ACCEPTED_TYPES.includes(file.type)) {
+        reportRejected('FORMAT', 'Format invalid. Acceptăm doar JPEG sau PNG.');
         setUploads((prev) => ({
           ...prev,
           [type]: {
@@ -370,6 +389,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
 
       // Validate file size
       if (file.size > MAX_FILE_SIZE) {
+        reportRejected('TOO_LARGE', 'Fișierul este prea mare. Limita este 10MB.');
         setUploads((prev) => ({
           ...prev,
           [type]: {
@@ -411,8 +431,9 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
 
       try {
         // Compress + decode (EXIF-safe). Reduces 3-7MB phone photos to ~250KB JPEG.
-        const compressed = await compressImage(file);
-        console.log(`[KYC] ${type}: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB`);
+        // Falls back to the original JPEG/PNG when this browser cannot decode it.
+        const compressed = await prepareImageForUpload(file, { ...errorCtxRef.current, docType: type });
+        console.log(`[KYC] ${type}: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB${compressed.fallback ? ' (original)' : ''}`);
         const base64 = compressed.base64;
 
         // Same picture as another document → refuse here; /submit would
@@ -495,6 +516,18 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
         }));
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Încărcarea a eșuat';
+        // Compression failures are reported inside prepareImageForUpload.
+        if (!(error instanceof ImageCompressionError)) {
+          reportClientError({
+            kind: 'upload_failed',
+            code: /aceeași poză|identică/.test(errorMessage) ? 'DUPLICATE' : 'UPLOAD',
+            message: errorMessage,
+            step: errorCtxRef.current.step,
+            serviceSlug: errorCtxRef.current.serviceSlug ?? undefined,
+            orderRef: errorCtxRef.current.orderRef ?? undefined,
+            meta: { docType: type },
+          });
+        }
         setUploads((prev) => ({
           ...prev,
           [type]: {

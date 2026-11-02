@@ -26,7 +26,7 @@ import {
   Info,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { compressImage } from '@/lib/images/compress';
+import { prepareImageForUpload } from '@/lib/images/prepare-upload';
 import { randomId } from '@/lib/random-id';
 
 // Types
@@ -244,7 +244,8 @@ export default function IdScanner({
 
     try {
       // Compress + decode (EXIF-safe). Reduces 3-7MB phone photos to ~250KB JPEG.
-      const compressed = await compressImage(file);
+      // Falls back to the original JPEG/PNG when this browser cannot decode it.
+      const compressed = await prepareImageForUpload(file, { step: 'account_id_scan', docType: type });
       console.log(`[IdScanner] ${type}: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB`);
 
       const preview = compressed.dataUrl;
@@ -376,7 +377,7 @@ export default function IdScanner({
 
     try {
       // Compress + decode (EXIF-safe). Reduces 3-7MB phone photos to ~250KB JPEG.
-      const compressed = await compressImage(file);
+      const compressed = await prepareImageForUpload(file, { step: 'account_id_scan', docType: 'selfie' });
       console.log(`[IdScanner] selfie: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB`);
 
       const preview = compressed.dataUrl;

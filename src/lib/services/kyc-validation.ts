@@ -6,6 +6,7 @@
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { trackGeminiModel } from '@/lib/ai/usage-log';
 import { KYCValidationResult } from '@/types/orders';
 
 // Initialize Gemini AI
@@ -35,7 +36,7 @@ export async function validateCIFront(
   imageBase64: string,
   mimeType: string
 ): Promise<KYCValidationResult> {
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+  const model = trackGeminiModel(genAI.getGenerativeModel({ model: GEMINI_MODEL }), GEMINI_MODEL, 'kyc_ci_front');
 
   const prompt = `Analizează această imagine a unei cărți de identitate românești (față).
 
@@ -127,7 +128,7 @@ export async function validateCIBack(
   imageBase64: string,
   mimeType: string
 ): Promise<KYCValidationResult> {
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+  const model = trackGeminiModel(genAI.getGenerativeModel({ model: GEMINI_MODEL }), GEMINI_MODEL, 'kyc_ci_back');
 
   const prompt = `Analizează această imagine a unei cărți de identitate românești (verso/spate).
 
@@ -213,7 +214,7 @@ export async function validateSelfie(
   ciBase64?: string,
   ciMimeType?: string
 ): Promise<KYCValidationResult> {
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+  const model = trackGeminiModel(genAI.getGenerativeModel({ model: GEMINI_MODEL }), GEMINI_MODEL, 'kyc_selfie');
 
   const parts: Array<string | { inlineData: { mimeType: string; data: string } }> = [];
 

@@ -815,3 +815,31 @@ plățile se calculează din `bank_statement_entries.description` cu
 | `printed_at` / `printed_by` | timestamptz / uuid FK `profiles` | „Listată” |
 | `handed_at` / `handed_by` | timestamptz / uuid FK `profiles` | „Predată contabil”: o lună e completă când toți furnizorii o au |
 | `note` | text ≤500 | ex. „lipsește factura din 12.09” |
+
+## ai_usage_log + client_error_log (migrarea 199, 02.11.2026)
+
+RLS pornit, fără politici, `REVOKE ALL` de la `anon`/`authenticated`: doar prin
+API (service role). Aceleași coloane în DB-ul CJO (citit de admin prin
+`createCjoClient()`).
+
+`ai_usage_log` — un rând per apel Gemini (`trackGeminiModel` în `src/lib/ai/usage-log.ts`).
+
+| Coloană | Tip | Note |
+|---|---|---|
+| `platform` | text | `eghiseul` (deploy-ul eghiseul + documentero), `cjo`, … |
+| `feature` | text | `ocr_ci_front`, `kyc_selfie`, `ancpi_receipt_amount`, `health_probe`, … |
+| `model` | text | `gemini-2.5-flash-lite` / `gemini-2.5-flash` |
+| `prompt_tokens` / `output_tokens` / `total_tokens` | int | din `usageMetadata`; output include `thoughtsTokenCount` |
+| `est_cost_usd` | numeric(12,6) | tabelul de prețuri din cod; 0 pe apel refuzat |
+| `ok` / `http_status` / `error_code` | bool / int / text | ex. `402:credit_depleted` |
+
+Index pe `created_at`. Creditul estimat: `admin_settings.gemini_credit`
+(alimentări + prag), starea alertei în `admin_settings.gemini_credit_alert`.
+
+`client_error_log` — erori arătate clientului în browser (`POST /api/client-errors`).
+Coloane: `platform` (brandul din host), `kind` (allowlist: `image_decode`,
+`image_compress`, `upload_failed`, `cnp_invalid`, `ocr_failed`, `kyc_failed`,
+`payment_error`, `other`), `code`, `message` (≤ 300, fără cifre lungi/emailuri),
+`page` (fără query), `step`, `service_slug`, `order_ref`, `user_agent`, `meta`
+(doar `mime`, `sizeBucket`, `fallback`, `docType`, `status`, `attempt`, `source`).
+Niciodată CNP, nume, email sau fișiere. Indexuri pe `created_at` și `kind`.

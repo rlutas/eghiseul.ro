@@ -45,10 +45,14 @@ import { getCountriesForForeignType } from '@/config/countries';
 import { DocumentTypePicker } from './DocumentTypePicker';
 import { DataSafetyNote } from './DataSafetyNote';
 import { validateCNP, summarizeCNP } from '@/lib/validations/cnp';
+import { cnpErrorCode, describeInvalidCnp, type CnpSex } from '@/lib/validations/cnp-help';
+import { reportClientError } from '@/lib/client-errors/report';
+import { sizeBucket } from '@/lib/client-errors/schema';
 import { cn } from '@/lib/utils';
 import { COUNTY_NAMES, getLocalitiesForCounty, getCountyName, findCounty } from '@/lib/data/romania-counties';
 import { fuzzyMatchLocality } from '@/lib/data/locality-fuzzy-match';
-import { compressImage } from '@/lib/images/compress';
+import { ImageCompressionError } from '@/lib/images/compress';
+import { prepareImageForUpload } from '@/lib/images/prepare-upload';
 import { randomId } from '@/lib/random-id';
 
 // Minimal ID Card Front Illustration (Gold theme)
@@ -150,6 +154,9 @@ const initialScanState: ScanState = {
 
 export default function PersonalDataStep({ config, onValidChange }: PersonalDataStepProps) {
   const { state, updatePersonalKyc, isPrefilled, prefillData, validationAttempt } = useModularWizard();
+  // Context for client error reports, read inside memoized handlers.
+  const errorCtxRef = useRef({ step: state.currentStepId as string, serviceSlug: state.serviceSlug, orderRef: state.friendlyOrderId });
+  errorCtxRef.current = { step: state.currentStepId, serviceSlug: state.serviceSlug, orderRef: state.friendlyOrderId };
   const personalKyc = state.personalKyc;
 
   // OCR scan handler commits `uploadedDocuments`/`ocrResults` as REPLACEMENT
@@ -367,8 +374,9 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         console.log(`[KYC] ${type}: PDF ${(file.size/1024).toFixed(0)}KB`);
       } else {
         // Image branch: compress + decode (EXIF-safe).
-        const compressed = await compressImage(file);
-        console.log(`[KYC] ${type}: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB`);
+        // Falls back to the original JPEG/PNG when this browser cannot decode it.
+        const compressed = await prepareImageForUpload(file, { ...errorCtxRef.current, docType: type });
+        console.log(`[KYC] ${type}: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB${compressed.fallback ? ' (original)' : ''}`);
         base64 = compressed.base64;
         mimeType = compressed.mimeType;
         preview = compressed.dataUrl;
@@ -588,6 +596,28 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       }
     } catch (error) {
       console.error('OCR error:', error);
+      // Compression failures are reported inside prepareImageForUpload.
+      if (!(error instanceof ImageCompressionError)) {
+        const message = error instanceof Error ? error.message : 'Eroare la procesare document';
+        const httpStatus = message.match(/\((\d{3})\)/)?.[1];
+        reportClientError({
+          kind: 'ocr_failed',
+          code: httpStatus
+            ? `HTTP_${httpStatus}`
+            : /încredere/.test(message)
+              ? 'LOW_CONFIDENCE'
+              : /CNP diferit/.test(message)
+                ? 'CNP_MISMATCH'
+                : /Citirea automată/.test(message)
+                  ? 'PROVIDER_DOWN'
+                  : 'EXTRACT_FAILED',
+          message,
+          step: errorCtxRef.current.step,
+          serviceSlug: errorCtxRef.current.serviceSlug ?? undefined,
+          orderRef: errorCtxRef.current.orderRef ?? undefined,
+          meta: { docType: type, mime: (file.type || 'unknown').slice(0, 40), sizeBucket: sizeBucket(file.size) },
+        });
+      }
       setState(prev => ({
         ...prev,
         scanning: false,
@@ -619,6 +649,24 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       });
     }
   }, [personalKyc, updatePersonalKyc]);
+
+  // Telemetry: a rejected CNP is reported once the customer leaves the field
+  // (not while typing). Only the error code goes out — never the digits.
+  const reportCnpIfInvalid = useCallback((value: string) => {
+    const clean = (value || '').replace(/\D/g, '');
+    if (!clean) return;
+    const code = cnpErrorCode(clean);
+    if (!code || code === 'EMPTY') return;
+    reportClientError({
+      kind: 'cnp_invalid',
+      code,
+      message: validateCNP(clean).errors[0],
+      step: state.currentStepId,
+      serviceSlug: state.serviceSlug ?? undefined,
+      orderRef: state.friendlyOrderId ?? undefined,
+      meta: { source: 'manual' },
+    });
+  }, [state.currentStepId, state.serviceSlug, state.friendlyOrderId]);
 
   // Handle CNP change with validation + auto-fill of derivable fields
   const handleCNPChange = useCallback((value: string) => {
@@ -905,6 +953,17 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
   }
 
   const cnpValidation = validateCNP(personalKyc.cnp);
+
+  // Sex read from the ID by OCR (if any) — used only to explain a first digit
+  // that contradicts it. The form has no sex field of its own.
+  const ocrSex: CnpSex | null = (() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    for (const r of (personalKyc.ocrResults || []) as any[]) {
+      const g = r?.extractedData?.gender;
+      if (g === 'male' || g === 'female') return g;
+    }
+    return null;
+  })();
 
   // After a scan, if the CNP couldn't be read — e.g. an upside-down passport
   // where both Gemini OCR and the MRZ fallback missed it — a Romanian citizen
@@ -1685,6 +1744,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
               maxLength={13}
               value={personalKyc.cnp}
               onChange={(e) => handleCNPChange(e.target.value)}
+              onBlur={(e) => reportCnpIfInvalid(e.target.value)}
               placeholder={personalKyc.citizenship === 'romanian' ? '1234567890123' : 'Lasă gol dacă nu ai CNP'}
               className={cn(
                 'font-mono text-lg tracking-wider pr-10 bg-white placeholder:text-neutral-400',
@@ -1705,6 +1765,18 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
               {cnpValidation.errors[0]}
             </p>
           )}
+          {!cnpValidation.valid && personalKyc.cnp.length === 13 && (() => {
+            // Decode what the typed digits say so the customer can spot the
+            // typo. Never suggests a corrected control digit (see cnp-help).
+            const help = describeInvalidCnp(personalKyc.cnp, ocrSex);
+            if (!help) return null;
+            return (
+              <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 space-y-1">
+                <p>{help.summary} {help.checkHint}</p>
+                {help.sexHint && <p className="font-medium">{help.sexHint}</p>}
+              </div>
+            );
+          })()}
         </div>
         )}
 

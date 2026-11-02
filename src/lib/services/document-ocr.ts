@@ -16,6 +16,7 @@
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { trackGeminiModel } from '@/lib/ai/usage-log';
 import { validateCNP } from '@/lib/validations/cnp';
 import { cleanNamePart } from '@/lib/format/person-name';
 import { isGeminiUnavailableError, OCR_UNAVAILABLE_MESSAGE } from './gemini-health';
@@ -129,7 +130,7 @@ export async function extractFromCIFront(
   imageBase64: string,
   mimeType: string
 ): Promise<OCRResult> {
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+  const model = trackGeminiModel(genAI.getGenerativeModel({ model: GEMINI_MODEL }), GEMINI_MODEL, 'ocr_ci_front');
 
   const prompt = `Analizează această imagine a unei cărți de identitate românești (față) și extrage TOATE datele vizibile.
 
@@ -263,7 +264,7 @@ export async function extractFromCIBack(
   imageBase64: string,
   mimeType: string
 ): Promise<OCRResult> {
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+  const model = trackGeminiModel(genAI.getGenerativeModel({ model: GEMINI_MODEL }), GEMINI_MODEL, 'ocr_ci_back');
 
   const prompt = `Analizează această imagine a unei cărți de identitate românești (verso/spate) și extrage adresa de domiciliu.
 
@@ -363,7 +364,7 @@ export async function extractFromCINouBack(
   imageBase64: string,
   mimeType: string
 ): Promise<OCRResult> {
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+  const model = trackGeminiModel(genAI.getGenerativeModel({ model: GEMINI_MODEL }), GEMINI_MODEL, 'ocr_ci_nou_back');
 
   const prompt = `Analizează această imagine a SPATELUI unei cărți electronice de identitate românești (CEI/eCI, cu cip).
 
@@ -442,7 +443,7 @@ export async function extractFromPassportOpened(
   imageBase64: string,
   mimeType: string
 ): Promise<OCRResult> {
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+  const model = trackGeminiModel(genAI.getGenerativeModel({ model: GEMINI_MODEL }), GEMINI_MODEL, 'ocr_passport_opened');
 
   const prompt = `Analizează această imagine a unui pașaport DESCHIS (ambele pagini vizibile: pagina cu foto + pagina opusă).
 
@@ -555,7 +556,7 @@ Răspunde în acest format JSON:
 export async function extractFromROCEIReaderPDF(
   pdfBase64: string
 ): Promise<OCRResult> {
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+  const model = trackGeminiModel(genAI.getGenerativeModel({ model: GEMINI_MODEL }), GEMINI_MODEL, 'ocr_ro_cei_pdf');
 
   const prompt = `Analizează acest PDF generat de aplicația oficială "RO CEI Reader" a MAI (Ministerul Afacerilor Interne din România).
 
@@ -1230,7 +1231,7 @@ export async function extractFromPassport(
   imageBase64: string,
   mimeType: string
 ): Promise<OCRResult> {
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+  const model = trackGeminiModel(genAI.getGenerativeModel({ model: GEMINI_MODEL }), GEMINI_MODEL, 'ocr_passport');
 
   const prompt = `Analizează această imagine a unui pașaport și extrage toate datele vizibile.
 
@@ -1314,7 +1315,7 @@ export async function extractFromDocument(
   imageBase64: string,
   mimeType: string
 ): Promise<OCRResult> {
-  const model = genAI.getGenerativeModel({ model: GEMINI_MODEL });
+  const model = trackGeminiModel(genAI.getGenerativeModel({ model: GEMINI_MODEL }), GEMINI_MODEL, 'ocr_auto_detect');
 
   const detectPrompt = `Analizează această imagine și determină ce tip de document este.
 

@@ -25,6 +25,8 @@ import {
   Coins,
   Phone,
   GraduationCap,
+  Cpu,
+  Bug,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -67,6 +69,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/tarife-ancpi', label: 'Tarife ANCPI', icon: Coins, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/colaboratori', label: 'Colaboratori', icon: Handshake, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/status-portaluri', label: 'Stare portaluri', icon: Activity, permission: 'orders.view', hideForRoles: ['avocat'] },
+  { href: '/admin/erori-clienti', label: 'Erori clienți', icon: Bug, permission: 'orders.view', hideForRoles: ['avocat'] },
   { href: '/admin/decontari', label: 'Decontări', icon: Banknote, permission: 'payments.verify', hideForRoles: ['avocat'] },
   { href: '/admin/costuri-furnizori', label: 'Costuri furnizori', icon: Coins, permission: 'payments.verify', hideForRoles: ['avocat'] },
   { href: '/admin/coupons', label: 'Cupoane', icon: Ticket, permission: 'settings.manage' },
@@ -74,6 +77,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/clienti', label: 'Clienți', icon: Users, permission: 'users.manage' },
   { href: '/admin/users', label: 'Utilizatori', icon: Users, permission: 'users.manage' },
   { href: '/admin/settings', label: 'Setari', icon: Settings, permission: 'settings.manage' },
+  { href: '/admin/credit-gemini', label: 'Credit Gemini', icon: Cpu, permission: 'settings.manage' },
   // Knowledge Center (14.09.2026): ce s-a livrat + procedurile echipei, citite
   // din docs/. Vizibil pentru orice rol de admin; badge cu livrările nevăzute.
   { href: '/admin/ghid', label: 'Ghid & noutăți', icon: GraduationCap },

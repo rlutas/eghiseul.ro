@@ -25,6 +25,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { ensureInvoiceForPaidOrder } from '@/lib/oblio';
 import type { ZeroVatInvoice } from '@/lib/oblio/vat';
 import { checkGeminiAndAlert } from '@/lib/services/gemini-health';
+import { checkGeminiCreditAndAlert } from '@/lib/ai/gemini-credit';
 import { sendEmail } from '@/lib/email/resend';
 
 const MIN_AGE_MS = 30 * 60 * 1000;
@@ -139,6 +140,9 @@ export async function POST(request: NextRequest) {
     return null;
   });
   if (gemini && !gemini.ok) console.error('[invoice-health-check] Gemini unavailable:', gemini.status, gemini.message);
+  // Estimated prepaid credit (top-ups typed in admin − logged usage of
+  // eghiseul + CJO). Emails once when < threshold or < 7 days of burn.
+  await checkGeminiCreditAndAlert(supabase, sendEmail);
 
   const now = Date.now();
   const cutoffNewIso = new Date(now - MIN_AGE_MS).toISOString();

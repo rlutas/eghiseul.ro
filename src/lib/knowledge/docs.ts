@@ -127,6 +127,13 @@ export interface GuideLink {
  */
 export const CURATED_GUIDES: GuideLink[] = [
   {
+    title: 'Credit Gemini și Erori clienți: cum le citești',
+    slug: 'admin/credit-gemini-si-erori-clienti',
+    category: 'automatizari',
+    description:
+      'Cât credit mai are citirea automată a actelor și pentru câte zile ajunge; cum treci o alimentare după plata în AI Studio; ce faci la alerta pe email; câți clienți au primit „poza nu a putut fi decodificată” sau „CNP invalid”.',
+  },
+  {
     title: 'Facturi furnizori pentru contabil: checklist lunar',
     slug: 'admin/facturi-furnizori-contabil',
     category: 'plati',
