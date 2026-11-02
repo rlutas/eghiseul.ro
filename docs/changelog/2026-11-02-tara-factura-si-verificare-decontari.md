@@ -7,6 +7,8 @@
 - Pe eghiseul.ro, regiunea scrisă de clientul străin (de exemplu „Lombardia”) trece acum în localitate, nu în județ. O factură pentru un client din Italia (EGH-0625, septembrie) a plecat la ANAF cu țara România din cauza asta.
 - **Decontările din septembrie și octombrie sunt verificate.** Toate payout-urile Stripe se regăsesc pe extrasul de bancă, cu aceeași sumă. Toate plățile cu cardul au factură. Extrasul din octombrie e importat complet, o singură dată.
 - **Client care a plătit de două ori 89 lei** (extras CF, 22 și 23.10): al doilea transfer e folosit pentru comanda lui nouă, care e acum plătită și facturată. Nota e pe ambele comenzi.
+- **Disputa bancară de 79,99 lei (extras CF din iulie), pierdută la bancă:** decizie, factura rămâne, nu se face storno, iar clientul are credit pentru un extras CF. Rândul din decontări scrie asta în loc de „se emite storno”.
+- Facturile vechi emise cu județ greșit pe țară străină nu se corectează; problema e reparată pentru facturile noi.
 - La o proformă Oblio plătită cu cardul, rândul din decontări arată „Proformă Oblio EGIP …”, iar factura e în coloana Factură (de exemplu EGIP 0323 → EGI2024-24340).
 
 ---
@@ -21,4 +23,4 @@
   - EGH-0583 era marcată `blocked` (02.09). Acum trece: a fost corectată în Oblio, iar statusul din DB era vechi.
   - Facturile deja emise nu se modifică automat.
 - **Decontări:** `stripe_payouts` față de `bank_statement_entries` pe 09 și 10: 22/22 + 22/22 potrivite la ban. Intrarea în bancă e cu o zi lucrătoare înainte de `arrival_date`. 172 de rânduri charge/payment în octombrie, 172 de facturi distincte. Ce nu are factură e intenționat: dispută, comision dispută 100 lei, rambursări 70% fără factură inițială.
-- **Dispută `EGI2024-24278` (79,99 lei):** Stripe o raportează `lost`. De verificat în Stripe și, dacă e pierdută, storno 79,99 lei.
+- **Dispută `EGI2024-24278` (79,99 lei):** Stripe o raportează `lost`. Decizia lui Raul (02.11): fără storno, clientul are credit pentru un extras CF. `DISPUTE_DECISIONS` în `src/lib/accounting/disputes.ts` (cheie = charge id) înlocuiește textul implicit „se emite storno” la următorul sync.

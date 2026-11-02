@@ -73,3 +73,15 @@ describe('disputeStatusRo', () => {
     expect(disputeStatusRo(null)).toBe('stare necunoscută');
   });
 });
+
+describe('owner decision on a lost dispute', () => {
+  it('replaces "se emite storno" when the owner decided otherwise', () => {
+    const row = { type: 'adjustment', gross_bani: -7999, fee_bani: 10000, description: null };
+    const lost = { status: 'lost', reason: 'product_unacceptable', evidenceDueBy: null };
+    const withDecision = describeDisputeRow(row, lost, null, 'ch_3Ton2UHGb8JBHhcl1stLZfNI');
+    expect(withDecision).toContain('FĂRĂ storno');
+    expect(withDecision).not.toContain('se emite storno');
+    const other = describeDisputeRow(row, lost, null, 'ch_other');
+    expect(other).toContain('se emite storno');
+  });
+});

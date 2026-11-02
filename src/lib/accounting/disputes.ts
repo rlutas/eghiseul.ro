@@ -47,6 +47,18 @@ const STATUS_RO: Record<string, string> = {
   warning_closed: 'închisă',
 };
 
+/**
+ * Owner decisions on LOST disputes that replace the default "se emite storno".
+ * Keyed by the disputed charge id. Only the owner (Raul) adds entries here.
+ */
+export const DISPUTE_DECISIONS: Record<string, string> = {
+  // EGI2024-24278, extras CF from 07.07.2026, lost at the bank. Decision
+  // 02.11.2026: no storno, the invoice stays and the client has a credit
+  // for one extras CF.
+  ch_3Ton2UHGb8JBHhcl1stLZfNI:
+    'pierdută · decizie 02.11.2026: FĂRĂ storno, factura rămâne, clientul are credit pentru un extras CF',
+};
+
 const REASON_RO: Record<string, string> = {
   product_unacceptable: 'produs neconform',
   product_not_received: 'produs neprimit',
@@ -92,7 +104,8 @@ export interface OriginalCharge {
 export function describeDisputeRow(
   row: DisputeRowInput,
   dispute: DisputeInfo | null,
-  original: OriginalCharge | null
+  original: OriginalCharge | null,
+  chargeId?: string | null
 ): string {
   const parts: string[] = [];
   if (row.type === 'stripe_fee') {
@@ -106,7 +119,8 @@ export function describeDisputeRow(
     );
   }
   if (dispute) {
-    parts.push(`stare: ${disputeStatusRo(dispute.status)}`);
+    const decision = dispute.status === 'lost' && chargeId ? DISPUTE_DECISIONS[chargeId] : undefined;
+    parts.push(`stare: ${decision ?? disputeStatusRo(dispute.status)}`);
     parts.push(`motiv: ${disputeReasonRo(dispute.reason)}`);
     if (dispute.evidenceDueBy && /needs_response/.test(dispute.status ?? '')) {
       parts.push(`termen răspuns ${dispute.evidenceDueBy}`);
@@ -181,7 +195,7 @@ export async function refreshDisputeRows(
       original = orig ?? null;
     }
 
-    const description = describeDisputeRow(row, dispute, original);
+    const description = describeDisputeRow(row, dispute, original, chargeId);
     const patch: Record<string, unknown> = { description };
     if (chargeId) patch.charge_id = chargeId;
     if (original) {
