@@ -29,6 +29,12 @@
  * (`phone_no_answer_attempts`, pe oricare comandă a lui — potrivire pe email
  * sau telefon) iese din coadă ca și cei sunați; comenzile începute DUPĂ a doua
  * încercare revin. Cu `includeContacted=1` apare marcat `noAnswerClosed`.
+ *
+ * Sunat pe altă comandă (02.11.2026): un apel din ultimele 60 de zile pe
+ * ORICARE comandă a clientului (email sau telefon, logat de aici sau din
+ * Abandonuri) contează ca apel pe toate comenzile lui. Înainte, coada ascundea
+ * doar comanda sunată, iar o comandă mai veche a aceluiași client urca în
+ * locul ei — 22 de comenzi pe 30 de zile, sunate a doua oară.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -36,18 +42,19 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
 import {
-  hasProgressBeyondContact,
   isForeignPhone,
   dataDepthScore,
   identifiableName,
 } from '@/lib/orders/abandoned-progress';
-import { isSuspiciousEmail, isUndeliverable } from '@/lib/email/deliverability';
 import {
+  buildCallIndex,
   buildPaidIndex,
+  findCall,
   findPaymentAfter,
   summarizeCalls,
   type PaidOrderRef,
 } from '@/lib/orders/phone-recovery-wins';
+import { CLAIM_DAYS, isRecoveryQueueCandidate } from '@/lib/orders/recovery-claims';
 import {
   buildNoAnswerIndex,
   isClosedByNoAnswer,
@@ -161,7 +168,7 @@ export async function GET(request: NextRequest) {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ordersTable = admin.from('orders') as any;
-  let query = ordersTable
+  const query = ordersTable
     .select(
       'id, order_number, friendly_order_id, status, total_price, customer_data:customer_data_list, created_at, updated_at, phone_contacted_at, phone_contacted_by, phone_contact_notes, recovery_email_step, current_step, stripe_checkout_session_id, payment_failed_count, payment_last_error, manual_recovery_email_at, manual_recovery_email_by, phone_no_answer_attempts, services(name, slug)'
     )
@@ -170,9 +177,8 @@ export async function GET(request: NextRequest) {
     .order('created_at', { ascending: false })
     .limit(300);
 
-  if (!includeContacted) {
-    query = query.is('phone_contacted_at', null);
-  }
+  // Called orders are filtered after the call index is applied (below): a
+  // call on another order of the same client counts too.
 
   // The paid-orders index and the calls of the lookback window don't depend on
   // the queue query: start all three together (they ran one after another,
@@ -221,6 +227,23 @@ export async function GET(request: NextRequest) {
     })) as PaidOrderRef[]
   );
 
+  // Calls of the last CLAIM_DAYS days on any order, by email and phone.
+  const callSinceMs = Date.now() - CLAIM_DAYS * 86_400_000;
+  const callIndex = buildCallIndex(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((contactedRows ?? []) as any[])
+      .filter((c) => new Date(c.phone_contacted_at).getTime() >= callSinceMs)
+      .map((c) => ({
+        email: c.contact?.email ?? null,
+        phone: c.contact?.phone ?? null,
+        at: c.phone_contacted_at,
+        by: c.phone_contacted_by ?? null,
+        notes: c.phone_contact_notes ?? null,
+        ref: c.friendly_order_id ?? String(c.id).slice(0, 8),
+        orderId: c.id,
+      }))
+  );
+
   // Clients closed by two no-answers, over every order of the window (the
   // attempts may sit on an older order than the one shown for that email).
   const noAnswerIndex = buildNoAnswerIndex(
@@ -237,29 +260,18 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const cd = (order.customer_data ?? {}) as any;
 
-    if (order.status === 'draft' && !hasProgressBeyondContact(order.customer_data)) {
-      continue; // window-shopper — nimic real de discutat la telefon
-    }
-    const name = identifiableName(order.customer_data);
-    if (!name) {
-      continue; // nici nume nu avem — nu merită apel, oricum primește email
-    }
-
-    const email = ((cd.contact?.email ?? '') as string).trim().toLowerCase() || null;
-    if (email && (isUndeliverable(email) || isSuspiciousEmail(email))) {
-      continue; // adresă inventată — apelul ar fi pe un „client" fictiv
-    }
-    // Already paid on another order (on their own or after a call): not „de sunat".
-    const paidLater = findPaymentAfter(
-      paidIndex,
-      email,
-      order.phone_contacted_at ?? order.created_at,
-      order.phone_contacted_at ? undefined : 0
-    );
-    if (paidLater) {
+    // Window-shopper drafts, no name, invented email, or paid since (on any
+    // order): not „de sunat". Same rule keeps clients out of Abandonuri.
+    if (!isRecoveryQueueCandidate(order, paidIndex)) {
       continue;
     }
+    const name = identifiableName(order.customer_data)!;
+    const email = ((cd.contact?.email ?? '') as string).trim().toLowerCase() || null;
     const phone = (cd.contact?.phone ?? null) as string | null;
+    // A call on another order of this client (newest one) counts as this
+    // order's call when the order has none of its own.
+    const clientCall = order.phone_contacted_at ? null : findCall(callIndex, email, phone);
+    const contactedAt: string | null = order.phone_contacted_at ?? clientCall?.at ?? null;
     const noAnswerClosed = isClosedByNoAnswer(noAnswerIndex, email, phone, order.created_at);
     if (noAnswerClosed && !includeContacted) {
       continue; // 2 încercări fără răspuns: recuperarea s-a închis
@@ -291,9 +303,13 @@ export async function GET(request: NextRequest) {
       isCivilStatus: civilStatus,
       depthScore,
       tier,
-      phoneContactedAt: order.phone_contacted_at ?? null,
-      phoneContactedBy: order.phone_contacted_by ?? null,
-      phoneContactNotes: order.phone_contact_notes ?? null,
+      phoneContactedAt: contactedAt,
+      phoneContactedBy: order.phone_contacted_at ? order.phone_contacted_by ?? null : clientCall?.by ?? null,
+      phoneContactNotes: order.phone_contacted_at
+        ? order.phone_contact_notes ?? null
+        : clientCall
+          ? [`Sunat pe comanda ${clientCall.ref}`, clientCall.notes].filter(Boolean).join(' — ')
+          : null,
       duplicateCount: 1,
       freshness: freshnessOf(order.created_at, Date.now()),
       recoveryEmailStep: Number(order.recovery_email_step ?? 0),
@@ -344,7 +360,9 @@ export async function GET(request: NextRequest) {
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
   rows.length = 0;
-  rows.push(...deduped);
+  // Un client sunat (pe oricare comandă) iese din „De sunat"; dedup-ul a ales
+  // deja rândul lui cel mai nou, deci filtrul de după acoperă tot clientul.
+  rows.push(...(includeContacted ? deduped : deduped.filter((r) => !r.phoneContactedAt)));
 
   // Calls of the lookback window: who paid afterwards (on any order, usually a
   // new one) is a recovery, shown in its own list instead of the open queue.

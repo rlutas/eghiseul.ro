@@ -9,6 +9,8 @@ import { LAWYER_SERVICE_SLUGS } from '@/lib/documents/no-lawyer-services';
 import { applyQuickOrStage } from '@/lib/admin/order-quick-filters';
 import { getOpenOutages } from '@/lib/services/platform-services';
 import { buildCallIndex, findCall, type CalledOrderRef } from '@/lib/orders/phone-recovery-wins';
+import { findClaim, MATCH_WINDOW_DAYS, pickVisibleIds, type ClaimReason } from '@/lib/orders/recovery-claims';
+import { loadRecoveryClaimIndex } from '@/lib/orders/recovery-claims-loader';
 
 // Calls logged in „Recuperare telefonică" within this window are shown on the
 // unpaid orders, matched by email or phone across all the client's orders.
@@ -65,11 +67,7 @@ export async function GET(request: NextRequest) {
     //   anything else (default = "hide") → live only (is_test=false)
     const testFilter = parseTestFilter(searchParams.get('test'));
 
-    // Build query
-    let query = adminClient
-      .from('orders')
-      .select(
-        `
+    const SELECT = `
         id,
         friendly_order_id,
         order_number,
@@ -97,92 +95,172 @@ export async function GET(request: NextRequest) {
         coupon_code,
         admin_notes,
         services(name, slug)
-      `,
-        { count: 'estimated' }
-      )
-      // paid_at first: o comandă creată ca draft ieri și plătită azi trebuie
-      // să apară în top AZI (echipa se uită la capul listei) — sortarea pe
-      // created_at o îngropa printre comenzile de ieri (caz real E-260714-773QA).
-      // Neplătitele (paid_at null) cad pe created_at.
-      // `nullsFirst`: an order that is live but not yet paid (transfer bancar
-      // with the proof uploaded, E-260918-SJCQY) has paid_at NULL — with
-      // NULLS LAST it sank under every paid order onto the final page of
-      // „Toate" and looked lost. Drafts/pending are already out of this list.
-      // Closed orders (completed / cancelled / refunded — `is_closed`, a
-      // generated column, migration 179) sink under the live ones: they need
-      // nothing from the team, and „Toate" is read from the top (Raul,
-      // 18.09.2026). Inside each half the recency order below still applies.
-      .order('is_closed', { ascending: true })
-      .order('paid_at', { ascending: false, nullsFirst: true })
-      .order('created_at', { ascending: false })
-      .range(page * limit, (page + 1) * limit - 1);
-
-    // Apply status filter via the shared resolver — supports tab values
-    // (paid/processing/shipped/completed/abandoned) plus the all + debug
-    // statuses (draft/pending/etc).
-    query = applyStatusFilter(query, resolveStatusFilter(status));
-
-    // Sandbox/test filter — three-state chip group: hide | only | all.
-    if (testFilter === 'only') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      query = (query as any).eq('is_test', true);
-    } else if (testFilter === 'hide') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      query = (query as any).eq('is_test', false);
-    }
-    // 'all' → no filter
-
-    // Brand filter (`?platform=eghiseul|documentero`) — the two public sites
-    // share this list; the chip narrows it to one of them.
-    const platformFilter = searchParams.get('platform');
-    if (platformFilter === 'eghiseul' || platformFilter === 'documentero') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      query = (query as any).eq('platform', platformFilter);
-    }
-
-    // Service filter — exact match on service_id (UUID). The UI passes the
-    // service id from the services dropdown.
-    if (service) {
-      query = query.eq('service_id', service);
-    }
+      `;
 
     // Scopare avocat: DOAR serviciile prin avocat (restul nu o privesc).
+    let lawyerServiceIds: string[] | null = null;
     if (userRole === 'avocat') {
       const { data: lawyerServices } = await adminClient
         .from('services')
         .select('id')
         .in('slug', [...LAWYER_SERVICE_SLUGS]);
-      const includeIds = (lawyerServices ?? []).map((s) => s.id);
-      // Fără potrivire = niciun serviciu prin avocat → listă goală, nu listă completă.
-      query = query.in('service_id', includeIds.length > 0 ? includeIds : ['00000000-0000-0000-0000-000000000000']);
+      lawyerServiceIds = (lawyerServices ?? []).map((s) => s.id);
     }
-
-    // Quick-filter / workflow-stage chip (overdue | deadline_soon | with_coupon
-    // | documents_generated | submitted | received | ready).
+    const platformFilter = searchParams.get('platform');
     const quick = searchParams.get('quick') || '';
-    if (quick) {
-      query = applyQuickOrStage(query, quick);
-    }
 
-    // Apply search filter (server-side). Parity with sister: also match client
-    // name (first/last), phone and billing name — the team looks people up by name.
-    if (search) {
-      // PostgREST uses -> for JSON traversal, ->> for text extraction.
-      query = query.or(
-        [
-          `order_number.ilike.%${search}%`,
-          `friendly_order_id.ilike.%${search}%`,
-          `delivery_tracking_number.ilike.%${search}%`,
-          `customer_data->contact->>email.ilike.%${search}%`,
-          `customer_data->contact->>phone.ilike.%${search}%`,
-          `customer_data->personal->>firstName.ilike.%${search}%`,
-          `customer_data->personal->>lastName.ilike.%${search}%`,
-          `customer_data->billing->>name.ilike.%${search}%`,
-        ].join(',')
+    // Every filter of the list, as one function: the page query, the id
+    // prefix and the „Recuperare telefonică" lookups below must see the same rows.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const withFilters = (q: any): any => {
+      // Apply status filter via the shared resolver — supports tab values
+      // (paid/processing/shipped/completed/abandoned) plus the all + debug
+      // statuses (draft/pending/etc).
+      q = applyStatusFilter(q, resolveStatusFilter(status));
+      // Sandbox/test filter — three-state chip group: hide | only | all.
+      if (testFilter === 'only') q = q.eq('is_test', true);
+      else if (testFilter === 'hide') q = q.eq('is_test', false);
+      // Brand filter (`?platform=eghiseul|documentero`) — the two public sites
+      // share this list; the chip narrows it to one of them.
+      if (platformFilter === 'eghiseul' || platformFilter === 'documentero') {
+        q = q.eq('platform', platformFilter);
+      }
+      // Service filter — exact match on service_id (UUID). The UI passes the
+      // service id from the services dropdown.
+      if (service) q = q.eq('service_id', service);
+      if (lawyerServiceIds) {
+        // Fără potrivire = niciun serviciu prin avocat → listă goală, nu listă completă.
+        q = q.in('service_id', lawyerServiceIds.length > 0 ? lawyerServiceIds : ['00000000-0000-0000-0000-000000000000']);
+      }
+      // Quick-filter / workflow-stage chip (overdue | deadline_soon | with_coupon
+      // | documents_generated | submitted | received | ready).
+      if (quick) q = applyQuickOrStage(q, quick);
+      // Apply search filter (server-side). Parity with sister: also match client
+      // name (first/last), phone and billing name — the team looks people up by name.
+      if (search) {
+        // PostgREST uses -> for JSON traversal, ->> for text extraction.
+        q = q.or(
+          [
+            `order_number.ilike.%${search}%`,
+            `friendly_order_id.ilike.%${search}%`,
+            `delivery_tracking_number.ilike.%${search}%`,
+            `customer_data->contact->>email.ilike.%${search}%`,
+            `customer_data->contact->>phone.ilike.%${search}%`,
+            `customer_data->personal->>firstName.ilike.%${search}%`,
+            `customer_data->personal->>lastName.ilike.%${search}%`,
+            `customer_data->billing->>name.ilike.%${search}%`,
+          ].join(',')
+        );
+      }
+      return q;
+    };
+    // paid_at first: o comandă creată ca draft ieri și plătită azi trebuie
+    // să apară în top AZI (echipa se uită la capul listei) — sortarea pe
+    // created_at o îngropa printre comenzile de ieri (caz real E-260714-773QA).
+    // Neplătitele (paid_at null) cad pe created_at.
+    // `nullsFirst`: an order that is live but not yet paid (transfer bancar
+    // with the proof uploaded, E-260918-SJCQY) has paid_at NULL — with
+    // NULLS LAST it sank under every paid order onto the final page of
+    // „Toate" and looked lost. Drafts/pending are already out of this list.
+    // Closed orders (completed / cancelled / refunded — `is_closed`, a
+    // generated column, migration 179) sink under the live ones: they need
+    // nothing from the team, and „Toate" is read from the top (Raul,
+    // 18.09.2026). Inside each half the recency order below still applies.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const withOrder = (q: any): any =>
+      q
+        .order('is_closed', { ascending: true })
+        .order('paid_at', { ascending: false, nullsFirst: true })
+        .order('created_at', { ascending: false });
+
+    // „Abandonuri" / „Neplătite" without the clients of „Recuperare
+    // telefonică" (team request 12.10.2026: the same client was called from
+    // both lists). Hidden by default; `?includeRecovery=1` shows them, marked.
+    // A search shows everything (looking a client up must find them).
+    const isUnpaidTab = status === 'abandoned';
+    const includeRecovery = searchParams.get('includeRecovery') === '1';
+    let claimIndex: Map<string, ClaimReason> | null = null;
+    const hiddenReasons = new Map<string, ClaimReason>();
+    if (isUnpaidTab) {
+      claimIndex = await loadRecoveryClaimIndex(adminClient);
+      if (!search && claimIndex.size > 0) {
+        // One contact read per unpaid order of the window (an `or` of 40
+        // email/phone conditions re-reads customer_data per condition and hit
+        // the statement timeout, measured 02.11.2026).
+        const since = new Date(Date.now() - MATCH_WINDOW_DAYS * 86_400_000).toISOString();
+        for (let from = 0; from < 5000; from += 1000) {
+          const res = await withFilters(adminClient.from('orders').select('id, contact:customer_data->contact'))
+            .gte('created_at', since)
+            .order('created_at', { ascending: false })
+            .range(from, from + 999);
+          if (res.error) {
+            console.error('List orders: recovery lookup failed:', res.error.message);
+            break;
+          }
+          const batch = (res.data ?? []) as Array<{ id: string; contact: { email?: string | null; phone?: string | null } | null }>;
+          for (const row of batch) {
+            const reason = findClaim(claimIndex, row.contact?.email, row.contact?.phone);
+            if (reason) hiddenReasons.set(row.id, reason);
+          }
+          if (batch.length < 1000) break;
+        }
+      }
+    }
+    const hideRecovery = isUnpaidTab && !search && !includeRecovery && hiddenReasons.size > 0;
+
+    let orders: unknown[] | null = null;
+    let error: { message: string } | null = null;
+    let count: number | null = null;
+    if (!hideRecovery) {
+      const res = await withOrder(withFilters(adminClient.from('orders').select(SELECT, { count: 'estimated' }))).range(
+        page * limit,
+        (page + 1) * limit - 1
       );
+      orders = res.data;
+      error = res.error;
+      count = res.count;
+    } else {
+      // The ids in list order, far enough to hold this page once the hidden
+      // ones are skipped (PostgREST returns at most 1000 rows per request).
+      const offset = page * limit;
+      const need = offset + limit + hiddenReasons.size;
+      const orderedIds: string[] = [];
+      for (let from = 0; from < need; from += 1000) {
+        const to = Math.min(from + 999, need - 1);
+        const res = await withOrder(withFilters(adminClient.from('orders').select('id'))).range(from, to);
+        if (res.error) {
+          error = res.error;
+          break;
+        }
+        const batch = ((res.data ?? []) as Array<{ id: string }>).map((r) => r.id);
+        orderedIds.push(...batch);
+        if (batch.length < to - from + 1) break;
+      }
+      const pageIds = pickVisibleIds(orderedIds, new Set(hiddenReasons.keys()), offset, limit);
+      if (!error) {
+        const [pageRes, countRes] = await Promise.all([
+          pageIds.length
+            ? withFilters(adminClient.from('orders').select(SELECT)).in('id', pageIds)
+            : Promise.resolve({ data: [], error: null }),
+          withFilters(adminClient.from('orders').select('id', { count: 'exact', head: true })),
+        ]);
+        error = pageRes.error ?? countRes.error ?? null;
+        const position = new Map(pageIds.map((id, i) => [id, i]));
+        orders = ((pageRes.data ?? []) as Array<{ id: string }>).sort(
+          (a, b) => (position.get(a.id) ?? 0) - (position.get(b.id) ?? 0)
+        );
+        count = Math.max(0, (countRes.count ?? 0) - hiddenReasons.size);
+      }
     }
-
-    const { data: orders, error, count } = await query;
+    const recoveryHidden = isUnpaidTab && !search
+      ? {
+          total: hiddenReasons.size,
+          queue: [...hiddenReasons.values()].filter((r) => r === 'queue').length,
+          called: [...hiddenReasons.values()].filter((r) => r === 'called').length,
+          noAnswer: [...hiddenReasons.values()].filter((r) => r === 'no_answer').length,
+          shown: !hideRecovery,
+        }
+      : null;
 
     if (error) {
       return NextResponse.json(
@@ -325,9 +403,17 @@ export async function GET(request: NextRequest) {
         onrc: onrcByOrder[o.id] ?? null,
         unread_messages: unreadMessages[o.id] ?? 0,
         phone_call: callByOrder[o.id] ?? null,
+        recovery_claim: claimIndex
+          ? findClaim(
+              claimIndex,
+              (o.customer_data as { contact?: { email?: string | null } } | null)?.contact?.email,
+              (o.customer_data as { contact?: { phone?: string | null } } | null)?.contact?.phone
+            )
+          : null,
       })),
       total: count || 0,
       openOutages,
+      recoveryHidden,
     });
   } catch (error) {
     console.error('List orders error:', error);

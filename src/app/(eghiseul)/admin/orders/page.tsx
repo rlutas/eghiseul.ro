@@ -54,6 +54,7 @@ import { getCustomerName } from '@/lib/admin/customer-name';
 // used to carry a stale 9-entry copy that showed newer statuses as raw slugs.
 import { STATUS_BADGES as STATUS_CONFIG } from '@/lib/admin/status-badges';
 import { MarkCalledDialog } from '@/components/admin/mark-called-dialog';
+import { CLAIM_LABELS, type ClaimReason } from '@/lib/orders/recovery-claims';
 import { PaymentSignalNote } from '@/components/admin/payment-signal-note';
 
 interface OrderRow {
@@ -122,6 +123,8 @@ interface OrderRow {
   unread_messages?: number;
   /** Call logged in „Recuperare telefonică” for this client (any of their orders). */
   phone_call?: { at: string; by: string | null; notes: string | null; ref: string; orderId: string } | null;
+  /** Client in „Recuperare telefonică" (Neplătite tab only): why it is hidden by default. */
+  recovery_claim?: ClaimReason | null;
   services: { name: string; slug: string } | null;
 }
 
@@ -132,6 +135,16 @@ interface ServiceOption {
 }
 
 const PAGE_SIZE = 25;
+
+/** How many unpaid orders the list keeps out because their client is in „Recuperare telefonică". */
+interface RecoveryHidden {
+  total: number;
+  queue: number;
+  called: number;
+  noAnswer: number;
+  /** True when the toggle shows them anyway. */
+  shown: boolean;
+}
 
 export default function AdminOrdersPage() {
   const router = useRouter();
@@ -146,10 +159,13 @@ export default function AdminOrdersPage() {
   const urlSearch = searchParams.get('search') || '';
   const urlQuick = searchParams.get('quick') || '';
   const urlPage = Math.max(0, parseInt(searchParams.get('page') || '0', 10));
+  // Neplătite: clients of „Recuperare telefonică" are hidden unless this is on.
+  const urlIncludeRecovery = searchParams.get('includeRecovery') === '1';
 
   const [orders, setOrders] = useState<OrderRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
+  const [recoveryHidden, setRecoveryHidden] = useState<RecoveryHidden | null>(null);
   const [counts, setCounts] = useState<OrdersCounts | null>(null);
   const [services, setServices] = useState<ServiceOption[]>([]);
   const [openOutages, setOpenOutages] = useState<OpenOutages>({ ancpi: null, onrc: null });
@@ -203,10 +219,11 @@ export default function AdminOrdersPage() {
     if (urlQuick) params.set('quick', urlQuick);
     if (urlTest !== 'hide') params.set('test', urlTest);
     if (urlPlatform) params.set('platform', urlPlatform);
+    if (urlIncludeRecovery) params.set('includeRecovery', '1');
     params.set('page', String(urlPage));
     params.set('limit', String(PAGE_SIZE));
     return params.toString();
-  }, [urlStatus, urlService, urlSearch, urlQuick, urlTest, urlPlatform, urlPage]);
+  }, [urlStatus, urlService, urlSearch, urlQuick, urlTest, urlPlatform, urlPage, urlIncludeRecovery]);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -225,6 +242,7 @@ export default function AdminOrdersPage() {
       })) as OrderRow[];
       setOrders(typedOrders);
       setTotalCount(json.total || 0);
+      setRecoveryHidden((json.recoveryHidden as RecoveryHidden | null | undefined) ?? null);
       setOpenOutages((json.openOutages as OpenOutages | undefined) ?? { ancpi: null, onrc: null });
     } catch (err) {
       console.error('Failed to fetch orders:', err);
@@ -513,6 +531,42 @@ export default function AdminOrdersPage() {
         )}
       </div>
 
+      {/* Neplătite fără clienții din Recuperare telefonică (cerere echipă
+          12.10.2026: același client era sunat din ambele liste). */}
+      {urlStatus === 'abandoned' && recoveryHidden && recoveryHidden.total > 0 && (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-sm text-sky-900">
+          <Phone className="h-4 w-4 shrink-0" />
+          <span>
+            {recoveryHidden.shown ? 'Se văd și ' : 'Ascunse: '}
+            <strong>{recoveryHidden.total}</strong>{' '}
+            {recoveryHidden.total === 1 ? 'comandă a unui client' : 'comenzi ale clienților'} din{' '}
+            <a href="/admin/recuperare-telefonica" className="font-medium underline" onClick={(e) => e.stopPropagation()}>
+              Recuperare telefonică
+            </a>
+            <span className="text-sky-700">
+              {' '}
+              ({[
+                recoveryHidden.queue ? `${recoveryHidden.queue} în coadă` : null,
+                recoveryHidden.called ? `${recoveryHidden.called} deja sunați` : null,
+                recoveryHidden.noAnswer ? `${recoveryHidden.noAnswer} fără răspuns` : null,
+              ]
+                .filter(Boolean)
+                .join(', ')}
+              ){recoveryHidden.shown ? '' : ' — nu-i suna de aici, îi sună colegele de acolo.'}
+            </span>
+          </span>
+          <label className="ml-auto inline-flex cursor-pointer items-center gap-2 text-xs font-medium">
+            <input
+              type="checkbox"
+              checked={urlIncludeRecovery}
+              onChange={(e) => updateParams({ includeRecovery: e.target.checked ? '1' : null })}
+              className="h-4 w-4 rounded border-sky-300"
+            />
+            Arată și cele din recuperare telefonică
+          </label>
+        </div>
+      )}
+
       {/* Table */}
       <div className="rounded-lg border bg-white">
         <Table>
@@ -719,6 +773,15 @@ export default function AdminOrdersPage() {
                         <Phone className="h-3 w-3" />
                         Sunat {new Date(order.phone_call.at).toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', timeZone: 'Europe/Bucharest' })}
                         {order.phone_call.orderId !== order.id && <span className="text-sky-600">· altă comandă</span>}
+                      </div>
+                    )}
+                    {order.recovery_claim && !order.phone_call && (
+                      <div
+                        className="mt-1 inline-flex items-center gap-1 whitespace-nowrap rounded bg-amber-50 px-1.5 py-0.5 text-[11px] font-medium text-amber-800"
+                        title="Clientul e în Recuperare telefonică: îl sună colegele de acolo, nu din lista asta."
+                      >
+                        <Phone className="h-3 w-3" />
+                        {CLAIM_LABELS[order.recovery_claim]}
                       </div>
                     )}
                   </TableCell>
