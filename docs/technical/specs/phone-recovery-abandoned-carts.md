@@ -135,6 +135,17 @@ Clientul sunat plătește aproape mereu pe o comandă **nouă**, deci comanda su
 
 Cifre la 06.10.2026 (citire producție): 20 de apeluri în 30 de zile, 4 în ultimele 7; 2 comenzi plătite după apel, 1.744,80 lei; în coadă 20 de clienți nesunați (3 din ultimele 7 zile), 4 ascunși pentru că au plătit pe altă comandă.
 
+## „Nu a răspuns” ×2 (02.11.2026)
+
+Cerere echipă 07.10: două căsuțe înaintea numelui, bifate când clientul nu răspunde; după a doua încercare recuperarea se închide. Același lucru pe CazierJudiciarOnline (migrarea CJO 043, `POST /api/admin/phone-recovery/[id]/no-answer`).
+
+- **Schema** (migrarea 196): `orders.phone_no_answer_attempts jsonb NOT NULL DEFAULT '[]'` = `[{ at, caller }]`, cel mult 2, cele mai vechi primele.
+- **`POST /api/admin/orders/[id]/phone-no-answer`** — `orders.manage`. Body `{ action: 'add' | 'undo', caller: 'Maria' | 'Carla' }`. `add` adaugă o încercare (409 la a treia), `undo` o scoate pe ultima (409 dacă nu e niciuna). Răspuns `{ success, data: { id, attempts } }`. Audit în `order_history` cu `event_type='phone_contact_logged'` (valoare deja permisă de CHECK, migrarea 194) și `new_value { no_answer_attempts, action }`.
+- **Coada** (`priority-calls`): index pe email + telefon (`buildNoAnswerIndex` în `src/lib/orders/phone-no-answer.ts`) peste toate comenzile din fereastră. Comanda e scoasă din „De sunat” dacă clientul are 2 încercări pe ORICARE comandă a lui și comanda a fost începută până la a doua încercare; o comandă începută după asta revine. Cu `includeContacted=1` rândul rămâne, cu `noAnswerClosed: true` („Nu răspunde ×2”). `unpaidNoCall7` nu-i mai numără.
+- **Pe ce comandă se bifează**: pe rândul văzut în coadă (cea mai nouă comandă a emailului). Închiderea urmează clientul (email/telefon), la fel ca `buildCallIndex`/`findCall`, ca să nu reapară o comandă mai veche a aceluiași client.
+- **Nu e apel**: `phone_contacted_at` nu se atinge, deci încercările nu intră în KPI-urile de apeluri și nici în „Recuperate”.
+- **UI**: căsuța următoare adaugă, ultima bifată anulează; restul sunt dezactivate. Data și cine apar la hover. Numele se ia din alegerea memorată pe calculator (`localStorage`), altfel se cere Maria/Carla. După a doua bifă rândul rămâne estompat până la reîncărcare (ca să poată fi debifat).
+
 ## UI — `/admin/recuperare-telefonica`
 
 Tabel cu prioritate/client/telefon/serviciu/valoare/vechime/status apel +
@@ -148,6 +159,7 @@ ascuns pentru rolul `avocat` (la fel ca restul secțiunii operaționale).
 - `supabase/migrations/156_phone_recovery_tracking.sql`
 - `src/lib/orders/abandoned-progress.ts` (nou, extras din cronul recovery-emails)
 - `src/app/api/admin/orders/[id]/phone-contact/route.ts`
+- `supabase/migrations/196_phone_no_answer_attempts.sql`, `src/lib/orders/phone-no-answer.ts`, `src/app/api/admin/orders/[id]/phone-no-answer/route.ts`, `tests/unit/lib/orders/phone-no-answer.test.ts` (02.11)
 - `src/app/api/admin/orders/priority-calls/route.ts`
 - `src/app/admin/recuperare-telefonica/page.tsx`
 - `src/app/api/admin/coupons/route.ts` (extins cu `system_kind`)

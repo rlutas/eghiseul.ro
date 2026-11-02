@@ -75,6 +75,12 @@ SELECT friendly_order_id, payment_failed_count, payment_last_failed_at, payment_
 FROM orders
 WHERE payment_failed_count > 0 AND payment_status <> 'paid'
 ORDER BY payment_last_failed_at DESC;
+
+-- Phone recovery: clients with 2 „Nu a răspuns" ticks (migration 196, from 2026-11-02)
+-- phone_no_answer_attempts = [{ "at": ISO, "caller": "Maria" | "Carla" }], max 2
+SELECT friendly_order_id, phone_no_answer_attempts
+FROM orders
+WHERE jsonb_array_length(phone_no_answer_attempts) >= 2;
 ```
 
 ### Order History

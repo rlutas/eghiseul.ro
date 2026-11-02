@@ -19,6 +19,17 @@ Clienții care încep o comandă și nu plătesc ajung într-o coadă. Un apel s
 3. Apăsați **„Marchează sunat”**, alegeți **cine a sunat (Maria sau Carla)** și scrieți nota pe scurt, cu ce a spus clientul. Fără nume, apelul nu se salvează. Toate intrați pe același cont, deci numele ales e singurul mod în care știm cine a vorbit cu clientul. Fereastra ține minte ultimul nume ales pe calculatorul vostru: verificați-l înainte să salvați.
 4. **Doar pe eGhiseul**: dacă e cazul, la marcare puteți da o reducere. Clientul primește un email cu reducerea deja aplicată și linkul de continuare. Pe CazierJudiciarOnline clientul primește deja automat un email cu reducere după abandon, deci nu dăm alta.
 
+## Nu a răspuns: cele două căsuțe (din 02.11.2026)
+
+Pe ambele site-uri, în **Recuperare telefonică**, înaintea numelui clientului sunt **două căsuțe mici**.
+
+1. Ați sunat și clientul nu a răspuns? Bifați **prima căsuță**. Nu apăsați „Marchează sunat”: n-ați vorbit cu el.
+2. Încercați din nou mai târziu sau a doua zi. Dacă iar nu răspunde, bifați **a doua căsuță**.
+3. După a doua bifă clientul **iese din „De sunat”** la următoarea reîncărcare. Nu-l mai sunăm. Dacă începe o comandă nouă după asta, apare din nou în listă.
+4. Ați bifat din greșeală? **Debifați ultima căsuță bifată** și se anulează doar ea.
+
+Țineți mouse-ul pe o căsuță bifată ca să vedeți când s-a încercat și cine. Numele se ia din ultima alegere făcută pe calculatorul vostru (Maria sau Carla); dacă nu ați ales niciodată, vă întreabă. Clienții închiși așa se văd cu **„Arată și sunate”**, marcați **„Nu răspunde ×2”**. O încercare fără răspuns nu e un apel, deci nu apare la „Recuperate” dacă clientul plătește mai târziu.
+
 ## Unde s-a oprit clientul (doar pe eGhiseul, din 14.10.2026)
 
 Sub numele serviciului, în Recuperare telefonică, și sub status, în **Comenzi → Neplătite**, vedeți unde s-a blocat clientul:
@@ -60,5 +71,6 @@ Aici apar clienții care au plătit după apelul vostru, cu suma și numărul co
 ## Ce nu facem
 
 - Nu sunăm clienții ecazier: sunt clienții cabinetului de avocatură, nu ai noștri.
-- Nu sunăm de mai multe ori pe zi același client. Dacă nu răspunde, un mesaj pe WhatsApp e suficient, iar nota spune ce s-a încercat.
+- Nu sunăm de mai multe ori pe zi același client. Dacă nu răspunde, bifați căsuța „nu a răspuns”; un mesaj pe WhatsApp e suficient.
+- Nu mai sunăm clienții cu două căsuțe bifate.
 - Nu promitem termene mai scurte decât cele de pe pagina serviciului.

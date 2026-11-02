@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-02 | 🟣 **Recuperare telefonică: două căsuțe „Nu a răspuns” înaintea numelui; după a doua încercare clientul iese din „De sunat” (eGhiseul + CazierJudiciarOnline)** — `orders.phone_no_answer_attempts` (migrarea 196, CJO 043), `POST /api/admin/orders/[id]/phone-no-answer` (CJO `/api/admin/phone-recovery/[id]/no-answer`), `buildNoAnswerIndex`/`isClosedByNoAnswer` | [2026-11-02-recuperare-nu-raspunde.md](2026-11-02-recuperare-nu-raspunde.md) |
 | 2026-11-02 | 🔴 **Poza actului dădea „Imaginea nu a putut fi decodificată” pe iPhone-uri vechi (iOS ≤16)** — `decodeImage()` în `compress.ts`: `createImageBitmap` cu/fără opțiuni, apoi `<img>` | [2026-11-02-poza-act-iphone-vechi.md](2026-11-02-poza-act-iphone-vechi.md) |
 | 2026-11-02 | 🔴 **Numele din act nu mai primește prefixul MRZ lipit (IDRO cu U sărit, PEROU tăiat pe jumătate)** — `recoverNamesFromMrz` (`IDRO(?!U)`, `P[<A-Z]ROU` = 5 caractere), port `IDRO` pe CJO | [2026-11-02-nume-prefix-mrz-idro-perou.md](2026-11-02-nume-prefix-mrz-idro-perou.md) |
 | 2026-11-02 | 🔴 **Citirea actelor (Gemini) oprită 23.10–02.11 pe toate site-urile: credit AI Studio epuizat (402); acum mesaj clar în admin + email de alertă orar** — `gemini-health.ts` (`checkGeminiAndAlert` în `invoice-health-check`), `OCR_UNAVAILABLE_MESSAGE` în `document-ocr`, `rerun-ocr`/CJO `extract-ci` 503 | [2026-11-02-citire-acte-gemini-credit.md](2026-11-02-citire-acte-gemini-credit.md) |
