@@ -66,11 +66,17 @@ export async function fulfilManuallyPaidOrder(
     urgent_days?: number | null;
     urgent_available?: boolean | null;
   } | null;
+  // Termenul pornește când echipa a verificat dovada și a pornit lucrul
+  // („Dovadă verificată"), nu la încasare — altfel s-ar muta din nou înainte
+  // la „Confirmă plata", după ce clientul l-a văzut deja.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const proofVerifiedAt = (order as any).proof_verified_at as string | null | undefined;
   const estimatedCompletionISO = await computeEstimatedCompletionISOForOrder(
     supabaseAdmin,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     order as any,
-    svc
+    svc,
+    proofVerifiedAt ? new Date(proofVerifiedAt) : new Date()
   );
 
   const paidAtNow = new Date().toISOString();

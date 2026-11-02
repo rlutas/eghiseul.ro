@@ -83,7 +83,8 @@ lucrul"**, vizibil doar pe comenzile de pe „Așteptare plată":
    în checkout; altfel emailul sau WhatsApp-ul clientului).
 2. Apasă butonul și confirmă. Comanda trece pe **„În procesare"**, se alocă
    numerele de Barou și se generează automat contractul de asistență — exact
-   ca după plată.
+   ca după plată. Din 02.11.2026 tot de aici pornește și **termenul de
+   livrare**; „Confirmă plata" nu îl mai mută.
 3. Împuternicirea și cererea le generezi ca de obicei, din panoul Documente
    („Generează"). Din 15.09.2026 butonul merge și pe comenzile pornite pe
    dovadă; înainte răspundea „Numerele Barou se alocă doar după plată".

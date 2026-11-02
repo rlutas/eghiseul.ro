@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ensureBarouDocumentsForPaidOrder } from '@/lib/documents/ensure-barou-documents';
 import { assessStartWorkOnProof, type StartWorkCandidate } from './start-work-on-proof';
+import { computeEstimatedCompletionISOForOrder } from './order-estimate';
 
 /** Server-side: vezi `start-work-on-proof.ts` pentru context și gardă. */
 export async function startWorkOnVerifiedProof(
@@ -12,7 +13,9 @@ export async function startWorkOnVerifiedProof(
 
   const { data: order, error } = await admin
     .from('orders')
-    .select('id, status, payment_status, payment_method, proof_verified_at, payment_proof_url')
+    .select(
+      'id, status, payment_status, payment_method, proof_verified_at, payment_proof_url, customer_data, selected_options, delivery_method, services(slug, estimated_days, urgent_days, urgent_available, verification_config)'
+    )
     .eq('id', orderId)
     .single();
   if (error || !order) return { ok: false, error: 'Comanda nu a fost găsită.' };
@@ -20,7 +23,13 @@ export async function startWorkOnVerifiedProof(
   const gate = assessStartWorkOnProof(order as StartWorkCandidate);
   if (!gate.ok) return gate;
 
-  const now = new Date().toISOString();
+  const nowDate = new Date();
+  const now = nowDate.toISOString();
+  // Termenul de livrare pornește de aici. Calculat la plasare, pe o comandă
+  // plătită prin transfer ajungea „expirat" exact când începea lucrul
+  // (E-261026-B9HW3: plasată 26.10, dovadă 01.11, termen 02.11).
+  const svc = Array.isArray(order.services) ? order.services[0] : order.services;
+  const estimatedCompletionISO = await computeEstimatedCompletionISOForOrder(admin, order, svc ?? null, nowDate);
   // Update condiționat pe statusul citit — două clickuri simultane nu pornesc
   // lucrul de două ori (al doilea nu potrivește niciun rând).
   const { data: updated, error: updateError } = await admin
@@ -30,6 +39,7 @@ export async function startWorkOnVerifiedProof(
       proof_verified_at: now,
       proof_verified_by: opts.adminId,
       updated_at: now,
+      ...(estimatedCompletionISO ? { estimated_completion_date: estimatedCompletionISO } : {}),
     })
     .eq('id', orderId)
     .eq('status', 'awaiting_payment')
