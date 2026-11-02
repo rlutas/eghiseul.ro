@@ -799,6 +799,16 @@ export function recoverNamesFromMrz(
     // l-ar mutila („SCHIV") — prins pe CJO-20260804-61939 (05.08.2026).
     if (/^I[D<]?ROU/.test(l)) {
       l = l.replace(/^I[D<]?ROU/, '');
+    } else if (/^IDRO(?!U)[A-Z]/.test(l)) {
+      // OCR dropped the U of „IDROU": „IDROVOICU<<ION" → VOICU
+      // (E-260929-8X5K9). A CI MRZ always starts with ID + ROU, so „IDRO"
+      // is never the start of a real surname.
+      l = l.slice(4);
+    } else if (/^P[<A-Z]ROU/.test(l)) {
+      // Romanian passport: always 5 chars — „P<ROU", or „PEROU" on the
+      // electronic passport (type „PE"; port from CJO, „UDOGARU" 06.08). The
+      // generic rule below cut only „PERO" and left a stray „U" (E-261021-SSSLZ).
+      l = l.slice(5);
     } else {
       l = l.replace(/^P<?[A-Z]{3}(?=[A-Z])/, '');
     }

@@ -218,3 +218,32 @@ describe('corecții deterministe CI — port CJO 05.08.2026', () => {
     expect(r.extractedData?.firstName).toBe('CĂTĂLIN-ALEXANDRU');
   });
 });
+
+describe('prefix MRZ mâzgălit de OCR (rapoarte echipă 30.09 + 22.10.2026)', () => {
+  it('pașaport „PEROU" (< citit E) → BRATU, nu UBRATU (E-261021-SSSLZ)', () => {
+    const out = recoverNamesFromMrz({
+      line1: 'PEROUBRATU<<ELENA<IOANA<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<',
+    });
+    expect(out).toEqual({ surname: 'BRATU', givenNames: 'ELENA IOANA' });
+  });
+
+  it('pașaport canonic și fără „<" rămân corecte', () => {
+    expect(recoverNamesFromMrz({ line1: 'P<ROUBRATU<<ELENA<IOANA<<<<' }).surname).toBe('BRATU');
+    expect(recoverNamesFromMrz({ line1: 'PROUBRATU<<ELENA<IOANA<<<<' }).surname).toBe('BRATU');
+  });
+
+  it('pașaport străin: prefixul generic de 5 caractere (P<FRA)', () => {
+    expect(recoverNamesFromMrz({ line1: 'P<FRADUPONT<<JEAN<<<<' }).surname).toBe('DUPONT');
+  });
+
+  it('CI „IDRO" fără U (OCR a sărit litera) → VOICU, nu IDROVOICU (E-260929-8X5K9)', () => {
+    const out = recoverNamesFromMrz({
+      line1: 'IDROVOICU<<ION<GEORGE<<<<<<<<<<<<<<',
+    });
+    expect(out).toEqual({ surname: 'VOICU', givenNames: 'ION GEORGE' });
+  });
+
+  it('nume real care începe cu U după IDROU nu pierde litera', () => {
+    expect(recoverNamesFromMrz({ line1: 'IDROUUNGUREANU<<ION<<<<' }).surname).toBe('UNGUREANU');
+  });
+});
