@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-02 | ✅ **Emailul după apelul de recuperare nu mai scrie numele colegei: „discuția de azi cu reprezentantul eGhișeul.ro”** — `phone-followup.ts` fără `agentName` în text | [2026-11-02-email-recuperare-fara-nume.md](2026-11-02-email-recuperare-fara-nume.md) |
 | 2026-11-02 | 🔴 **Poza actului dădea „Imaginea nu a putut fi decodificată” pe iPhone-uri vechi (iOS ≤16)** — `decodeImage()` în `compress.ts`: `createImageBitmap` cu/fără opțiuni, apoi `<img>` | [2026-11-02-poza-act-iphone-vechi.md](2026-11-02-poza-act-iphone-vechi.md) |
 | 2026-11-02 | 🔴 **Numele din act nu mai primește prefixul MRZ lipit (IDRO cu U sărit, PEROU tăiat pe jumătate)** — `recoverNamesFromMrz` (`IDRO(?!U)`, `P[<A-Z]ROU` = 5 caractere), port `IDRO` pe CJO | [2026-11-02-nume-prefix-mrz-idro-perou.md](2026-11-02-nume-prefix-mrz-idro-perou.md) |
 | 2026-11-02 | 🔴 **Citirea actelor (Gemini) oprită 23.10–02.11 pe toate site-urile: credit AI Studio epuizat (402); acum mesaj clar în admin + email de alertă orar** — `gemini-health.ts` (`checkGeminiAndAlert` în `invoice-health-check`), `OCR_UNAVAILABLE_MESSAGE` în `document-ocr`, `rerun-ocr`/CJO `extract-ci` 503 | [2026-11-02-citire-acte-gemini-credit.md](2026-11-02-citire-acte-gemini-credit.md) |
