@@ -9,6 +9,12 @@
  *
  * Setează admin_edited_at: clientul care revine cu un localStorage mai vechi
  * primește datele de pe server (provider-ul compară timestamp-urile).
+ *
+ * Din 02.11.2026 merge și pe comenzi PLĂTITE (cerere echipă, E-261007-K59HB:
+ * date client greșite după plată, nicio cale de corectare în admin). Pe o
+ * comandă plătită: facturarea nu se mai editează dacă factura e emisă (se
+ * corectează în Oblio), iar documentele deja generate (cerere, împuternicire)
+ * trebuie regenerate de echipă; răspunsul o spune prin `documentsToRegenerate`.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -24,7 +30,10 @@ const ALLOWED: Record<string, Set<string>> = {
   billing: new Set(['firstName', 'lastName', 'cnp', 'address', 'city', 'county', 'postalCode', 'country']),
 };
 
-const EDITABLE_STATUSES = new Set(['draft', 'pending', 'abandoned']);
+/** Unfinished orders: the customer may still come back to the wizard. */
+const PRE_PAYMENT_STATUSES = new Set(['draft', 'pending', 'abandoned', 'awaiting_payment']);
+/** Closed orders: nothing to correct any more. */
+const LOCKED_STATUSES = new Set(['cancelled', 'refunded']);
 
 type Section = Record<string, unknown>;
 
@@ -81,15 +90,22 @@ export async function PATCH(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: order } = await (adminClient as any)
       .from('orders')
-      .select('id, status, customer_data')
+      .select('id, status, customer_data, invoice_number')
       .eq('id', orderId)
       .single();
     if (!order) {
       return NextResponse.json({ success: false, error: 'Comanda nu a fost găsită' }, { status: 404 });
     }
-    if (!EDITABLE_STATUSES.has(order.status)) {
+    if (LOCKED_STATUSES.has(order.status)) {
       return NextResponse.json(
-        { success: false, error: `Editarea de formular e doar pentru comenzi neterminate (status curent: ${order.status}). Pentru comenzi plătite folosește „Modifică".` },
+        { success: false, error: `Comanda e închisă (status: ${order.status}); datele nu se mai corectează.` },
+        { status: 409 }
+      );
+    }
+    const prePayment = PRE_PAYMENT_STATUSES.has(order.status);
+    if (!prePayment && order.invoice_number && Object.keys(patches.billing).length) {
+      return NextResponse.json(
+        { success: false, error: `Factura ${order.invoice_number} e deja emisă: datele de facturare se corectează în Oblio, nu aici.` },
         { status: 409 }
       );
     }
@@ -116,11 +132,28 @@ export async function PATCH(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: updErr } = await (adminClient as any)
       .from('orders')
-      .update({ customer_data: cd, admin_edited_at: nowIso, updated_at: nowIso })
+      .update(
+        prePayment
+          ? { customer_data: cd, admin_edited_at: nowIso, updated_at: nowIso }
+          : { customer_data: cd, updated_at: nowIso }
+      )
       .eq('id', orderId);
     if (updErr) {
       console.error('[edit-draft] update failed:', updErr);
       return NextResponse.json({ success: false, error: 'Nu am putut salva modificările' }, { status: 500 });
+    }
+
+    // Documents generated from the old data (cerere, împuternicire, contracte).
+    let documentsToRegenerate: string[] = [];
+    if (!prePayment) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: docs } = await (adminClient as any)
+        .from('order_documents')
+        .select('type')
+        .eq('order_id', orderId);
+      documentsToRegenerate = Array.from(
+        new Set(((docs ?? []) as Array<{ type?: string | null }>).map((d) => d.type).filter((t): t is string => !!t))
+      );
     }
 
     // Audit: CE s-a schimbat (căile, nu valorile — fără PII în istoric).
@@ -128,12 +161,18 @@ export async function PATCH(
     await (adminClient as any).from('order_history').insert({
       order_id: orderId,
       changed_by: user.id,
-      event_type: 'draft_edited_by_admin',
-      new_value: { fields: changedPaths },
-      notes: `Operator a corectat date de formular: ${changedPaths.join(', ')}`,
+      event_type: prePayment ? 'draft_edited_by_admin' : 'admin_action',
+      new_value: { fields: changedPaths, ...(prePayment ? {} : { after_payment: true }) },
+      notes: prePayment
+        ? `Operator a corectat date de formular: ${changedPaths.join(', ')}`
+        : `Date client corectate după plată: ${changedPaths.join(', ')}` +
+          (documentsToRegenerate.length ? ' · de regenerat documentele generate înainte' : ''),
     });
 
-    return NextResponse.json({ success: true, data: { changedFields: changedPaths } });
+    return NextResponse.json({
+      success: true,
+      data: { changedFields: changedPaths, afterPayment: !prePayment, documentsToRegenerate },
+    });
   } catch (error) {
     console.error('[edit-draft] error:', error);
     return NextResponse.json({ success: false, error: 'Internal error' }, { status: 500 });

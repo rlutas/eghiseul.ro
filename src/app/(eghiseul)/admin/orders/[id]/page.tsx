@@ -1760,6 +1760,12 @@ export default function AdminOrderDetailPage() {
               onSaved={refreshSilent}
             />
 
+            {/* Corectare date client pe comandă plătită (nume, CNP, adresă).
+                Pe comenzile neterminate editorul e în bannerul „Comandă neterminată". */}
+            {!['draft', 'pending', 'abandoned', 'awaiting_payment', 'cancelled', 'refunded'].includes(order.status ?? '') && (
+              <PaidClientDataEditInline order={order} onSaved={refreshSilent} />
+            )}
+
             {/* Account linkage — client cu cont eGhișeul + status KYC pe cont */}
             <div className="pt-3 border-t border-neutral-100 space-y-2">
               <div className="flex items-center justify-between gap-2 text-sm border-b border-border/60 py-1.5 last:border-b-0">
@@ -5804,6 +5810,134 @@ function ContactEditInline({
         </Button>
       </div>
       <p className="text-[11px] text-amber-700">Modificarea se notează automat în Note Echipă (vechi → nou).</p>
+    </div>
+  );
+}
+
+// ---------- Corectare date client pe comandă plătită ----------
+// Cerere echipă (E-261007-K59HB): datele greșite ale clientului nu se puteau
+// corecta după plată. Folosește același endpoint ca editorul de ciornă; trimite
+// DOAR câmpurile schimbate. Documentele deja generate trebuie regenerate.
+const PAID_EDIT_FIELDS: Array<{ key: string; section: 'personal' | 'personalAddress'; label: string; wide?: boolean }> = [
+  { key: 'lastName', section: 'personal', label: 'Nume' },
+  { key: 'firstName', section: 'personal', label: 'Prenume' },
+  { key: 'cnp', section: 'personal', label: 'CNP', wide: true },
+  { key: 'birthDate', section: 'personal', label: 'Data nașterii' },
+  { key: 'birthPlace', section: 'personal', label: 'Locul nașterii' },
+  { key: 'fatherName', section: 'personal', label: 'Prenume tată' },
+  { key: 'motherName', section: 'personal', label: 'Prenume mamă' },
+  { key: 'street', section: 'personalAddress', label: 'Stradă' },
+  { key: 'number', section: 'personalAddress', label: 'Nr.' },
+  { key: 'building', section: 'personalAddress', label: 'Bloc' },
+  { key: 'staircase', section: 'personalAddress', label: 'Scară' },
+  { key: 'floor', section: 'personalAddress', label: 'Etaj' },
+  { key: 'apartment', section: 'personalAddress', label: 'Apartament' },
+  { key: 'city', section: 'personalAddress', label: 'Localitate' },
+  { key: 'county', section: 'personalAddress', label: 'Județ' },
+  { key: 'postalCode', section: 'personalAddress', label: 'Cod poștal' },
+];
+
+function PaidClientDataEditInline({ order, onSaved }: { order: OrderDetail; onSaved: () => void }) {
+  const cd = (order.customer_data as AnyObj | null) ?? {};
+  const personal = (cd.personal as AnyObj | null) ?? {};
+  const addr = (personal.address as AnyObj | null) ?? {};
+  const initial = useMemo(() => {
+    const out: Record<string, string> = {};
+    for (const f of PAID_EDIT_FIELDS) {
+      const src = f.section === 'personal' ? personal : addr;
+      const v = src[f.key];
+      out[`${f.section}.${f.key}`] = typeof v === 'string' || typeof v === 'number' ? String(v) : '';
+    }
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order.customer_data]);
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState<Record<string, string>>(initial);
+  const [saving, setSaving] = useState(false);
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          setForm(initial);
+          setOpen(true);
+        }}
+        className="inline-flex items-center gap-1.5 rounded-md border border-neutral-200 px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50"
+      >
+        <Pencil className="h-3 w-3" />
+        Corectează datele clientului
+      </button>
+    );
+  }
+
+  const save = async () => {
+    const personalPatch: Record<string, string> = {};
+    const addressPatch: Record<string, string> = {};
+    for (const f of PAID_EDIT_FIELDS) {
+      const k = `${f.section}.${f.key}`;
+      if ((form[k] ?? '').trim() === (initial[k] ?? '').trim()) continue;
+      (f.section === 'personal' ? personalPatch : addressPatch)[f.key] = form[k] ?? '';
+    }
+    if (!Object.keys(personalPatch).length && !Object.keys(addressPatch).length) {
+      toast.info('Nicio modificare');
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/edit-draft`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ personal: personalPatch, personalAddress: addressPatch }),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || 'Eroare la salvare');
+      const docs: string[] = json.data?.documentsToRegenerate ?? [];
+      toast.success(
+        docs.length
+          ? 'Date corectate. Regenerează cererea și împuternicirea: cele generate au datele vechi.'
+          : 'Date corectate.',
+        { duration: 8000 }
+      );
+      setOpen(false);
+      onSaved();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Nu am putut salva');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2 rounded-lg border border-amber-200 bg-amber-50/50 p-3">
+      <p className="text-xs font-semibold text-amber-800">Corectează datele clientului (după plată)</p>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {PAID_EDIT_FIELDS.map((f) => {
+          const k = `${f.section}.${f.key}`;
+          return (
+            <input
+              key={k}
+              value={form[k] ?? ''}
+              onChange={(e) => setForm((p) => ({ ...p, [k]: e.target.value }))}
+              placeholder={f.label}
+              aria-label={f.label}
+              className={`h-9 rounded-md border border-neutral-200 bg-white px-3 text-sm outline-none focus:border-amber-400${f.wide ? ' sm:col-span-2' : ''}`}
+            />
+          );
+        })}
+      </div>
+      <div className="flex gap-2">
+        <Button size="sm" className="h-7 text-xs" onClick={save} disabled={saving}>
+          {saving ? 'Se salvează…' : 'Salvează'}
+        </Button>
+        <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setOpen(false)} disabled={saving}>
+          Anulează
+        </Button>
+      </div>
+      <p className="text-[11px] text-amber-700">
+        Se schimbă doar câmpurile modificate. Factura emisă nu se schimbă (se corectează în Oblio).
+        Cererea și împuternicirea deja generate trebuie regenerate.
+      </p>
     </div>
   );
 }

@@ -26,6 +26,12 @@ clientului (nume, CNP, adresă, contact) și îl aduce pe client cu datele
 corectate dacă se întoarce în formular. Nu semnați și nu plătiți în locul
 lui.
 
+Pe comenzile **plătite** (din 02.11.2026): butonul **„Corectează datele
+clientului”**, sub „Corectează contact”. Schimbă nume, CNP, data și locul
+nașterii, părinții și adresa din act. După salvare, **regenerați cererea și
+împuternicirea**, pentru că cele generate au datele vechi. Factura emisă nu se
+schimbă de aici: datele de facturare se corectează în Oblio.
+
 Pe comenzile neterminate: banner galben cu **„Copiază link continuare”**
 (link special, 48 de ore, îl duce la pasul lui cu datele lui, merge și fără
 email) și **pasul unde s-a oprit**. Tot acolo e **„Finalizează ca comandă
