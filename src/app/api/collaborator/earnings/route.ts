@@ -8,6 +8,7 @@ import { requirePrivateUnlock } from '@/lib/collaborator/private-gate';
 import {
   computeSettlementBreakdown,
   sumAncpiCosts,
+  hasAncpiFeeRow,
   platformCostForRange,
   pendingOcpiSummary,
   averageOcpiBySlug,
@@ -97,6 +98,7 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const orderIds = (data ?? []).map((o: any) => o.id);
     const costsByOrder = new Map<string, number>();
+    const feeRecorded = new Set<string>();
     for (let i = 0; i < orderIds.length; i += 200) {
       const chunk = orderIds.slice(i, i + 200);
       const { data: costRows, error: costErr } = await admin
@@ -109,6 +111,7 @@ export async function GET(request: NextRequest) {
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       for (const row of (costRows ?? []) as any[]) {
+        if (hasAncpiFeeRow([row])) feeRecorded.add(row.order_id);
         const amount = sumAncpiCosts([row]);
         if (amount > 0) {
           costsByOrder.set(row.order_id, (costsByOrder.get(row.order_id) ?? 0) + amount);
@@ -145,6 +148,8 @@ export async function GET(request: NextRequest) {
         clientTotal: Number(o.total_price) || 0,
         // Taxa OCPI plătită pe comanda asta (0 = încă neînregistrată).
         ocpiCost: Math.round((costsByOrder.get(o.id) ?? 0) * 100) / 100,
+        // Taxa e trecută pe comandă, chiar și cu 0 lei (CF colectiv).
+        ocpiRecorded: feeRecorded.has(o.id),
         // Comisionul Stripe reținut pe încasarea comenzii.
         stripeFee: Math.round(((feeByRef.get(o.friendly_order_id) ?? feeByRef.get(o.order_number) ?? 0)) * 100) / 100,
         // Comisionul de 15 lei/comandă, unde serviciul îl are setat.
@@ -180,7 +185,7 @@ export async function GET(request: NextRequest) {
       : buildMonthlyStatement(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           allOrders.map((o: any) => ({
-            paidAt: o.paidAt, total: o.clientTotal, ocpiCost: o.ocpiCost, stripeFee: o.stripeFee,
+            paidAt: o.paidAt, total: o.clientTotal, ocpiCost: o.ocpiCost, ocpiRecorded: o.ocpiRecorded, stripeFee: o.stripeFee,
             commission: o.commission, serviceSlug: o.serviceSlug, serviceName: o.service, status: o.status, isTest: o.isTest,
           })),
           ((periodCostRows ?? []) as Array<{ amount_ron: number; period_start: string }>).map((c) => ({
@@ -193,7 +198,7 @@ export async function GET(request: NextRequest) {
       .reduce((s, c) => s + (Number(c.amount_ron) || 0), 0);
     // Taxele care abia urmează: orice comandă încasată fără taxă înregistrată.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const taxInputs = billable.map((o: any) => ({ serviceSlug: o.serviceSlug, status: o.status, ocpiCost: o.ocpiCost }));
+    const taxInputs = billable.map((o: any) => ({ serviceSlug: o.serviceSlug, status: o.status, ocpiCost: o.ocpiCost, ocpiRecorded: o.ocpiRecorded }));
     const pending = pendingOcpiSummary(taxInputs);
     const pendingOcpi = pending.total;
     const avgBySlug = averageOcpiBySlug(taxInputs);

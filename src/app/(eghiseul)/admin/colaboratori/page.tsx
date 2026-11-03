@@ -25,6 +25,7 @@ interface CollabOrder {
   total: number;
   fee: number;
   ocpiCost: number;
+  ocpiRecorded?: boolean;
   isTest: boolean;
   createdAt: string;
 }
@@ -1061,7 +1062,7 @@ export default function CollaboratorsAdminPage() {
                     <td className="px-4 py-3 text-slate-700">{o.client}</td>
                     <td className="px-4 py-3"><span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">{findStatusLabel(o.status)}</span></td>
                     <td className="px-4 py-3 text-right text-slate-700">{fmt(o.total)}</td>
-                    <td className="px-4 py-3 text-right text-slate-700">{summary.breakdown ? (o.ocpiCost > 0 ? fmt(o.ocpiCost) : '—') : fmt(o.fee)}</td>
+                    <td className="px-4 py-3 text-right text-slate-700">{summary.breakdown ? (o.ocpiCost > 0 || o.ocpiRecorded ? fmt(o.ocpiCost) : '—') : fmt(o.fee)}</td>
                     <td className="px-4 py-3 text-slate-500">{new Date(o.createdAt).toLocaleDateString('ro-RO')}</td>
                   </tr>
                 ))}

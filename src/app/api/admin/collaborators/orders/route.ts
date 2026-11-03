@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission, getCollaboratorServices } from '@/lib/admin/permissions';
 import { formatPersonName } from '@/lib/format/person-name';
 import { buildMonthlyStatement, bucharestMonth } from '@/lib/collaborator/statement';
-import { computeSettlementBreakdown, sumAncpiCosts, platformCostForRange, estimatePendingOcpi, SETTLEMENT_PERIOD_START } from '@/lib/collaborator/settlement';
+import { computeSettlementBreakdown, sumAncpiCosts, hasAncpiFeeRow, platformCostForRange, estimatePendingOcpi, SETTLEMENT_PERIOD_START } from '@/lib/collaborator/settlement';
 
 /**
  * Orders handled by a collaborator (across all their assigned services), with a
@@ -97,6 +97,7 @@ export async function GET(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const orderIds = (data || []).map((o: any) => o.id);
     const costsByOrder = new Map<string, number>();
+    const feeRecorded = new Set<string>();
     for (let i = 0; i < orderIds.length; i += 200) {
       const { data: costRows } = await admin
         .from('order_supplier_costs')
@@ -104,6 +105,7 @@ export async function GET(request: NextRequest) {
         .in('order_id', orderIds.slice(i, i + 200));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       for (const row of (costRows ?? []) as any[]) {
+        if (hasAncpiFeeRow([row])) feeRecorded.add(row.order_id);
         const amount = sumAncpiCosts([row]);
         if (amount > 0) {
           costsByOrder.set(row.order_id, (costsByOrder.get(row.order_id) ?? 0) + amount);
@@ -140,6 +142,7 @@ export async function GET(request: NextRequest) {
         total: Number(o.total_price) || 0,
         fee,
         ocpiCost: Math.round((costsByOrder.get(o.id) ?? 0) * 100) / 100,
+        ocpiRecorded: feeRecorded.has(o.id),
         serviceSlug: o.services?.slug || '',
         stripeFee: Math.round((feeByRef.get(o.friendly_order_id) ?? feeByRef.get(o.order_number) ?? 0) * 100) / 100,
         isTest: !!o.is_test,
@@ -186,8 +189,8 @@ export async function GET(request: NextRequest) {
         platformCost: platformCostForRange(rangeStart, rangeEnd),
         otherCosts: periodCosts,
         pendingOcpi: estimatePendingOcpi(
-          billable.map((o: { serviceSlug: string; status: string; ocpiCost: number }) => ({
-            serviceSlug: o.serviceSlug, status: o.status, ocpiCost: o.ocpiCost,
+          billable.map((o: { serviceSlug: string; status: string; ocpiCost: number; ocpiRecorded: boolean }) => ({
+            serviceSlug: o.serviceSlug, status: o.status, ocpiCost: o.ocpiCost, ocpiRecorded: o.ocpiRecorded,
           }))
         ),
       }),
@@ -197,8 +200,8 @@ export async function GET(request: NextRequest) {
     // for it, what was paid.
     const statement = collaboratorId !== '__avocat__' && isMonth
       ? buildMonthlyStatement(
-          allOrders.map((o: { paidAt: string | null; total: number; ocpiCost: number; stripeFee: number; fee: number; serviceSlug: string; service: string; status: string; isTest: boolean }) => ({
-            paidAt: o.paidAt, total: o.total, ocpiCost: o.ocpiCost, stripeFee: o.stripeFee,
+          allOrders.map((o: { paidAt: string | null; total: number; ocpiCost: number; ocpiRecorded: boolean; stripeFee: number; fee: number; serviceSlug: string; service: string; status: string; isTest: boolean }) => ({
+            paidAt: o.paidAt, total: o.total, ocpiCost: o.ocpiCost, ocpiRecorded: o.ocpiRecorded, stripeFee: o.stripeFee,
             commission: o.fee, serviceSlug: o.serviceSlug, serviceName: o.service, status: o.status, isTest: o.isTest,
           })),
           costRowsAll.map((c) => ({ amount: Number(c.amount_ron) || 0, periodStart: c.period_start })),

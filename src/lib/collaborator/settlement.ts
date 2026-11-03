@@ -300,16 +300,35 @@ const IDENTIFICATION_FILED = new Set(['identification_pending_ocpi', 'on_hold_in
 const NO_TAX_DUE = new Set(['refunded', 'cancelled']);
 
 /**
+ * Order fields the OCPI estimate needs. `ocpiRecorded` = an ANCPI fee row
+ * exists on the order, even at 0 lei: a fee recorded as 0 (CF colectiv, Raul
+ * 03.11.2026) is a known fee, not a missing one.
+ */
+export interface OcpiInput {
+  serviceSlug: string;
+  status: string;
+  ocpiCost: number;
+  ocpiRecorded?: boolean;
+}
+
+/** True when the rows hold an ANCPI institution fee, whatever the amount (0 included). */
+export function hasAncpiFeeRow(
+  rows: { supplier?: string | null; category?: string | null }[] | null | undefined
+): boolean {
+  return (rows ?? []).some((r) => r.supplier === SUPPLIER_ANCPI && r.category === 'taxa_institutie');
+}
+
+/**
  * Taxa OCPI estimată pentru o comandă care încă n-are taxa înregistrată.
  * Orice comandă plătită ajunge să plătească taxă la OCPI (instituția nu
  * eliberează gratuit), inclusiv cele finalizate la care taxa n-a fost trecută.
  * `null` = nu există o bază de estimare (serviciu fără nicio taxă înregistrată).
  */
 export function estimateOrderOcpi(
-  order: { serviceSlug: string; status: string; ocpiCost: number },
+  order: OcpiInput,
   avgBySlug: Map<string, number>
 ): number | null {
-  if (order.ocpiCost > 0 || NO_TAX_DUE.has(order.status)) return 0;
+  if (order.ocpiCost > 0 || order.ocpiRecorded || NO_TAX_DUE.has(order.status)) return 0;
   if (IDENTIFICATION_SLUGS.has(order.serviceSlug)) {
     return IDENTIFICATION_FILED.has(order.status) ? IDENTIFICATION_OCPI.cerere : IDENTIFICATION_OCPI.extrasCf;
   }
@@ -337,20 +356,20 @@ export function averageOcpiBySlug(
  * taxa intră când e plătită), dar se arată ca să se știe că urmează.
  */
 export function estimatePendingOcpi(
-  orders: { serviceSlug: string; status: string; ocpiCost: number }[]
+  orders: OcpiInput[]
 ): number {
   return pendingOcpiSummary(orders).total;
 }
 
 export function pendingOcpiSummary(
-  orders: { serviceSlug: string; status: string; ocpiCost: number }[]
+  orders: OcpiInput[]
 ): { total: number; count: number; unknownCount: number } {
   const avg = averageOcpiBySlug(orders);
   let total = 0;
   let count = 0;
   let unknownCount = 0;
   for (const o of orders) {
-    if (o.ocpiCost > 0 || NO_TAX_DUE.has(o.status)) continue;
+    if (o.ocpiCost > 0 || o.ocpiRecorded || NO_TAX_DUE.has(o.status)) continue;
     count += 1;
     const est = estimateOrderOcpi(o, avg);
     if (est === null) unknownCount += 1;

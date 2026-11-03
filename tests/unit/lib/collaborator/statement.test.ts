@@ -41,3 +41,18 @@ describe('buildMonthlyStatement', () => {
     expect(s.result.otherCosts).toBe(100);
   });
 });
+
+describe('fee recorded at 0 lei', () => {
+  it('is a known fee, not a pending one (CF colectiv, 03.11.2026)', () => {
+    const base = { paidAt: '2026-10-27T06:10:00Z', total: 168.19, ocpiCost: 0, stripeFee: 0, commission: 15,
+      serviceSlug: 'extras-cf-colectiv', serviceName: 'CF colectiv', status: 'completed', isTest: false };
+    const paidPeer = { ...base, paidAt: '2026-10-15T06:10:00Z', ocpiCost: 20 };
+    const missing = buildMonthlyStatement([paidPeer, base], [], '2026-10');
+    expect(missing.pending.count).toBe(1);
+    expect(missing.byService[0]!.withoutOcpi).toBe(1);
+    const recorded = buildMonthlyStatement([paidPeer, { ...base, ocpiRecorded: true }], [], '2026-10');
+    expect(recorded.pending.count).toBe(0);
+    expect(recorded.pending.total).toBe(0);
+    expect(recorded.byService[0]!.withoutOcpi).toBe(0);
+  });
+});

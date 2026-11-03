@@ -19,6 +19,7 @@ interface EarningOrder {
   ocpiCost: number;
   /** Taxa estimată când nu e încă înregistrată; null = de completat. */
   ocpiEstimate?: number | null;
+  ocpiRecorded?: boolean;
   commission?: number;
   isTest: boolean;
 }
@@ -195,7 +196,7 @@ function CollaboratorDecontInner() {
                     {o.isTest ? '—' : lei(o.clientTotal)}
                   </td>
                   <td className="px-4 py-3 text-right text-slate-600">
-                    {o.isTest ? '—' : o.ocpiCost > 0 ? lei(o.ocpiCost) : o.ocpiEstimate ? (
+                    {o.isTest ? '—' : o.ocpiCost > 0 || o.ocpiRecorded ? lei(o.ocpiCost) : o.ocpiEstimate ? (
                       <span className="text-amber-600" title="Taxa nu e încă trecută pe comandă; sumă estimată">~{lei(o.ocpiEstimate)}</span>
                     ) : o.ocpiEstimate === null ? (
                       <span className="text-amber-600">de completat</span>

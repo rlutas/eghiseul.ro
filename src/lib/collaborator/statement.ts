@@ -26,6 +26,8 @@ export interface StatementOrder {
   paidAt: string | null;
   total: number;
   ocpiCost: number;
+  /** An ANCPI fee row exists, even at 0 lei (see `OcpiInput`). */
+  ocpiRecorded?: boolean;
   stripeFee: number;
   commission: number;
   serviceSlug: string;
@@ -118,7 +120,7 @@ function breakdownFor(orders: StatementOrder[], costs: StatementCost[]) {
   const billable = orders.filter((o) => !o.isTest);
   const sum = (f: (o: StatementOrder) => number) => billable.reduce((s, o) => s + f(o), 0);
   const pending = pendingOcpiSummary(
-    billable.map((o) => ({ serviceSlug: o.serviceSlug, status: o.status, ocpiCost: o.ocpiCost }))
+    billable.map((o) => ({ serviceSlug: o.serviceSlug, status: o.status, ocpiCost: o.ocpiCost, ocpiRecorded: o.ocpiRecorded }))
   );
   const result = computeSettlementBreakdown(sum((o) => o.total), sum((o) => o.ocpiCost), {
     stripeFees: sum((o) => o.stripeFee),
@@ -142,7 +144,7 @@ function groupByService(orders: StatementOrder[]): StatementServiceLine[] {
     if (DONE.has(o.status)) l.completed += 1;
     l.collected = round2(l.collected + o.total);
     l.ocpi = round2(l.ocpi + o.ocpiCost);
-    if (!(o.ocpiCost > 0)) l.withoutOcpi += 1;
+    if (!(o.ocpiCost > 0) && !o.ocpiRecorded) l.withoutOcpi += 1;
     if (o.commission > 0) {
       l.commissionOrders += 1;
       l.commission = round2(l.commission + o.commission);
