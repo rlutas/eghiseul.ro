@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requirePermission } from '@/lib/admin/permissions';
-import { buildDecont, platformLabel, round2, ONORARIU_PER_COMANDA, TVA } from '@/lib/admin/avocat-decont';
+import { buildDecont, platformLabel, round2, ONORARIU_PER_COMANDA, PLATFORMS, TVA } from '@/lib/admin/avocat-decont';
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
@@ -32,10 +32,11 @@ export async function GET(request: NextRequest) {
   if (format === 'tsv') {
     const head = ['Platforma', 'Comanda', 'Data platii', 'Client', 'Serviciu', 'Status', 'Serviciu (cu TVA)', 'Urgenta', 'Apostila Haga', 'Add-on cabinet', 'Total (cu TVA)', 'Total (fara TVA)', 'Onorariu', 'Retur'];
     const lines = rows.map((r) =>
-      [platformLabel(r.platform), r.orderNumber, (r.paidAt || '').slice(0, 10), r.client, r.service, r.status, r.cazier, r.urgenta, r.apostila, r.addon, r.total, r.totalNet, ONORARIU_PER_COMANDA, r.refunded || ''].join('\t')
+      [platformLabel(r.platform), r.orderNumber, (r.paidAt || '').slice(0, 10), r.client, r.service, r.status, r.cazier, r.urgenta, r.apostila, r.addon, r.total, r.totalNet, r.extraOf ? 0 : ONORARIU_PER_COMANDA, r.refunded || ''].join('\t')
     );
     lines.push('');
-    for (const [key, s] of [['eghiseul', byPlatform.eghiseul], ['cjo', byPlatform.cjo]] as const) {
+    for (const key of PLATFORMS) {
+      const s = byPlatform[key];
       if (!s.count) continue;
       lines.push([`TOTAL ${platformLabel(key)} (${s.count} comenzi)`, '', '', '', '', '', s.totalCazier, s.totalUrgenta, s.totalApostila, s.totalAddon, s.total, s.totalNet, s.onorarii, ''].join('\t'));
     }

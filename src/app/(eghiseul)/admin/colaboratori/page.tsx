@@ -565,12 +565,12 @@ function AvocatDecont() {
   });
   const [platform, setPlatform] = useState<DecontPlatform>('all');
   const [rows, setRows] = useState<{
-    id: string; platform: 'eghiseul' | 'cjo'; orderNumber: string; paidAt: string; client: string;
+    id: string; platform: 'eghiseul' | 'documentero' | 'cjo' | 'ecazier'; orderNumber: string; paidAt: string; client: string;
     service: string; status: string; isTest: boolean; cazier: number; urgenta: number;
     apostila: number; addon: number; total: number; totalNet: number; refunded: number;
   }[]>([]);
   const [summary, setSummary] = useState<DecontSummary>(EMPTY_DECONT_SUMMARY);
-  const [byPlatform, setByPlatform] = useState<{ eghiseul: DecontSummary; cjo: DecontSummary }>({ eghiseul: EMPTY_DECONT_SUMMARY, cjo: EMPTY_DECONT_SUMMARY });
+  const [byPlatform, setByPlatform] = useState<Partial<Record<'eghiseul' | 'documentero' | 'cjo' | 'ecazier', DecontSummary>>>({});
   const [warnings, setWarnings] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [showExport, setShowExport] = useState(false);
@@ -641,7 +641,7 @@ function AvocatDecont() {
         if (json.success) {
           setRows(json.data.rows);
           setSummary(json.data.summary);
-          setByPlatform(json.data.byPlatform ?? { eghiseul: EMPTY_DECONT_SUMMARY, cjo: EMPTY_DECONT_SUMMARY });
+          setByPlatform(json.data.byPlatform ?? {});
           setWarnings(json.data.warnings ?? []);
         }
         setLoading(false);
@@ -664,9 +664,9 @@ function AvocatDecont() {
         <div>
           <label className="mb-1 block text-xs font-medium text-slate-500">Platformă</label>
           <select value={platform} onChange={(e) => setPlatform(e.target.value as DecontPlatform)} className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
-            <option value="all">Ambele (eghiseul + CJO)</option>
-            <option value="eghiseul">eghiseul.ro</option>
-            <option value="cjo">cazierjudiciaronline.com</option>
+            <option value="all">Toate (eghiseul, documentero, CJO, ecazier)</option>
+            <option value="eghiseul">eghiseul.ro + documentero.ro</option>
+            <option value="cjo">cazierjudiciaronline.com + ecazier.ro</option>
           </select>
         </div>
         <p className="max-w-sm text-xs text-slate-400">
@@ -786,9 +786,11 @@ function AvocatDecont() {
         </div>
       </div>
 
-      {platform === 'all' && (byPlatform.eghiseul.count > 0 || byPlatform.cjo.count > 0) && (
+      {platform === 'all' && Object.values(byPlatform).some((s) => (s?.count ?? 0) > 0) && (
         <div className="mb-6 grid gap-4 sm:grid-cols-2">
-          {([['eghiseul.ro', byPlatform.eghiseul], ['cazierjudiciaronline.com', byPlatform.cjo]] as const).map(([label, s]) => (
+          {([['eghiseul.ro', byPlatform.eghiseul], ['documentero.ro', byPlatform.documentero], ['cazierjudiciaronline.com', byPlatform.cjo], ['ecazier.ro (încasat la noi)', byPlatform.ecazier]] as Array<[string, DecontSummary | undefined]>)
+            .filter((x): x is [string, DecontSummary] => (x[1]?.count ?? 0) > 0)
+            .map(([label, s]) => (
             <div key={label} className="rounded-xl border border-slate-200 bg-white p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
               <p className="mt-1 text-lg font-bold text-slate-900">{fmt(s.total)} <span className="text-xs font-semibold text-slate-400">RON cu TVA</span></p>
@@ -840,8 +842,8 @@ function AvocatDecont() {
                   {r.refunded > 0 && <span className="ml-2 rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-bold text-rose-700">RETUR {fmt(r.refunded)}</span>}
                 </td>
                 <td className="px-3 py-2">
-                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${r.platform === 'cjo' ? 'bg-indigo-50 text-indigo-700' : 'bg-emerald-50 text-emerald-700'}`}>
-                    {r.platform === 'cjo' ? 'CJO' : 'eghiseul'}
+                  <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${r.platform === 'cjo' || r.platform === 'ecazier' ? 'bg-indigo-50 text-indigo-700' : 'bg-emerald-50 text-emerald-700'}`}>
+                    {{ cjo: 'CJO', ecazier: 'ecazier', documentero: 'documentero', eghiseul: 'eghiseul' }[r.platform]}
                   </span>
                 </td>
                 <td className="px-3 py-2 text-slate-500">{(r.paidAt || '').slice(0, 10)}</td>

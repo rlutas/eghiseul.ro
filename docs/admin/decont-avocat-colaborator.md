@@ -5,8 +5,9 @@
 
 ## Scop
 
-- **Platforme: eghiseul + cazierjudiciaronline (CJO)** + **plățile prin vechiul WordPress** (link-uri vechi de plată, încă primesc comenzi ocazional).
-- **ecazier NU intră** — e cabinetul ei propriu (facturi SmartBill seria EJC, banii intră direct la ea). Atenție: lista istorică de iunie a contabililor le amesteca (prețurile 249/349 de acolo = ecazier pre-aliniere).
+- **Platforme: TOATE patru — eghiseul.ro, documentero.ro, cazierjudiciaronline.com, ecazier.ro** (regula Raul, 03.11.2026: „tot timpul așa o să fie").
+- **Criteriul e contul în care au intrat banii, nu site-ul.** Intră tot ce a încasat EDIGITALIZARE. Pe ecazier, comenzile plătite la noi (Stripe EDIGITALIZARE, factură Oblio EGH) intră. Cele plătite direct cabinetului (Stripe `cabinet_tarta`, facturi SmartBill EJC) sunt ale ei și nu intră.
+- **Plățile fără comandă** (proformă Oblio plătită cu cardul, vechiul WordPress) se adaugă ca rânduri manuale, cu contractul din registru. Plata extra pe o comandă deja în decont nu mai primește încă un onorariu de 15 lei.
 - **Servicii: TOT ce trece prin cabinet** — cazier judiciar (PF+PJ), cazier auto, cazier fiscal, certificat integritate, certificat naștere/căsătorie/celibat, extrase multilingve + add-on-urile lor de cabinet (apostilă **Haga**, extras multilingv, al doilea cazier, addon integritate/fiscal).
 
 ## Reguli de calcul
@@ -82,6 +83,8 @@ Identitatea care închide reconcilierea: `Stripe 63.567,49 + 198 (comanda lipsă
 | Iunie 2026 | 195 (lista contabililor) | 63.460 | — | — | delegațiile 6677→7103; includea și ecazier + WP |
 | **Iulie 2026** | **208** (90 egh + 94 CJO + 21 WP + 3 identificate) | **73.284,49** | **60.565,69** | **3.105** | verificat Stripe (183/183) + registru (continuitate 7101→7468); 2 poziții „de confirmat cu echipa" (galbene) |
 | **August 2026** | **186** (72 egh + 114 CJO) | **54.218,80** | **44.808,93** | **2.790** | calculat 07.09.2026 direct din admin (ambele platforme). Componente: serviciu 45.925,45 · urgență 4.620 · apostilă Haga 2.108,70 (11 buc) · add-on cabinet 1.564,65. 2 comenzi CJO cu retur parțial incluse (CJO-20260804-15831 −25, CJO-20260811-23113 −138,60); WP nereconciliat |
+| Septembrie 2026 | 151 (41 egh + 110 CJO) | 43.088,86 | 35.610,63 | 2.265 | plătit 06.10; o comandă prin proformă (contract 6322) a scăpat, intră în octombrie |
+| **Octombrie 2026** | **99** (44 egh + 1 documentero + 53 CJO + 1 ecazier; din care 2 rânduri din proforme) | **30.924,92** | **25.557,79** | **1.470** (98 contracte) | calculat 03.11.2026; registrul bate: 97 contracte din platforme + 6322; 18 alocări manuale „Client avocat” = clienții ei, excluse. Total către ea 3.677,44 (onorarii 1.470 + factura lunară 1.250 + transfer 957,44) |
 | 1–7 sept. 2026 (parțial) | 30 (5 egh + 25 CJO) | 7.847,30 | 6.485,37 | 450 | doar informativ — intră în decontul lunii septembrie |
 
 Prețuri „ciudate" legitime: 305,10 = cetățean străin (220+119−10%); 178,20 = apostila Haga cu ONLINE10; 448,20 = urgent+apostilă cu discount.

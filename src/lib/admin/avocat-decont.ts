@@ -2,11 +2,15 @@
  * Decontul lunar cu avocata colaboratoare — calculul comun, folosit atât de
  * raportul din admin (JSON/TSV) cât și de exportul Excel.
  *
- * Acoperă ambele platforme care intră în decont: eghiseul (DB local,
- * descompunere din base_price/selected_options) și cazierjudiciaronline (DB
- * separat, descompunere din `contract_snapshot.lineItems`). ecazier NU intră —
- * e cabinetul ei propriu (`source = 'ecazier'`, Stripe cabinet_tarta, facturi
- * SmartBill EJC). Plățile prin vechiul WordPress nu au DB — se adaugă manual.
+ * Acoperă TOATE cele patru platforme (regula Raul, 03.11.2026): eghiseul și
+ * documentero (DB local, descompunere din base_price/selected_options),
+ * cazierjudiciaronline și ecazier (DB-ul CJO, descompunere din
+ * `contract_snapshot.lineItems`). Criteriul pe DB-ul CJO e CONTUL STRIPE, nu
+ * site-ul: intră tot ce a încasat EDIGITALIZARE (`stripe_account =
+ * 'edigitalizare'`), inclusiv comenzile ecazier plătite la noi; ce a încasat
+ * cabinetul direct (`cabinet_tarta`, SmartBill EJC) e al ei și nu intră.
+ * Plățile fără comandă (proforme Oblio, vechiul WordPress) se adaugă în
+ * `MANUAL_DECONT_ROWS`.
  *
  * Regula componentelor (Raul, 07.09.2026) e o LISTĂ ALBĂ: serviciu + urgență +
  * apostilă Haga + add-on-uri de cabinet. Livrarea, traducerea, legalizarea,
@@ -78,7 +82,9 @@ export const ONORARIU_PER_COMANDA = 15;
 
 export const TVA = 1.21;
 
-export type Platform = 'eghiseul' | 'documentero' | 'cjo';
+export type Platform = 'eghiseul' | 'documentero' | 'cjo' | 'ecazier';
+
+export const PLATFORMS: Platform[] = ['eghiseul', 'documentero', 'cjo', 'ecazier'];
 
 export interface DecontRow {
   id: string;
@@ -106,7 +112,56 @@ export interface DecontRow {
   contractNumber?: string;
   delegationNumber?: string;
   stripeFee?: number;
+  /** Plată extra pe o comandă deja în decont (același contract): nu mai
+   *  primește încă un onorariu de 15 lei. */
+  extraOf?: string;
+  /** Explicație pentru rândurile adăugate manual. */
+  note?: string;
 }
+
+/**
+ * Plăți de cabinet încasate de noi FĂRĂ comandă în platformă (proforme Oblio
+ * plătite cu cardul, vechiul WordPress). Se adaugă în luna în care se
+ * decontează; `orderNumber` e referința din registrul central, ca rândul să
+ * primească numărul de contract.
+ */
+export const MANUAL_DECONT_ROWS: Array<{ month: string } & Omit<DecontRow, 'id' | 'totalNet' | 'isTest' | 'refunded'>> = [
+  {
+    month: '2026-10',
+    platform: 'eghiseul',
+    orderNumber: 'MANUAL-MUL6L4VE',
+    paidAt: '2026-09-28T12:00:00.000Z',
+    // Client name stays out of the repo (public); it is on the Oblio invoice.
+    client: 'Client firmă (proformă EGIP 0322)',
+    service: 'Cazier judiciar (proformă Oblio EGIP 0322)',
+    status: 'completed',
+    cazier: 263,
+    urgenta: 0,
+    apostila: 0,
+    addon: 0,
+    total: 263,
+    stripeFee: 5.17,
+    note: 'Plătit prin proforma EGIP 0322 / factura EGI2024-24339 (278 = cazier 263 + onorariu 15). Contract 6322 alocat manual de echipă pe 28.09; scăpat din decontul pe septembrie, adăugat în octombrie (Raul, 03.11.2026).',
+  },
+  {
+    month: '2026-10',
+    platform: 'eghiseul',
+    orderNumber: 'E-261021-SSSLZ',
+    extraOf: 'E-261021-SSSLZ',
+    paidAt: '2026-10-21T12:00:00.000Z',
+    client: 'Soțul clientei E-261021-SSSLZ (proformă EGIP 0323)',
+    service: 'Apostilă Haga certificat căsătorie (proformă Oblio EGIP 0323)',
+    status: 'completed',
+    cazier: 0,
+    urgenta: 0,
+    apostila: 198,
+    addon: 0,
+    total: 198,
+    // Comisionul Stripe al plății de 416,50, proporțional cu apostila.
+    stripeFee: 3.45,
+    note: 'Extra pe E-261021-SSSLZ (certificatul de căsătorie al soțului, notat în istoricul comenzii): factura EGI2024-24340 = apostilă Haga 198 + traducere 218,50 (traducerea nu e a cabinetului).',
+  },
+];
 
 /** Comenzile eghiseul — descompunere directă din prețurile din DB. */
 async function loadEghiseul(range: { start: string; end: string } | null, warnings: string[]): Promise<DecontRow[]> {
@@ -225,7 +280,8 @@ async function loadCjo(range: { start: string; end: string } | null, warnings: s
     .from('orders')
     .select('id, order_number, status, paid_at, is_test, source, service_type, amount_total, refunded_amount_bani, additional_paid_bani, contract_snapshot, nume, prenume, company_name, email, phone')
     // ecazier (cabinetul ei propriu, Stripe cabinet_tarta / SmartBill EJC) NU intră în decont.
-    .eq('source', 'cazierjudiciaronline')
+    // Ce a încasat EDIGITALIZARE, de pe ambele site-uri (CJO + ecazier).
+    .eq('stripe_account', 'edigitalizare')
     .not('paid_at', 'is', null)
     .not('status', 'in', '(cancelled,abandoned)')
     .order('paid_at', { ascending: true })
@@ -296,7 +352,7 @@ async function loadCjo(range: { start: string; end: string } | null, warnings: s
     }
     rows.push({
       id: o.id,
-      platform: 'cjo',
+      platform: o.source === 'ecazier' ? 'ecazier' : 'cjo',
       orderNumber: o.order_number,
       paidAt: o.paid_at,
       client: `${(o.nume || '').trim()} ${(o.prenume || '').trim()}`.trim() || (o.company_name || '').trim() || o.email || '',
@@ -330,14 +386,17 @@ export function summarize(rows: DecontRow[]) {
     // Totalul apostilelor Haga — cerut explicit de Raul (se urmăresc separat).
     totalApostila: sum((r) => r.apostila),
     apostilaCount: rows.filter((r) => r.apostila > 0).length,
-    onorarii: round2(rows.length * ONORARIU_PER_COMANDA),
+    // Un onorariu per contract: plățile extra pe aceeași comandă nu mai au unul.
+    contracts: rows.filter((r) => !r.extraOf).length,
+    onorarii: round2(rows.filter((r) => !r.extraOf).length * ONORARIU_PER_COMANDA),
     onorariuPerComanda: ONORARIU_PER_COMANDA,
   };
 }
 
-export function platformLabel(p: Platform | 'eghiseul' | 'cjo'): string {
+export function platformLabel(p: Platform): string {
   if (p === 'cjo') return 'cazierjudiciaronline';
   if (p === 'documentero') return 'documentero';
+  if (p === 'ecazier') return 'ecazier';
   return 'eghiseul';
 }
 
@@ -369,7 +428,7 @@ export interface DecontOptions {
 export interface DecontResult {
   rows: DecontRow[];
   summary: ReturnType<typeof summarize>;
-  byPlatform: { eghiseul: ReturnType<typeof summarize>; cjo: ReturnType<typeof summarize> };
+  byPlatform: Record<Platform, ReturnType<typeof summarize>>;
   warnings: string[];
   range: { start: string; end: string } | null;
 }
@@ -391,6 +450,14 @@ export async function buildDecont(opts: DecontOptions): Promise<DecontResult> {
   const rows: DecontRow[] = [];
   if (platform !== 'cjo') rows.push(...(await loadEghiseul(range, warnings)));
   if (platform !== 'eghiseul') rows.push(...(await loadCjo(range, warnings)));
+  for (const m of MANUAL_DECONT_ROWS) {
+    if (m.month !== month) continue;
+    const isCjoDb = m.platform === 'cjo' || m.platform === 'ecazier';
+    if ((platform === 'eghiseul' && isCjoDb) || (platform === 'cjo' && !isCjoDb)) continue;
+    const { month: _m, ...r } = m;
+    void _m;
+    rows.push({ ...r, id: `manual:${r.orderNumber}:${r.service}`, isTest: false, refunded: 0, totalNet: round2(r.total / TVA) });
+  }
   rows.sort((a, b) => (a.paidAt || '').localeCompare(b.paidAt || ''));
 
   if (opts.enrich) await enrichRows(rows, warnings);
@@ -399,10 +466,9 @@ export async function buildDecont(opts: DecontOptions): Promise<DecontResult> {
   return {
     rows,
     summary: summarize(real),
-    byPlatform: {
-      eghiseul: summarize(real.filter((r) => r.platform === 'eghiseul')),
-      cjo: summarize(real.filter((r) => r.platform === 'cjo')),
-    },
+    byPlatform: Object.fromEntries(
+      PLATFORMS.map((p) => [p, summarize(real.filter((r) => r.platform === p))])
+    ) as Record<Platform, ReturnType<typeof summarize>>,
     warnings,
     range,
   };
@@ -425,7 +491,7 @@ async function enrichRows(rows: DecontRow[], warnings: string[]): Promise<void> 
         .is('voided_at', null);
       if (error) { warnings.push(`Registru: ${error.message}`); break; }
       for (const n of data ?? []) {
-        const row = rows.find((r) => r.orderNumber === n.order_ref);
+        const row = rows.find((r) => r.orderNumber === n.order_ref && !r.extraOf);
         if (!row) continue;
         const label = `${n.series ? `${n.series} ` : ''}${String(n.number).padStart(6, '0')}/${n.year}`;
         if (n.type === 'contract') row.contractNumber = label;
@@ -447,7 +513,7 @@ async function enrichRows(rows: DecontRow[], warnings: string[]): Promise<void> 
       .in('order_number', chunk);
     if (error) { warnings.push(`Comisioane Stripe: ${error.message}`); break; }
     for (const t of (data ?? []) as Array<{ order_number: string; fee_bani: number | null }>) {
-      const row = rows.find((r) => r.orderNumber === t.order_number);
+      const row = rows.find((r) => r.orderNumber === t.order_number && !r.extraOf);
       if (!row) continue;
       row.stripeFee = round2((row.stripeFee ?? 0) + (Number(t.fee_bani) || 0) / 100);
     }
