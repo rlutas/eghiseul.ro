@@ -15,7 +15,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
 import { getCollaboratorServices } from '@/lib/admin/permissions';
-import { sumAncpiCosts } from '@/lib/collaborator/settlement';
+import { getAdvancesSummary } from '@/lib/collaborator/advances';
 
 const METHODS = new Set(['revolut', 'card', 'transfer', 'numerar', 'alt']);
 
@@ -45,50 +45,17 @@ export async function GET(request: NextRequest) {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const admin = createAdminClient() as any;
-  const { data: advances, error } = await admin
-    .from('collaborator_advances')
-    .select('id, amount_ron, sent_at, method, note, created_at')
-    .eq('collaborator_id', collaboratorId)
-    .order('sent_at', { ascending: false })
-    .limit(500);
-  if (error) {
-    console.error('[admin] advances list error:', error.message);
+  try {
+    const serviceIds = await getCollaboratorServices(collaboratorId);
+    const { advances, sent, spent, balance } = await getAdvancesSummary(admin, collaboratorId, serviceIds);
+    return NextResponse.json({
+      success: true,
+      data: { advances, summary: { sent, spent, balance } },
+    });
+  } catch (e) {
+    console.error('[admin] advances list error:', e instanceof Error ? e.message : e);
     return NextResponse.json({ success: false, error: 'Eroare la încărcarea avansurilor' }, { status: 500 });
   }
-
-  // Consumul: taxele ANCPI înregistrate pe comenzile colaboratorului.
-  const serviceIds = await getCollaboratorServices(collaboratorId);
-  let spent = 0;
-  if (serviceIds.length) {
-    const { data: orders } = await admin
-      .from('orders')
-      .select('id')
-      .or(`service_id.in.(${serviceIds.join(',')}),assigned_collaborator_id.eq.${collaboratorId}`)
-      .eq('payment_status', 'paid')
-      .neq('status', 'cancelled');
-    const ids = (orders ?? []).map((o: { id: string }) => o.id);
-    for (let i = 0; i < ids.length; i += 200) {
-      const { data: rows } = await admin
-        .from('order_supplier_costs')
-        .select('supplier, category, amount_ron')
-        .in('order_id', ids.slice(i, i + 200));
-      spent += sumAncpiCosts(rows ?? []);
-    }
-  }
-
-  const sent = (advances ?? []).reduce((s: number, a: { amount_ron: number }) => s + (Number(a.amount_ron) || 0), 0);
-  return NextResponse.json({
-    success: true,
-    data: {
-      advances: advances ?? [],
-      summary: {
-        sent: round2(sent),
-        spent: round2(spent),
-        // Pozitiv = are bani la el, neconsumați încă în taxe.
-        balance: round2(sent - spent),
-      },
-    },
-  });
 }
 
 export async function POST(request: NextRequest) {
@@ -142,8 +109,4 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Nu s-a putut șterge' }, { status: 500 });
   }
   return NextResponse.json({ success: true });
-}
-
-function round2(n: number): number {
-  return Math.round(n * 100) / 100;
 }

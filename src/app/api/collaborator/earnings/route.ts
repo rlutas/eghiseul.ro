@@ -18,6 +18,7 @@ import {
   DISTRIBUTIONS,
   IDENTIFICATION_OCPI,
 } from '@/lib/collaborator/settlement';
+import { getAdvancesSummary } from '@/lib/collaborator/advances';
 import { buildMonthlyStatement, bucharestMonth, previousMonth } from '@/lib/collaborator/statement';
 
 /**
@@ -215,10 +216,26 @@ export async function GET(request: NextRequest) {
       pendingOcpi,
     });
 
+    // Money sent to him for OCPI fees vs fees recorded: same numbers as the admin panel.
+    let advances: Awaited<ReturnType<typeof getAdvancesSummary>> | null = null;
+    try {
+      advances = await getAdvancesSummary(admin, collaboratorId, serviceIds);
+    } catch (e) {
+      console.error('[collaborator] earnings advances error:', e instanceof Error ? e.message : e);
+    }
+
     return NextResponse.json({
       success: true,
       data: {
         month,
+        advances: advances && {
+          sent: advances.sent,
+          spent: advances.spent,
+          balance: advances.balance,
+          list: advances.advances.map((a) => ({
+            sentAt: a.sent_at, amount: Number(a.amount_ron) || 0, method: a.method, note: a.note,
+          })),
+        },
         orders,
         summary: {
           count: billable.length,

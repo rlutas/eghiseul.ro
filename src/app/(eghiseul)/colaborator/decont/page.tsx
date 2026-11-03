@@ -51,8 +51,76 @@ interface Breakdown {
   collaboratorCashToReceive: number;
 }
 
+interface AdvancesData {
+  sent: number;
+  spent: number;
+  balance: number;
+  list: { sentAt: string; amount: number; method: string; note: string | null }[];
+}
+
+const METHOD_LABEL: Record<string, string> = {
+  revolut: 'Revolut', card: 'Card', transfer: 'Transfer bancar', numerar: 'Numerar', alt: 'Regularizare',
+};
+
+/** Money sent for OCPI fees vs fees recorded on the orders. */
+function AdvancesCard({ a }: { a: AdvancesData }) {
+  const [open, setOpen] = useState(false);
+  const fmt = (n: number) => n.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return (
+    <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
+      <h2 className="mb-1 text-base font-semibold text-slate-900">Bani pentru taxe OCPI</h2>
+      <p className="mb-4 text-sm text-slate-500">
+        Banii primiți de la eGhiseul pentru taxe, față de taxele trecute pe comenzi (toată colaborarea).
+      </p>
+      <dl className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-md bg-slate-50 p-3">
+          <dt className="text-xs uppercase text-slate-500">Primit pentru taxe</dt>
+          <dd className="text-lg font-semibold tabular-nums text-slate-900">{fmt(a.sent)} lei</dd>
+        </div>
+        <div className="rounded-md bg-slate-50 p-3">
+          <dt className="text-xs uppercase text-slate-500">Taxe trecute pe comenzi</dt>
+          <dd className="text-lg font-semibold tabular-nums text-slate-900">{fmt(a.spent)} lei</dd>
+        </div>
+        <div className={`rounded-md p-3 ${a.balance < 0 ? 'bg-amber-50' : 'bg-emerald-50'}`}>
+          <dt className="text-xs uppercase text-slate-500">Sold la tine</dt>
+          <dd className={`text-lg font-semibold tabular-nums ${a.balance < 0 ? 'text-amber-700' : 'text-emerald-700'}`}>
+            {fmt(a.balance)} lei
+          </dd>
+        </div>
+      </dl>
+      {a.balance < 0 && (
+        <p className="mt-3 text-sm text-amber-700">
+          Ai plătit taxe din banii tăi peste ce ai primit. Spune-ne, ca să ți-i trimitem.
+        </p>
+      )}
+      {a.list.length > 0 && (
+        <>
+          <button type="button" onClick={() => setOpen((v) => !v)} className="mt-4 text-sm font-medium text-primary-600 hover:underline">
+            {open ? 'Ascunde' : 'Vezi'} sumele primite ({a.list.length})
+          </button>
+          {open && (
+            <table className="mt-3 w-full text-sm">
+              <tbody className="divide-y divide-slate-100">
+                {a.list.map((x, i) => (
+                  <tr key={i}>
+                    <td className="py-1.5 pr-3 text-slate-600">{new Date(x.sentAt).toLocaleDateString('ro-RO')}</td>
+                    <td className="py-1.5 pr-3 text-slate-600">{METHOD_LABEL[x.method] ?? x.method}</td>
+                    <td className="py-1.5 pr-3 text-slate-500">{x.note ?? ''}</td>
+                    <td className="py-1.5 text-right tabular-nums text-slate-900">{fmt(x.amount)} lei</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 interface EarningsData {
   month: string | null;
+  advances?: AdvancesData | null;
   orders: EarningOrder[];
   summary: { count: number; totalCollected: number };
   breakdown: Breakdown;
@@ -148,6 +216,7 @@ function CollaboratorDecontInner() {
       {!loading && data?.statement && (
         <SettlementStatement statement={data.statement} audience="collaborator" />
       )}
+      {!loading && data?.advances && <AdvancesCard a={data.advances} />}
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
       {!loading && !error && (data?.orders.length ?? 0) === 0 && (
