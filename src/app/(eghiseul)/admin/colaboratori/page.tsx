@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Download, Users, ClipboardList, Wallet, Receipt, ListChecks, Eye, FileSpreadsheet, Plus, X, Loader2, Lock } from 'lucide-react';
 import { useAdminPermissions } from '@/hooks/use-admin-permissions';
 import { findStatusLabel } from '@/lib/admin/status-options';
+import { AVOCAT_SETTLEMENTS, settlementTotal } from '@/lib/admin/avocat-settlements';
 
 interface Collaborator {
   id: string;
@@ -558,9 +559,79 @@ const EMPTY_DECONT_SUMMARY: DecontSummary = {
   totalApostila: 0, totalAddon: 0, apostilaCount: 0, onorarii: 0, onorariuPerComanda: 15,
 };
 
+const LUNI_RO = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
+const lunaRo = (m: string) => `${LUNI_RO[Number(m.slice(5, 7)) - 1] ?? m} ${m.slice(0, 4)}`;
+const dataRo = (d: string) => `${d.slice(8, 10)}.${d.slice(5, 7)}.${d.slice(0, 4)}`;
+
+/** Closed settlements: what was sent, checked and paid, month by month. */
+function AvocatSettlementsHistory() {
+  const lei = (n: number) => n.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const rows = [...AVOCAT_SETTLEMENTS].reverse();
+  return (
+    <div className="mb-6 rounded-xl border border-slate-200 bg-white">
+      <div className="border-b border-slate-100 px-4 py-3">
+        <h3 className="text-sm font-semibold text-slate-900">Deconturi închise</h3>
+        <p className="text-xs text-slate-500">Ce s-a trimis cabinetului, verificat de Raul, și dacă s-a plătit.</p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm tabular-nums">
+          <thead className="bg-slate-50 text-left text-xs uppercase text-slate-500">
+            <tr>
+              <th className="px-3 py-2">Luna</th>
+              <th className="px-3 py-2 text-right">Poziții</th>
+              <th className="px-3 py-2 text-right">Servicii cabinet</th>
+              <th className="px-3 py-2 text-right">Onorarii</th>
+              <th className="px-3 py-2 text-right">Factura lunară</th>
+              <th className="px-3 py-2 text-right">Transfer TM</th>
+              <th className="px-3 py-2 text-right">Total către cabinet</th>
+              <th className="px-3 py-2">Stare</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {rows.map((s, i) => {
+              const prev = rows[i + 1];
+              const chg = prev ? s.servicesTotal / prev.servicesTotal - 1 : null;
+              return (
+                <tr key={s.month} title={s.note ?? ''}>
+                  <td className="px-3 py-2 font-medium text-slate-900">{lunaRo(s.month)}</td>
+                  <td className="px-3 py-2 text-right text-slate-700">{s.positions}</td>
+                  <td className="px-3 py-2 text-right text-slate-700">
+                    {lei(s.servicesTotal)}
+                    {chg !== null && (
+                      <span className={`ml-1 text-xs ${chg < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                        {chg > 0 ? '+' : ''}{Math.round(chg * 100)}%
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-3 py-2 text-right text-slate-700">{lei(s.onorarii)}</td>
+                  <td className="px-3 py-2 text-right text-slate-700">{s.facturaLunara ? lei(s.facturaLunara) : '—'}</td>
+                  <td className="px-3 py-2 text-right text-slate-700">{lei(s.transfer)}</td>
+                  <td className="px-3 py-2 text-right font-semibold text-slate-900">{lei(settlementTotal(s))}</td>
+                  <td className="px-3 py-2">
+                    {s.paid ? (
+                      <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">Plătit{s.paidOn ? ` ${dataRo(s.paidOn)}` : ''}</span>
+                    ) : (
+                      <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700">
+                        Verificat{s.checkedOn ? ` ${dataRo(s.checkedOn)}` : ''} · de plătit
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function AvocatDecont() {
   const [month, setMonth] = useState(() => {
+    // Default: last month, the one being settled.
     const d = new Date();
+    d.setDate(1);
+    d.setMonth(d.getMonth() - 1);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   });
   const [platform, setPlatform] = useState<DecontPlatform>('all');
@@ -654,6 +725,7 @@ function AvocatDecont() {
 
   return (
     <>
+      <AvocatSettlementsHistory />
       <div className="mb-6 flex flex-wrap items-end gap-3">
         <div>
           <label className="mb-1 block text-xs font-medium text-slate-500">Lună</label>
