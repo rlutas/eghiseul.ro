@@ -1,5 +1,9 @@
 # eGhiseul.ro - Status Curent
 
+> **🔵 Update 2026-11-03 — deconturi + de ce scad comenzile.**
+> - **Deconturi octombrie verificate:** topograf 1.161/parte (factură 135 + transfer 1.026), cabinet avocat 3.677,44 pe toate 4 platformele; tabelul „Deconturi închise” în Colaboratori. De plătit amândouă.
+> - **Căderea:** aug 320 → sept 202 → oct 150 comenzi; 1–3.11 = 8 comenzi, CJO zero între 30.10 și 02.11. Clicurile Google au scăzut din 16–19.10 (CJO −68%, eghiseul −44%), iar pozițiile doar puțin. În SERP: Hub MAI „GRATUIT” pe 1–2, plus Ads de la infocazier, caziere.ro, roghiseul, obtinecazier; noi suntem blocați la Ads. **Urmărire în fiecare luni:** [diagnostic + tabel](seo/2026-11-03-cadere-mijloc-octombrie-urmarire.md) · [changelog](changelog/2026-11-03-cadere-octombrie-diagnostic.md)
+
 > **🟣 Update 2026-11-02 — fapte corectate pe 4 site-uri, CJO hub, monitorizare SEO.**
 > - **Octombrie vs septembrie:** 44,9k vs 58,0k lei (−22,6%). eghiseul stabil (29,1k), scăderea e pe CJO (−49%, 53 vs 110 comenzi). Decontările pe septembrie și octombrie verificate (payout-uri Stripe 22/22 + 22/22 în extras).
 > - **Fapte corectate (surse oficiale în cod):** fără taxă de timbru (Legea 1/2017); ECRIS, Anexa 22/35/38 la cazier; orice primărie pentru duplicate, extras multilingv și statut civil (HG 255/2024, din 31.03.2024); consulatele eliberează; Hub MAI scos de la stare civilă; SPV PF fără semnătură calificată; străini = act de identitate valabil; împuternicire avocațială semnată la distanță; originalul doar la cerere; „Preț final” unde nu plătim taxă instituției. changelog: [taxe/anexe](changelog/2026-11-02-fapte-corectate-taxe-anexe.md) · [preț final/primărie/SPV](changelog/2026-11-02-pret-final-orice-primarie-spv.md) · [Hub MAI/împuternicire](changelog/2026-11-02-hub-mai-imputernicire-integritate.md) · [consulat](changelog/2026-11-02-consulat-elibereaza-acte-stare-civila.md)
