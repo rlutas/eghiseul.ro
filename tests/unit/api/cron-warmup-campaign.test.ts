@@ -284,3 +284,22 @@ describe('POST /api/cron/warmup-campaign — leaving the queue', () => {
     expect(state.updates).toHaveLength(0);
   });
 });
+
+describe('POST /api/cron/warmup-campaign — queue order', () => {
+  it('asks for recent Stripe buyers first, then loyalty priority', async () => {
+    state.settings = { enabled: true, dailyBatchSize: 10 };
+    state.candidates = [];
+    await POST(makeReq());
+    const queue = state.selects.find((s) => s.filters.some((f) => f.startsWith('order:')));
+    const orders = queue?.filters.filter((f) => f.startsWith('order:')) ?? [];
+    expect(orders[0]).toBe('order:stripe_last_paid_at,{"ascending":false,"nullsFirst":false}');
+    expect(orders[1]).toContain('order:warmup_priority');
+  });
+
+  it('uses the buyer wording for a past Stripe payer who is not flagged as customer', async () => {
+    state.settings = { enabled: true, dailyBatchSize: 10 };
+    state.candidates = [contact('c1', 'a@gmail.com', { is_customer: false, stripe_last_paid_at: '2025-03-01T00:00:00Z' })];
+    await POST(makeReq());
+    expect(sendEmail.mock.calls[0][0].text).toContain('Ai obținut prin noi');
+  });
+});

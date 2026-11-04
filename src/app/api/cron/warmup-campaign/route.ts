@@ -101,15 +101,17 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  // Clienții fideli întâi (decizie 2026-09-25): `warmup_priority` = comenzi
-  // pe platformă ×10 + câte servicii a cerut pe site-ul vechi (coloană
-  // generată, migrarea 187). La egalitate, FIFO după `created_at`.
+  // Cumpărătorii reali întâi, de la ultima plată cea mai recentă (decizie
+  // 2026-11-04, migrarea 200). Apoi clienții fideli (decizie 2026-09-25):
+  // `warmup_priority` = comenzi pe platformă ×10 + câte servicii a cerut pe
+  // site-ul vechi (migrarea 187). La egalitate, FIFO după `created_at`.
   const { data: candidates, error: fetchError } = await admin
     .from('contacts')
-    .select('id, email, first_name, services, is_customer, orders_count, unsubscribe_token')
+    .select('id, email, first_name, services, is_customer, orders_count, stripe_last_paid_at, unsubscribe_token')
     .is('warmup_email_sent_at', null)
     .is('warmup_skipped_at', null)
     .not('marketing_status', 'in', '(unsubscribed,suppressed)')
+    .order('stripe_last_paid_at', { ascending: false, nullsFirst: false })
     .order('warmup_priority', { ascending: false })
     .order('created_at', { ascending: true })
     .limit(batchSize);
@@ -185,7 +187,8 @@ export async function POST(request: NextRequest) {
     const payload = {
       firstName: contact.first_name ?? null,
       serviceSlugs: contact.services ?? [],
-      isCustomer: !!contact.is_customer,
+      // A plătit, chiar dacă pe site-ul vechi: textul „Ai obținut prin noi” e adevărat.
+      isCustomer: !!contact.is_customer || !!contact.stripe_last_paid_at,
       coupon,
       unsubscribeUrl,
     };

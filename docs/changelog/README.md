@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-04 | ✅ **Warm-up: cumpărătorii întâi, 800/zi** — migrarea 200 `contacts.stripe_last_paid_at` (potrivire pe hash cu Stripe), cron sortat după ultima plată | [2026-11-04-warmup-cumparatori-intai.md](2026-11-04-warmup-cumparatori-intai.md) |
 | 2026-11-04 | 🔴 **Nume și email: cedilă, majuscule, prenume tăiat; emailul scos din URL** — `correctNamesFromMrz` aliniat cu CJO, `stripEmailFromAddressBar` în wizard și status | [2026-11-04-conexiune-slaba-si-pdf-wizard.md](2026-11-04-conexiune-slaba-si-pdf-wizard.md) |
 | 2026-11-04 | 🔴 **PDF-urile nu mai sunt șterse la „Plătește”** — `/submit` accepta doar imagini din 18.09 (`KYC_INCOMPLETE` la act PDF); `classifyInlineDocument` acceptă PDF, mai puțin la selfie | [2026-11-04-conexiune-slaba-si-pdf-wizard.md](2026-11-04-conexiune-slaba-si-pdf-wizard.md) |
 | 2026-11-04 | ✅ **Ghid echipă: client blocat în formular sau cu probleme la act** — procedură nouă în `docs/admin/` și în `CURATED_GUIDES` | [2026-11-04-conexiune-slaba-si-pdf-wizard.md](2026-11-04-conexiune-slaba-si-pdf-wizard.md) |
