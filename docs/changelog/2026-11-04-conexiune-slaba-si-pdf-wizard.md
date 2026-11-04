@@ -9,6 +9,7 @@
 - În „Erori clienți” apar două tipuri noi: „Comandă nesalvată” și „Pas neîncărcat”, cu codul comenzii văzut de client. Așa puteți căuta un cod pe care „Comenzi” nu îl are.
 - La pasul de acte, clienții pot încărca buletinul sau pașaportul ca PDF, până la 1,5 MB. Selfie-ul rămâne doar poză.
 - Pe fișa comenzii, actul poate fi deci și PDF, ca la pasul de scanare a actului.
+- Din 18.09 până azi, un buletin în PDF nu trecea de „Plătește”: clientul vedea „Lipsesc documente obligatorii”. Reparat. Două comenzi finalizate au dovada de domiciliu fără fișier: E-260929-BE4AB și E-261013-B3RQ8.
 - Pe documentero, citirea automată a actului era refuzată de server, deci clienții completau datele de mână. Acum merge ca pe eghiseul.
 - Numele foarte lungi nu mai sunt tăiate la citirea actului. Înainte, „ANDREEA-MĂDĂLINA” putea ieși „ANDREEA MADALIN”, pentru că banda de la baza actului are lățime fixă.
 
@@ -57,6 +58,10 @@ Date reale, comenzi plătite eghiseul din ultimele 180 de zile, OCR comparat cu 
 
 Valoarea finală poate fi chiar cea propusă de OCR, dacă clientul n-a corectat-o, deci tabelul e o limită superioară.
 
+## PDF șters la „Plătește”
+
+Din 18.09.2026, verificarea documentelor din `/submit` accepta doar imagini: un PDF își pierdea conținutul, iar o comandă care cere actul primea `KYC_INCOMPLETE`. Dovada: `E-260929-BE4AB` și `E-261013-B3RQ8` au `ro_cei_reader_pdf` fără fișier, iar după acea dată nu există nicio comandă plătită cu act de identitate în PDF (21 în iulie–august). Acum `classifyInlineDocument` acceptă PDF, mai puțin la selfie.
+
 ## Date PDF
 
 - CJO/ecazier (acceptă PDF de la lansare): 146 din 1.044 comenzi din mai–noiembrie au actul în PDF, cam 14%.
@@ -66,7 +71,6 @@ Valoarea finală poate fi chiar cea propusă de OCR, dacă clientul n-a corectat
 
 - Unit: 2.379+ teste trecute, inclusiv `module-load`, `save-failure`, `queue`, `read-pdf-for-upload`.
 - Browser pe build de producție local, cu salvarea simulată: salvare eșuată + modul eșuat + revenire semnal; modul blocat permanent (mesaj, fără buclă, buton); PDF valid, prea mare, fals; selfie PDF refuzat.
-- Neverificat: PDF la pasul Acte până la S3 și în admin. Drumul e același cu cel al PDF-urilor de la pasul de scanare.
 
 ## De verificat separat
 

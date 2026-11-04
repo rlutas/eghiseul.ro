@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-04 | 🔴 **PDF-urile nu mai sunt șterse la „Plătește”** — `/submit` accepta doar imagini din 18.09 (`KYC_INCOMPLETE` la act PDF); `classifyInlineDocument` acceptă PDF, mai puțin la selfie | [2026-11-04-conexiune-slaba-si-pdf-wizard.md](2026-11-04-conexiune-slaba-si-pdf-wizard.md) |
 | 2026-11-04 | ✅ **Ghid echipă: client blocat în formular sau cu probleme la act** — procedură nouă în `docs/admin/` și în `CURATED_GUIDES` | [2026-11-04-conexiune-slaba-si-pdf-wizard.md](2026-11-04-conexiune-slaba-si-pdf-wizard.md) |
 | 2026-11-04 | 🔴 **OCR: documentero nu mai primește 403; numele lungi nu mai sunt tăiate de MRZ** — origine `documentero.ro` permisă în `/api/ocr/extract`, `correctNamesFromMrz` păstrează prenumele tipărit când MRZ-ul e doar începutul lui | [2026-11-04-conexiune-slaba-si-pdf-wizard.md](2026-11-04-conexiune-slaba-si-pdf-wizard.md) |
 | 2026-11-04 | 🔴 **Wizard: conexiune slabă nu mai blochează comanda; buletin PDF acceptat la pasul Acte** — modul neîncărcat = reload automat cu date păstrate (`src/lib/wizard/module-load.ts`), autosave cu reîncercări și timeout, 404 nu mai șterge copia locală a unui draft nesalvat, `save_failed`/`module_load_failed` în `client_error_log`, PDF ≤ 1,5 MB, cheie S3 `.pdf` | [2026-11-04-conexiune-slaba-si-pdf-wizard.md](2026-11-04-conexiune-slaba-si-pdf-wizard.md) |

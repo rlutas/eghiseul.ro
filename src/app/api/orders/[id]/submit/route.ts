@@ -7,6 +7,7 @@ import { createHash, timingSafeEqual } from 'crypto';
 import { autoGenerateOrderDocuments } from '@/lib/documents/auto-generate';
 import { uploadOrderSignature, uploadBase64, copyFile, getFileInfo, downloadFile } from '@/lib/aws/s3';
 import { computeEstimatedCompletionISOForOrder } from '@/lib/orders/order-estimate';
+import { classifyInlineDocument } from '@/lib/orders/inline-document';
 import { getMissingInvoiceClientFields } from '@/lib/oblio/invoice';
 import { computeServerPricing, type CouponRow, type OptionRow, type StoredOption } from '@/lib/orders/server-pricing';
 import { emailDomainAcceptsMail } from '@/lib/email-mx';
@@ -23,14 +24,6 @@ interface RouteParams {
  * Links the order to the authenticated user if not already linked.
  * Uses admin client to bypass RLS for reliable database operations.
  */
-/** JPEG / PNG / WebP by magic bytes — what the wizard's scan and camera produce. */
-function isImageBytes(b: Buffer): boolean {
-  if (b.length < 12) return false;
-  if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return true;
-  if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47) return true;
-  return b.subarray(0, 4).toString('ascii') === 'RIFF' && b.subarray(8, 12).toString('ascii') === 'WEBP';
-}
-
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
@@ -154,15 +147,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         if (!doc.base64 || doc.s3Key || !doc.type) continue;
         const raw = doc.base64.replace(/^data:[^;]+;base64,/, '');
         const bytes = Buffer.from(raw, 'base64');
-        if (bytes.length < 2048 || bytes.length > 12 * 1024 * 1024 || !isImageBytes(bytes)) {
-          // Not an image (or absurdly large) — drop the claim, do not upload garbage.
+        const stored = classifyInlineDocument(bytes, isSelfieType(doc.type));
+        if (!stored) {
+          // Not a document we accept (or absurdly large): drop the claim, do not upload garbage.
+          console.error(`[submit] inline document dropped: order ${id}, type ${doc.type}, ${bytes.length} bytes`);
           delete doc.base64;
           continue;
         }
         try {
-          const ext = doc.mimeType?.includes('png') ? 'png' : doc.mimeType?.includes('webp') ? 'webp' : 'jpg';
-          const s3Key = `kyc/${id}/${String(doc.type).replace(/[^a-z0-9_]/gi, '')}.${ext}`;
-          await uploadBase64(s3Key, doc.base64, doc.mimeType || 'image/jpeg', {
+          const s3Key = `kyc/${id}/${String(doc.type).replace(/[^a-z0-9_]/gi, '')}.${stored.extension}`;
+          doc.mimeType = stored.contentType;
+          await uploadBase64(s3Key, doc.base64, stored.contentType, {
             'order-id': id,
             'document-type': String(doc.type),
             'uploaded-at': new Date().toISOString(),
