@@ -12,6 +12,8 @@
 - Pe documentero, citirea automată a actului era refuzată de server, deci clienții completau datele de mână. Acum merge ca pe eghiseul.
 - Numele foarte lungi nu mai sunt tăiate la citirea actului. Înainte, „ANDREEA-MĂDĂLINA” putea ieși „ANDREEA MADALIN”, pentru că banda de la baza actului are lățime fixă.
 
+Ce faci când te contactează un client: [Client blocat în formular sau cu probleme la act](../admin/client-blocat-in-formular.md).
+
 Detalii despre erori: [Credit Gemini și Erori clienți](../admin/credit-gemini-si-erori-clienti.md).
 
 ---

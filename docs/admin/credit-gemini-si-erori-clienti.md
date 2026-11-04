@@ -62,4 +62,5 @@ Nu se salvează CNP-ul, numele, emailul sau poza clientului.
 
 ## Legat
 
+- [Client blocat în formular sau cu probleme la act: ce faci](client-blocat-in-formular.md)
 - [Pagina comenzii](pagina-comenzii.md)

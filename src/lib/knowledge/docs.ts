@@ -127,6 +127,13 @@ export interface GuideLink {
  */
 export const CURATED_GUIDES: GuideLink[] = [
   {
+    title: 'Client blocat în formular sau cu probleme la act: ce faci',
+    slug: 'admin/client-blocat-in-formular',
+    category: 'comenzi',
+    description:
+      'Comandă care nu apare în listă, „Conexiune slabă”, pas neîncărcat, buletin în PDF: ce înseamnă fiecare mesaj și ce îi spui clientului.',
+  },
+  {
     title: 'Credit Gemini și Erori clienți: cum le citești',
     slug: 'admin/credit-gemini-si-erori-clienti',
     category: 'automatizari',
