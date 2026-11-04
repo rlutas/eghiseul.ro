@@ -963,6 +963,15 @@ export function correctNamesFromMrz(result: OCRResult): OCRResult {
     return result;
   }
 
+  // The MRZ has a fixed width, so a long name gets cut there and stays whole on
+  // the printed line: „ANDREEA-MĂDĂLINA” vs „ANDREEA<MADALIN”. The printed text is
+  // then the complete one, and a rebuild would put the cut name on the contract.
+  const flatFirst = deburrName(visFirst).replace(/-/g, ' ');
+  const givenCutByMrz = flatFirst.length > mrzGiv.length && flatFirst.startsWith(mrzGiv.replace(/-/g, ' '));
+  if (hyphEq(deburrName(visLast), mrzSur) && givenCutByMrz) {
+    return result;
+  }
+
   // Disagreement → rebuild from MRZ, recovering diacritics from the visual text.
   // Split pe cratimă la potrivire, ca „CĂTĂLIN-ALEXANDRU" să dea spellingul
   // pentru ambele token-uri MRZ.
@@ -976,7 +985,7 @@ export function correctNamesFromMrz(result: OCRResult): OCRResult {
   // recoverNamesFromMrz), iar rescrierea de aici bate curățarea făcută deja în
   // parseGeminiOCRResponse — fără asta, un prefix nou l-ar reintroduce în nume.
   data.lastName = stripMrzCountryPrefix(mrzSur.split(' ').map(pickSpelling).join(' '));
-  data.firstName = mrzGiv.split(' ').map(pickSpelling).join(' ');
+  data.firstName = givenCutByMrz ? visFirst : mrzGiv.split(' ').map(pickSpelling).join(' ');
 
   result.issues = [
     ...(result.issues ?? []).filter((i) => !/nume corectat din mrz/i.test(i)),

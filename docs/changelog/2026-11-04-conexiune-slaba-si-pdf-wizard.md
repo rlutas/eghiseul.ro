@@ -9,6 +9,8 @@
 - În „Erori clienți” apar două tipuri noi: „Comandă nesalvată” și „Pas neîncărcat”, cu codul comenzii văzut de client. Așa puteți căuta un cod pe care „Comenzi” nu îl are.
 - La pasul de acte, clienții pot încărca buletinul sau pașaportul ca PDF, până la 1,5 MB. Selfie-ul rămâne doar poză.
 - Pe fișa comenzii, actul poate fi deci și PDF, ca la pasul de scanare a actului.
+- Pe documentero, citirea automată a actului era refuzată de server, deci clienții completau datele de mână. Acum merge ca pe eghiseul.
+- Numele foarte lungi nu mai sunt tăiate la citirea actului. Înainte, „ANDREEA-MĂDĂLINA” putea ieși „ANDREEA MADALIN”, pentru că banda de la baza actului are lățime fixă.
 
 Detalii despre erori: [Credit Gemini și Erori clienți](../admin/credit-gemini-si-erori-clienti.md).
 
@@ -33,6 +35,25 @@ Raport client, E-261104-SAQKA, pe telefon: „Eroare salvare”, „Failed to fe
 - `src/lib/wizard/save-failure.ts` + provider: reîncercări la 3, 8, 20 și 60 s, reluare la evenimentul `online`, timeout 20 s, `POST` direct pe `/api/orders/draft/` (fără 308).
 - `src/lib/client-errors/report.ts`: coadă în `sessionStorage` (`queueClientError`, `flushQueuedClientErrors`), pentru că `sendBeacon` raportează succes și fără rețea.
 - `src/lib/images/read-pdf-for-upload.ts`: PDF ≤ 1,5 MB, verificare `%PDF-`. Limita vine din autosave: toate documentele pleacă în base64 în același request, iar limita Vercel e 4,5 MB. Cel mai mare PDF pe comandă plătită în ultimele 120 de zile: 1,33 MB.
+
+## Citirea datelor (OCR)
+
+- `POST /api/ocr/extract` refuza originea `documentero.ro` cu 403: lista permisă avea doar eghiseul. Verificat pe live cu `curl`. Doar 1 din cele 13 comenzi documentero din DB are rezultate OCR.
+- `correctNamesFromMrz` reconstruia numele din MRZ când acesta diferea de textul tipărit. MRZ-ul are lățime fixă, deci prenumele lung ajungea tăiat, fără cratimă și fără diacritice. Dacă MRZ-ul e doar începutul prenumelui tipărit, rămâne textul tipărit. Bug-ul nu ține de PDF.
+- CJO are aceeași funcție în repo-ul său și nu e reparată aici.
+
+Verificare cu Gemini real, pe 6 PDF-uri sintetice cu date inventate (card întreg, A4, față-verso, 2 pagini, rotit 90°, mic, gri și neclar): CNP, nume, prenume, serie și număr corecte pe toate 6, după fix. Înainte, prenumele lung era tăiat pe toate 6. Data nașterii citită greșit o dată (15.02 în loc de 15.03); formularul o ia din CNP când CNP-ul e valid.
+
+Date reale, comenzi plătite eghiseul din ultimele 180 de zile, OCR comparat cu valoarea finală a comenzii:
+
+| Act | Format | CNP | Nume | Prenume |
+|---|---|---|---|---|
+| CI față | PDF | 18/18 | 18/18 | 18/18 |
+| CI față | poză | 103/105 | 104/105 | 105/105 |
+| Pașaport | PDF | 4/4 | 3/4 | 4/4 |
+| Pașaport | poză | 24/26 | 23/26 | 26/26 |
+
+Valoarea finală poate fi chiar cea propusă de OCR, dacă clientul n-a corectat-o, deci tabelul e o limită superioară.
 
 ## Date PDF
 

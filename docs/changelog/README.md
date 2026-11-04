@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-04 | 🔴 **OCR: documentero nu mai primește 403; numele lungi nu mai sunt tăiate de MRZ** — origine `documentero.ro` permisă în `/api/ocr/extract`, `correctNamesFromMrz` păstrează prenumele tipărit când MRZ-ul e doar începutul lui | [2026-11-04-conexiune-slaba-si-pdf-wizard.md](2026-11-04-conexiune-slaba-si-pdf-wizard.md) |
 | 2026-11-04 | 🔴 **Wizard: conexiune slabă nu mai blochează comanda; buletin PDF acceptat la pasul Acte** — modul neîncărcat = reload automat cu date păstrate (`src/lib/wizard/module-load.ts`), autosave cu reîncercări și timeout, 404 nu mai șterge copia locală a unui draft nesalvat, `save_failed`/`module_load_failed` în `client_error_log`, PDF ≤ 1,5 MB, cheie S3 `.pdf` | [2026-11-04-conexiune-slaba-si-pdf-wizard.md](2026-11-04-conexiune-slaba-si-pdf-wizard.md) |
 | 2026-11-03 | 🔵 **Căderea din mijlocul lui octombrie: diagnostic + urmărire săptămânală** — GSC CJO −68%, eghiseul −44% din 16–19.10; SERP `pws=0`: Hub MAI „GRATUIT” pe 1–2, 4 concurenți cu Ads pe caziere, fără AI Overview; plan în 4 puncte | [2026-11-03-cadere-octombrie-diagnostic.md](2026-11-03-cadere-octombrie-diagnostic.md) |
 | 2026-11-03 | 🟣 **Deconturi avocat închise în admin** — `AVOCAT_SETTLEMENTS` + tabel „Deconturi închise” (iul–oct, stare plătit/de plătit, variație lunară); octombrie verificat | [2026-11-03-deconturi-avocat-inchise-admin.md](2026-11-03-deconturi-avocat-inchise-admin.md) |

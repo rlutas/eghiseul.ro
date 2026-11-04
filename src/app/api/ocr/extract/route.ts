@@ -65,6 +65,8 @@ export async function POST(request: NextRequest) {
       'http://localhost:3000',
       'https://eghiseul.ro',
       'https://www.eghiseul.ro',
+      'https://documentero.ro',
+      'https://www.documentero.ro',
     ].filter(Boolean);
 
     const isValidOrigin = allowedOrigins.some(allowed =>

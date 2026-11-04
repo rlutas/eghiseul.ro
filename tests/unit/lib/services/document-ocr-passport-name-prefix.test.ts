@@ -247,3 +247,39 @@ describe('prefix MRZ mâzgălit de OCR (rapoarte echipă 30.09 + 22.10.2026)', (
     expect(recoverNamesFromMrz({ line1: 'IDROUUNGUREANU<<ION<<<<' }).surname).toBe('UNGUREANU');
   });
 });
+
+describe('correctNamesFromMrz — numele lungi, tăiate de lățimea MRZ', () => {
+  const build = (lastName: string, firstName: string, line1: string) =>
+    ({
+      success: true,
+      documentType: 'ci_front',
+      confidence: 95,
+      extractedData: { lastName, firstName, mrz: { line1 } },
+      issues: [],
+    }) as unknown as OCRResult;
+  const names = (r: OCRResult) => r.extractedData as { lastName?: string; firstName?: string };
+
+  it('keeps the printed given names when the MRZ cuts them short', () => {
+    const out = correctNamesFromMrz(
+      build('POPESCU-ȘERBAN', 'ANDREEA-MĂDĂLINA', 'IDROUPOPESCU<SERBAN<<ANDREEA<MADALIN'),
+    );
+    expect(names(out).lastName).toBe('POPESCU-ȘERBAN');
+    expect(names(out).firstName).toBe('ANDREEA-MĂDĂLINA');
+  });
+
+  it('keeps the printed name when the MRZ drops a whole given name', () => {
+    const out = correctNamesFromMrz(build('POPESCU', 'ANA MARIA', 'IDROUPOPESCU<<ANA'));
+    expect(names(out).firstName).toBe('ANA MARIA');
+  });
+
+  it('restores a cut name while it removes a prefix from the surname', () => {
+    const out = correctNamesFromMrz(build('IDROUPOPESCU', 'MĂDĂLINA', 'IDROUPOPESCU<<MADALIN'));
+    expect(names(out).lastName).toBe('POPESCU');
+    expect(names(out).firstName).toBe('MĂDĂLINA');
+  });
+
+  it('still trusts the MRZ when the printed given name is a different one', () => {
+    const out = correctNamesFromMrz(build('POPESCU', 'MARIUS', 'IDROUPOPESCU<<MARIAN'));
+    expect(names(out).firstName).toBe('MARIAN');
+  });
+});
