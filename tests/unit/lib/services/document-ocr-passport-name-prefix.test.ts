@@ -283,3 +283,45 @@ describe('correctNamesFromMrz — numele lungi, tăiate de lățimea MRZ', () =>
     expect(names(out).firstName).toBe('MARIAN');
   });
 });
+
+describe('numele pe actul românesc', () => {
+  const build = (lastName: string, firstName: string, line1: string) =>
+    ({
+      success: true,
+      documentType: 'ci_front',
+      confidence: 95,
+      extractedData: { lastName, firstName, mrz: { line1 } },
+      issues: [],
+    }) as unknown as OCRResult;
+  const names = (r: OCRResult) => r.extractedData as { lastName?: string; firstName?: string };
+
+  it('turns the old cedilla into the comma form', () => {
+    const out = correctNamesFromMrz(build('POPESCU-ŞERBAN', 'ŢIŢA', 'IDROUPOPESCU<SERBAN<<TITA'));
+    expect(names(out).lastName).toBe('POPESCU-ȘERBAN');
+    expect(names(out).firstName).toBe('ȚIȚA');
+  });
+
+  it('prints the name in upper case, as on the act', () => {
+    const out = correctNamesFromMrz(build('Cepuc', 'ana', 'IDROUCEPUC<<ANA'));
+    expect(names(out).lastName).toBe('CEPUC');
+    expect(names(out).firstName).toBe('ANA');
+  });
+
+  it('keeps the marks of a foreign name on a foreign passport', () => {
+    const out = correctNamesFromMrz(build('MÜLLER', 'HANS', 'P<DEUMULLER<<HANS'));
+    expect(names(out).lastName).toBe('MÜLLER');
+  });
+
+  it('fixes the cedilla on a CI without MRZ, in names and address', () => {
+    const out = applyCiDeterministicCorrections({
+      success: true,
+      documentType: 'ci_front',
+      confidence: 95,
+      extractedData: { lastName: 'ŞERBAN', firstName: 'ANA', address: { street: 'Ştefan cel Mare' } },
+      issues: [],
+    } as unknown as OCRResult);
+    const data = out.extractedData as { lastName?: string; address?: { street?: string } };
+    expect(data.lastName).toBe('ȘERBAN');
+    expect(data.address?.street).toBe('Ștefan cel Mare');
+  });
+});

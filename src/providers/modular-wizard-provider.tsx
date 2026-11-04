@@ -7,6 +7,8 @@
  * Supports different verification modules: PersonalKYC, CompanyKYC, Property, Vehicle, Signature.
  */
 
+import { stripEmailFromAddressBar } from '@/lib/url/strip-email-param';
+import { cachedEmailForOrder } from '@/lib/wizard/cached-order-email';
 import {
   createContext,
   useContext,
@@ -1034,17 +1036,14 @@ export function ModularWizardProvider({
         orderId || (state.friendlyOrderId && stepNumber > 1 ? state.friendlyOrderId : null);
       if (effectiveOrderId) {
         params.set('order', effectiveOrderId);
-        // Carry the email too so the link can resume a GUEST draft from the
-        // server on another device (the draft GET requires a matching email
-        // for guest orders — anti-IDOR). It's the customer's own email in
-        // their own resume link.
-        const email = state.contact.email;
-        if (email) params.set('email', email);
       }
+      // Never in the address: analytics would send it with the page URL. A guest
+      // resumes from the local cache here and from the email link on another device.
+      params.delete('email');
 
       router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     },
-    [pathname, router, state.friendlyOrderId, state.contact.email]
+    [pathname, router, state.friendlyOrderId]
   );
 
   // Restore from localStorage on mount
@@ -1092,6 +1091,7 @@ export function ModularWizardProvider({
         const urlParams = new URLSearchParams(window.location.search);
         const orderParam = urlParams.get('order');
         const emailParam = urlParams.get('email');
+        stripEmailFromAddressBar();
         // Token de continuare emis de admin (?resume=) — hidratează draftul
         // indiferent de email (clienți blocați înainte de pasul contact).
         const resumeParam = urlParams.get('resume');
@@ -1102,7 +1102,10 @@ export function ModularWizardProvider({
           const qs = resumeParam
             ? new URLSearchParams({ resume: resumeParam })
             : new URLSearchParams({ id: orderParam! });
-          if (!resumeParam && emailParam) qs.set('email', emailParam);
+          // The address no longer carries the email, so a reload takes it from the
+          // local copy of this same order.
+          const guestEmail = resumeParam ? null : emailParam || cachedEmailForOrder(orderParam);
+          if (guestEmail) qs.set('email', guestEmail);
           const res = await fetch(`/api/orders/draft?${qs.toString()}`);
           if (res.ok) {
             const json = await res.json();

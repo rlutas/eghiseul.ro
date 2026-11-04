@@ -912,6 +912,16 @@ export function applyCiDeterministicCorrections(result: OCRResult): OCRResult {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data = result.extractedData as any;
   if (!data) return result;
+  // A Romanian CI never carries the old cedilla forms, and a new CI has no MRZ on
+  // the front, so the name correction does not always run.
+  for (const key of ['lastName', 'firstName', 'birthPlace', 'issuedBy']) {
+    if (typeof data[key] === 'string') data[key] = fixRomanianCedilla(data[key]);
+  }
+  if (data.address) {
+    for (const [key, value] of Object.entries(data.address)) {
+      if (typeof value === 'string') data.address[key] = fixRomanianCedilla(value);
+    }
+  }
   const doc = extractDocNumberFromMrz(data.mrz);
   if (doc && (data.series !== doc.series || String(data.number ?? '') !== doc.number)) {
     data.series = doc.series;
@@ -940,6 +950,52 @@ export function correctCiFrontNames(result: OCRResult): OCRResult {
  * ZAVATE → „PEROUZAVATE", MIHAI → „PEROU MIHAI". Mergea așa mai departe în
  * contracte, împuterniciri și facturi.
  */
+/** True when the MRZ holds only the beginning of the printed name, whole words first. */
+export function isCutMrzName(visual: string, mrz: string): boolean {
+  const printed = visual.replace(/-/g, ' ').split(' ').filter(Boolean);
+  const cut = mrz.replace(/-/g, ' ').split(' ').filter(Boolean);
+  if (cut.length === 0 || cut.length > printed.length) return false;
+  const last = cut.length - 1;
+  const sameStart = cut.slice(0, last).every((word, i) => word === printed[i]);
+  if (!sameStart) return false;
+  if (cut[last] === printed[last]) return printed.length > cut.length;
+  return cut[last].length >= 3 && printed[last].startsWith(cut[last]);
+}
+
+/** The name as printed on the act: upper case, Romanian diacritics on a Romanian act. */
+function finishName(value: string, mrz: unknown): string {
+  const upper = value.toLocaleUpperCase('ro-RO');
+  return isRomanianMrz(mrz) ? stripNonRomanianDiacritics(upper) : upper;
+}
+
+/** Old cedilla forms become the correct comma forms; other invented marks are dropped. */
+function stripNonRomanianDiacritics(value: string): string {
+  const allowed = new Set(['Ă', 'Â', 'Î', 'Ș', 'Ț', 'ă', 'â', 'î', 'ș', 'ț']);
+  return fixRomanianCedilla(value)
+    .split('')
+    .map((ch) =>
+      allowed.has(ch) || ch.normalize('NFD').length === 1
+        ? ch
+        : ch.normalize('NFD').replace(/[\u0300-\u036f]/g, ''),
+    )
+    .join('');
+}
+
+function fixRomanianCedilla(value: string): string {
+  return value.replace(/Ş/g, 'Ș').replace(/ş/g, 'ș').replace(/Ţ/g, 'Ț').replace(/ţ/g, 'ț');
+}
+
+function isRomanianMrz(mrz: unknown): boolean {
+  const lines = Array.isArray(mrz)
+    ? mrz
+    : [
+        (mrz as { line1?: string })?.line1,
+        (mrz as { line2?: string })?.line2,
+        (mrz as { line3?: string })?.line3,
+      ];
+  return lines.some((line) => typeof line === 'string' && /ROU/i.test(line));
+}
+
 export function correctNamesFromMrz(result: OCRResult): OCRResult {
   const data = result.extractedData as ExtractedPersonalData & {
     mrz?: { line1?: string | null; line2?: string | null; line3?: string | null };
@@ -959,16 +1015,14 @@ export function correctNamesFromMrz(result: OCRResult): OCRResult {
   // fără toleranță, numele compuse pierdeau cratima ȘI diacriticele la rebuild
   // (CJO-20260804-61939, port 05.08.2026).
   const hyphEq = (a: string, b: string) => a.replace(/-/g, ' ') === b.replace(/-/g, ' ');
-  if (hyphEq(deburrName(visLast), mrzSur) && hyphEq(deburrName(visFirst), mrzGiv)) {
-    return result;
-  }
+  // The MRZ has a fixed width and the model may also return it cut, so a long name
+  // can stay whole only on the printed line: „ANDREEA-MĂDĂLINA” vs „ANDREEA<MADALIN”.
+  // The MRZ decides the surname/given split, not how much of the name exists.
+  const givenCutByMrz = isCutMrzName(deburrName(visFirst), mrzGiv);
 
-  // The MRZ has a fixed width, so a long name gets cut there and stays whole on
-  // the printed line: „ANDREEA-MĂDĂLINA” vs „ANDREEA<MADALIN”. The printed text is
-  // then the complete one, and a rebuild would put the cut name on the contract.
-  const flatFirst = deburrName(visFirst).replace(/-/g, ' ');
-  const givenCutByMrz = flatFirst.length > mrzGiv.length && flatFirst.startsWith(mrzGiv.replace(/-/g, ' '));
-  if (hyphEq(deburrName(visLast), mrzSur) && givenCutByMrz) {
+  if (hyphEq(deburrName(visLast), mrzSur) && (hyphEq(deburrName(visFirst), mrzGiv) || givenCutByMrz)) {
+    data.lastName = finishName(visLast, data.mrz);
+    data.firstName = finishName(visFirst, data.mrz);
     return result;
   }
 
@@ -984,8 +1038,8 @@ export function correctNamesFromMrz(result: OCRResult): OCRResult {
   // Plasa de siguranță la scriere: MRZ-ul poate fi el însuși contaminat (vezi
   // recoverNamesFromMrz), iar rescrierea de aici bate curățarea făcută deja în
   // parseGeminiOCRResponse — fără asta, un prefix nou l-ar reintroduce în nume.
-  data.lastName = stripMrzCountryPrefix(mrzSur.split(' ').map(pickSpelling).join(' '));
-  data.firstName = givenCutByMrz ? visFirst : mrzGiv.split(' ').map(pickSpelling).join(' ');
+  data.lastName = finishName(stripMrzCountryPrefix(mrzSur.split(' ').map(pickSpelling).join(' ')), data.mrz);
+  data.firstName = finishName(givenCutByMrz ? visFirst : mrzGiv.split(' ').map(pickSpelling).join(' '), data.mrz);
 
   result.issues = [
     ...(result.issues ?? []).filter((i) => !/nume corectat din mrz/i.test(i)),

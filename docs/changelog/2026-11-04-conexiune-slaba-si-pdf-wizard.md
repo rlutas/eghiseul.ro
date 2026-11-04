@@ -10,6 +10,7 @@
 - La pasul de acte, clienții pot încărca buletinul sau pașaportul ca PDF, până la 1,5 MB. Selfie-ul rămâne doar poză.
 - Pe fișa comenzii, actul poate fi deci și PDF, ca la pasul de scanare a actului.
 - Din 18.09 până azi, un buletin în PDF nu trecea de „Plătește”: clientul vedea „Lipsesc documente obligatorii”. Reparat. Două comenzi finalizate au dovada de domiciliu fără fișier: E-260929-BE4AB și E-261013-B3RQ8.
+- Dacă un client copiază adresa formularului pe alt dispozitiv, nu își mai reia comanda din ea, pentru că adresa nu mai conține emailul. Linkurile din emailurile noastre merg ca înainte.
 - Pe documentero, citirea automată a actului era refuzată de server, deci clienții completau datele de mână. Acum merge ca pe eghiseul.
 - Numele foarte lungi nu mai sunt tăiate la citirea actului. Înainte, „ANDREEA-MĂDĂLINA” putea ieși „ANDREEA MADALIN”, pentru că banda de la baza actului are lățime fixă.
 
@@ -61,6 +62,12 @@ Valoarea finală poate fi chiar cea propusă de OCR, dacă clientul n-a corectat
 ## PDF șters la „Plătește”
 
 Din 18.09.2026, verificarea documentelor din `/submit` accepta doar imagini: un PDF își pierdea conținutul, iar o comandă care cere actul primea `KYC_INCOMPLETE`. Dovada: `E-260929-BE4AB` și `E-261013-B3RQ8` au `ro_cei_reader_pdf` fără fișier, iar după acea dată nu există nicio comandă plătită cu act de identitate în PDF (21 în iulie–august). Acum `classifyInlineDocument` acceptă PDF, mai puțin la selfie.
+
+Verificat pe live cu date inventate, pe eghiseul și documentero: draft cu act PDF, `/submit` 200, obiect `ci_front.pdf` în S3 cu `application/pdf`. Testul rulat înainte de deploy a reprodus bug-ul (`KYC_INCOMPLETE`, fără fișier).
+
+## Emailul nu mai stă în URL
+
+Formularul punea `?email=` în adresă, iar GA4 și Meta, după acord, primesc URL-ul paginii. Formularul și pagina de status îl scot imediat după citire, iar linkurile din emailuri merg mai departe. La reîncărcare, emailul vine din copia locală sau din sesiunea tab-ului.
 
 ## Date PDF
 

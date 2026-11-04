@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { stripEmailFromAddressBar } from '@/lib/url/strip-email-param';
 import Link from 'next/link';
 import {
   Card,
@@ -202,7 +203,16 @@ function OrderStatusContent() {
   // Auto-search if params are provided
   useEffect(() => {
     const order = searchParams.get('order');
-    const emailParam = searchParams.get('email');
+    const emailKey = `order_status_email:${order}`;
+    let emailParam = searchParams.get('email');
+    try {
+      // The tab keeps it, so a reload still finds the order once the address is clean.
+      if (emailParam) sessionStorage.setItem(emailKey, emailParam);
+      else emailParam = sessionStorage.getItem(emailKey);
+    } catch {
+      // storage blocked: the customer types the email again after a reload
+    }
+    stripEmailFromAddressBar();
 
     if (order && emailParam) {
       setOrderCode(order);

@@ -34,6 +34,8 @@ Nici acolo nu apare mereu: raportul pleacă abia când revine semnalul și doar 
 
 Citirea automată poate pierde diacriticele pe un scan neclar, de exemplu „MADALINA” în loc de „MĂDĂLINA”. Pe comenzile dinainte de 04.11.2026, prenumele lungi puteau ieși tăiate, de exemplu „ANDREEA MADALIN”.
 
+Între 18.09 și 04.11.2026, un act în PDF era șters la „Plătește”. Clientul vedea „Lipsesc documente obligatorii”. Dacă a plătit, cere-i din nou documentul dacă lipsește din comandă.
+
 Înainte să generezi sau să depui documente, compară numele din comandă cu actul.
 
 ## Mesaj pentru client
@@ -52,7 +54,9 @@ Trimite codul comenzii, ora, captura de ecran și dispozitivul din „Erori clie
 
 ## Limite
 
-Pe CazierJudiciarOnline și ecazier formularul e diferit, iar salvările eșuate nu apar încă în „Erori clienți”.
+Pe CazierJudiciarOnline și ecazier formularul e diferit: salvările eșuate apar în „Erori clienți”, dar nu există mesajele de reluare de mai sus.
+
+Pentru alt dispozitiv, clientul folosește linkul din emailul nostru. Adresa copiată din formular nu mai reia comanda.
 
 ## Legat
 
