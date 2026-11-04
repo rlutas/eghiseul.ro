@@ -2,6 +2,8 @@
 
 **Data:** 03.11.2026 · **Site-uri:** cazierjudiciaronline.com (CJO), eghiseul.ro, ecazier.ro · **Surse:** GSC API (contul de serviciu `claude-seo`), comenzile plătite din ambele baze de date, SERP-ul real verificat cu `&pws=0&gl=ro`.
 
+> **Precizare, 04.11:** fereastra de mai jos rămâne corectă: pe CJO ruptura e pe 18–19.10. Pozițiile n-au coborât doar puțin: pe paginile de oraș 4,83 → 5,84, pe cele comerciale 6,76 → 9,05, iar ghidurile aproape își țin locul. Vezi [diagnosticul CJO](2026-11-04-cjo-diagnostic-trafic.md).
+
 ## Pe scurt
 
 - Vânzările scad lună de lună: august 320 comenzi / 77,3k lei, septembrie 202 / 57,4k, octombrie 150 / 44,9k.
