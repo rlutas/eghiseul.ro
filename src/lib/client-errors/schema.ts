@@ -15,6 +15,8 @@ export const CLIENT_ERROR_KINDS = [
   'ocr_failed',
   'kyc_failed',
   'payment_error',
+  'save_failed',
+  'module_load_failed',
   'other',
 ] as const;
 

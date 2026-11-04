@@ -571,7 +571,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       for (const doc of personalData.uploadedDocuments) {
         if (doc.base64 && !doc.s3Key) {
           try {
-            const ext = doc.mimeType?.includes('png') ? 'png' : 'jpg';
+            const ext = doc.mimeType?.includes('png') ? 'png' : doc.mimeType?.includes('pdf') ? 'pdf' : 'jpg';
             const contentType = doc.mimeType || 'image/jpeg';
             const s3Key = `kyc/${id}/${doc.type || doc.id || 'document'}.${ext}`;
 

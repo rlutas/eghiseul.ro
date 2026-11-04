@@ -39,6 +39,7 @@ import { cn } from '@/lib/utils';
 import type { PersonalKYCConfig, DocumentType, UploadedDocumentState } from '@/types/verification-modules';
 import { ImageCompressionError } from '@/lib/images/compress';
 import { prepareImageForUpload } from '@/lib/images/prepare-upload';
+import { isPdfFile, readPdfForUpload } from '@/lib/images/read-pdf-for-upload';
 import { reportClientError } from '@/lib/client-errors/report';
 import { sizeBucket } from '@/lib/client-errors/schema';
 import { randomId } from '@/lib/random-id';
@@ -375,13 +376,19 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
           meta: { docType: type, mime: (file.type || 'unknown').slice(0, 40), sizeBucket: sizeBucket(file.size) },
         });
 
-      if (!ACCEPTED_TYPES.includes(file.type)) {
-        reportRejected('FORMAT', 'Format invalid. Acceptăm doar JPEG sau PNG.');
+      // A scanned ID often comes as PDF (about 14% of the orders on the sister
+      // site). The selfie stays a photo: the team compares a face with the act.
+      const pdfAllowed = type !== 'selfie' && isPdfFile(file);
+      if (!ACCEPTED_TYPES.includes(file.type) && !pdfAllowed) {
+        const message = type === 'selfie'
+          ? 'Selfie-ul trebuie să fie o poză, JPEG sau PNG.'
+          : 'Format invalid. Acceptăm JPEG, PNG sau PDF.';
+        reportRejected('FORMAT', message);
         setUploads((prev) => ({
           ...prev,
           [type]: {
             ...prev[type],
-            error: 'Format invalid. Acceptăm doar JPEG sau PNG.',
+            error: message,
           },
         }));
         return;
@@ -432,8 +439,10 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
       try {
         // Compress + decode (EXIF-safe). Reduces 3-7MB phone photos to ~250KB JPEG.
         // Falls back to the original JPEG/PNG when this browser cannot decode it.
-        const compressed = await prepareImageForUpload(file, { ...errorCtxRef.current, docType: type });
-        console.log(`[KYC] ${type}: ${(compressed.sizeBefore/1024/1024).toFixed(1)}MB → ${(compressed.sizeAfter/1024).toFixed(0)}KB${compressed.fallback ? ' (original)' : ''}`);
+        const pdfUpload = type !== 'selfie' && isPdfFile(file);
+        const compressed = pdfUpload
+          ? await readPdfForUpload(file)
+          : await prepareImageForUpload(file, { ...errorCtxRef.current, docType: type });
         const base64 = compressed.base64;
 
         // Same picture as another document → refuse here; /submit would
@@ -785,7 +794,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
                   Trage fișierul aici sau click pentru a selecta
                 </p>
                 <p className="text-xs text-neutral-500">
-                  JPEG sau PNG, max 10MB
+                  JPEG sau PNG, max 10MB; PDF, max 1,5MB
                 </p>
               </div>
             )}

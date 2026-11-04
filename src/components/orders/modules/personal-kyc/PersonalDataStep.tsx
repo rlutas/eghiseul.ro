@@ -53,6 +53,7 @@ import { COUNTY_NAMES, getLocalitiesForCounty, getCountyName, findCounty } from 
 import { fuzzyMatchLocality } from '@/lib/data/locality-fuzzy-match';
 import { ImageCompressionError } from '@/lib/images/compress';
 import { prepareImageForUpload } from '@/lib/images/prepare-upload';
+import { isPdfFile, readPdfForUpload } from '@/lib/images/read-pdf-for-upload';
 import { randomId } from '@/lib/random-id';
 
 // Minimal ID Card Front Illustration (Gold theme)
@@ -352,8 +353,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     try {
       // PDF branch — Gemini accepts application/pdf natively. Skip image
       // compression (it's already a small vector format) and pass through.
-      const isPdf = file.type === 'application/pdf' ||
-        file.name.toLowerCase().endsWith('.pdf');
+      const isPdf = isPdfFile(file);
 
       let base64: string;
       let preview: string;
@@ -361,16 +361,12 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       let sizeAfter: number;
 
       if (isPdf) {
-        // Read PDF as base64 directly.
-        const buf = await file.arrayBuffer();
-        const bytes = new Uint8Array(buf);
-        let binary = '';
-        for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-        base64 = btoa(binary);
-        mimeType = 'application/pdf';
+        const pdf = await readPdfForUpload(file);
+        base64 = pdf.base64;
+        mimeType = pdf.mimeType;
         // Use a generic PDF placeholder for preview (no inline image).
         preview = '';
-        sizeAfter = file.size;
+        sizeAfter = pdf.sizeAfter;
         console.log(`[KYC] ${type}: PDF ${(file.size/1024).toFixed(0)}KB`);
       } else {
         // Image branch: compress + decode (EXIF-safe).

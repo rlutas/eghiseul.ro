@@ -53,6 +53,9 @@ import { generateOrderId, getDraftStorageKey, validateOrderId } from '@/lib/orde
 import { HANDOFF_STORAGE_KEY, handoffActions } from '@/lib/orders/wizard-handoff';
 import { getAttribution } from '@/lib/analytics/attribution';
 import { trackMeta } from '@/lib/analytics/meta-pixel';
+import { flushQueuedClientErrors, queueClientError } from '@/lib/client-errors/report';
+import { WIZARD_RELOAD_FLAG } from '@/lib/wizard/module-load';
+import { CONNECTION_LOST_MESSAGE, isNetworkFailure, nextSaveRetryDelay, saveFailureMessage } from '@/lib/wizard/save-failure';
 
 // Cache version for migrations
 // v3: Added clientType to cache for proper step reconstruction
@@ -979,6 +982,10 @@ export function ModularWizardProvider({
   const isUrlSyncRef = useRef(false);
   const initialSyncDoneRef = useRef(false);
   const saveAbortControllerRef = useRef<AbortController | null>(null);
+  // Automatic retry after a lost connection: which attempt comes next, and its timer.
+  const saveRetryAttemptRef = useRef(0);
+  const saveRetryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveFailedOnNetworkRef = useRef(false);
 
   // Prefill data state
   const [prefillData, setPrefillData] = useState<UserPrefillData | null>(initialPrefill ?? null);
@@ -1165,7 +1172,16 @@ export function ModularWizardProvider({
                         return;
                       }
                     } else if (response.status === 404) {
-                      // Order not found - clear stale cache
+                      // Never saved on the server (the first save failed, no
+                      // signal): the phone holds the only copy of the answers.
+                      // Deleting it emptied the form on reload (E-261104-SAQKA).
+                      if (!cacheData.orderId) {
+                        console.log('Draft not on server yet, restoring local copy:', cacheData.friendlyOrderId);
+                        dispatch({ type: 'RESTORE_FROM_CACHE', payload: cacheData });
+                        dispatch({ type: 'MARK_DIRTY' });
+                        return;
+                      }
+                      // It was saved and is gone now: the local copy is stale.
                       console.log('Draft not found on server, clearing cache:', cacheData.friendlyOrderId);
                       localStorage.removeItem(key);
                       dispatch({ type: 'MARK_INITIALIZED' });
@@ -1454,7 +1470,19 @@ export function ModularWizardProvider({
     if (saveAbortControllerRef.current) {
       saveAbortControllerRef.current.abort();
     }
-    saveAbortControllerRef.current = new AbortController();
+    const saveController = new AbortController();
+    saveAbortControllerRef.current = saveController;
+    if (saveRetryTimerRef.current) {
+      clearTimeout(saveRetryTimerRef.current);
+      saveRetryTimerRef.current = null;
+    }
+    // A request that never answers would keep „Se salvează..." on screen for good.
+    let saveTimedOut = false;
+    const saveTimeout = setTimeout(() => {
+      saveTimedOut = true;
+      saveController.abort();
+    }, 20000);
+    let failedStatus: number | null = null;
 
     dispatch({ type: 'SAVE_START' });
 
@@ -1494,10 +1522,11 @@ export function ModularWizardProvider({
         customerData.bundled_services = bundledServices;
       }
 
-      const response = await fetch('/api/orders/draft', {
+      // Trailing slash: without it every save first takes a 308 round trip.
+      const response = await fetch('/api/orders/draft/', {
         method,
         headers: { 'Content-Type': 'application/json' },
-        signal: saveAbortControllerRef.current.signal,
+        signal: saveController.signal,
         body: JSON.stringify({
           id: state.orderId,
           friendly_order_id: state.friendlyOrderId,
@@ -1618,6 +1647,7 @@ export function ModularWizardProvider({
           return;
         }
 
+        failedStatus = response.status;
         throw new Error(errorData.error?.message || `Salvarea a eșuat (${response.status})`);
       }
 
@@ -1656,24 +1686,73 @@ export function ModularWizardProvider({
         }
       }
 
+      saveRetryAttemptRef.current = 0;
+      saveFailedOnNetworkRef.current = false;
       dispatch({ type: 'SAVE_SUCCESS', payload: new Date().toISOString() });
+      void flushQueuedClientErrors();
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
+      if (error instanceof Error && error.name === 'AbortError' && !saveTimedOut) {
         // Request was aborted - reset saving state without error
         dispatch({ type: 'SAVE_SUCCESS', payload: new Date().toISOString() });
         return;
       }
       console.error('Auto-save failed:', error);
+
+      const connectionLost = saveTimedOut || isNetworkFailure(error);
+      const retryAttempt = saveRetryAttemptRef.current;
+      // The team must see this in „Erori clienți": the order may not exist in
+      // the database at all, so there is nothing else to search for.
+      queueClientError({
+        kind: 'save_failed',
+        code: saveTimedOut ? 'TIMEOUT' : connectionLost ? 'NETWORK' : `HTTP_${failedStatus ?? 'UNKNOWN'}`,
+        message: error instanceof Error ? error.message : undefined,
+        step: state.currentStepId,
+        serviceSlug: state.serviceSlug ?? undefined,
+        orderRef: state.friendlyOrderId,
+        meta: { attempt: retryAttempt + 1, source: navigator.onLine ? 'online' : 'offline' },
+      });
+      void flushQueuedClientErrors();
+
       dispatch({
         type: 'SAVE_ERROR',
-        payload: error instanceof Error ? error.message : 'Salvarea a eșuat',
+        payload: connectionLost ? CONNECTION_LOST_MESSAGE : saveFailureMessage(error),
       });
+
+      if (connectionLost) {
+        saveFailedOnNetworkRef.current = true;
+        const delay = nextSaveRetryDelay(retryAttempt);
+        if (delay !== null) {
+          saveRetryAttemptRef.current = retryAttempt + 1;
+          saveRetryTimerRef.current = setTimeout(() => {
+            void saveDraftToServerRef.current();
+          }, delay);
+        }
+      }
+    } finally {
+      clearTimeout(saveTimeout);
     }
   }, [state, priceBreakdown, saveToLocalStorage, canSaveToServer]);
 
   // Use ref for save function to avoid recreating debounce on every state change
   const saveDraftToServerRef = useRef(saveDraftToServer);
   saveDraftToServerRef.current = saveDraftToServer;
+
+  // The connection came back: save now instead of waiting for the next retry.
+  useEffect(() => {
+    const onOnline = () => {
+      void flushQueuedClientErrors();
+      if (!saveFailedOnNetworkRef.current) return;
+      saveRetryAttemptRef.current = 0;
+      void saveDraftToServerRef.current();
+    };
+    window.addEventListener('online', onOnline);
+    // Errors queued before the customer reloaded the page.
+    void flushQueuedClientErrors();
+    return () => {
+      window.removeEventListener('online', onOnline);
+      if (saveRetryTimerRef.current) clearTimeout(saveRetryTimerRef.current);
+    };
+  }, []);
 
   // Debounced save - stable function that uses ref
   const debouncedSave = useMemo(
@@ -1913,6 +1992,8 @@ export function ModularWizardProvider({
   // Warn on page unload if dirty
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      // The wizard reloads itself to recover a step: the answers are in localStorage.
+      if ((window as unknown as Record<string, boolean>)[WIZARD_RELOAD_FLAG]) return;
       if (state.isDirty && state.friendlyOrderId && canSaveToServer) {
         e.preventDefault();
       }

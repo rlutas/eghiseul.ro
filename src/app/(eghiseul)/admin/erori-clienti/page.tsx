@@ -33,6 +33,8 @@ const KIND_LABEL: Record<string, string> = {
   ocr_failed: 'Citire act eșuată',
   kyc_failed: 'Verificare act eșuată',
   payment_error: 'Eroare plată',
+  save_failed: 'Comandă nesalvată',
+  module_load_failed: 'Pas neîncărcat',
   other: 'Altele',
 };
 

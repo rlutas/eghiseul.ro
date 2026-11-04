@@ -23,6 +23,8 @@ import { OrderIdDisplay, OrderIdBadge } from './order-id-display';
 import { Service, ServiceOption } from '@/types/services';
 import { MODULE_LOADERS, hasModuleLoader } from '@/lib/verification-modules/registry';
 import { scrollToFirstWizardError } from '@/lib/wizard/scroll-to-first-error';
+import { loadWithTimeout, ModuleLoadTimeoutError, reloadWizardPage, shouldAutoReloadForStep } from '@/lib/wizard/module-load';
+import { flushQueuedClientErrors, queueClientError } from '@/lib/client-errors/report';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { ModularStepId } from '@/types/verification-modules';
 import { createClient } from '@/lib/supabase/client';
@@ -105,6 +107,8 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Component: React.ComponentType<any>;
   } | null>(null);
+  // Step whose code could not be downloaded, after the automatic retries.
+  const [moduleLoadFailedStep, setModuleLoadFailedStep] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   // Refusal from /submit, pinned on the step that can fix it. A toast alone
   // vanished in seconds and left the customer on Billing with a „dead"
@@ -143,8 +147,10 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
 
   // Load dynamic component when step changes
   useEffect(() => {
+    let cancelled = false;
     const loadComponent = async () => {
       const stepId = state.currentStepId;
+      setModuleLoadFailedStep(null);
 
       // Core steps don't use dynamic loading
       if (['contact', 'options', 'delivery', 'review'].includes(stepId)) {
@@ -157,18 +163,66 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
         const loader = MODULE_LOADERS[stepId];
         if (loader) {
           try {
-            const module = await loader();
+            const module = await loadWithTimeout(loader);
+            if (cancelled) return;
             setDynamicModule({ stepId, Component: module.default });
+            void flushQueuedClientErrors();
           } catch (error) {
+            if (cancelled) return;
             console.error(`Failed to load module for step ${stepId}:`, error);
             setDynamicModule(null);
+            setModuleLoadFailedStep(stepId);
+            queueClientError({
+              kind: 'module_load_failed',
+              code: error instanceof ModuleLoadTimeoutError ? 'TIMEOUT' : 'NETWORK',
+              message: error instanceof Error ? error.message : undefined,
+              step: stepId,
+              serviceSlug: initialService.slug,
+              orderRef: state.friendlyOrderId ?? undefined,
+              meta: { source: navigator.onLine ? 'online' : 'offline' },
+            });
+            void flushQueuedClientErrors();
           }
         }
       }
     };
 
     loadComponent();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs per step; the ids are only telemetry
   }, [state.currentStepId]);
+
+  // A step is stuck: reload the page once the server answers again. Reloading
+  // while offline would replace the wizard with the browser's error page. The
+  // answers are in localStorage (and on the server if the draft was saved).
+  useEffect(() => {
+    if (!moduleLoadFailedStep) return;
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const probe = async () => {
+      if (stopped) return;
+      try {
+        const response = await fetch(window.location.pathname, { method: 'HEAD', cache: 'no-store' });
+        if (!stopped && response.ok && shouldAutoReloadForStep(moduleLoadFailedStep, sessionStorage)) {
+          reloadWizardPage();
+          return;
+        }
+        if (response.ok) return; // Already reloaded once: the button is the next step.
+      } catch {
+        // still no connection
+      }
+      if (!stopped) timer = setTimeout(probe, 5000);
+    };
+    void probe();
+    window.addEventListener('online', probe);
+    return () => {
+      stopped = true;
+      if (timer) clearTimeout(timer);
+      window.removeEventListener('online', probe);
+    };
+  }, [moduleLoadFailedStep]);
 
   // Get module config for current step
   const getModuleConfig = () => {
@@ -223,6 +277,21 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
       const { Component } = dynamicModule;
       const config = getModuleConfig();
       return <Component key={stepId} config={config} onValidChange={setStepValid} />;
+    }
+
+    if (moduleLoadFailedStep === stepId) {
+      return (
+        <div role="alert" className="flex flex-col items-center gap-3 p-8 text-center">
+          <AlertTriangle className="h-8 w-8 text-amber-500" />
+          <p className="font-semibold text-secondary-900">Nu am putut încărca acest pas</p>
+          <p className="text-sm text-neutral-600">
+            Conexiunea pare slabă. Reîncărcăm singuri pagina când revine. Ce ai completat rămâne salvat.
+          </p>
+          <Button onClick={reloadWizardPage} className="bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold">
+            Reîncarcă pagina
+          </Button>
+        </div>
+      );
     }
 
     return <StepLoading />;
@@ -326,6 +395,11 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
 
   // Handle next
   const handleNext = () => {
+    // The step's form is not on screen, so „câmpuri necompletate" would be false.
+    if (moduleLoadFailedStep === state.currentStepId) {
+      toast.error('Pasul nu s-a încărcat. Apasă „Reîncarcă pagina".');
+      return;
+    }
     // Pas invalid → nu avansăm; semnalăm pasului să afișeze ce lipsește + scroll
     // la prima problemă (în loc să lăsăm butonul „mort" fără explicație). Toast =
     // plasă de siguranță pentru pașii care nu au listă proprie de erori.

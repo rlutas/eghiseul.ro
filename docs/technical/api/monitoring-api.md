@@ -21,7 +21,7 @@ Public, fără autentificare. Înregistrează o eroare arătată clientului în 
 }
 ```
 
-- `kind` ∈ `image_decode`, `image_compress`, `upload_failed`, `cnp_invalid`, `ocr_failed`, `kyc_failed`, `payment_error`, `other`; altceva → ignorat.
+- `kind` ∈ `image_decode`, `image_compress`, `upload_failed`, `cnp_invalid`, `ocr_failed`, `kyc_failed`, `payment_error`, `save_failed`, `module_load_failed`, `other`; altceva → ignorat.
 - Câmpuri în afara listei sunt ignorate; `code`/`step`/`serviceSlug` doar `[A-Za-z0-9_\-./]`; `orderRef` doar format de cod de comandă; `message` ≤ 300 cu cifre lungi și emailuri înlocuite; `page` fără query/hash; `meta` doar cheile `mime`, `sizeBucket`, `fallback`, `docType`, `status`, `attempt`, `source`.
 - `platform` din host (`brandFromRequest`), `user_agent` din header.
 - Limită: 30 de cereri / 10 minute / IP (în memorie); peste limită → ignorat.

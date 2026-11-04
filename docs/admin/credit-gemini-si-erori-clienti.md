@@ -45,6 +45,8 @@ Aici apar erorile pe care clienții le-au văzut în formular, înregistrate aut
 |---|---|
 | Poză nedecodificată | „Imaginea nu a putut fi decodificată” — de obicei iPhone vechi |
 | Poză neprocesată | HEIC, fișier gol sau altă problemă de procesare |
+| Comandă nesalvată | Salvarea a eșuat: de obicei semnal slab („NETWORK”). Comanda poate lipsi din „Comenzi”, codul din rând e cel văzut de client |
+| Pas neîncărcat | Pasul nu s-a descărcat pe telefon. Pagina se reîncarcă singură când revine conexiunea, cu datele păstrate |
 | Încărcare eșuată | format greșit, fișier prea mare, aceeași poză la două acte |
 | CNP invalid | CNP-ul tastat nu trece verificarea (cu motivul: lungime, dată, cifra de control…) |
 | Citire act eșuată | „Nu am putut extrage datele din document” |
