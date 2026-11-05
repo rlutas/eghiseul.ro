@@ -21,8 +21,19 @@ export function isNetworkFailure(error: unknown): boolean {
   return NETWORK_MESSAGES.some((known) => message.includes(known));
 }
 
-export function saveFailureMessage(error: unknown): string {
+export const SAVE_TOO_LARGE_MESSAGE =
+  'Documentele încărcate sunt prea mari. Șterge ultimul document și încarcă o poză sau un PDF mai mic.';
+export const SAVE_SERVER_ERROR_MESSAGE = 'Nu am putut salva comanda. Reîncercăm automat.';
+
+/** A server failure can pass on its own. A rejected request (4xx) will not. */
+export function isRetriableSaveStatus(status: number | null | undefined): boolean {
+  return typeof status === 'number' && status >= 500 && status < 600;
+}
+
+export function saveFailureMessage(error: unknown, status?: number | null): string {
   if (isNetworkFailure(error)) return CONNECTION_LOST_MESSAGE;
+  if (status === 413) return SAVE_TOO_LARGE_MESSAGE;
+  if (isRetriableSaveStatus(status)) return SAVE_SERVER_ERROR_MESSAGE;
   return error instanceof Error && error.message ? error.message : 'Salvarea a eșuat';
 }
 

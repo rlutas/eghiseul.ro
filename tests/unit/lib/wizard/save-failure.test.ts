@@ -1,5 +1,30 @@
 import { describe, it, expect } from 'vitest';
-import { isNetworkFailure, saveFailureMessage, nextSaveRetryDelay } from '@/lib/wizard/save-failure';
+import {
+  isNetworkFailure,
+  isRetriableSaveStatus,
+  saveFailureMessage,
+  nextSaveRetryDelay,
+  SAVE_SERVER_ERROR_MESSAGE,
+  SAVE_TOO_LARGE_MESSAGE,
+} from '@/lib/wizard/save-failure';
+
+describe('server failures', () => {
+  it('retries a server error, not a refused request', () => {
+    expect(isRetriableSaveStatus(500)).toBe(true);
+    expect(isRetriableSaveStatus(503)).toBe(true);
+    expect(isRetriableSaveStatus(413)).toBe(false);
+    expect(isRetriableSaveStatus(404)).toBe(false);
+    expect(isRetriableSaveStatus(null)).toBe(false);
+  });
+
+  it('tells the customer what to do about a request that is too large', () => {
+    expect(saveFailureMessage(new Error('Salvarea a eșuat (413)'), 413)).toBe(SAVE_TOO_LARGE_MESSAGE);
+  });
+
+  it('never shows the raw server text on a server error', () => {
+    expect(saveFailureMessage(new Error('An unexpected error occurred'), 500)).toBe(SAVE_SERVER_ERROR_MESSAGE);
+  });
+});
 
 describe('isNetworkFailure', () => {
   it('recognises what fetch throws on Chrome, Firefox and Safari', () => {

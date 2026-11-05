@@ -30,6 +30,10 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { randomId } from '@/lib/random-id';
+import { prepareImageForUpload } from '@/lib/images/prepare-upload';
+import { isPdfFile, looksLikePdf, MAX_PDF_BYTES, readPdfForUpload } from '@/lib/images/read-pdf-for-upload';
+import { uploadClientFile } from '@/lib/orders/client-files-upload';
+import { isNetworkFailure } from '@/lib/wizard/save-failure';
 import type { CompanyKYCConfig, UploadedDocumentState } from '@/types/verification-modules';
 
 interface CompanyDocumentsStepProps {
@@ -38,6 +42,8 @@ interface CompanyDocumentsStepProps {
 }
 
 type CompanyDocType = 'company_registration_cert' | 'company_statement_cert';
+
+type StoredDocument = Pick<UploadedDocumentState, 'mimeType' | 'fileSize' | 'base64' | 's3Key'>;
 
 interface UploadState {
   file: File | null;
@@ -210,6 +216,57 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
   const [validationBaseline] = useState(validationAttempt);
   const showStepErrors = validationAttempt !== validationBaseline;
 
+  const storeImage = useCallback(
+    async (file: File, type: CompanyDocType): Promise<StoredDocument> => {
+      // Larger than the identity photos: a certificate has small print.
+      const image = await prepareImageForUpload(
+        file,
+        {
+          docType: type,
+          step: state.currentStepId ?? undefined,
+          serviceSlug: state.serviceSlug,
+          orderRef: state.friendlyOrderId,
+        },
+        { maxEdge: 2200, quality: 0.85 }
+      );
+      return { base64: image.base64, mimeType: image.mimeType, fileSize: image.sizeAfter };
+    },
+    [state.currentStepId, state.serviceSlug, state.friendlyOrderId]
+  );
+
+  const storePdf = useCallback(
+    async (file: File): Promise<StoredDocument> => {
+      if (!(await looksLikePdf(file))) {
+        throw new Error('Fișierul nu poate fi citit ca PDF. Încarcă alt fișier sau o poză a documentului.');
+      }
+      const inline = async (): Promise<StoredDocument> => {
+        const pdf = await readPdfForUpload(file);
+        return { base64: pdf.base64, mimeType: pdf.mimeType, fileSize: pdf.sizeAfter };
+      };
+      // The first save has not reached the server yet, so there is no order to
+      // upload into. A small PDF still fits in the autosave.
+      if (!state.orderId) {
+        if (file.size <= MAX_PDF_BYTES) return inline();
+        throw new Error('Comanda se salvează încă. Așteaptă câteva secunde și încarcă din nou documentul.');
+      }
+      try {
+        const uploaded = await uploadClientFile(state.orderId, file, {
+          email: state.contact.email,
+          resumeToken: state.resumeToken,
+        });
+        return { s3Key: uploaded.key, mimeType: uploaded.mimeType, fileSize: uploaded.size };
+      } catch (error) {
+        if (file.size <= MAX_PDF_BYTES) return inline();
+        // fetch's own text is English („Failed to fetch") and must not reach the customer.
+        if (isNetworkFailure(error)) {
+          throw new Error('Încărcarea a eșuat. Verifică conexiunea și încearcă din nou.');
+        }
+        throw error;
+      }
+    },
+    [state.orderId, state.contact.email, state.resumeToken]
+  );
+
   // Handle file selection
   const handleFileSelect = useCallback(
     async (type: CompanyDocType, file: File) => {
@@ -254,17 +311,12 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
       }));
 
       try {
-        // Read file as base64
-        const reader = new FileReader();
-        const base64Promise = new Promise<string>((resolve, reject) => {
-          reader.onload = () => {
-            const result = reader.result as string;
-            resolve(result.split(',')[1]); // Remove data:... prefix
-          };
-          reader.onerror = reject;
-        });
-        reader.readAsDataURL(file);
-        const base64 = await base64Promise;
+        // Every autosave carries the inline documents, and Vercel refuses a
+        // request over 4.5 MB: a large scan made every later save fail with 413
+        // (E-261105-MPVQH). Photos shrink, PDFs go straight to S3.
+        const stored = isPdfFile(file)
+          ? await storePdf(file)
+          : await storeImage(file, type);
 
         setUploads((prev) => ({
           ...prev,
@@ -276,10 +328,8 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
           id: randomId(),
           type: type,
           fileName: file.name,
-          fileSize: file.size,
-          mimeType: file.type,
           uploadedAt: new Date().toISOString(),
-          base64,
+          ...stored,
         };
 
         // Update state - remove existing document of same type, add new one.
@@ -299,17 +349,21 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
         }));
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Încărcarea a eșuat';
+        if (preview) URL.revokeObjectURL(preview);
+        // Back to the upload area, so the customer can pick another file.
         setUploads((prev) => ({
           ...prev,
           [type]: {
             ...prev[type],
+            file: null,
+            preview: null,
             uploading: false,
             error: errorMessage,
           },
         }));
       }
     },
-    [companyKyc?.uploadedDocuments, updateCompanyKycDocuments]
+    [storePdf, storeImage, updateCompanyKycDocuments]
   );
 
   // Handle remove
@@ -401,8 +455,13 @@ export default function CompanyDocumentsStep({ config, onValidChange }: CompanyD
                   <p className="font-medium text-sm text-secondary-900 truncate">
                     {existingDoc?.fileName || uploadState.file?.name}
                   </p>
-                  <p className="text-xs text-neutral-500">PDF Document</p>
+                  <p className="text-xs text-neutral-500">
+                    {uploadState.uploading ? 'Se încarcă...' : 'PDF Document'}
+                  </p>
                 </div>
+                {uploadState.uploading && (
+                  <Loader2 className="w-5 h-5 text-neutral-500 animate-spin flex-shrink-0" />
+                )}
               </div>
             ) : (
               <div

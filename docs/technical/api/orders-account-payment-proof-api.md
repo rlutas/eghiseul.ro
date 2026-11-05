@@ -119,6 +119,10 @@ vizibil clientului; notele interne rămân în `order_history`.
   `orders/<id>/acte-client/` (altă comandă, `..`, alt folder). Aplicat la
   submit (`property.supportingDocuments`), la postarea mesajului și înainte de
   semnarea URL-urilor în portalul colaboratorului.
+- **Documente de firmă în wizard** (05.11, `src/lib/orders/company-documents.ts`):
+  PDF-urile folosesc același presign și păstrează `s3Key` în
+  `company.uploadedDocuments`. `/submit` elimină cheile din afara comenzii și le
+  copiază la `kyc/<id>/company_<tip>.<ext>` (`settleCompanyDocuments`).
 - **Wizard**: `property.supportingDocsAnswer` (`yes|no`) +
   `property.supportingDocuments[]` pe serviciile cu `identificationService`
   (`SupportingDocsCard`), upload direct prin `uploadClientFile`.

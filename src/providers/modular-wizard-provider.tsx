@@ -57,7 +57,7 @@ import { getAttribution } from '@/lib/analytics/attribution';
 import { trackMeta } from '@/lib/analytics/meta-pixel';
 import { flushQueuedClientErrors, queueClientError } from '@/lib/client-errors/report';
 import { WIZARD_RELOAD_FLAG } from '@/lib/wizard/module-load';
-import { CONNECTION_LOST_MESSAGE, isNetworkFailure, nextSaveRetryDelay, saveFailureMessage } from '@/lib/wizard/save-failure';
+import { CONNECTION_LOST_MESSAGE, isNetworkFailure, isRetriableSaveStatus, nextSaveRetryDelay, saveFailureMessage } from '@/lib/wizard/save-failure';
 
 // Cache version for migrations
 // v3: Added clientType to cache for proper step reconstruction
@@ -1718,11 +1718,11 @@ export function ModularWizardProvider({
 
       dispatch({
         type: 'SAVE_ERROR',
-        payload: connectionLost ? CONNECTION_LOST_MESSAGE : saveFailureMessage(error),
+        payload: connectionLost ? CONNECTION_LOST_MESSAGE : saveFailureMessage(error, failedStatus),
       });
 
-      if (connectionLost) {
-        saveFailedOnNetworkRef.current = true;
+      if (connectionLost) saveFailedOnNetworkRef.current = true;
+      if (connectionLost || isRetriableSaveStatus(failedStatus)) {
         const delay = nextSaveRetryDelay(retryAttempt);
         if (delay !== null) {
           saveRetryAttemptRef.current = retryAttempt + 1;

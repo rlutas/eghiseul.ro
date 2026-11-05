@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-05 | 🔴 **Documentele de firmă mari nu mai blochează comanda (HTTP 413)** — PDF direct în S3, poze comprimate, `settleCompanyDocuments` la `/submit`, reîncercare la 5xx | [2026-11-05-documente-firma-prea-mari.md](2026-11-05-documente-firma-prea-mari.md) |
 | 2026-11-04 | ✅ **Warm-up: cumpărătorii întâi, 800/zi** — migrarea 200 `contacts.stripe_last_paid_at` (potrivire pe hash cu Stripe), cron sortat după ultima plată | [2026-11-04-warmup-cumparatori-intai.md](2026-11-04-warmup-cumparatori-intai.md) |
 | 2026-11-04 | 🔴 **Nume și email: cedilă, majuscule, prenume tăiat; emailul scos din URL** — `correctNamesFromMrz` aliniat cu CJO, `stripEmailFromAddressBar` în wizard și status | [2026-11-04-conexiune-slaba-si-pdf-wizard.md](2026-11-04-conexiune-slaba-si-pdf-wizard.md) |
 | 2026-11-04 | 🔴 **PDF-urile nu mai sunt șterse la „Plătește”** — `/submit` accepta doar imagini din 18.09 (`KYC_INCOMPLETE` la act PDF); `classifyInlineDocument` acceptă PDF, mai puțin la selfie | [2026-11-04-conexiune-slaba-si-pdf-wizard.md](2026-11-04-conexiune-slaba-si-pdf-wizard.md) |

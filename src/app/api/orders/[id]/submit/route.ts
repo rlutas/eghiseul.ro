@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse, after } from 'next/server';
 import { sanitizeClientFiles } from '@/lib/orders/client-files';
+import { settleCompanyDocuments } from '@/lib/orders/company-documents';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAudit, getAuditContext } from '@/lib/security/audit-logger';
@@ -590,25 +591,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const companyData = (existingCustomerData.company || existingCustomerData.companyData) as any;
     if (companyData?.uploadedDocuments?.length > 0) {
-      for (const doc of companyData.uploadedDocuments) {
-        if (doc.base64 && !doc.s3Key) {
-          try {
-            const ext = doc.mimeType?.includes('png') ? 'png' : doc.mimeType?.includes('pdf') ? 'pdf' : 'jpg';
-            const contentType = doc.mimeType || 'image/jpeg';
-            const s3Key = `kyc/${id}/company_${doc.type || doc.id || 'document'}.${ext}`;
-
-            await uploadBase64(s3Key, doc.base64, contentType, {
-              'order-id': id,
-              'document-type': doc.type || 'unknown',
-              'uploaded-at': new Date().toISOString(),
-            });
-            doc.s3Key = s3Key;
-            delete doc.base64;
-          } catch (err) {
-            console.error(`Failed to upload company KYC doc ${doc.type} to S3:`, err);
-          }
-        }
-      }
+      companyData.uploadedDocuments = await settleCompanyDocuments(id, companyData.uploadedDocuments, {
+        copyFile,
+        uploadBase64,
+      });
     }
 
     // Acte de la client pentru identificarea imobilului: cheile vin din

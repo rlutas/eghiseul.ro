@@ -77,4 +77,17 @@ O completăm în fiecare luni, pentru săptămâna trecută. Clicurile sunt medi
 
 **Semnal de revenire:** clicuri CJO peste 250/zi două săptămâni la rând sau peste 25 de comenzi CJO pe săptămână. **Semnal de alarmă:** CJO sub 100 de clicuri/zi sau o săptămână cu sub 5 comenzi CJO.
 
+## Verificare 05.11: formularul CJO nu e cauza
+
+Comenzile plătite CJO păreau să cadă de la 13 la 2 pe săptămână din 28.10. Verificat pe date: conversia a rămas stabilă, deci cauza e traficul.
+
+- Clicuri GSC pe săptămână: 2.813 (05–11.10), 2.456, 1.381, 891 (26.10–01.11). Orașele au scăzut cel mai mult: 2.082 → 525.
+- Comenzi plătite din sesiuni: 7,7% (01–15.10), 7,2% (16–22.10), 9,8% (23.10–02.11), 8,8% (03–05.11).
+- Săptămâna cu 13 comenzi a fost umflată de 26–27.10 (10 comenzi, 4 recuperate). Scăderea reală începe pe 16–19.10.
+- Fără legătură: OCR-ul oprit în 23.10–02.11 (extragerea e doar în admin), codul (zero commit-uri 18.10–02.11), prețul (schimbat pe 02.11), erorile server pe `/api`.
+
+Formularul a fost testat live pe mobil până la pasul 5, fără plată. Pasul 6 și plata sunt susținute doar de comenzile plătite din 03–05.11.
+
+De urmărit: abandonul la pasul 2 a urcat de la 31% la 46–50% din 23.10, cu cod neschimbat. Ipoteza e un trafic cu intenție mai slabă, nedovedită. Cazier fiscal: 13 comenzi plătite în 01–27.10, zero după.
+
 Raportul lunar (28 față de 28 de zile) rămâne în [`monitorizare/`](monitorizare/README.md).
