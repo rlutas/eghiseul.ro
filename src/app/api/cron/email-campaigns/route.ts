@@ -22,6 +22,7 @@ import { listUnsubscribeHeaders } from '@/lib/email/templates/marketing-footer';
 import { renderCampaignEmail } from '@/lib/email/templates/campaign';
 import { appBase } from '@/lib/lifecycle/contacts';
 import { campaignUtmKey, withUtm } from '@/lib/email/utm';
+import { isExpiredBlackFridayCampaign } from '@/lib/coupons/black-friday';
 
 export const maxDuration = 300;
 const SEND_SPACING_MS = 600;
@@ -85,6 +86,11 @@ export async function POST(request: NextRequest) {
   for (const c of campaigns as Campaign[]) {
     const batch = Math.min(c.daily_batch_size, budget);
     if (batch <= 0) break;
+
+    if (isExpiredBlackFridayCampaign(c.body_text)) {
+      console.warn(`[email-campaigns] campaign ${c.id} promises an ended offer, skipped`);
+      continue;
+    }
 
     // Fără serviciu, segmentul ar deveni tot registrul. Mai bine nu trimitem nimic.
     if (c.segment === 'service_buyers' && !c.service_slug) {

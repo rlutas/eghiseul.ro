@@ -4,6 +4,7 @@ import {
   blackFridayRate,
   couponAmount,
   isBlackFridayActive,
+  isExpiredBlackFridayCampaign,
 } from '@/lib/coupons/black-friday';
 import { couponDiscount, type CouponRow } from '@/lib/orders/server-pricing';
 
@@ -45,6 +46,13 @@ describe('Black Friday coupon', () => {
   it('stops at Monday 16.11.2026 23:59:59 Romanian time', () => {
     expect(isBlackFridayActive(new Date('2026-11-16T21:59:59Z'))).toBe(true);
     expect(isBlackFridayActive(new Date('2026-11-16T22:00:00Z'))).toBe(false);
+  });
+
+  it('stops campaigns that name the code after the end date only', () => {
+    const after = new Date('2026-11-16T22:00:00Z');
+    expect(isExpiredBlackFridayCampaign('ai codul BLACKFRIDAY', after)).toBe(true);
+    expect(isExpiredBlackFridayCampaign('ai codul BLACKFRIDAY', new Date('2026-11-16T07:40:00Z'))).toBe(false);
+    expect(isExpiredBlackFridayCampaign('fara reducere', after)).toBe(false);
   });
 
   it('is refused by the server after valid_until', () => {

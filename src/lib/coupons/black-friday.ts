@@ -65,6 +65,11 @@ export function isBlackFridayActive(now: Date = new Date()): boolean {
   return now.getTime() <= new Date(BLACK_FRIDAY_ENDS_AT).getTime();
 }
 
+/** A campaign that names the code must stop with the offer, even with contacts left to send to. */
+export function isExpiredBlackFridayCampaign(bodyText: string | null | undefined, now: Date = new Date()): boolean {
+  return (bodyText ?? '').toUpperCase().includes(BLACK_FRIDAY_CODE) && !isBlackFridayActive(now);
+}
+
 /** Percent for one service; 0 means the service is not part of the campaign. */
 export function blackFridayRate(serviceSlug: string | null | undefined): number {
   return RATES.get(serviceSlug ?? '') ?? 0;

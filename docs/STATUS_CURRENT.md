@@ -241,6 +241,10 @@
 
 ---
 
+## 🟣 2026-11-06 — Black Friday pe 4 site-uri, până pe 16.11 23:59
+
+Cod `BLACKFRIDAY`, doar la prețul de bază, cu bară și cronometru. Campanii pe serviciu, 400 de emailuri pe zi, plus warm-up. Detalii și ce se șterge după final: `docs/changelog/2026-11-06-black-friday.md`.
+
 ## ✅ 2026-06-15 — ONRC constatator funcțional A→Z pentru TOATE tipurile
 
 **Comanda live `E-260615-GL74D`** (fonduri IMM, motiv „Primãrie"): depusă 21:13 → emisă + livrată automat 21:16 = **~3 minute**. Job `DONE`, PDF atașat (`order_documents` tip `constatator`), email client, `document_ready`.

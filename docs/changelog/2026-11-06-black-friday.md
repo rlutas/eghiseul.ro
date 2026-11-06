@@ -10,7 +10,9 @@
 - Reducerea se calculează doar la prețul de bază. Opțiunile, urgența, traducerea, legalizarea și livrarea rămân la preț întreg. Rovinieta nu intră în campanie.
 - Un client folosește un singur cupon pe comandă. Cine vine cu cupon personal din email îl păstrează pe acela.
 - În pagina de cupoane, BLACKFRIDAY apare cu 10%. Procentul real se calculează pe serviciu, deci nu modificați cuponul de acolo.
-- Cumpărătorii de certificat constatator primesc o campanie separată, iar emailurile de reactivare menționează reducerea până la final.
+- Cumpărătorii primesc campanii pe serviciu, până la 400 de emailuri pe zi: constatator, cazier judiciar, auto, fiscal, integritate, naștere, căsătorie și extras de carte funciară. Campaniile se opresc singure la final.
+- Emailurile de reactivare menționează și ele reducerea până la final.
+- Pe CJO și ecazier, comanda web neplătită are acum în pagină butonul „Copiază linkul”. Îl trimiteți clientului ca să continue comanda. Linkul merge 7 zile de la începerea comenzii; după aceea clientul plasează o comandă nouă.
 
 ---
 
@@ -21,6 +23,8 @@
 `BlackFridayBar` stă în layouturile `(eghiseul)`, `(order)` și `documentero`, ascunsă pe `/admin` și `/colaborator`. Pasul de plată aplică singur codul dacă nu există alt cupon. `?coupon=` din URL are prioritate.
 
 Tot în această livrare intră motorul de campanii pe serviciu din `a2e0b54d`: segmentul `service_buyers`, migrarea 202 și coloanele `service_slug`, `min_last_paid_at`, `max_last_paid_at`.
+
+Campaniile folosesc segmentul `service_buyers`, cu ultima plată până la 23.10.2026. La cazier judiciar plata e de după 21.07.2025, iar la extras CF de după 18.03.2025, ca lista să se termine până pe 16.11 la 400 de emailuri pe zi. `isExpiredBlackFridayCampaign()` oprește în cron orice campanie care numește codul după data de final. `cazier-judiciar-persoana-fizica` și `-juridica` au rămas pe dinafară: o parte mare dintre contacte sunt și pe `cazier-judiciar`, și ar fi primit același text de două ori.
 
 Prețul de referință: reducerea pleacă de la prețul curent. Nu există migrări care să fi schimbat prețuri în ultimele 30 de zile, dar modificările din admin nu au fost verificate.
 
