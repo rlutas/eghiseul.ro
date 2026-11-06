@@ -84,3 +84,45 @@ describe('warm-up email for buyers from a sister site', () => {
     expect(buildWarmupText(own)).toContain('De atunci am rescris toată platforma.');
   });
 });
+
+describe('warm-up email by service', () => {
+  const base = { firstName: 'Ana', isCustomer: true, unsubscribeUrl: 'https://eghiseul.ro/u' };
+
+  it('promises minutes for the constatator, hedged and only for the basic one', () => {
+    const input = { ...base, serviceSlugs: ['certificat-constatator'] };
+    expect(buildWarmupSubject(input)).toBe('Ana, certificat constatator în câteva minute, oricând ai nevoie');
+    expect(buildWarmupText(input)).toContain('Certificatul constatator de bază ajunge de obicei pe email în câteva minute');
+    expect(buildWarmupHtml(input)).toContain('/comanda/certificat-constatator/');
+  });
+
+  it('sends the constatator buyer to the constatator form, whatever the slug order', () => {
+    const input = { ...base, serviceSlugs: ['cazier-judiciar', 'certificat-constatator'] };
+    expect(buildWarmupHtml(input)).toContain('/comanda/certificat-constatator/');
+  });
+
+  it('lists the surveyor services for land book buyers, with links', () => {
+    const input = { ...base, serviceSlugs: ['extras-carte-funciara'] };
+    const html = buildWarmupHtml(input);
+    expect(buildWarmupSubject(input)).toContain('extras de carte funciară și alte acte pentru imobil');
+    expect(html).toContain('prin topograf autorizat');
+    expect(html).toContain('/servicii/certificat-sarcini/');
+    expect(html).toContain('utm_campaign=warmup-imobiliare');
+    expect(buildWarmupText(input)).toContain('- certificat de sarcini: https://eghiseul.ro/servicii/certificat-sarcini/');
+  });
+
+  it('shows neither block to other buyers', () => {
+    const input = { ...base, serviceSlugs: ['cazier-judiciar'] };
+    const all = buildWarmupHtml(input) + buildWarmupText(input);
+    expect(all).not.toContain('topograf');
+    expect(all).not.toContain('Certificatul constatator de bază');
+  });
+
+  it('keeps the coupon subject for loyal buyers', () => {
+    const input = {
+      ...base,
+      serviceSlugs: ['certificat-constatator'],
+      coupon: { code: 'FIDEL-X', discountPercent: 10, validUntil: '2026-12-01T00:00:00Z' },
+    };
+    expect(buildWarmupSubject(input)).toContain('10% reducere');
+  });
+});

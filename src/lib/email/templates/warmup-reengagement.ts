@@ -46,6 +46,41 @@ export interface WarmupCoupon {
   validUntil: string;
 }
 
+// Măsurat pe 83 de comenzi din 20.06.2026: mediana 3,7 minute, 62 în cel mult 5
+// minute, inclusiv 11 din 12 plătite noaptea. Două au durat 11–17 ore, deci „de
+// obicei”. Variantele IMM și insolvență trec prin ONRC și pot dura până la 24 de
+// ore, deci promisiunea e doar pentru cel de bază.
+const CONSTATATOR_PITCH =
+  'Certificatul constatator de bază ajunge de obicei pe email în câteva minute, oricând comanzi, și noaptea, și în weekend. Băncile și instituțiile cer de obicei un certificat recent, așa că îl poți lua chiar în ziua în care ai nevoie.';
+
+const PROPERTY_PITCH = 'Pentru același imobil, obținem prin topograf autorizat și:';
+
+/** Servicii prin topograful nostru, cu pagină proprie. Fără termene sau prețuri: se schimbă în DB, nu aici. */
+const PROPERTY_SERVICES: ReadonlyArray<{ slug: string; label: string }> = [
+  { slug: 'extras-plan-cadastral', label: 'extras de plan cadastral' },
+  { slug: 'copie-carte-funciara', label: 'copie integrală de carte funciară' },
+  { slug: 'certificat-sarcini', label: 'certificat de sarcini' },
+  { slug: 'identificare-imobil', label: 'identificare imobil după adresă' },
+  { slug: 'identificare-imobile-proprietar', label: 'identificare imobile după proprietar' },
+  { slug: 'copie-contract-vanzare', label: 'copie contract de vânzare-cumpărare' },
+  { slug: 'copie-intabulare', label: 'copie încheiere de intabulare' },
+  { slug: 'copie-plan-cadastral', label: 'copie plan cadastral' },
+  { slug: 'copie-inventar-coordonate', label: 'inventar de coordonate Stereo 70' },
+  { slug: 'plan-amplasament-delimitare', label: 'plan de amplasament și delimitare' },
+  { slug: 'actualizare-adresa-cf', label: 'actualizare adresă în cartea funciară' },
+  { slug: 'certificat-urbanism-informare', label: 'certificat de urbanism pentru informare' },
+];
+
+const hasConstatator = (input: Pick<WarmupEmailInput, 'serviceSlugs'>) =>
+  (input.serviceSlugs ?? []).includes('certificat-constatator');
+
+const hasLandBook = (input: Pick<WarmupEmailInput, 'serviceSlugs'>) =>
+  (input.serviceSlugs ?? []).some((s) => s === 'extras-carte-funciara' || s === 'extras-cf-colectiv');
+
+function propertyServiceUrl(slug: string): string {
+  return withUtm(`${BASE_URL}/servicii/${slug}/`, 'warmup', 'warmup-imobiliare');
+}
+
 export type PurchasedOn = 'cazierjudiciaronline' | 'ecazier';
 
 const SISTER_SITE_NAMES: Record<PurchasedOn, string> = {
@@ -82,16 +117,22 @@ function joinRo(items: string[]): string {
   return `${items.slice(0, -1).join(', ')} și ${items[items.length - 1]}`;
 }
 
+/** Constatatorul are prioritate: e singurul livrat în minute. Altfel, primul serviciu cunoscut. */
+function primarySlug(input: Pick<WarmupEmailInput, 'serviceSlugs'>): string | undefined {
+  if (hasConstatator(input)) return 'certificat-constatator';
+  return (input.serviceSlugs ?? []).find((s) => s in SERVICE_LABELS);
+}
+
 /** Primul serviciu cunoscut → formularul lui (cu cuponul în URL, aplicat singur la pasul de plată); altfel lista de servicii. */
 export function warmupCtaUrl(input: Pick<WarmupEmailInput, 'serviceSlugs' | 'coupon'>): string {
-  const slug = (input.serviceSlugs ?? []).find((s) => s in SERVICE_LABELS);
+  const slug = primarySlug(input);
   const url = new URL(slug ? `${BASE_URL}/comanda/${slug}/` : `${BASE_URL}/servicii/`);
   if (slug && input.coupon) url.searchParams.set('coupon', input.coupon.code);
   return withUtm(url.toString(), 'warmup', input.coupon ? 'warmup-fidel' : 'warmup');
 }
 
 function ctaLabel(input: WarmupEmailInput): string {
-  const slug = (input.serviceSlugs ?? []).find((s) => s in SERVICE_LABELS);
+  const slug = primarySlug(input);
   return slug ? `Comandă ${SERVICE_LABELS[slug]}` : 'Vezi serviciile disponibile';
 }
 
@@ -124,6 +165,14 @@ export function buildWarmupSubject(input: WarmupEmailInput): string {
     const base = `ai ${input.coupon.discountPercent}% reducere pentru că ne-ai ales de mai multe ori`;
     return name ? `${name}, ${base}` : base.charAt(0).toUpperCase() + base.slice(1);
   }
+  if (hasConstatator(input)) {
+    const base = 'certificat constatator în câteva minute, oricând ai nevoie';
+    return name ? `${name}, ${base}` : base.charAt(0).toUpperCase() + base.slice(1);
+  }
+  if (hasLandBook(input)) {
+    const base = 'extras de carte funciară și alte acte pentru imobil, într-un singur loc';
+    return name ? `${name}, ${base}` : base.charAt(0).toUpperCase() + base.slice(1);
+  }
   if (input.purchasedOn) {
     const base = 'poți obține și alte documente prin eGhișeul.ro';
     return name ? `${name}, ${base}` : base.charAt(0).toUpperCase() + base.slice(1);
@@ -148,9 +197,22 @@ export function buildWarmupHtml(input: WarmupEmailInput): string {
           <p style="margin:0;color:#64748b;font-size:12px;line-height:1.5;">Valabil până la ${formatDate(input.coupon.validUntil)}, o singură folosire, pe orice serviciu. Din butonul de mai jos se aplică singur.</p>
         </div>`
     : '';
+  const constatatorBlock = hasConstatator(input)
+    ? `<p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">${escapeHtml(CONSTATATOR_PITCH)}</p>`
+    : '';
+  const propertyBlock = hasLandBook(input)
+    ? `<p style="margin:0 0 6px;color:#475569;font-size:14px;line-height:1.6;">${escapeHtml(PROPERTY_PITCH)}</p>
+        <ul style="margin:0 0 16px;padding-left:20px;color:#475569;font-size:14px;line-height:1.7;">${PROPERTY_SERVICES.map(
+          (s) => `<li><a href="${escapeAttr(propertyServiceUrl(s.slug))}" style="color:#0B1B33;">${escapeHtml(s.label)}</a></li>`,
+        ).join('')}</ul>`
+    : '';
   return brandedEmailHtml({
     preheader: input.coupon
       ? `${input.coupon.discountPercent}% reducere la următoarea comandă, pentru că ne-ai ales de mai multe ori.`
+      : hasConstatator(input)
+        ? 'Îl primești de obicei pe email în câteva minute, și noaptea, și în weekend.'
+        : hasLandBook(input)
+          ? 'Plan cadastral, copii din arhivă, certificat de sarcini, identificare imobil.'
       : input.purchasedOn
         ? 'Comenzi online, plată directă, curier până la ușă.'
         : 'Am rescris platforma — comenzi online, plată directă, curier până la ușă.',
@@ -158,6 +220,8 @@ export function buildWarmupHtml(input: WarmupEmailInput): string {
         <h1 style="margin:0 0 12px;color:#0B1B33;font-size:20px;">${greeting}</h1>
         <p style="margin:0 0 12px;color:#475569;font-size:14px;line-height:1.6;">${history}${thanks}</p>
         ${couponBlock}
+        ${constatatorBlock}
+        ${propertyBlock}
         <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">Comanzi online în câteva minute, plătești cu cardul și primești actul prin curier sau pe email, fără drumuri la ghișeu. Obținem pentru tine cazier judiciar, extras de carte funciară, certificat constatator, certificate de stare civilă și altele.</p>
         ${ctaButton(ctaLabel(input), warmupCtaUrl(input))}
         <p style="margin:12px 0 0;font-size:13px;color:#475569;line-height:1.6;">Sau <a href="${escapeAttr(withUtm(`${BASE_URL}/servicii/`, 'warmup', input.coupon ? 'warmup-fidel' : 'warmup'))}" style="color:#0B1B33;">vezi toate serviciile</a>${input.coupon ? ' și introdu codul la pasul de plată' : ''}.</p>
@@ -175,6 +239,10 @@ export function buildWarmupText(input: WarmupEmailInput): string {
       `Valabil până la ${formatDate(input.coupon.validUntil)}, o singură folosire, pe orice serviciu.`,
       '',
     );
+  }
+  if (hasConstatator(input)) lines.push(CONSTATATOR_PITCH, '');
+  if (hasLandBook(input)) {
+    lines.push(PROPERTY_PITCH, ...PROPERTY_SERVICES.map((s) => `- ${s.label}: ${propertyServiceUrl(s.slug)}`), '');
   }
   lines.push(
     'Comanzi online în câteva minute, plătești cu cardul și primești actul prin curier sau pe email, fără drumuri la ghișeu.',
