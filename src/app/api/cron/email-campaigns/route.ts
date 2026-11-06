@@ -7,7 +7,7 @@
  * singură dată, indiferent dacă i s-a trimis sau a fost sărit.
  *
  * Segmente: `customers` (is_customer), `subscribed` (opt-in explicit),
- * `all_contacts`. Toate exclud `unsubscribed`/`suppressed`, adresele de test
+ * `all_contacts`, `service_buyers` (`service_slug` + interval de plată). Toate exclud `unsubscribed`/`suppressed`, adresele de test
  * și domeniile nelivrabile. Jurnal per destinatar în `email_campaign_sends`
  * (PK campaign_id+contact_id = claim; 23505 = deja trimis).
  *
@@ -36,7 +36,10 @@ interface Campaign {
   body_text: string;
   cta_label: string | null;
   cta_url: string | null;
-  segment: 'customers' | 'subscribed' | 'all_contacts';
+  segment: 'customers' | 'subscribed' | 'all_contacts' | 'service_buyers';
+  service_slug: string | null;
+  min_last_paid_at: string | null;
+  max_last_paid_at: string | null;
   daily_batch_size: number;
   sent_count: number;
   cursor_created_at: string | null;
@@ -65,7 +68,7 @@ export async function POST(request: NextRequest) {
 
   const { data: campaigns, error } = await admin
     .from('email_campaigns')
-    .select('id, subject, preheader, body_text, cta_label, cta_url, segment, daily_batch_size, sent_count, cursor_created_at, cursor_id')
+    .select('id, subject, preheader, body_text, cta_label, cta_url, segment, service_slug, min_last_paid_at, max_last_paid_at, daily_batch_size, sent_count, cursor_created_at, cursor_id')
     .eq('status', 'sending')
     .order('started_at', { ascending: true });
   if (error) {
@@ -83,6 +86,13 @@ export async function POST(request: NextRequest) {
     const batch = Math.min(c.daily_batch_size, budget);
     if (batch <= 0) break;
 
+    // Fără serviciu, segmentul ar deveni tot registrul. Mai bine nu trimitem nimic.
+    if (c.segment === 'service_buyers' && !c.service_slug) {
+      console.error(`[email-campaigns] campaign ${c.id} has no service_slug, skipped`);
+      summary.push({ campaignId: c.id, sent: 0, skipped: 0, errors: 1, done: false });
+      continue;
+    }
+
     // Keyset: (created_at, id) > (cursor_created_at, cursor_id). Un `from()`
     // nou pentru fiecare interogare — builder-ul postgrest-js nu se refolosește.
     let q = admin
@@ -94,6 +104,11 @@ export async function POST(request: NextRequest) {
       .limit(batch);
     if (c.segment === 'customers') q = q.eq('is_customer', true);
     if (c.segment === 'subscribed') q = q.eq('marketing_status', 'subscribed');
+    if (c.segment === 'service_buyers') {
+      q = q.contains('services', [c.service_slug]).not('stripe_last_paid_at', 'is', null);
+      if (c.min_last_paid_at) q = q.gte('stripe_last_paid_at', c.min_last_paid_at);
+      if (c.max_last_paid_at) q = q.lte('stripe_last_paid_at', c.max_last_paid_at);
+    }
     if (c.cursor_created_at && c.cursor_id) {
       q = q.or(`created_at.gt.${c.cursor_created_at},and(created_at.eq.${c.cursor_created_at},id.gt.${c.cursor_id})`);
     }

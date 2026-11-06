@@ -23,7 +23,7 @@ export const campaignSchema = z.object({
   body_text: z.string().trim().min(20).max(20_000),
   cta_label: z.string().trim().max(60).optional().nullable(),
   cta_url: z.string().trim().url().max(500).optional().nullable().or(z.literal('')),
-  segment: z.enum(['customers', 'subscribed', 'all_contacts']).default('customers'),
+  segment: z.enum(['customers', 'subscribed', 'all_contacts', 'service_buyers']).default('customers'),
   daily_batch_size: z.number().int().min(1).max(2000).default(100),
 });
 

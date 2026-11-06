@@ -24,7 +24,7 @@ import {
 import { Newspaper, Play, Pause, Pencil, Plus, RefreshCw, Send, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-type Segment = 'customers' | 'subscribed' | 'all_contacts';
+type Segment = 'customers' | 'subscribed' | 'all_contacts' | 'service_buyers';
 type Status = 'draft' | 'sending' | 'paused' | 'done';
 
 interface Campaign {
@@ -48,6 +48,7 @@ const SEGMENT_LABEL: Record<Segment, string> = {
   customers: 'Clienți (au cumpărat)',
   subscribed: 'Abonați newsletter (opt-in explicit)',
   all_contacts: 'Tot registrul (72k, treptat)',
+  service_buyers: 'Cumpărătorii unui serviciu',
 };
 const STATUS_LABEL: Record<Status, string> = { draft: 'Draft', sending: 'Se trimite', paused: 'Pauză', done: 'Terminată' };
 const STATUS_CLASS: Record<Status, string> = {
