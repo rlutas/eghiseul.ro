@@ -24,6 +24,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useModularWizard } from '@/providers/modular-wizard-provider';
+import { BLACK_FRIDAY_CODE, blackFridayRate, isBlackFridayActive } from '@/lib/coupons/black-friday';
 
 
 interface ReviewStepProps {
@@ -56,7 +57,12 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
       const res = await fetch('/api/coupons/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, subtotal }),
+        body: JSON.stringify({
+          code,
+          subtotal,
+          serviceSlug: state.serviceSlug,
+          basePrice: priceBreakdown.basePrice,
+        }),
       });
       const json = await res.json();
       if (res.ok && json.success && json.data?.valid) {
@@ -95,10 +101,13 @@ export function ReviewStepModular({ onValidChange }: ReviewStepProps) {
   useEffect(() => {
     if (autoCouponTriedRef.current || state.coupon) return;
     const urlCode = new URLSearchParams(window.location.search).get('coupon')?.trim().toUpperCase();
-    if (!urlCode) return;
+    const blackFridayCode =
+      isBlackFridayActive() && blackFridayRate(state.serviceSlug) > 0 ? BLACK_FRIDAY_CODE : null;
+    const autoCode = urlCode || blackFridayCode;
+    if (!autoCode) return;
     autoCouponTriedRef.current = true;
-    setCouponInput(urlCode);
-    applyCouponCode(urlCode);
+    setCouponInput(autoCode);
+    applyCouponCode(autoCode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.coupon]);
 

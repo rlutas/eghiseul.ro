@@ -58,6 +58,7 @@ import { trackMeta } from '@/lib/analytics/meta-pixel';
 import { flushQueuedClientErrors, queueClientError } from '@/lib/client-errors/report';
 import { WIZARD_RELOAD_FLAG } from '@/lib/wizard/module-load';
 import { CONNECTION_LOST_MESSAGE, isNetworkFailure, isRetriableSaveStatus, nextSaveRetryDelay, saveFailureMessage } from '@/lib/wizard/save-failure';
+import { couponAmount, isBlackFridayCode } from '@/lib/coupons/black-friday';
 
 // Cache version for migrations
 // v3: Added clientType to cache for proper step reconstruction
@@ -1401,7 +1402,13 @@ export function ModularWizardProvider({
     const subtotal = basePrice + optionsPrice + deliveryPrice;
     let discountAmount = 0;
     if (state.coupon) {
-      if (state.coupon.discountType === 'percentage') {
+      if (isBlackFridayCode(state.coupon.code)) {
+        discountAmount = couponAmount(
+          { code: state.coupon.code, discount_type: state.coupon.discountType, discount_value: state.coupon.discountValue },
+          subtotal,
+          { serviceSlug: state.serviceSlug, basePrice }
+        );
+      } else if (state.coupon.discountType === 'percentage') {
         discountAmount = (subtotal * state.coupon.discountValue) / 100;
       } else {
         discountAmount = state.coupon.discountAmount || state.coupon.discountValue;

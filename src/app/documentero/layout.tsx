@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Bricolage_Grotesque } from 'next/font/google';
 import { FooterDocumentero } from '@/components/documentero/footer';
+import { BlackFridayBar } from '@/components/shared/black-friday-bar';
 import { RevealObserver } from '@/components/documentero/reveal';
 import { BrandProvider } from '@/lib/brand/client';
 import { CookieConsent } from '@/components/consent/cookie-consent';
@@ -52,6 +53,7 @@ export default function DocumenteroLayout({ children }: { children: React.ReactN
         data-brand="documentero"
         className={`${bricolage.variable} min-h-screen bg-d-bg text-d-ink font-[family-name:var(--font-bricolage)] antialiased`}
       >
+        <BlackFridayBar />
         {children}
         <FooterDocumentero />
         <RevealObserver />

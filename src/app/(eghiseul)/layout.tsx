@@ -6,13 +6,16 @@
  * are in `documentero/` with their own chrome.
  */
 import { Header } from '@/components/shared/header';
+import { BlackFridayBar } from '@/components/shared/black-friday-bar';
 import { WhatsAppFloat } from '@/components/shared/whatsapp-float';
 import { CookieConsent } from '@/components/consent/cookie-consent';
 
 export default function EghiseulLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
+      {/* After Header: it is fixed, and its spacer pushes the bar below it. */}
       <Header />
+      <BlackFridayBar belowFixedHeader />
       {children}
       <WhatsAppFloat />
       <CookieConsent />

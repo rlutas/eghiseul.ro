@@ -5,6 +5,7 @@ import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createHostedCheckoutSession } from '@/lib/stripe'
 import { buildStripeLineItems, buildPaymentIntentDescription } from '@/lib/stripe-line-items'
 import { normalizeOrderOptions } from '@/lib/orders/normalize'
+import { couponAmount } from '@/lib/coupons/black-friday'
 
 // Service role client for bypassing RLS (for guest orders)
 const getServiceClient = () => createServiceClient(
@@ -37,7 +38,7 @@ interface OrderWithService {
   payment_status: string
   stripe_payment_intent_id: string | null
   created_at: string
-  services: { name: string } | null
+  services: { name: string; slug: string | null } | null
   customer_data: {
     contact?: {
       firstName?: string
@@ -97,7 +98,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .select(`
         id, user_id, order_number, friendly_order_id, total_price, base_price, options_price, delivery_price, delivery_method, coupon_code, discount_amount, selected_options, payment_status, stripe_payment_intent_id, created_at, customer_data, platform,
         services (
-          name
+          name,
+          slug
         )
       `)
       .eq('id', id)
@@ -200,14 +202,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         subtotal >= Number(coupon.min_amount || 0)
 
       if (isValid) {
-        let discount = 0
-        if (coupon.discount_type === 'percentage') {
-          discount = (subtotal * Number(coupon.discount_value)) / 100
-        } else {
-          discount = Number(coupon.discount_value)
-        }
-        discount = Math.min(discount, subtotal)
-        discount = Math.round(discount * 100) / 100
+        const discount = couponAmount(coupon, subtotal, {
+          serviceSlug: order.services?.slug,
+          basePrice: parseFloat(String(order.base_price ?? 0)),
+        })
         finalTotalPrice = Math.max(0, Math.round((subtotal - discount) * 100) / 100)
 
         // Persist re-validated amounts (in case the draft stored stale values)

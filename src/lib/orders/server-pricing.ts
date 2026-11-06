@@ -9,6 +9,7 @@
  * Mirrors `priceBreakdown` in `providers/modular-wizard-provider.tsx`.
  */
 import { hasForeignDrivingLicense } from '@/lib/orders/order-estimate';
+import { couponAmount, type CouponOrderContext } from '@/lib/coupons/black-friday';
 
 /** Minimum domestic delivery price (VAT incl.) — same floor as the delivery step. */
 export const MIN_DOMESTIC_DELIVERY_RON = 25;
@@ -32,6 +33,7 @@ export interface OptionRow {
 
 export interface PricingInput {
   serviceBasePrice: number;
+  serviceSlug?: string | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   verificationConfig: any;
   customerData: unknown;
@@ -51,6 +53,7 @@ export interface PricingInput {
 }
 
 export interface CouponRow {
+  code?: string | null;
   discount_type: string;
   discount_value: number;
   owner_user_id?: string | null;
@@ -66,7 +69,8 @@ export function couponDiscount(
   coupon: CouponRow | null,
   subtotal: number,
   orderUserId: string | null,
-  now: Date = new Date()
+  now: Date = new Date(),
+  order: CouponOrderContext = { basePrice: subtotal }
 ): number {
   if (!coupon) return 0;
   const valid =
@@ -76,11 +80,7 @@ export function couponDiscount(
     (!coupon.valid_until || new Date(coupon.valid_until) >= now) &&
     subtotal >= num(coupon.min_amount);
   if (!valid) return 0;
-  const raw =
-    coupon.discount_type === 'percentage'
-      ? (subtotal * num(coupon.discount_value)) / 100
-      : num(coupon.discount_value);
-  return round2(Math.min(raw, subtotal));
+  return couponAmount(coupon, subtotal, order);
 }
 
 export interface PricingResult {
@@ -140,7 +140,10 @@ export function computeServerPricing(input: PricingInput): PricingResult {
   // Discount only from a valid coupon, computed here (bank transfer charges
   // total_price as stored; /payment re-validates again for Stripe).
   const subtotal = basePrice + optionsPrice + deliveryPrice;
-  const discountAmount = couponDiscount(input.coupon, subtotal, input.orderUserId, input.now);
+  const discountAmount = couponDiscount(input.coupon, subtotal, input.orderUserId, input.now, {
+    serviceSlug: input.serviceSlug,
+    basePrice,
+  });
 
   return {
     basePrice: round2(basePrice),

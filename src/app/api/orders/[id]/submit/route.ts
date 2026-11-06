@@ -369,7 +369,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (adminClient as any)
             .from('coupons')
-            .select('discount_type, discount_value, owner_user_id, max_uses, times_used, valid_from, valid_until, min_amount')
+            .select('code, discount_type, discount_value, owner_user_id, max_uses, times_used, valid_from, valid_until, min_amount')
             .ilike('code', pricedOrder.coupon_code.trim())
             .eq('is_active', true)
             .maybeSingle()
@@ -387,6 +387,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
     const serverPricing = computeServerPricing({
       serviceBasePrice: Number(pricedOrder.services?.base_price ?? 0),
+      serviceSlug: pricedOrder.services?.slug ?? null,
       verificationConfig: pricedOrder.services?.verification_config,
       customerData: pricedOrder.customer_data,
       selectedOptions: storedOptions,

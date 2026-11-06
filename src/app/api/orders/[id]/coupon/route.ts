@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 import { stripe } from '@/lib/stripe';
+import { blackFridayRate, couponAmount, isBlackFridayCode } from '@/lib/coupons/black-friday';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyClient = any;
@@ -40,6 +41,7 @@ interface OrderRow {
   total_price: number;
   payment_status: string;
   stripe_payment_intent_id: string | null;
+  services: { slug: string | null } | null;
 }
 
 const bodySchema = z.object({
@@ -80,7 +82,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
   const { data: orderData, error: orderErr } = await admin
     .from('orders')
     .select(
-      'id, user_id, base_price, options_price, delivery_price, total_price, payment_status, stripe_payment_intent_id, customer_data'
+      'id, user_id, base_price, options_price, delivery_price, total_price, payment_status, stripe_payment_intent_id, customer_data, services(slug)'
     )
     .eq('id', id)
     .maybeSingle();
@@ -207,12 +209,16 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
   }
 
   // Compute discount
-  let discount =
-    coupon.discount_type === 'percentage'
-      ? (subtotal * Number(coupon.discount_value)) / 100
-      : Number(coupon.discount_value);
-  discount = Math.min(discount, subtotal);
-  discount = Math.round(discount * 100) / 100;
+  if (isBlackFridayCode(coupon.code) && blackFridayRate(order.services?.slug) === 0) {
+    return NextResponse.json(
+      { success: false, error: 'Cuponul nu se aplica acestui serviciu' },
+      { status: 400 }
+    );
+  }
+  const discount = couponAmount(coupon, subtotal, {
+    serviceSlug: order.services?.slug,
+    basePrice: Number(order.base_price ?? 0),
+  });
   const finalTotal = Math.max(0, Math.round((subtotal - discount) * 100) / 100);
 
   // Cancel any existing PaymentIntent — new amount → new intent.

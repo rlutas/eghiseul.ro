@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { checkRateLimit, getClientIP } from '@/lib/security/rate-limiter';
+import { blackFridayRate, couponAmount, isBlackFridayCode } from '@/lib/coupons/black-friday';
 
 // coupons table is not in generated Supabase types yet.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,6 +25,9 @@ interface CouponRow {
 const bodySchema = z.object({
   code: z.string().trim().min(1).max(50),
   subtotal: z.number().min(0),
+  // Display only: /submit and /payment recompute the discount from the order.
+  serviceSlug: z.string().max(100).nullish(),
+  basePrice: z.number().min(0).optional(),
 });
 
 // ──────────────────────────────────────────────────────────────
@@ -69,7 +73,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { code, subtotal } = parsed.data;
+  const { code, subtotal, serviceSlug, basePrice } = parsed.data;
   const normalizedCode = code.toUpperCase();
 
   try {
@@ -134,18 +138,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Compute discount (RON)
-    let discount = 0;
-    if (coupon.discount_type === 'percentage') {
-      discount = (subtotal * Number(coupon.discount_value)) / 100;
-    } else {
-      discount = Number(coupon.discount_value);
+    const isBlackFriday = isBlackFridayCode(coupon.code);
+    if (isBlackFriday && blackFridayRate(serviceSlug) === 0) {
+      return NextResponse.json(
+        { success: false, error: 'Cuponul nu se aplica acestui serviciu' },
+        { status: 400 }
+      );
     }
 
-    // Cap at subtotal (never negative total)
-    discount = Math.min(discount, subtotal);
-    // Round to 2 decimals (RON)
-    discount = Math.round(discount * 100) / 100;
+    // Capped at the subtotal, rounded to 2 decimals (RON)
+    const discount = couponAmount(coupon, subtotal, { serviceSlug, basePrice: basePrice ?? 0 });
 
     const final = Math.max(0, Math.round((subtotal - discount) * 100) / 100);
 
@@ -158,7 +160,7 @@ export async function POST(request: NextRequest) {
           code: coupon.code,
           description: coupon.description,
           discount_type: coupon.discount_type,
-          discount_value: Number(coupon.discount_value),
+          discount_value: isBlackFriday ? blackFridayRate(serviceSlug) : Number(coupon.discount_value),
         },
         discount,
         final,

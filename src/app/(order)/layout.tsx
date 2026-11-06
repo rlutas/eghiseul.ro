@@ -9,6 +9,7 @@
  */
 import type { Metadata } from 'next';
 import { Header } from '@/components/shared/header';
+import { BlackFridayBar } from '@/components/shared/black-friday-bar';
 import { WhatsAppFloat } from '@/components/shared/whatsapp-float';
 import { HeaderDocumentero } from '@/components/documentero/header';
 import { BrandProvider } from '@/lib/brand/client';
@@ -43,7 +44,9 @@ export default async function OrderLayout({ children }: { children: React.ReactN
   const isDocumentero = brand.id === 'documentero';
   const body = (
     <>
+      {/* After the header: the eghiseul one is fixed, and its spacer pushes the bar below it. */}
       {isDocumentero ? <HeaderDocumentero /> : <Header />}
+      <BlackFridayBar belowFixedHeader={!isDocumentero} />
       {children}
       {!isDocumentero && <WhatsAppFloat />}
       <CookieConsent />

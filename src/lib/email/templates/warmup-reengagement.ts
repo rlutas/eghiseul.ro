@@ -13,6 +13,7 @@
 
 import { brandedEmailHtml, ctaButton } from './branded-layout';
 import { withUtm } from '../utm';
+import { BLACK_FRIDAY_CODE, blackFridayRate, isBlackFridayActive } from '@/lib/coupons/black-friday';
 
 const BASE_URL = 'https://eghiseul.ro';
 
@@ -131,6 +132,17 @@ export function warmupCtaUrl(input: Pick<WarmupEmailInput, 'serviceSlugs' | 'cou
   return withUtm(url.toString(), 'warmup', input.coupon ? 'warmup-fidel' : 'warmup');
 }
 
+/** Stops by itself at the end date. Loyal contacts keep their own coupon: one coupon per order. */
+function blackFridayLine(input: WarmupEmailInput): string | null {
+  if (input.coupon || !isBlackFridayActive()) return null;
+  const slug = primarySlug(input);
+  const rate = blackFridayRate(slug);
+  const offer = slug && rate > 0
+    ? `${rate}% reducere la ${SERVICE_LABELS[slug]}, la prețul de bază`
+    : 'până la 20% reducere la prețul de bază al documentelor';
+  return `Black Friday până luni, 16 noiembrie 2026, ora 23:59: ${offer}, cu codul ${BLACK_FRIDAY_CODE}. Se aplică singur la plată și nu include opțiunile, traducerea, legalizarea sau livrarea.`;
+}
+
 function ctaLabel(input: WarmupEmailInput): string {
   const slug = primarySlug(input);
   return slug ? `Comandă ${SERVICE_LABELS[slug]}` : 'Vezi serviciile disponibile';
@@ -197,6 +209,10 @@ export function buildWarmupHtml(input: WarmupEmailInput): string {
           <p style="margin:0;color:#64748b;font-size:12px;line-height:1.5;">Valabil până la ${formatDate(input.coupon.validUntil)}, o singură folosire, pe orice serviciu. Din butonul de mai jos se aplică singur.</p>
         </div>`
     : '';
+  const blackFriday = blackFridayLine(input);
+  const blackFridayBlock = blackFriday
+    ? `<p style="margin:0 0 16px;padding:12px 14px;border-radius:8px;background:#0B1B33;color:#ffffff;font-size:14px;line-height:1.5;">${escapeHtml(blackFriday)}</p>`
+    : '';
   const constatatorBlock = hasConstatator(input)
     ? `<p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">${escapeHtml(CONSTATATOR_PITCH)}</p>`
     : '';
@@ -220,6 +236,7 @@ export function buildWarmupHtml(input: WarmupEmailInput): string {
         <h1 style="margin:0 0 12px;color:#0B1B33;font-size:20px;">${greeting}</h1>
         <p style="margin:0 0 12px;color:#475569;font-size:14px;line-height:1.6;">${history}${thanks}</p>
         ${couponBlock}
+        ${blackFridayBlock}
         ${constatatorBlock}
         ${propertyBlock}
         <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">Comanzi online în câteva minute, plătești cu cardul și primești actul prin curier sau pe email, fără drumuri la ghișeu. Obținem pentru tine cazier judiciar, extras de carte funciară, certificat constatator, certificate de stare civilă și altele.</p>
@@ -240,6 +257,8 @@ export function buildWarmupText(input: WarmupEmailInput): string {
       '',
     );
   }
+  const blackFriday = blackFridayLine(input);
+  if (blackFriday) lines.push(blackFriday, '');
   if (hasConstatator(input)) lines.push(CONSTATATOR_PITCH, '');
   if (hasLandBook(input)) {
     lines.push(PROPERTY_PITCH, ...PROPERTY_SERVICES.map((s) => `- ${s.label}: ${propertyServiceUrl(s.slug)}`), '');

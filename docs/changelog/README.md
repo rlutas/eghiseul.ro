@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-06 | 🟣 **Black Friday pe toate site-urile, până pe 16.11** — cod `BLACKFRIDAY`, 20% sau 10% pe serviciu, doar la prețul de bază, bară cu cronometru, aplicare automată; include segmentul de campanie `service_buyers` | [2026-11-06-black-friday.md](2026-11-06-black-friday.md) |
 | 2026-11-06 | ✅ **Warm-up: text pe serviciu** — constatator „de obicei în câteva minute”, extras CF cu lista serviciilor prin topograf, UTM `warmup-imobiliare` | [2026-11-06-warmup-texte-pe-serviciu.md](2026-11-06-warmup-texte-pe-serviciu.md) |
 | 2026-11-06 | ✅ **Warm-up: cumpărătorii CJO și ecazier, cu text propriu** — migrarea 201 `contacts.purchased_on`, import unic, emailul numește site-ul de pe care au cumpărat | [2026-11-06-warmup-cumparatori-cjo-ecazier.md](2026-11-06-warmup-cumparatori-cjo-ecazier.md) |
 | 2026-11-06 | 🔴 **Tracking: fără erori la curierii fără API** — `hasLiveTracking()` limitează interogarea la Fan Courier și Sameday; Poșta Internațională și DHL returnează linkul pus de echipă | [2026-11-06-tracking-curieri-fara-api.md](2026-11-06-tracking-curieri-fara-api.md) |
