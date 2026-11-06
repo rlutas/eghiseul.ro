@@ -18,6 +18,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getCourierProvider, CourierCode } from '@/lib/services/courier';
 import { isFinalStatus, extractCourierProviderFromDeliveryMethod } from '@/lib/services/courier/utils';
+import { hasLiveTracking } from '@/lib/services/courier/live-tracking';
 import type { TrackingInfo, TrackingStatus } from '@/lib/services/courier/types';
 import type { Json } from '@/types/supabase';
 
@@ -152,8 +153,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const deliveryMethod = order.delivery_method as { name?: string } | null;
     const providerCode = (order.courier_provider || extractCourierProviderFromDeliveryMethod(deliveryMethod)) as CourierCode | null;
 
-    if (!providerCode) {
-      // Can't determine provider - return what we have
+    if (!hasLiveTracking(providerCode)) {
+      // Unknown provider, or one with no tracking API (the team's link is the tracker)
       return NextResponse.json({
         success: true,
         data: {
@@ -170,7 +171,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     let trackingInfo: TrackingInfo;
     try {
-      const provider = getCourierProvider(providerCode);
+      const provider = getCourierProvider(providerCode as CourierCode);
       trackingInfo = await provider.trackShipment(awb);
     } catch (error) {
       console.error('[Tracking] Courier tracking failed:', error);

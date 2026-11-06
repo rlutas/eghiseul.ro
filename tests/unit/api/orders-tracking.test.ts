@@ -204,3 +204,26 @@ describe('GET /api/orders/[id]/tracking — cache behavior', () => {
     expect(getCourierProvider).not.toHaveBeenCalled();
   });
 });
+
+describe('GET /api/orders/[id]/tracking — courier with no tracking API', () => {
+  it('returns the team link for posta_intl without asking a provider or logging an error', async () => {
+    setupOrder({
+      id: 'o-posta',
+      user_id: null,
+      delivery_tracking_number: 'RN755687985RO',
+      delivery_tracking_url: 'https://parcelsapp.com/en/tracking/RN755687985RO',
+      delivery_tracking_status: null,
+      courier_provider: 'posta_intl',
+      customer_data: { contact: { email: 'guest@example.com' } },
+    });
+
+    const res = await callRoute('o-posta', { email: 'guest@example.com' });
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.data.trackingUrl).toBe('https://parcelsapp.com/en/tracking/RN755687985RO');
+    expect(body.data.fetchError).toBeUndefined();
+    expect(getCourierProvider).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
+  });
+});

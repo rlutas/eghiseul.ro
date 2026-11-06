@@ -17,6 +17,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getCourierProvider, CourierCode } from '@/lib/services/courier';
+import { hasLiveTracking } from '@/lib/services/courier/live-tracking';
 import { isFinalStatus, extractCourierProviderFromDeliveryMethod } from '@/lib/services/courier/utils';
 
 // Active tracking statuses (non-final)
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
       const deliveryMethod = order.delivery_method as { name?: string } | null;
       const providerCode = (order.courier_provider || extractCourierProviderFromDeliveryMethod(deliveryMethod)) as CourierCode | null;
 
-      if (!providerCode || !order.delivery_tracking_number) continue;
+      if (!hasLiveTracking(providerCode) || !providerCode || !order.delivery_tracking_number) continue;
 
       const existing = ordersByProvider.get(providerCode) || [];
       existing.push(order);
