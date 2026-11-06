@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
   // site-ul vechi (migrarea 187). La egalitate, FIFO după `created_at`.
   const { data: candidates, error: fetchError } = await admin
     .from('contacts')
-    .select('id, email, first_name, services, is_customer, orders_count, stripe_last_paid_at, unsubscribe_token')
+    .select('id, email, first_name, services, is_customer, orders_count, stripe_last_paid_at, purchased_on, unsubscribe_token')
     .is('warmup_email_sent_at', null)
     .is('warmup_skipped_at', null)
     .not('marketing_status', 'in', '(unsubscribed,suppressed)')
@@ -189,6 +189,7 @@ export async function POST(request: NextRequest) {
       serviceSlugs: contact.services ?? [],
       // A plătit, chiar dacă pe site-ul vechi: textul „Ai obținut prin noi” e adevărat.
       isCustomer: !!contact.is_customer || !!contact.stripe_last_paid_at,
+      purchasedOn: contact.purchased_on ?? null,
       coupon,
       unsubscribeUrl,
     };

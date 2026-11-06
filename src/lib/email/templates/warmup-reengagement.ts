@@ -46,12 +46,21 @@ export interface WarmupCoupon {
   validUntil: string;
 }
 
+export type PurchasedOn = 'cazierjudiciaronline' | 'ecazier';
+
+const SISTER_SITE_NAMES: Record<PurchasedOn, string> = {
+  cazierjudiciaronline: 'cazierjudiciaronline.com',
+  ecazier: 'ecazier.ro',
+};
+
 export interface WarmupEmailInput {
   firstName?: string | null;
   /** Slug-urile din `contacts.services`, în ordinea din registru. */
   serviceSlugs?: string[] | null;
   /** A plătit cel puțin o comandă pe platforma nouă (`contacts.is_customer`). */
   isCustomer?: boolean;
+  /** Site-ul soră de pe care a cumpărat (`contacts.purchased_on`); gol = eGhișeul.ro. */
+  purchasedOn?: PurchasedOn | null;
   /** Doar pentru clienții fideli. */
   coupon?: WarmupCoupon | null;
   unsubscribeUrl: string;
@@ -91,17 +100,32 @@ function formatDate(iso: string): string {
   return `${String(d.getUTCDate()).padStart(2, '0')}.${String(d.getUTCMonth() + 1).padStart(2, '0')}.${d.getUTCFullYear()}`;
 }
 
+function historyVerb(input: WarmupEmailInput): string {
+  if (input.purchasedOn) return `Ai obținut prin ${SISTER_SITE_NAMES[input.purchasedOn]}`;
+  return input.isCustomer ? 'Ai obținut prin noi' : 'Ai apelat la noi pentru';
+}
+
+/** Propoziția de după istoric. Cine a cumpărat de pe alt site n-a văzut platforma „rescrisă”. */
+function followUpLine(input: WarmupEmailInput): string {
+  if (input.coupon) return ' Mulțumim că ne-ai ales de mai multe ori.';
+  if (input.purchasedOn) return ' Îți scriem de la eGhișeul.ro, unde poți obține și alte documente.';
+  return ' De atunci am rescris toată platforma.';
+}
+
 function historyLine(input: WarmupEmailInput): string | null {
   const labels = serviceLabels(input.serviceSlugs);
   if (labels.length === 0) return null;
-  const verb = input.isCustomer ? 'Ai obținut prin noi' : 'Ai apelat la noi pentru';
-  return `${verb} ${joinRo(labels)}.`;
+  return `${historyVerb(input)} ${joinRo(labels)}.`;
 }
 
 export function buildWarmupSubject(input: WarmupEmailInput): string {
   const name = input.firstName?.trim();
   if (input.coupon) {
     const base = `ai ${input.coupon.discountPercent}% reducere pentru că ne-ai ales de mai multe ori`;
+    return name ? `${name}, ${base}` : base.charAt(0).toUpperCase() + base.slice(1);
+  }
+  if (input.purchasedOn) {
+    const base = 'poți obține și alte documente prin eGhișeul.ro';
     return name ? `${name}, ${base}` : base.charAt(0).toUpperCase() + base.slice(1);
   }
   return name ? `${name}, eGhișeul.ro s-a schimbat de când ne-ai scris` : 'eGhișeul.ro s-a schimbat de când ne-ai scris';
@@ -111,9 +135,12 @@ export function buildWarmupHtml(input: WarmupEmailInput): string {
   const greeting = input.firstName ? `Salut ${escapeHtml(input.firstName)},` : 'Salut,';
   const labels = serviceLabels(input.serviceSlugs);
   const history = labels.length
-    ? `${input.isCustomer ? 'Ai obținut prin noi' : 'Ai apelat la noi pentru'} ${joinRo(labels.map((l) => `<strong>${escapeHtml(l)}</strong>`))}.`
+    ? `${historyVerb(input)} ${joinRo(labels.map((l) => `<strong>${escapeHtml(l)}</strong>`))}.`
     : 'Ai fost în contact cu noi.';
-  const thanks = input.coupon ? ' Mulțumim că ne-ai ales de mai multe ori.' : ' De atunci am rescris toată platforma.';
+  const thanks = followUpLine(input);
+  const contactReason = input.purchasedOn
+    ? `ai comandat pe ${SISTER_SITE_NAMES[input.purchasedOn]}`
+    : 'ai fost în contact cu eGhișeul.ro';
   const couponBlock = input.coupon
     ? `<div style="margin:0 0 16px;padding:14px 16px;border:1px dashed #0B1B33;border-radius:8px;background:#F8FAFC;">
           <p style="margin:0 0 6px;color:#0B1B33;font-size:14px;line-height:1.5;">Ca mulțumire, ai <strong>${input.coupon.discountPercent}% reducere</strong> la următoarea comandă:</p>
@@ -124,7 +151,9 @@ export function buildWarmupHtml(input: WarmupEmailInput): string {
   return brandedEmailHtml({
     preheader: input.coupon
       ? `${input.coupon.discountPercent}% reducere la următoarea comandă, pentru că ne-ai ales de mai multe ori.`
-      : 'Am rescris platforma — comenzi online, plată directă, curier până la ușă.',
+      : input.purchasedOn
+        ? 'Comenzi online, plată directă, curier până la ușă.'
+        : 'Am rescris platforma — comenzi online, plată directă, curier până la ușă.',
     content: `
         <h1 style="margin:0 0 12px;color:#0B1B33;font-size:20px;">${greeting}</h1>
         <p style="margin:0 0 12px;color:#475569;font-size:14px;line-height:1.6;">${history}${thanks}</p>
@@ -132,14 +161,14 @@ export function buildWarmupHtml(input: WarmupEmailInput): string {
         <p style="margin:0 0 16px;color:#475569;font-size:14px;line-height:1.6;">Comanzi online în câteva minute, plătești cu cardul și primești actul prin curier sau pe email, fără drumuri la ghișeu. Obținem pentru tine cazier judiciar, extras de carte funciară, certificat constatator, certificate de stare civilă și altele.</p>
         ${ctaButton(ctaLabel(input), warmupCtaUrl(input))}
         <p style="margin:12px 0 0;font-size:13px;color:#475569;line-height:1.6;">Sau <a href="${escapeAttr(withUtm(`${BASE_URL}/servicii/`, 'warmup', input.coupon ? 'warmup-fidel' : 'warmup'))}" style="color:#0B1B33;">vezi toate serviciile</a>${input.coupon ? ' și introdu codul la pasul de plată' : ''}.</p>
-        <p style="margin:16px 0 0;font-size:12px;color:#9ca3af;line-height:1.6;">Primești acest email pentru că ai fost în contact cu eGhișeul.ro. Dacă nu te mai interesează, te poți dezabona oricând — <a href="${escapeAttr(input.unsubscribeUrl)}" style="color:#0B1B33;">un singur click</a>.</p>`,
+        <p style="margin:16px 0 0;font-size:12px;color:#9ca3af;line-height:1.6;">Primești acest email pentru că ${contactReason}. Dacă nu te mai interesează, te poți dezabona oricând — <a href="${escapeAttr(input.unsubscribeUrl)}" style="color:#0B1B33;">un singur click</a>.</p>`,
   });
 }
 
 export function buildWarmupText(input: WarmupEmailInput): string {
   const greeting = input.firstName ? `Salut ${input.firstName},` : 'Salut,';
   const history = historyLine(input) ?? 'Ai fost în contact cu noi.';
-  const lines = [greeting, '', `${history}${input.coupon ? ' Mulțumim că ne-ai ales de mai multe ori.' : ' De atunci am rescris toată platforma.'}`, ''];
+  const lines = [greeting, '', `${history}${followUpLine(input)}`, ''];
   if (input.coupon) {
     lines.push(
       `Ca mulțumire, ai ${input.coupon.discountPercent}% reducere la următoarea comandă: ${input.coupon.code}`,

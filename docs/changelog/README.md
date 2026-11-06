@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-06 | ✅ **Warm-up: cumpărătorii CJO și ecazier, cu text propriu** — migrarea 201 `contacts.purchased_on`, import unic, emailul numește site-ul de pe care au cumpărat | [2026-11-06-warmup-cumparatori-cjo-ecazier.md](2026-11-06-warmup-cumparatori-cjo-ecazier.md) |
 | 2026-11-06 | 🔴 **Tracking: fără erori la curierii fără API** — `hasLiveTracking()` limitează interogarea la Fan Courier și Sameday; Poșta Internațională și DHL returnează linkul pus de echipă | [2026-11-06-tracking-curieri-fara-api.md](2026-11-06-tracking-curieri-fara-api.md) |
 | 2026-11-05 | 🔴 **Documentele de firmă mari nu mai blochează comanda (HTTP 413)** — PDF direct în S3, poze comprimate, `settleCompanyDocuments` la `/submit`, reîncercare la 5xx | [2026-11-05-documente-firma-prea-mari.md](2026-11-05-documente-firma-prea-mari.md) |
 | 2026-11-04 | ✅ **Warm-up: cumpărătorii întâi, 800/zi** — migrarea 200 `contacts.stripe_last_paid_at` (potrivire pe hash cu Stripe), cron sortat după ultima plată | [2026-11-04-warmup-cumparatori-intai.md](2026-11-04-warmup-cumparatori-intai.md) |

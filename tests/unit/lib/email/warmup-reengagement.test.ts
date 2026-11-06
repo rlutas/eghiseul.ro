@@ -55,3 +55,32 @@ describe('isLoyalContact', () => {
     expect(isLoyalContact({ orders_count: 0, services: ['cazier-judiciar', 'cazier-fiscal'] })).toBe(true);
   });
 });
+
+describe('warm-up email for buyers from a sister site', () => {
+  const input = {
+    firstName: 'Ana',
+    serviceSlugs: ['cazier-judiciar'],
+    isCustomer: true,
+    purchasedOn: 'cazierjudiciaronline' as const,
+    unsubscribeUrl: 'https://eghiseul.ro/u',
+  };
+
+  it('names the site they bought from', () => {
+    expect(buildWarmupText(input)).toContain('Ai obținut prin cazierjudiciaronline.com cazier judiciar.');
+    expect(buildWarmupHtml(input)).toContain('ai comandat pe cazierjudiciaronline.com');
+    expect(buildWarmupText({ ...input, purchasedOn: 'ecazier' })).toContain('Ai obținut prin ecazier.ro');
+  });
+
+  it('does not claim they knew eGhișeul or saw it rebuilt', () => {
+    const all = buildWarmupSubject(input) + buildWarmupHtml(input) + buildWarmupText(input);
+    expect(all).not.toContain('rescris');
+    expect(all).not.toContain('s-a schimbat');
+    expect(all).not.toContain('prin noi');
+  });
+
+  it('keeps the existing text when the site is not set', () => {
+    const { purchasedOn: _unused, ...own } = input;
+    expect(buildWarmupSubject(own)).toBe('Ana, eGhișeul.ro s-a schimbat de când ne-ai scris');
+    expect(buildWarmupText(own)).toContain('De atunci am rescris toată platforma.');
+  });
+});
