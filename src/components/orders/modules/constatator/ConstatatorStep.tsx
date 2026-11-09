@@ -274,7 +274,6 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
           <Field label="CNP persoană solicitantă" required>
             <Input
               inputMode="numeric"
-              maxLength={13}
               value={cs.requesterCnp ?? ''}
               onChange={(e) => updateConstatator({ requesterCnp: e.target.value.replace(/\D/g, '').slice(0, 13) })}
               placeholder="13 cifre"

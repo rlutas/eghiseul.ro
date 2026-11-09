@@ -229,9 +229,8 @@ export function PersonalStepForm({ onDirtyChange, onSaved, onRequestClose }: Pro
           type="text"
           inputMode="numeric"
           autoComplete="off"
-          maxLength={13}
           value={values.cnp}
-          onChange={(e) => setField('cnp', e.target.value.replace(/\D/g, ''))}
+          onChange={(e) => setField('cnp', e.target.value.replace(/\D/g, '').slice(0, 13))}
           onBlur={() => handleBlur('cnp')}
           aria-invalid={shown('cnp') ? true : undefined}
           aria-describedby={describedBy(ids.cnp, shown('cnp'), CNP_HINT)}

@@ -924,10 +924,9 @@ export default function PropertyDataStep({ config, onValidChange }: PropertyData
                 <Input
                   id="beneficiary-cnp"
                   inputMode="numeric"
-                  maxLength={13}
                   value={property.beneficiaryCnp || ''}
                   onChange={(e) =>
-                    updateProperty?.({ beneficiaryCnp: e.target.value.replace(/\D/g, '') })
+                    updateProperty?.({ beneficiaryCnp: e.target.value.replace(/\D/g, '').slice(0, 13) })
                   }
                   placeholder="13 cifre"
                 />

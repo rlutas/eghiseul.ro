@@ -1733,11 +1733,13 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             )}
           </Label>
           <div className="relative">
+            {/* No maxLength: the browser cuts a pasted "1850101 123456" to 13
+                characters before handleCNPChange strips the space, leaving 12
+                digits. handleCNPChange strips, then cuts to 13. */}
             <Input
               id="cnp"
               type="text"
               inputMode="numeric"
-              maxLength={13}
               value={personalKyc.cnp}
               onChange={(e) => handleCNPChange(e.target.value)}
               onBlur={(e) => reportCnpIfInvalid(e.target.value)}

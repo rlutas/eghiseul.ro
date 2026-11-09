@@ -520,7 +520,7 @@ export default function ProfileTab({ initialData, className, autoEdit = false }:
                 value={editData.cnp || ''}
                 onChange={(e) => handleCNPChange(e.target.value)}
                 placeholder="1234567890123"
-                maxLength={13}
+                inputMode="numeric"
                 className={cn(
                   'font-mono',
                   editData.cnp && editData.cnp.length === 13 && !cnpValidation.valid && 'border-red-500'

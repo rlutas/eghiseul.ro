@@ -367,9 +367,8 @@ export default function BillingProfileForm({
             <Input
               id="cnp"
               type="text"
-              maxLength={13}
               value={value.cnp || ''}
-              onChange={(e) => updateField('cnp', e.target.value.replace(/\D/g, ''))}
+              onChange={(e) => updateField('cnp', e.target.value.replace(/\D/g, '').slice(0, 13))}
               placeholder="1234567890123"
               className="bg-white font-mono h-11"
               inputMode="numeric"

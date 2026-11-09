@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-09 | 🔴 **CNP-ul lipit cu spații nu mai e tăiat la 12 cifre** — `maxLength={13}` scos din 7 câmpuri (strip, apoi `slice(0, 13)`), test de regresie; CJO: același fix + reîncercare la salvarea sesiunii | [2026-11-09-cnp-lipit-taiat.md](2026-11-09-cnp-lipit-taiat.md) |
 | 2026-11-06 | 🟣 **Black Friday pe toate site-urile, până pe 16.11** — cod `BLACKFRIDAY`, 20% sau 10% pe serviciu, doar la prețul de bază, bară cu cronometru, aplicare automată; include segmentul de campanie `service_buyers` | [2026-11-06-black-friday.md](2026-11-06-black-friday.md) |
 | 2026-11-06 | ✅ **Warm-up: text pe serviciu** — constatator „de obicei în câteva minute”, extras CF cu lista serviciilor prin topograf, UTM `warmup-imobiliare` | [2026-11-06-warmup-texte-pe-serviciu.md](2026-11-06-warmup-texte-pe-serviciu.md) |
 | 2026-11-06 | ✅ **Warm-up: cumpărătorii CJO și ecazier, cu text propriu** — migrarea 201 `contacts.purchased_on`, import unic, emailul numește site-ul de pe care au cumpărat | [2026-11-06-warmup-cumparatori-cjo-ecazier.md](2026-11-06-warmup-cumparatori-cjo-ecazier.md) |
