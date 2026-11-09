@@ -26,7 +26,11 @@ import { isExpiredBlackFridayCampaign } from '@/lib/coupons/black-friday';
 
 export const maxDuration = 300;
 const SEND_SPACING_MS = 600;
-const MAX_PER_RUN = 400; // ~4 min la 600 ms; restul mâine
+const MAX_PER_RUN = 400; // plafon pe rulare; restul mâine
+// Each send is 600 ms of spacing plus the Resend call and two DB writes, so
+// 400 sends ran past maxDuration (504 on 07.11 and 09.11.2026). Vercel killed
+// the run before the cursor and sent_count were written. Stop well before.
+const RUN_DEADLINE_MS = 240_000;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -81,11 +85,13 @@ export async function POST(request: NextRequest) {
   }
 
   let budget = MAX_PER_RUN;
+  const deadline = Date.now() + RUN_DEADLINE_MS;
+  let timeUp = false;
   const summary: Array<{ campaignId: string; sent: number; skipped: number; errors: number; done: boolean }> = [];
 
   for (const c of campaigns as Campaign[]) {
     const batch = Math.min(c.daily_batch_size, budget);
-    if (batch <= 0) break;
+    if (batch <= 0 || timeUp) break;
 
     if (isExpiredBlackFridayCampaign(c.body_text)) {
       console.warn(`[email-campaigns] campaign ${c.id} promises an ended offer, skipped`);
@@ -131,6 +137,10 @@ export async function POST(request: NextRequest) {
     let last: Contact | null = null;
 
     for (const contact of (contacts ?? []) as Contact[]) {
+      if (Date.now() > deadline) {
+        timeUp = true;
+        break;
+      }
       last = contact;
       const email = (contact.email ?? '').trim().toLowerCase();
       if (!email || TEST_EMAILS.has(email) || isUndeliverable(email)) {
@@ -191,12 +201,19 @@ export async function POST(request: NextRequest) {
     }
 
     budget -= sent + errors;
-    const done = (contacts ?? []).length < batch;
+    const done = !timeUp && (contacts ?? []).length < batch;
     // Cursorul avansează doar peste contactele parcurse; la eroare tranzitorie
     // ultimul contact rămâne nesemnat (claim șters) — dar cursorul l-a depășit.
     // Acceptat: campania e newsletter, nu tranzacțional.
+    // Counted from the send log, not added up: a run killed by a timeout
+    // never wrote its share, so the stored number had drifted (344 vs 501).
+    const { count: sentTotal } = await admin
+      .from('email_campaign_sends')
+      .select('campaign_id', { count: 'exact', head: true })
+      .eq('campaign_id', c.id)
+      .not('sent_at', 'is', null);
     const patch: Record<string, unknown> = {
-      sent_count: c.sent_count + sent,
+      sent_count: typeof sentTotal === 'number' ? sentTotal : c.sent_count + sent,
       updated_at: new Date().toISOString(),
       ...(last ? { cursor_created_at: last.created_at, cursor_id: last.id } : {}),
       ...(done ? { status: 'done', finished_at: new Date().toISOString() } : {}),
@@ -205,7 +222,7 @@ export async function POST(request: NextRequest) {
     summary.push({ campaignId: c.id, sent, skipped, errors, done });
   }
 
-  return NextResponse.json({ success: true, data: { campaigns: summary, processedAt: new Date().toISOString() } });
+  return NextResponse.json({ success: true, data: { campaigns: summary, timeUp, processedAt: new Date().toISOString() } });
 }
 
 export async function GET(request: NextRequest) {

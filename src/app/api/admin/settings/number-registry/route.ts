@@ -98,8 +98,11 @@ export async function GET(request: NextRequest) {
       dataQuery = dataQuery.eq('order_ref', orderRef);
     }
 
-    if (search) {
-      const searchFilter = `client_name.ilike.%${search}%,client_email.ilike.%${search}%,client_cnp.ilike.%${search}%,client_cui.ilike.%${search}%`;
+    // A comma or parenthesis in the search text ("Popescu, Ion") splits the
+    // PostgREST or() filter and the query fails with an empty error message.
+    const safeSearch = search?.replace(/[,()"\\]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (safeSearch) {
+      const searchFilter = `client_name.ilike.%${safeSearch}%,client_email.ilike.%${safeSearch}%,client_cnp.ilike.%${safeSearch}%,client_cui.ilike.%${safeSearch}%`;
       countQuery = countQuery.or(searchFilter);
       dataQuery = dataQuery.or(searchFilter);
     }
@@ -108,7 +111,7 @@ export async function GET(request: NextRequest) {
     const [countResult, dataResult] = await Promise.all([countQuery, dataQuery]);
 
     if (countResult.error) {
-      console.error('Failed to count number registry entries:', countResult.error);
+      console.error('Failed to count number registry entries:', countResult.status, countResult.error);
       return NextResponse.json(
         { success: false, error: 'Eroare la numararea inregistrarilor din registru' },
         { status: 500 }

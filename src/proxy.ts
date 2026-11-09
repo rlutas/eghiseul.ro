@@ -50,7 +50,27 @@ export async function proxy(request: NextRequest) {
       headers: { 'X-Robots-Tag': 'noindex' },
     })
   }
-  return await updateSession(request)
+  try {
+    return await updateSession(request)
+  } catch (error) {
+    // The session refresh is a convenience: every API route builds its own
+    // client and checks the user itself. Letting a Supabase Auth hiccup throw
+    // here turned a wizard autosave into an empty 500 (E-261104-W9VR4,
+    // 04.11.2026, no log line). Pass API and public requests on instead.
+    // Pages behind a login go to the login page rather than open unchecked.
+    console.error('[proxy] updateSession failed:', error)
+    const path = request.nextUrl.pathname
+    const needsLogin =
+      ['/account', '/kyc', '/admin'].some((p) => path.startsWith(p)) ||
+      (path.startsWith('/orders') && !path.startsWith('/orders/new'))
+    if (needsLogin && !path.startsWith('/admin/invite')) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/auth/login'
+      url.searchParams.set('redirect', path)
+      return NextResponse.redirect(url)
+    }
+    return NextResponse.next({ request })
+  }
 }
 
 export const config = {
