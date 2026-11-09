@@ -89,9 +89,14 @@ export async function POST(request: NextRequest) {
   let timeUp = false;
   const summary: Array<{ campaignId: string; sent: number; skipped: number; errors: number; done: boolean }> = [];
 
+  // The cron runs every hour in the working day (vercel.json), so
+  // daily_batch_size is a cap per UTC day, counted from the send log, not per
+  // run. One 4-minute run only got through ~300 sends.
+  const dayStart = new Date();
+  dayStart.setUTCHours(0, 0, 0, 0);
+
   for (const c of campaigns as Campaign[]) {
-    const batch = Math.min(c.daily_batch_size, budget);
-    if (batch <= 0 || timeUp) break;
+    if (budget <= 0 || timeUp) break;
 
     if (isExpiredBlackFridayCampaign(c.body_text)) {
       console.warn(`[email-campaigns] campaign ${c.id} promises an ended offer, skipped`);
@@ -104,6 +109,14 @@ export async function POST(request: NextRequest) {
       summary.push({ campaignId: c.id, sent: 0, skipped: 0, errors: 1, done: false });
       continue;
     }
+
+    const { count: sentToday } = await admin
+      .from('email_campaign_sends')
+      .select('campaign_id', { count: 'exact', head: true })
+      .eq('campaign_id', c.id)
+      .gte('created_at', dayStart.toISOString());
+    const batch = Math.min(c.daily_batch_size - (sentToday ?? 0), budget);
+    if (batch <= 0) continue;
 
     // Keyset: (created_at, id) > (cursor_created_at, cursor_id). Un `from()`
     // nou pentru fiecare interogare — builder-ul postgrest-js nu se refolosește.

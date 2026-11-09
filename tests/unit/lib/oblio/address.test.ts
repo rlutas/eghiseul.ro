@@ -12,6 +12,7 @@ import {
   countryForOblio,
   isForeignCountry,
   resolveInvoiceAddress,
+  foreignInvoiceState,
 } from '@/lib/oblio/address';
 
 describe('canonicalCounty', () => {
@@ -174,30 +175,51 @@ describe('resolveInvoiceAddress', () => {
     expect(r.usedFallback).toBe(false);
   });
 
-  it('client străin: județ „-" când lipsește, țara din lista Oblio', () => {
+  it('client străin fără regiune: orașul trece la județ, țara din lista Oblio', () => {
+    // EGH-0949 (Sofia) și EGH-0953 (Berlin) au plecat cu „Județ: -” și echipa
+    // a pus orașul de mână înainte de SPV.
     const r = resolveInvoiceAddress(
       { street: '12 Clifton Road', city: 'Slough', county: '', country: 'Marea Britanie' },
       null
     );
     expect(r.country).toBe('Regatul Unit (UK)');
     expect(r.city).toBe('Slough');
-    expect(r.state).toBe('-');
+    expect(r.state).toBe('Slough');
+    const sofia = resolveInvoiceAddress(
+      { street: 'Pirotska 8', city: 'Sofia', county: '', country: 'Bulgaria' },
+      null
+    );
+    expect(sofia).toMatchObject({ state: 'Sofia', city: 'Sofia', country: 'Bulgaria' });
   });
 
-  it('client străin: regiunea trece în localitate, județul rămâne „-"', () => {
-    // EGH-0625: „RC” (Reggio Calabria) trimis ca județ → factura a plecat în SPV ca România / RO-CT.
+  it('client străin cu regiune: regiunea la județ, fără diacritice', () => {
     const r = resolveInvoiceAddress(
       { street: 'Via Roma 1', city: 'Stezzano', county: 'Lombardia', country: 'Italia' },
       null
     );
-    expect(r.state).toBe('-');
-    expect(r.city).toBe('Stezzano, Lombardia');
-    expect(r.country).toBe('Italia');
+    expect(r).toMatchObject({ state: 'Lombardia', city: 'Stezzano', country: 'Italia' });
+    const berlin = resolveInvoiceAddress(
+      { street: 'Walter-Friedländer-Straße, 24', city: 'Berlin', county: 'Berlin', country: 'Germania' },
+      null
+    );
+    expect(berlin).toMatchObject({ state: 'Berlin', city: 'Berlin', country: 'Germania' });
+  });
+
+  it('client străin: un cod scurt de regiune nu ajunge la județ', () => {
+    // EGH-0625: „RC” (Reggio Calabria) trimis ca județ → factura a plecat în SPV ca România / RO-CT.
     const rc = resolveInvoiceAddress(
       { street: 'Via Nicola 14', city: 'Reggio Calabria ', county: 'RC', country: 'Italia' },
       null
     );
-    expect(rc).toMatchObject({ state: '-', city: 'Reggio Calabria, RC', country: 'Italia' });
+    expect(rc).toMatchObject({ state: 'Reggio Calabria', city: 'Reggio Calabria, RC', country: 'Italia' });
+  });
+
+  it('client străin: nume de județ românesc sau oraș de o literă → „-”', () => {
+    expect(foreignInvoiceState('Alba', 'M')).toBe('-');
+    expect(foreignInvoiceState('', 'M')).toBe('-');
+    expect(foreignInvoiceState('', '')).toBe('-');
+    expect(foreignInvoiceState('Cluj', 'Lyon')).toBe('Lyon');
+    expect(foreignInvoiceState('Île-de-France', 'Paris')).toBe('Ile-de-France');
   });
 
   it('sectorul din adresa KYC (câmp separat) ajunge în localitate', () => {

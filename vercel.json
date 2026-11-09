@@ -48,7 +48,7 @@
     },
     {
       "path": "/api/cron/email-campaigns/",
-      "schedule": "40 7 * * *"
+      "schedule": "40 7-15 * * *"
     },
     {
       "path": "/api/cron/indexnow/",

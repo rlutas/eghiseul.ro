@@ -169,6 +169,24 @@ export function isForeignCountry(value?: string | null): boolean {
 // Rezolvarea adresei de facturare
 // ────────────────────────────────────────────────────────────────────────────
 
+/**
+ * „Județ” for a foreign client: the region, else the city, as the team fills
+ * it by hand in Oblio (EGH-0942, 0949, 0953 were sent with „-” and edited to
+ * „Carcassonne”, „Sofia”, „Berlin” before SPV). Oblio matches this text
+ * against Romanian counties, so anything that could pass for one — a short
+ * code („RC” went to SPV as RO-CT on EGH-0625) or a Romanian county name —
+ * falls back to the next candidate, and finally to '-'.
+ */
+export function foreignInvoiceState(region?: string | null, city?: string | null): string {
+  for (const candidate of [region, city]) {
+    const value = stripDiacritics((candidate || '').trim()).replace(/\s+/g, ' ');
+    if (value.replace(/[^A-Za-z]/g, '').length < 4) continue;
+    if (canonicalCounty(value)) continue;
+    return value;
+  }
+  return '-';
+}
+
 export interface AddressBlock {
   street?: string;
   city?: string;
@@ -182,7 +200,7 @@ export interface AddressBlock {
 export interface ResolvedInvoiceAddress {
   address: string;
   city: string;
-  /** Județ canonic, '-' pentru clienți străini (convenția Oblio). */
+  /** Județ canonic; la client străin regiunea sau orașul (vezi foreignInvoiceState). */
   state: string;
   /** Denumirea de țară în forma acceptată de Oblio (nume RO fără diacritice). */
   country: string;
@@ -278,21 +296,17 @@ export function resolveInvoiceAddress(
     .trim();
 
   if (foreign) {
-    // The foreign region stays on the invoice, but inside the locality: Oblio
-    // reads `state` as a Romanian county.
     const foreignCity = (block.city || '').trim();
     const region = (block.county || '').trim();
-    const cityWithRegion =
-      region && normalizeCounty(region) !== normalizeCounty(foreignCity)
-        ? [foreignCity, region].filter(Boolean).join(', ')
-        : foreignCity;
+    const state = foreignInvoiceState(region, foreignCity);
+    // A region that could not go into „Județ” (a code like „RC”) stays on the
+    // invoice inside the locality.
+    const regionInCity =
+      region && state !== stripDiacritics(region).trim() && normalizeCounty(region) !== normalizeCounty(foreignCity);
     return {
       address: street,
-      city: cityWithRegion,
-      // Always '-' for foreign clients (Oblio's convention). A foreign region
-      // typed in the county field („RC” for Reggio Calabria) went to Oblio as
-      // a Romanian county: EGH-0625 (Italia) reached SPV as RO / RO-CT.
-      state: '-',
+      city: regionInCity ? [foreignCity, region].filter(Boolean).join(', ') : foreignCity,
+      state,
       country,
       usedFallback,
     };
