@@ -791,9 +791,14 @@ afara României"**: țară din lista mondială (`src/config/countries.ts`), loca
 regiune text liber, cod poștal alfanumeric, **CNP opțional**. Reguli Oblio (verificate
 pe docs + FAQ oficial):
 
-- `country` = text liber acceptat de Oblio; `state` (județ) text liber pentru străini —
-  `buildOblioClient` trimite regiunea sau **`'-'`** când lipsește (convenția Oblio),
-  ceea ce ține guard-ul `getMissingInvoiceClientFields` satisfăcut fără modificări.
+- `country` = text liber acceptat de Oblio; `state` (județ) text liber pentru străini.
+  Din 2026-11-09, `foreignInvoiceState(region, city)` (`src/lib/oblio/address.ts`, și pe
+  CJO) trimite regiunea, altfel orașul, fără diacritice. Sare peste valorile sub 4 litere
+  („RC”, „M”) și peste cele recunoscute de `canonicalCounty()` ca județ românesc
+  („Alba”), ca SPV să nu primească un județ RO (incident EGH-0625). Dacă nu rămâne nimic,
+  trimite **`'-'`**. Între 02.11 și 09.11 se trimitea `'-'` mereu, iar echipa corecta de
+  mână (EGH-0942, 0949, 0953). XML-ul e-Factura are `CountrySubentity` = `<ISO>-`
+  (ex. `DE-`) la orice țară străină, indiferent de text: Oblio nu pune textul în XML.
 - **CNP:** Oblio nu îl cere; la e-Factura/SPV completează automat 13 zerouri pentru
   străini. ⚠️ La țară străină fără CNP pe billing, `cif` NU mai face fallback pe
   CNP-ul din KYC (ar pune CNP-ul cumpărătorului pe factura altei persoane).
