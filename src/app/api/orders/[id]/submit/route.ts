@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse, after } from 'next/server';
 import { sanitizeClientFiles } from '@/lib/orders/client-files';
-import { settleCompanyDocuments } from '@/lib/orders/company-documents';
+import { classifyCompanyDocumentKey, settleCompanyDocuments } from '@/lib/orders/company-documents';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logAudit, getAuditContext } from '@/lib/security/audit-logger';
@@ -596,6 +596,39 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         copyFile,
         uploadBase64,
       });
+    }
+
+    // Company documents guard: the wizard step only exists when the service
+    // config says so, and nothing checked it here. `cazier-judiciar` (PF/PJ
+    // choice) lacked `documentsRequired`, so 5 paid PJ orders (19.10–06.11,
+    // e.g. E-261105-7ZTJ7) arrived with no registration certificate.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ck = (order.services as any)?.verification_config?.companyKyc;
+      const clientType = String(existingCustomerData.clientType ?? '').toLowerCase();
+      const isCompanyClient = !!companyData?.cui && clientType !== 'pf';
+      const required: string[] =
+        ck?.enabled && ck?.documentsRequired && Array.isArray(ck.requiredDocuments) ? ck.requiredDocuments : [];
+      if (isCompanyClient && required.length > 0) {
+        const docs = (companyData?.uploadedDocuments ?? []) as Array<{ type?: string; s3Key?: string }>;
+        const missingCompanyDocs = required.filter(
+          (t) => !docs.some((d) => d.type === t && !!d.s3Key && classifyCompanyDocumentKey(id, d.s3Key) !== 'foreign')
+        );
+        if (missingCompanyDocs.length > 0) {
+          console.error(`[submit] company documents missing: order ${id}, ${missingCompanyDocs.join(', ')}`);
+          return NextResponse.json(
+            {
+              success: false,
+              error: {
+                code: 'COMPANY_DOCUMENTS_INCOMPLETE',
+                message:
+                  'Lipsește certificatul de înregistrare al firmei (CUI). Te rugăm să revii la pasul „Documente firmă” și să îl încarci.',
+              },
+            },
+            { status: 400 }
+          );
+        }
+      }
     }
 
     // Acte de la client pentru identificarea imobilului: cheile vin din

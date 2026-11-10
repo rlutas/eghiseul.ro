@@ -33,9 +33,14 @@ contul are un front neexpirat și comanda nu are, iar
 (din `kyc/<user_id>/…`, HeadObject) în `kyc/<orderId>/` și în
 `uploadedDocuments` (`fromAccount: true`); (5) guard-ul numără doar obiectele
 din `kyc/<orderId>/` confirmate cu HeadObject; selfie-ul trebuie să difere de
-act după SHA-256; pașaportul acceptă `passport` și `passport_opened`.
+act după SHA-256; pașaportul acceptă `passport` și `passport_opened`;
+(6) documentele firmei (10.11.2026): când serviciul are
+`companyKyc.enabled` + `documentsRequired` și comanda e de firmă (`company.cui`
+prezent, `clientType` ≠ `pf`), fiecare tip din `requiredDocuments` trebuie să
+aibă un `s3Key` în namespace-ul comenzii, după `settleCompanyDocuments`.
 Erori: `FORBIDDEN`, `CONFIG_UNAVAILABLE` (503), `ACCOUNT_KYC_UNAVAILABLE`
-(503), `ACCOUNT_KYC_COPY_FAILED` (500), `KYC_INCOMPLETE` (400). La succes
+(503), `ACCOUNT_KYC_COPY_FAILED` (500), `KYC_INCOMPLETE` (400),
+`COMPANY_DOCUMENTS_INCOMPLETE` (400). La succes
 `resume_token` se șterge.
 
 ### `GET /api/courier/quote`

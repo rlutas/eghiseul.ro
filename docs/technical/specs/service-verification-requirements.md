@@ -16,7 +16,7 @@ This document defines the verification requirements for each service on eghiseul
 | Service | KYC Personal | KYC Company | Company Docs | Signature | Selfie | Parents Docs | Property Data | Vehicle Data |
 |---------|--------------|-------------|--------------|-----------|--------|--------------|---------------|--------------|
 | Cazier Fiscal | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Cazier Judiciar | ✅ | ⚡ PJ only | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Cazier Judiciar | ✅ | ⚡ PJ only | ⚡ PJ only | ✅ | ✅ | ❌ | ❌ | ❌ |
 | Cazier Auto | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Certificat Naștere | ✅ | ❌ | ❌ | ✅ | ✅ | ⚡ Minor | ❌ | ❌ |
 | Certificat Căsătorie | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
@@ -34,6 +34,8 @@ This document defines the verification requirements for each service on eghiseul
 - ❌ Not required
 
 > **Note:** The "Company Docs" column indicates whether the service requires company document uploads (e.g., Certificat de Inregistrare, Certificat Constatator). This column only applies to PJ orders and is controlled by the `companyKyc.documentsRequired` configuration field.
+>
+> ⚠️ **Rule (10.11.2026):** any service where a company can order (`companyKyc.enabled`, with or without `condition: "client_type == 'PJ'"`) needs `documentsRequired: true` + `requiredDocuments` in the DB config, unless the institution needs no company document (Certificat Constatator: ONRC works from the CUI). The combined `cazier-judiciar` flow (PF/PJ chosen in the wizard) lacked both keys until migration 203, so the „Documente Firmă” step never appeared and 5 paid PJ orders (19.10–06.11) came in without the CUI certificate. `/api/orders/[id]/submit` now refuses a PJ order whose required company documents are missing (`COMPANY_DOCUMENTS_INCOMPLETE`).
 
 ---
 

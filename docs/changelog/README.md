@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-10 | 🔴 **Cazier PJ: certificatul CUI obligatoriu pe fluxul combinat și pe CJO/ecazier** — migrarea 203 `documentsRequired` pe `cazier-judiciar`, guard `COMPANY_DOCUMENTS_INCOMPLETE` în `/submit`, `errs.cert` în `Step3Documents` CJO | [2026-11-10-cazier-pj-fara-certificat-cui.md](2026-11-10-cazier-pj-fara-certificat-cui.md) |
 | 2026-11-10 | ✅ **Celibat: născut în străinătate; apostilă: lista HCCH completă (Kârgâzstan, Jamaica)** — `civil_status.bornAbroad` + `birthCountry` la celibat, `birth_judet` = țara pe documente, `APOSTILA_COUNTRIES` 82 → 125 (HCCH) | [2026-11-10-celibat-nascut-strainatate-apostila.md](2026-11-10-celibat-nascut-strainatate-apostila.md) |
 | 2026-11-09 | 🔴 **Factura la client străin: regiunea sau orașul la „Județ”, nu „-”; campaniile din oră în oră** — `foreignInvoiceState()` pe eghiseul și CJO, cron `40 7-15 * * *` cu plafon pe zi din `email_campaign_sends` | [2026-11-09-judet-factura-strain-si-campanii-pe-ore.md](2026-11-09-judet-factura-strain-si-campanii-pe-ore.md) |
 | 2026-11-09 | 🔴 **Loguri Vercel: cron campanii tăiat la 300 s, salvare pierdută în middleware, căutare registru** — `RUN_DEADLINE_MS` + `sent_count` numărat din trimiteri, try/catch pe `updateSession()` în `proxy.ts`, `or()` curățat de virgule | [2026-11-09-loguri-vercel-reparatii.md](2026-11-09-loguri-vercel-reparatii.md) |
