@@ -22,6 +22,7 @@ import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { cn } from '@/lib/utils';
 import { useBrand } from '@/lib/brand/client';
 import { OrderFlowDisclosure } from '@/components/legal/order-flow-disclosure';
+import { BLACK_FRIDAY_CODE, blackFridayRate, isBlackFridayActive } from '@/lib/coupons/black-friday';
 
 interface OrderData {
   id: string;
@@ -203,8 +204,15 @@ export default function CheckoutPage() {
   // here; the CouponInput stays available for manual entry.
   const autoCouponTriedRef = useRef(false);
   useEffect(() => {
-    const code = searchParams.get('coupon')?.trim().toUpperCase();
-    if (!code || !order || order.coupon_code || autoCouponTriedRef.current) return;
+    // Black Friday applies itself here: this page is where every wizard order
+    // pays (the Review step that held the auto-apply was dropped on
+    // 27.05.2026), so 8 of 12 paid orders between 06.11 and 09.11 paid full
+    // price. A code from the URL still wins.
+    const urlCode = searchParams.get('coupon')?.trim().toUpperCase();
+    const blackFridayCode =
+      order && isBlackFridayActive() && blackFridayRate(order.service_slug) > 0 ? BLACK_FRIDAY_CODE : null;
+    const code = urlCode || blackFridayCode;
+    if (!code || !order || order.coupon_code || order.payment_status === 'paid' || autoCouponTriedRef.current) return;
     autoCouponTriedRef.current = true;
     (async () => {
       try {
