@@ -17,6 +17,7 @@ Index al documentației SEO. Status curent al expansiunii: [`SEO-STATUS-2026-06-
 ## Planuri & referințe (vii)
 | Fișier | Rol |
 |---|---|
+| [`2026-11-10-plan-crestere-organic/`](2026-11-10-plan-crestere-organic/README.md) | 🔴 **PLANUL CURENT (10.11.2026)**: plan de creștere organic nov 2026 – feb 2027 pe 4 site-uri, din GSC 16 luni, GA4 + comenzi, Bing, crawl CJO și SERP real. CJO prioritar: 404 pe sluguri inventate, meniu randat pe server, canibalizare, drum spre comandă pe ghidurile care rankează; eghiseul: paginile de bani câte una pe săptămână; fără site nou, fără linkuri cumpărate |
 | [`2026-11-04-cjo-diagnostic-trafic.md`](2026-11-04-cjo-diagnostic-trafic.md) | 🔴 **CURENT (04.11.2026)**: diagnostic CJO: fără acțiune manuală sau problemă tehnică; ruptură pe 18–19.10; eghiseul se stabilizează, CJO continuă să scadă |
 | [`2026-11-03-cadere-mijloc-octombrie-urmarire.md`](2026-11-03-cadere-mijloc-octombrie-urmarire.md) | 🔴 **CURENT (03.11.2026)**: clicurile CJO −68% și eghiseul −44% din 16–19.10; în SERP, Hub MAI „GRATUIT” pe 1–2 și 4 concurenți cu Ads pe caziere; plan în 4 puncte + tabel de urmărire săptămânală (completat lunea) |
 | [`2026-10-05-ecazier-documentero-stare-organic.md`](2026-10-05-ecazier-documentero-stare-organic.md) | 🔵 **STARE 05.10** — de ce ecazier și documentero nu urcă: indexarea e OK (ecazier 14/15; documentero e domeniu de 12 zile); ecazier are șanse doar pe cazier auto (poziții 4–8), pe fiscal pierde la CJO (28 vs 5,9); documentero e testat de Google pe coada lungă (poziții 7–15) |
