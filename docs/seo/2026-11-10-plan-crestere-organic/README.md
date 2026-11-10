@@ -115,6 +115,8 @@ Nu atinge textul paginilor de oraș, deci nu strică testul din 17.11.
 | 0.6 | `dateModified` real pe pagină, nu bump global | 63 din 75 de pagini au 02.11 pentru o schimbare de preț făcută pe 4 (regula 3) | `src/config/page-dates.ts` | — | — |
 | 0.7 | Linkuri contextuale spre paginile informaționale bune care au doar 1–3 linkuri primite | `/conditii-de-calatorie-cu-minori` are 8,1k afișări și 1 link; fiscal pentru străini, verificare fiscal și angajare au 1–3 | corpul paginilor + un bloc „Ghiduri legate” | — | poziția acestor pagini în 3–4 săptămâni |
 
+**Stare 10.11: livrată** (commit CJO `cd76eb27`), fără 0.6: datele de 02.11 corespund unor corecturi reale de text, verificate în git. Detalii: [changelog](../../changelog/2026-11-10-cjo-faza-0-seo-tehnic.md).
+
 Riscul fazei: zero pe conținut. 0.2 schimbă HTML-ul header-ului: de verificat vizual pe mobil că meniul arată la fel.
 
 ### Faza 1: 17.11 – 07.12. Paginile de bani CJO și canibalizarea
