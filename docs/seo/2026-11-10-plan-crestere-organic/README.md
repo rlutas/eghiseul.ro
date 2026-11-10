@@ -51,6 +51,7 @@ Anexele sunt în dosarul acesta. Cifrele de vânzări pe pagină rămân în afa
 | Canibalizare: 123 de interogări cu 2 sau mai multe URL-uri CJO. Perechile mari: `/` cu `/cazier-judiciar-gratuit`, `/` cu `/taxa-cazier-judiciar`, `/` cu `/eliberare-cazier-judiciar-online` | 01 §5.1, 03 |
 | Tehnic: canonical, redirecturi și robots sunt curate. CWV pe home: lab LCP 4,1 s pe mobil, field încă „bun” (2,32 s) dar în creștere | 03 |
 | Profil de linkuri: ~63 de domenii, zero căutări pe brand | 02 |
+| Înainte și după update, pe proprietatea veche (prefix URL, istoric din iulie 2025): 13.07–09.08 = 14,4k clicuri, 335k afișări, CTR 4,3%, poziție 5,2; 11.10–07.11 = 5,68k clicuri (−61%), 263k afișări (−21%), CTR 2,2%, poziție 6,0. Cele mai mari pierderi: orașele (Constanța 627 → 208, Craiova 608 → 187, Brăila 445 → 58), condiții de călătorie cu minori 490 → 56, home 489 → 167 | GSC UI, 10.11 |
 
 ### eghiseul
 
@@ -164,7 +165,7 @@ Indicator: afișările săptămânale pe `/servicii/` (anexa 01 §1.2). Primul s
 |---|---|---|
 | 3.1 | Trimite cererile `rel="sponsored"` pentru linkurile plătite ale CJO (Antena 3 ×2, ProTV, infocons): redactate, netrimise | linkuri plătite fără marcaj sunt risc de spam pe linkuri |
 | 3.2 | Comunicat cu date proprii agregate din comenzi (ex. „cât durează un cazier în fiecare județ”) | singura sursă de linkuri editoriale câștigate; CJO are 0 căutări pe brand |
-| 3.3 | Profil de companie Google pentru firmă, cu recenziile adunate acolo | stelele de la 1.6 au nevoie de o sursă curentă și verificabilă |
+| 3.3 | ~~Profil de companie Google nou~~ — nu facem altul. Folosim profilul eGhișeul existent ca sursă a recenziilor (decizia din 10.11) | stelele de la 1.6 au nevoie de o sursă curentă și verificabilă; o avem deja |
 
 ### Faza 4, continuu: Bing
 
@@ -198,12 +199,12 @@ Bing IndexNow e deja pe ambele repo-uri. Bing urmărit lunar în raportul `monit
 
 ---
 
-## 6. Decizii pentru Raul
+## 6. Decizii (luate pe 10.11)
 
-1. **Recenziile ca marcaj (1.6):** le punem pe CJO, cu recenziile Google reale vizibile în pagină? Recenziile sunt ale profilului eGhișeul.ro, deci trebuie scris clar în pagină de unde vin.
-2. **Profil de companie Google (3.3):** pentru ce firmă și ce adresă?
-3. **Comunicatul cu date agregate (3.2):** e acceptabil să publicăm termene medii pe județ din comenzile noastre?
-4. **Proprietate GSC veche pentru CJO:** dacă există una înainte de 20.09 pe alt cont Google, trebuie partajată cu claude-seo. Fără ea nu putem măsura cât a pierdut CJO în august.
+1. **Recenziile ca marcaj (1.6): DA, pe CJO.** Recenziile Google reale stau vizibile în pagină, iar pagina spune clar că vin din profilul eGhișeul.ro. Intră în Faza 1, după verdictul din 17.11.
+2. **Profil de companie Google (3.3): NU facem unul nou.** Sursa recenziilor rămâne profilul eGhișeul existent.
+3. **Comunicatul cu date agregate (3.2): DA.** Doar termene medii pe județ, calculate din comenzi; fără nume, fără date despre clienți, fără cifre de vânzări. Faza 3.
+4. **Proprietate GSC veche pentru CJO: EXISTĂ.** `https://cazierjudiciaronline.com/` (prefix URL), pe contul Google care deține CJO, are istoric din iulie 2025. Cifrele înainte/după sunt în §1, CJO. Contul claude-seo nu e încă adăugat pe ea: trebuie adăugat manual (Setări → Utilizatori și permisiuni → Adaugă, permisiune „Restricționată”). După asta, scriptul lunar poate citi și august.
 
 ---
 
