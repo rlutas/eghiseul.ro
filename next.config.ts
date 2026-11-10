@@ -17,12 +17,12 @@ const DOCUMENTERO_HOST_RE = `(?:${DOCUMENTERO_HOSTS.map((h) => h.replace(/[.*+?^
 const onDocumentero = [{ type: 'host' as const, value: DOCUMENTERO_HOST_RE }];
 
 /**
- * Hosts served as cazier-fiscal.ro (third brand, 2026-11-10): same pattern as
+ * Hosts served as cazierfiscal.com (third brand, 2026-11-10): same pattern as
  * documentero, route group `src/app/cazierfiscal/`.
  */
 const CAZIERFISCAL_HOSTS = [
-  'cazier-fiscal.ro',
-  'www.cazier-fiscal.ro',
+  'cazierfiscal.com',
+  'www.cazierfiscal.com',
   ...(process.env.CAZIERFISCAL_EXTRA_HOSTS ?? '')
     .split(',')
     .map((h) => h.trim().toLowerCase())
@@ -87,7 +87,7 @@ const nextConfig: NextConfig = {
           has: onDocumentero,
           destination: '/documentero/:path',
         },
-        // cazier-fiscal.ro — same rules, its own group.
+        // cazierfiscal.com — same rules, its own group.
         { source: '/', has: onCazierFiscal, destination: '/cazierfiscal' },
         { source: '/robots.txt', has: onCazierFiscal, destination: '/cazierfiscal/robots.txt' },
         { source: '/sitemap.xml', has: onCazierFiscal, destination: '/cazierfiscal/sitemap.xml' },

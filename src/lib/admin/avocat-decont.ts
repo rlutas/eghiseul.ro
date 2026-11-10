@@ -245,7 +245,7 @@ async function loadEghiseul(range: { start: string; end: string } | null, warnin
       id: o.id,
       // Same DB, two brands: documentero orders are labelled so the decont
       // shows where each came from (2026-09-19).
-      // cazier-fiscal.ro orders (2026-11-10) are counted with eghiseul: same
+      // cazierfiscal.com orders (2026-11-10) are counted with eghiseul: same
       // Stripe account, same registry platform.
       platform: o.platform === 'documentero' ? 'documentero' : 'eghiseul',
       orderNumber: o.order_number,

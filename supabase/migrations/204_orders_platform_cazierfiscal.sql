@@ -1,5 +1,5 @@
 -- =============================================================================
--- 204 — orders.platform: third brand cazier-fiscal.ro (2026-11-10)
+-- 204 — orders.platform: third brand cazierfiscal.com (2026-11-10)
 -- =============================================================================
 -- Same deployment, DB and admin as eghiseul.ro and documentero.ro
 -- (src/lib/brand/brands.ts). The draft route stamps the brand of the request

@@ -22,7 +22,7 @@ function Col({ title, items }: { title: string; items: ReadonlyArray<{ label: st
 }
 
 /**
- * cazier-fiscal.ro footer. Same legal obligations as the documentero and
+ * cazierfiscal.com footer. Same legal obligations as the documentero and
  * eghiseul footers: company data, ANPC badges (SAL + EU consumer redress),
  * the consumer phone line and the non-affiliation disclosure (ANAF).
  */
@@ -74,7 +74,7 @@ export function FooterCazierFiscal() {
         <div className="mt-10 border-t border-d-line pt-6">
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col gap-1 text-[12px] leading-relaxed text-d-muted">
-              <span>© {new Date().getFullYear()} cazier-fiscal.ro · {ORGANIZATION.legalName}</span>
+              <span>© {new Date().getFullYear()} cazierfiscal.com · {ORGANIZATION.legalName}</span>
               <span>
                 CUI {ORGANIZATION.cui} · Reg. Com. {ORGANIZATION.regCom} · {ORGANIZATION.address.region},{' '}
                 {ORGANIZATION.address.locality}, {ORGANIZATION.address.street}
@@ -99,7 +99,7 @@ export function FooterCazierFiscal() {
             </div>
           </div>
           <p className="m-0 mt-5 text-[12px] leading-relaxed text-d-muted">
-            cazier-fiscal.ro este un serviciu privat de asistență și intermediere al {ORGANIZATION.legalName}. Nu suntem
+            cazierfiscal.com este un serviciu privat de asistență și intermediere al {ORGANIZATION.legalName}. Nu suntem
             instituție de stat și nu suntem afiliați ANAF sau altei autorități. Certificatul de cazier fiscal îl eliberează
             exclusiv ANAF și poate fi obținut și direct, gratuit, la ghișeu sau din SPV; tariful nostru acoperă asistența,
             reprezentarea prin avocat înscris în Barou și livrarea.

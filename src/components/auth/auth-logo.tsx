@@ -19,7 +19,7 @@ export function AuthLogo({ size = 'sm' }: { size?: 'sm' | 'lg' }) {
   const brand = useBrand();
   if (brand.id === 'cazierfiscal') {
     return (
-      <Link href="/" className="inline-flex items-center" aria-label="cazier-fiscal.ro — acasă">
+      <Link href="/" className="inline-flex items-center" aria-label="cazierfiscal.com — acasă">
         <CazierFiscalLogo size={size === 'lg' ? 24 : 20} onDark />
       </Link>
     );

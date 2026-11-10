@@ -12,7 +12,7 @@ export const metadata = buildPageMetadata({
   brand: 'cazierfiscal',
   title: 'Termeni și condiții',
   description:
-    'Termenii și condițiile de utilizare a platformei cazier-fiscal.ro (eDigitalizare SRL): cazier fiscal pentru persoane fizice, prin avocat, ' +
+    'Termenii și condițiile de utilizare a platformei cazierfiscal.com (eDigitalizare SRL): cazier fiscal pentru persoane fizice, prin avocat, ' +
     'comandă, plată, termene, livrare, anulare și rambursare, semnătură electronică, GDPR și răspundere.',
   path: PATH,
   noindex: !CAZIERFISCAL_INDEXABLE,
@@ -23,7 +23,7 @@ export const revalidate = 86400;
 /**
  * Same company and the same provisions as eghiseul.ro/termeni-si-conditii/
  * (src/app/(eghiseul)/termeni-si-conditii/page.tsx) and documentero, scoped
- * to what cazier-fiscal.ro sells: the cazier fiscal for natural persons,
+ * to what cazierfiscal.com sells: the cazier fiscal for natural persons,
  * obtained through the partner lawyer. The cancellation percentages and windows are copied as-is; the
  * cancel endpoint enforces the same rules on both brands.
  */
@@ -41,16 +41,16 @@ export default function Page() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
       <LegalLayoutCazierFiscal title="Termeni și condiții" path={PATH}>
         <p>
-          Acești Termeni și Condiții reglementează utilizarea platformei <strong>cazier-fiscal.ro</strong>, operată de
+          Acești Termeni și Condiții reglementează utilizarea platformei <strong>cazierfiscal.com</strong>, operată de
           <strong> eDigitalizare SRL</strong> (CUI RO49278701, Reg. Com. J2023001097301, sediul în Jud. Satu Mare,
-          Com. Odoreu, Str. Salcâmilor nr. 2), denumită în continuare „cazier-fiscal.ro”, „Prestatorul” sau „noi”. Prin
+          Com. Odoreu, Str. Salcâmilor nr. 2), denumită în continuare „cazierfiscal.com”, „Prestatorul” sau „noi”. Prin
           accesarea platformei și plasarea unei comenzi, confirmi că ai citit, înțeles și acceptat integral acești
           termeni. Dacă nu ești de acord cu oricare prevedere, te rugăm să nu utilizezi serviciile.
         </p>
 
         <h2>1. Definiții</h2>
         <ul>
-          <li><strong>Platforma</strong>: site-ul cazier-fiscal.ro, cu toate paginile, formularele și funcționalitățile.</li>
+          <li><strong>Platforma</strong>: site-ul cazierfiscal.com, cu toate paginile, formularele și funcționalitățile.</li>
           <li><strong>Prestatorul</strong>: eDigitalizare SRL, cu datele de mai sus.</li>
           <li><strong>Beneficiarul (Clientul)</strong>: orice persoană fizică ce utilizează serviciile, pentru sine sau, cu împuternicire, pentru un membru al familiei.</li>
           <li><strong>Serviciile</strong>: serviciul privat de asistență la obținerea certificatului de cazier fiscal de la ANAF, prin avocat.</li>
@@ -60,7 +60,7 @@ export default function Page() {
 
         <h2>2. Serviciile noastre</h2>
         <p>
-          cazier-fiscal.ro este o platformă privată de asistență și intermediere. Nu suntem o instituție publică și nu
+          cazierfiscal.com este o platformă privată de asistență și intermediere. Nu suntem o instituție publică și nu
           suntem afiliați niciunui organ guvernamental; acționăm în numele tău, pe bază de contract de asistență
           juridică și împuternicire avocațială, pentru depunerea cererilor și ridicarea actelor. Certificatul de cazier
           fiscal este emis exclusiv de Agenția Națională de Administrare Fiscală (ANAF), care îl eliberează și direct,

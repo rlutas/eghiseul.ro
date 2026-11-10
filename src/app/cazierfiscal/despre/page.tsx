@@ -17,7 +17,7 @@ export const metadata = buildPageMetadata({
   brand: 'cazierfiscal',
   title: 'Despre noi: cine obține cazierul fiscal pentru tine',
   description:
-    'cazier-fiscal.ro este un serviciu al eDigitalizare SRL (eghiseul.ro), Satu Mare. Cererea la ANAF o depune avocat Tarța Ana Gabriela, Baroul Satu Mare.',
+    'cazierfiscal.com este un serviciu al eDigitalizare SRL (eghiseul.ro), Satu Mare. Cererea la ANAF o depune avocat Tarța Ana Gabriela, Baroul Satu Mare.',
   path: PATH,
   noindex: !CAZIERFISCAL_INDEXABLE,
 });
@@ -52,7 +52,7 @@ export default function DesprePage() {
             Un singur document, făcut bine: cazierul fiscal.
           </h1>
           <p className="m-0 max-w-[760px] text-[17px] leading-[1.6] text-d-muted sm:text-[18px]">
-            cazier-fiscal.ro este un serviciu al {ORGANIZATION.legalName}, firma din Satu Mare din spatele{' '}
+            cazierfiscal.com este un serviciu al {ORGANIZATION.legalName}, firma din Satu Mare din spatele{' '}
             <a href={BRANDS.eghiseul.baseUrl} className="underline underline-offset-2">eghiseul.ro</a>. Din 2023 obținem
             documente de la instituțiile din România pentru oameni care nu au timp de ghișeu sau nu au cont SPV. Pe
             eghiseul.ro avem peste {SOCIAL_PROOF.roundedDown} de recenzii pe Google, cu nota {rating} din 5.
@@ -76,7 +76,7 @@ export default function DesprePage() {
               <span className="text-[14px] text-d-muted">{LAWYER.title} · {LAWYER.experience}</span>
               <p className="m-0 text-[15px] leading-[1.6] text-d-body">
                 Cabinet individual în Satu Mare ({LAWYER.office}). Lucrează pentru clienții eghiseul.ro, documentero.ro
-                și cazier-fiscal.ro.
+                și cazierfiscal.com.
               </p>
               <a href={LAWYER.site} target="_blank" rel="noopener" className="mt-1 text-[14px] font-semibold text-d-ink underline decoration-d-acc underline-offset-2">avocat-tarta.ro</a>
             </div>

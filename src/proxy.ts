@@ -25,7 +25,7 @@ const WORDPRESS_GONE = /^\/(wp-admin|wp-content|wp-includes|wp-json)(\/|$)|^\/(w
  * Middleware sees the path as the user sent it, before the rewrite, so this
  * never touches the rewritten requests.
  */
-const BRAND_INTERNAL = /^\/(documentero|cazierfiscal)(\/|$)/  // + cazier-fiscal.ro group (2026-11-10)
+const BRAND_INTERNAL = /^\/(documentero|cazierfiscal)(\/|$)/  // + cazierfiscal.com group (2026-11-10)
 /**
  * The only files under `/documentero/` that must stay reachable: the icons
  * Next.js emits from `src/app/documentero/icon.png` and `apple-icon.png`

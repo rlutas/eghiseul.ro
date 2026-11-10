@@ -3,7 +3,7 @@ import { CAZIERFISCAL_NAV, CAZIERFISCAL_ORDER_HREF, CAZIERFISCAL_TRACK_HREF } fr
 import { CazierFiscalLogo } from './logo';
 
 /**
- * cazier-fiscal.ro header: server component, no client JS. Used by the public
+ * cazierfiscal.com header: server component, no client JS. Used by the public
  * pages and by the shared wizard/checkout/status routes on this host
  * (src/app/(order)/layout.tsx). Under 1024px the links sit in a <details>
  * menu, which works without JavaScript. The order button is always visible.
@@ -13,7 +13,7 @@ export function HeaderCazierFiscal({ active }: { active?: string }) {
   return (
     <header className="sticky top-0 z-40 border-b border-d-line bg-d-bg/90 backdrop-blur-md">
       <div className="mx-auto flex h-[68px] max-w-[1312px] items-center justify-between gap-3 px-3 sm:gap-6 sm:px-6 lg:px-8">
-        <Link href="/" aria-label="cazier-fiscal.ro — Acasă" className="shrink-0 hover:opacity-85">
+        <Link href="/" aria-label="cazierfiscal.com — Acasă" className="shrink-0 hover:opacity-85">
           <span className="sm:hidden"><CazierFiscalLogo size={17} /></span>
           <span className="hidden sm:inline"><CazierFiscalLogo size={20} /></span>
         </Link>

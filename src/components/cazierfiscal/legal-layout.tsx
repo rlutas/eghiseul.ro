@@ -4,7 +4,7 @@ import { HeaderCazierFiscal } from './header';
 import { Eyebrow, Section } from '@/components/documentero/ui';
 
 /**
- * Shared frame for the cazier-fiscal.ro legal pages (termeni, confidențialitate,
+ * Shared frame for the cazierfiscal.com legal pages (termeni, confidențialitate,
  * anulare, cookies): header lit on the page's path, a small breadcrumb, the
  * title with the last-updated date, then one prose column. Same obligations
  * as src/components/legal/legal-layout.tsx (eghiseul), documentero's look:

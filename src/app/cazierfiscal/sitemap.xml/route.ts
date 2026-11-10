@@ -3,7 +3,7 @@ import { CAZIERFISCAL_SITEMAP } from '@/config/cazierfiscal-sitemap';
 import { CAZIERFISCAL_GUIDES, CAZIERFISCAL_INDEXABLE } from '@/config/cazierfiscal-nav';
 
 /**
- * sitemap.xml for cazier-fiscal.ro: curated list (content rules §4). Guides
+ * sitemap.xml for cazierfiscal.com: curated list (content rules §4). Guides
  * come from CAZIERFISCAL_GUIDES, so a guide is listed once its page exists.
  * Empty until launch, same as the noindex on every page.
  */

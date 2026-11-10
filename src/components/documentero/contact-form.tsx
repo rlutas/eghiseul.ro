@@ -25,7 +25,7 @@ const label = 'text-[13px] font-bold text-d-ink';
 
 /**
  * Copy that changes per site. documentero passes nothing (civil-status
- * defaults); cazier-fiscal.ro passes its own topics (2026-11-10).
+ * defaults); cazierfiscal.com passes its own topics (2026-11-10).
  */
 export interface ContactFormCopy {
   topics?: ReadonlyArray<readonly [string, string]>;

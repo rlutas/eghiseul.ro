@@ -129,7 +129,7 @@ const EMAIL_HOSTS: Array<[RegExp, string]> = [
 const NETWORK: Array<[RegExp, string]> = [
   [/(^|\.)eghiseul\.ro$/, 'eghiseul'],
   [/(^|\.)documentero\.ro$/, 'documentero'],
-  [/(^|\.)cazier-fiscal\.ro$/, 'cazierfiscal'],
+  [/(^|\.)cazierfiscal\.com$/, 'cazierfiscal'],
   [/(^|\.)ecazier\.ro$/, 'ecazier'],
   [/(^|\.)cazierjudiciaronline\.com$/, 'cazierjudiciaronline'],
   [/(^|\.)avocat-tarta\.ro$/, 'avocat-tarta'],

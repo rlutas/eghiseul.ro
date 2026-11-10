@@ -1,6 +1,6 @@
 # Două branduri, un deploy: eghiseul.ro + documentero.ro
 
-> **10.11.2026:** al treilea brand, `cazier-fiscal.ro` (`cazierfiscal`), pe același mecanism: grupul `src/app/cazierfiscal/`, `CAZIERFISCAL_EXTRA_HOSTS`, migrarea 204. Vezi [`../../cazier-fiscal/README.md`](../../cazier-fiscal/README.md).
+> **10.11.2026:** al treilea brand, `cazierfiscal.com` (`cazierfiscal`), pe același mecanism: grupul `src/app/cazierfiscal/`, `CAZIERFISCAL_EXTRA_HOSTS`, migrarea 204. Vezi [`../../cazier-fiscal/README.md`](../../cazier-fiscal/README.md).
 
 **Stare:** fundația LIVE din 19.09.2026 (rutare pe host, brand pe comandă,
 emailuri, admin). Paginile publice documentero se scriu separat (vezi

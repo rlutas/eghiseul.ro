@@ -1,6 +1,6 @@
-# cazier-fiscal.ro: al treilea brand, doar cazier fiscal
+# cazierfiscal.com: al treilea brand, doar cazier fiscal
 
-**Stare (10.11.2026):** codul e gata pe branch-ul `feat/brand-cazier-fiscal`. Site-ul nu e încă live. Pentru lansare lipsesc trei lucruri, listate mai jos.
+**Stare (10.11.2026):** codul e gata pe branch-ul `feat/brand-cazier-fiscal`. Domeniul e cumpărat în Vercel și legat de proiect, iar proprietatea Search Console e verificată. Site-ul intră live după migrarea 204 și merge.
 
 ## De ce
 
@@ -21,7 +21,7 @@ Paginile de fiscal de pe CJO rămân. A decis Raul: le păstrăm până crește 
 
 Același repo, același deploy Vercel, aceeași bază de date, același admin, același Stripe și aceeași avocată ca eghiseul.ro și documentero.ro. Mecanismul e cel din [`../technical/specs/multi-brand.md`](../technical/specs/multi-brand.md):
 
-- brandul `cazierfiscal` în `src/lib/brand/brands.ts`, domeniul `cazier-fiscal.ro`, vinde doar `cazier-fiscal`;
+- brandul `cazierfiscal` în `src/lib/brand/brands.ts`, domeniul `cazierfiscal.com`, vinde doar `cazier-fiscal`;
 - hostul e rescris spre `src/app/cazierfiscal/` (`next.config.ts`), iar calea internă dă 404 (`src/proxy.ts`);
 - wizardul, plata, statusul și contul sunt partajate, cu header și paletă proprii;
 - comenzile primesc `orders.platform = 'cazierfiscal'` (migrarea 204), iar în admin au filtru și badge „cazier-fiscal”;
@@ -37,10 +37,10 @@ Reguli: [`../../.claude/rules/content-and-seo.md`](../../.claude/rules/content-a
 ## Pași pentru lansare
 
 1. **Migrarea 204** pe baza eghiseul. Fără ea, comanda de pe hostul nou cade la constrângerea `orders_platform_check`.
-2. **Domeniul:** se adaugă `cazier-fiscal.ro` și `www.cazier-fiscal.ro` în proiectul Vercel `eghiseul-ro`; la registrar (cyberfolks) DNS-ul se pune spre Vercel.
-3. **Resend:** se verifică domeniul `cazier-fiscal.ro` și se adaugă în `RESEND_VERIFIED_DOMAINS`. Până atunci emailurile pleacă de pe adresa eghiseul.
-4. **Search Console:** proprietate Domain `cazier-fiscal.ro` (TXT în DNS) și acces pentru contul de serviciu claude-seo.
-5. Merge pe `main`, apoi `CAZIERFISCAL_INDEXABLE = true`, trimiterea sitemap-ului și IndexNow (cheia e în `src/lib/seo/indexnow.ts`).
+2. ✅ **Domeniul:** `cazierfiscal.com` e cumpărat în Vercel (DNS pe Vercel). `cazierfiscal.com` și `www.cazierfiscal.com` sunt în proiectul `eghiseul-ro`.
+3. **Resend:** blocat, planul Resend a atins limita de domenii. După upgrade: se verifică `cazierfiscal.com` și se adaugă în `RESEND_VERIFIED_DOMAINS`. Până atunci emailurile pleacă de pe adresa eghiseul (fallback automat).
+4. ✅ **Search Console:** proprietatea Domain `sc-domain:cazierfiscal.com` e verificată prin TXT; contul de serviciu claude-seo e owner.
+5. Merge pe `main` (`CAZIERFISCAL_INDEXABLE` e deja `true`), apoi trimiterea sitemap-ului și IndexNow (cheia e în `src/lib/seo/indexnow.ts`).
 6. **Opțional:** stream GA4 propriu (`NEXT_PUBLIC_GA_MEASUREMENT_ID_CAZIERFISCAL`). Până atunci datele intră în streamul eghiseul, filtrabil pe hostname.
 
 ## Ce urmărim

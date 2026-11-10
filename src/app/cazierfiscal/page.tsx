@@ -37,7 +37,7 @@ const ANAF_SPV = 'https://www.anaf.ro/anaf/internet/ANAF/servicii_online/inregis
 const FAQ = [
   {
     q: 'Sunteți ANAF?',
-    a: 'Nu. cazier-fiscal.ro este un serviciu privat al eDigitalizare SRL. Certificatul de cazier fiscal îl eliberează numai ANAF; noi depunem cererea în numele tău, prin avocat, și ți-l trimitem.',
+    a: 'Nu. cazierfiscal.com este un serviciu privat al eDigitalizare SRL. Certificatul de cazier fiscal îl eliberează numai ANAF; noi depunem cererea în numele tău, prin avocat, și ți-l trimitem.',
   },
   {
     q: 'Pot să-l iau gratuit?',

@@ -416,7 +416,7 @@ export default function AdminOrdersPage() {
         />
         <SandboxChip
           active={urlPlatform === 'cazierfiscal'}
-          label="cazier-fiscal.ro"
+          label="cazierfiscal.com"
           onClick={() => updateParams({ platform: urlPlatform === 'cazierfiscal' ? null : 'cazierfiscal' })}
         />
       </div>
@@ -632,10 +632,10 @@ export default function AdminOrdersPage() {
                       )}
                       {order.platform === 'cazierfiscal' && (
                         <span
-                          title="Comandă plasată pe cazier-fiscal.ro"
+                          title="Comandă plasată pe cazierfiscal.com"
                           className="inline-flex items-center rounded border border-orange-300 bg-orange-50 px-1 py-0 text-[9px] font-semibold uppercase tracking-wide text-orange-800"
                         >
-                          cazier-fiscal
+                          cazierfiscal
                         </span>
                       )}
                       {order.payment_status === 'paid' && !order.invoice_number && (

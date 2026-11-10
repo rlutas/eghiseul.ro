@@ -1,10 +1,10 @@
 /**
- * Navigation + indexing switch for cazier-fiscal.ro (third brand, 2026-11-10).
+ * Navigation + indexing switch for cazierfiscal.com (third brand, 2026-11-10).
  * One service, so no mega menu: the order button goes straight to the wizard.
  */
 
-/** Flip to true once the domain points at Vercel and the content is reviewed. */
-export const CAZIERFISCAL_INDEXABLE = false;
+/** Launched 10.11.2026: pages indexable, sitemap served. */
+export const CAZIERFISCAL_INDEXABLE = true;
 
 export const CAZIERFISCAL_ORDER_HREF = '/comanda/cazier-fiscal/';
 export const CAZIERFISCAL_TRACK_HREF = '/comanda/status/';

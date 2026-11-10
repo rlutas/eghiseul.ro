@@ -23,7 +23,7 @@ export const revalidate = 86400;
 /**
  * Same rules as eghiseul.ro/politica-de-anulare/ (src/app/(eghiseul)/politica-de-anulare/page.tsx):
  * the lists come from the DB (`processing_config.allow_self_cancel`), limited to
- * the services cazier-fiscal.ro sells, so the page can never drift from what the
+ * the services cazierfiscal.com sells, so the page can never drift from what the
  * cancel endpoint enforces. Revalidated daily with the page.
  */
 async function getCancellationLists(): Promise<{ cancellable: string[]; excluded: string[] }> {
@@ -132,7 +132,7 @@ export default async function Page() {
           </>
         ) : (
           <p>
-            În prezent, cazierul fiscal comandat pe cazier-fiscal.ro poate fi anulat în fereastra de 30 de minute.
+            În prezent, cazierul fiscal comandat pe cazierfiscal.com poate fi anulat în fereastra de 30 de minute.
           </p>
         )}
         <p>
@@ -184,7 +184,7 @@ export default async function Page() {
 
         <p>
           Politica completă, împreună cu restul condițiilor contractuale, este parte din{' '}
-          <Link href="/termeni-si-conditii/#anulare">Termenii și condițiile</Link> cazier-fiscal.ro
+          <Link href="/termeni-si-conditii/#anulare">Termenii și condițiile</Link> cazierfiscal.com
           (secțiunea 8).
         </p>
       </LegalLayoutCazierFiscal>

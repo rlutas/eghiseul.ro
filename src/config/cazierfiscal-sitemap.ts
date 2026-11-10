@@ -1,5 +1,5 @@
 /**
- * Curated sitemap of cazier-fiscal.ro. A page goes here only when it is
+ * Curated sitemap of cazierfiscal.com. A page goes here only when it is
  * written, reviewed and meant to be indexed (content rules §2 and §4).
  * Public paths on the cazier-fiscal host, with trailing slash.
  */

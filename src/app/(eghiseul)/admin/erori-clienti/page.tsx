@@ -41,7 +41,7 @@ const KIND_LABEL: Record<string, string> = {
 const PLATFORM_LABEL: Record<string, string> = {
   eghiseul: 'eghiseul',
   documentero: 'documentero',
-  cazierfiscal: 'cazier-fiscal',
+  cazierfiscal: 'cazierfiscal',
   cjo: 'CJO',
   ecazier: 'ecazier',
 };

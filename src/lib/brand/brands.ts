@@ -82,7 +82,7 @@ export const DOCUMENTERO_SERVICE_SLUGS = [
 ] as const;
 
 /**
- * cazier-fiscal.ro (2026-11-10): single-service niche site for the cazier
+ * cazierfiscal.com (2026-11-10): single-service niche site for the cazier
  * fiscal, same backend. Raul's call after seeing cazierauto.ro (one-topic
  * site, live since 06.2026) rank above us; eghiseul sits at position 55–80
  * on the fiscal queries and CJO at 7–9. CJO keeps its fiscal pages.
@@ -137,18 +137,18 @@ export const BRANDS: Record<BrandId, Brand> = {
   },
   cazierfiscal: {
     id: 'cazierfiscal',
-    name: 'cazier-fiscal.ro',
-    domain: 'cazier-fiscal.ro',
-    baseUrl: 'https://cazier-fiscal.ro',
+    name: 'cazierfiscal.com',
+    domain: 'cazierfiscal.com',
+    baseUrl: 'https://cazierfiscal.com',
     // No mailbox on the new domain: every address a person writes to is the
     // eghiseul inbox, as on documentero. Sending falls back to the eghiseul
-    // sender until cazier-fiscal.ro is verified in Resend
+    // sender until cazierfiscal.com is verified in Resend
     // (RESEND_VERIFIED_DOMAINS, src/lib/email/resend.ts).
     contactEmail: 'contact@eghiseul.ro',
     phoneDisplay: '+40 757 708 181',
     whatsappNumber: '40757708181',
-    emailFrom: 'cazier-fiscal.ro <contact@cazier-fiscal.ro>',
-    emailLogoUrl: 'https://cazier-fiscal.ro/images/cazierfiscal/email-logo.png',
+    emailFrom: 'cazierfiscal.com <contact@cazierfiscal.com>',
+    emailLogoUrl: 'https://cazierfiscal.com/images/cazierfiscal/email-logo.png',
     // Palette: docs/cazier-fiscal/README.md (aubergine + coral).
     emailHeaderBg: '#2A1438',
     emailCtaBg: '#FF8A5B',
@@ -159,9 +159,9 @@ export const BRANDS: Record<BrandId, Brand> = {
     // are allocated on the eghiseul platform, so the central registry needs
     // no new platform value.
     registryPlatform: 'eghiseul',
-    legalBaseUrl: 'https://cazier-fiscal.ro',
+    legalBaseUrl: 'https://cazierfiscal.com',
     legalTagline:
-      'eDigitalizare SRL · CUI RO49278701 · cazier-fiscal.ro este un serviciu privat de asistență la obținerea cazierului fiscal; nu suntem instituție de stat și nu suntem afiliați ANAF.',
+      'eDigitalizare SRL · CUI RO49278701 · cazierfiscal.com este un serviciu privat de asistență la obținerea cazierului fiscal; nu suntem instituție de stat și nu suntem afiliați ANAF.',
   },
 };
 

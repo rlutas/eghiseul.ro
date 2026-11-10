@@ -209,6 +209,15 @@ export function Footer() {
               </a>
               .
             </p>
+            {/* Al treilea site soră (10.11.2026): doar cazier fiscal, același
+                backend. Același tipar: un link din text. docs/cazier-fiscal/. */}
+            <p className="mt-2 text-xs leading-relaxed text-white/50">
+              Cazier fiscal prin avocat, fără SPV:{' '}
+              <a href="https://cazierfiscal.com/" className="text-white/80 underline underline-offset-2 hover:text-primary-500">
+                cazierfiscal.com
+              </a>
+              .
+            </p>
           </div>
         </div>
       </div>

@@ -13,7 +13,7 @@ export const metadata = buildPageMetadata({
   brand: 'cazierfiscal',
   title: 'Politica de cookie-uri',
   description:
-    'Exact ce cookie-uri folosește cazier-fiscal.ro, ce urmărim și ce NU urmărim, cât timp și cum îți schimbi opțiunea oricând.',
+    'Exact ce cookie-uri folosește cazierfiscal.com, ce urmărim și ce NU urmărim, cât timp și cum îți schimbi opțiunea oricând.',
   path: PATH,
   noindex: !CAZIERFISCAL_INDEXABLE,
 });
@@ -39,7 +39,7 @@ export default function Page() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
       <LegalLayoutCazierFiscal title="Politica de cookie-uri" path={PATH}>
         <p>
-          <strong>cazier-fiscal.ro</strong> (eDigitalizare SRL) folosește puține cookie-uri și le folosește
+          <strong>cazierfiscal.com</strong> (eDigitalizare SRL) folosește puține cookie-uri și le folosește
           transparent. Pe scurt: cele strict necesare rulează mereu (altfel nu funcționează comanda și
           plata), iar analiza Google Analytics pornește <strong>doar dacă apeși „Accept”</strong> în
           banner. Nimic altceva.
@@ -82,7 +82,7 @@ export default function Page() {
           <tbody>
             <tr>
               <td><code>eg_cookie_consent</code></td>
-              <td>cazier-fiscal.ro</td>
+              <td>cazierfiscal.com</td>
               <td>Reține alegerea ta din bannerul de cookie-uri</td>
               <td>6 luni</td>
               <td>Strict necesar</td>

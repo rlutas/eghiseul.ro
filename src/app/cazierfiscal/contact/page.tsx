@@ -25,7 +25,7 @@ export default function ContactPage() {
     '@context': 'https://schema.org',
     '@graph': [cazierFiscalOrganizationNode(), cazierFiscalWebsiteNode(), cazierFiscalBreadcrumb([{ name: 'Acasă', path: '/' }, { name: 'Contact', path: PATH }], PATH)],
   };
-  const wa = `https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent('Bună! Am o întrebare despre cazierul fiscal (cazier-fiscal.ro).')}`;
+  const wa = `https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent('Bună! Am o întrebare despre cazierul fiscal (cazierfiscal.com).')}`;
   const channels = [
     { k: 'W', t: `WhatsApp · ${brand.phoneDisplay}`, d: `${SUPPORT_HOURS_SHORT} · răspuns de obicei sub o oră · poți trimite poze cu ce ți se cere`, h: wa, primary: true },
     { k: '@', t: brand.contactEmail, d: 'pentru întrebări detaliate; răspundem în aceeași zi lucrătoare', h: `mailto:${brand.contactEmail}`, primary: false },

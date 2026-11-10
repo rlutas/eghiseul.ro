@@ -17,8 +17,8 @@ const bricolage = Bricolage_Grotesque({
 });
 
 /**
- * cazier-fiscal.ro public pages (third brand, 2026-11-10). Reached ONLY
- * through the host rewrite in next.config.ts (cazier-fiscal.ro/x →
+ * cazierfiscal.com public pages (third brand, 2026-11-10). Reached ONLY
+ * through the host rewrite in next.config.ts (cazierfiscal.com/x →
  * /cazierfiscal/x); the internal path is refused in src/proxy.ts.
  *
  * It reuses the documentero design system (`d-*` tokens, ui.tsx); the
@@ -28,8 +28,8 @@ const bricolage = Bricolage_Grotesque({
 export const metadata: Metadata = {
   metadataBase: new URL(brand.baseUrl),
   title: {
-    default: 'Cazier fiscal online prin avocat, fără SPV | cazier-fiscal.ro',
-    template: '%s | cazier-fiscal.ro',
+    default: 'Cazier fiscal online prin avocat, fără SPV | cazierfiscal.com',
+    template: '%s | cazierfiscal.com',
   },
   authors: [{ name: brand.name }],
   creator: brand.name,

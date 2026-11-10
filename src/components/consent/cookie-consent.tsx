@@ -17,7 +17,7 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 // documentero.ro has its own GA4 data stream (own property, own reports).
 // Empty → the eghiseul stream also collects documentero traffic (before 21.09.2026 that was the case).
 const GA_ID_DOCUMENTERO = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID_DOCUMENTERO || GA_ID;
-// cazier-fiscal.ro: own stream once created; until then the eghiseul stream
+// cazierfiscal.com: own stream once created; until then the eghiseul stream
 // collects it (hostname separates it in reports).
 const GA_ID_CAZIERFISCAL = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID_CAZIERFISCAL || GA_ID;
 type BrandKey = 'eghiseul' | 'documentero' | 'cazierfiscal';
@@ -34,7 +34,7 @@ const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 // documentero.ro has its own Google Ads account (05.10.2026). No fallback to
 // the eghiseul account: documentero conversions must never land there.
 const ADS_ID_DOCUMENTERO = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID_DOCUMENTERO;
-// cazier-fiscal.ro: no Ads account yet, and no fallback to eghiseul's.
+// cazierfiscal.com: no Ads account yet, and no fallback to eghiseul's.
 const ADS_ID_CAZIERFISCAL = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID_CAZIERFISCAL;
 function adsIdFor(brand: BrandKey): string | undefined {
   if (brand === 'documentero') return ADS_ID_DOCUMENTERO;

@@ -12,7 +12,7 @@ export const metadata = buildPageMetadata({
   brand: 'cazierfiscal',
   title: 'Politica de confidențialitate',
   description:
-    'Cum colectează, folosește și protejează cazier-fiscal.ro (eDigitalizare SRL) datele tale personale: ' +
+    'Cum colectează, folosește și protejează cazierfiscal.com (eDigitalizare SRL) datele tale personale: ' +
     'date colectate, scop, temei legal, destinatari și persoane împuternicite, durata stocării și drepturile tale GDPR.',
   path: PATH,
   noindex: !CAZIERFISCAL_INDEXABLE,
@@ -42,7 +42,7 @@ export default function Page() {
       <LegalLayoutCazierFiscal title="Politica de confidențialitate" path={PATH}>
         <p>
           <strong>eDigitalizare SRL</strong> (CUI RO49278701, Reg. Com. J2023001097301, sediul în Jud. Satu Mare,
-          Com. Odoreu, Str. Salcâmilor nr. 2), operatorul platformei <strong>cazier-fiscal.ro</strong>, denumită în
+          Com. Odoreu, Str. Salcâmilor nr. 2), operatorul platformei <strong>cazierfiscal.com</strong>, denumită în
           continuare „Operatorul” sau „noi”, prelucrează datele tale cu caracter personal în conformitate cu
           Regulamentul (UE) 2016/679 (GDPR), Legea nr. 190/2018 și legislația națională în vigoare. Această politică
           explică ce date colectăm, în ce scop, cui le divulgăm, cât le păstrăm și ce drepturi ai.
@@ -50,7 +50,7 @@ export default function Page() {
 
         <h2>1. Operatorul de date</h2>
         <p>
-          Operatorul de date cu caracter personal pentru platforma cazier-fiscal.ro este <strong>eDigitalizare SRL</strong>,
+          Operatorul de date cu caracter personal pentru platforma cazierfiscal.com este <strong>eDigitalizare SRL</strong>,
           cu datele de identificare de mai sus. Pentru orice solicitare privind datele tale, ne poți contacta la{' '}
           {email} sau {phone}.
         </p>

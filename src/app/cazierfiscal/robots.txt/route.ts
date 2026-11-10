@@ -2,7 +2,7 @@ import { BRANDS } from '@/lib/brand/brands';
 import { AI_ASSISTANT_FETCHERS, AI_CRAWLERS } from '@/lib/seo/ai-bots';
 
 /**
- * robots.txt for cazier-fiscal.ro (served through the host rewrite in
+ * robots.txt for cazierfiscal.com (served through the host rewrite in
  * next.config.ts). Same policy as eghiseul: public content open to every
  * crawler including the AI ones, private routes closed.
  */

@@ -1,5 +1,5 @@
 /**
- * JSON-LD for cazier-fiscal.ro, copied from documentero-schema.ts with the
+ * JSON-LD for cazierfiscal.com, copied from documentero-schema.ts with the
  * brand swapped. Same company (ORGANIZATION), `parentOrganization` eghiseul.ro.
  * No aggregateRating, no invented authors (content rules §3), and no new
  * FAQPage: Google retired FAQ rich results on 07.05.2026, so callers do not
@@ -184,7 +184,7 @@ export function cazierFiscalHomeGraph() {
         '@type': 'WebPage',
         '@id': `${BASE}/#webpage`,
         url: `${BASE}/`,
-        name: 'cazier-fiscal.ro — cazier fiscal prin avocat, fără SPV',
+        name: 'cazierfiscal.com — cazier fiscal prin avocat, fără SPV',
         inLanguage: 'ro-RO',
         isPartOf: { '@id': `${BASE}/#website` },
       },
