@@ -1,13 +1,14 @@
-# 10.11.2026 — cazierfiscal.com: site nou, doar pentru cazierul fiscal (pregătit, încă nelansat)
+# 10.11.2026 — cazierfiscal.com: site nou, doar pentru cazierul fiscal (live)
 <!-- categorie: comenzi -->
 
 ## Pentru echipă
 
-- Pregătim un site nou, **cazierfiscal.com**, care vinde un singur serviciu: cazierul fiscal pentru persoane fizice. Prețul și opțiunile sunt cele de pe eghiseul.
-- Comenzile de acolo intră în **același admin**, cu un badge portocaliu „cazier-fiscal” lângă număr. Pe pagina de comenzi există și un filtru „cazierfiscal.com”.
-- Le lucrați exact ca pe cele de cazier fiscal de pe eghiseul: aceeași avocată, aceleași documente, aceleași statusuri. Diferă doar ce vede clientul: alt site, alte culori, emailuri cu numele cazierfiscal.com.
+- Avem un site nou, **cazierfiscal.com**, care vinde un singur serviciu: cazierul fiscal pentru persoane fizice. Prețul și opțiunile sunt cele de pe eghiseul.
+- Comenzile de acolo intră în **același admin**, cu un badge portocaliu „cazierfiscal” lângă număr. Pe pagina de comenzi există și un filtru „cazierfiscal.com”.
+- Le lucrați exact ca pe cele de cazier fiscal de pe eghiseul: aceeași avocată, aceleași documente, aceleași statusuri. Diferă doar ce vede clientul: alt site, alte culori, emailuri cu numele cazierfiscal.com (deocamdată emailurile pleacă tot de pe adresa eghiseul).
 - Dacă un client sună de pe cazierfiscal.com: suntem aceeași firmă, iar el plătește asistența avocatului, nu documentul (la ANAF și în SPV certificatul e gratuit).
-- Site-ul nu e încă live. Anunțăm aici când pornește.
+- Site-ul e live din 10.11.2026. Pe site nu există procesare urgentă la cazierul fiscal, iar termenul afișat e 1–3 zile lucrătoare.
+- Site-ul nu face trimitere la eghiseul.ro. Firma și datele legale sunt aceleași.
 
 ---
 
