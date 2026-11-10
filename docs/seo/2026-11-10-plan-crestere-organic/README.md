@@ -201,6 +201,37 @@ Bing IndexNow e deja pe ambele repo-uri. Bing urmărit lunar în raportul `monit
 | 15.12 | verdict Faza 0 (meniu server-side, 404) și 1.1–1.4 |
 | 01.02.2027 | verdict Faza 2: urcă `/servicii/` pe eghiseul sau mutăm efortul |
 
+### Jurnal de execuție și ce urmărim
+
+**10.11.2026: livrat pe CJO**
+
+| Ce | Commit CJO | Verificat |
+|---|---|---|
+| Faza 0: 404 pe orașe inventate, meniuri în HTML, 301 Oradea, `noindex` pe `/status-comanda`, spațiu în H1, 3 ghiduri în hub-ul home | `cd76eb27` | live: `xyzabc` și `cluj-napoca` dau 404; Oradea 308; `noindex, follow` pe status |
+| 1.5: caseta „Îl obținem noi” pe 5 ghiduri | `d6426af0`, `7970cea3` (text) | live |
+| Crawl pe tot sitemap-ul (74 URL-uri) | — | 74/74: 200, canonical către sine, un singur H1, fără H1 lipit, JSON-LD valid, nimic `noindex` în sitemap |
+| URL-uri cu afișări în GSC din 01.05 care nu mai dau 200 | — | nicio pagină de oraș cu trafic n-a ajuns pe 404. Rămân 404 doar URL-uri greșite cu 0 clicuri (de ex. `/tari-pentru-need-de-apostila`), corect după regula 6 |
+| Sitemap retrimis în GSC (`sc-domain` și proprietatea veche) | — | 0 erori, 0 avertismente |
+| IndexNow (Bing, Yandex) pentru cele 11 URL-uri schimbate | — | 200 |
+| „Solicită indexarea” în GSC: home, model cerere, reabilitare, după cât timp se șterge, valabilitate, angajare | — | confirmat în GSC, câte un mesaj pe fiecare |
+
+GSC → Pagini (10.11): 76 indexate, 692 neindexate. Din cele 692, 636 sunt „Accesată cu crawlere – nu este indexată”, iar exemplele sunt fișiere `/_next/static/…js|css`, adică resurse, nu pagini. Nu e o problemă. Mai sunt 45 de redirecturi (corect) și 9 404.
+
+**De urmărit, cu data și pragul de eșec:**
+
+| Când | Ce verifici | Unde | Semnal bun | Eșec |
+|---|---|---|---|---|
+| 13–14.11 | cele 6 URL-uri cerute la indexare au data de crawl după 10.11 | GSC → Verificarea adresei URL | „Ultima accesare” ≥ 10.11 | — |
+| 17.11 | verdictul pe orașe (Iași, Brașov, Timișoara, Constanța față de restul) | anexa 01, scriptul GSC | cele 4 au pierdut mai puțin | decide Faza 1 pentru orașe |
+| 17.11 | pornesc 1.3 (integritate) și 1.4 (gratuit / ghiseul.ro), apoi 24.11 1.1 (home) și 1.2 (eliberare) | — | — | — |
+| 24.11 | 404-urile noi din GSC → Pagini sunt doar orașe inventate | GSC → Pagini → 404 | doar sluguri greșite | apare un URL bun pe 404 |
+| 01.12 | `begin_checkout` cu `landing` pe cele 5 ghiduri cu casetă | GA4 CJO + `orders` (atribuire din 06.10) | ≥ 1 comandă | 0 comenzi după 4 săptămâni → casetă mai sus, în primul ecran |
+| 01.12 | poziția `/cazier-fiscal-online`, `/cazier-auto-online`, `/certificat-integritate-comportamentala` (efectul meniului în HTML) | `monitor-lunar.py` | urcă | stă pe loc → linkuri din conținut |
+| 01.12 | cele 3 ghiduri puse în hub (minori, verificare fiscal, fiscal străini) | GSC pe pagină | poziție mai bună | — |
+| săptămânal, luni | clicuri CJO pe săptămână față de 791 (02.11) | tabelul din `2026-11-03-cadere-mijloc-octombrie-urmarire.md` | ≥ 1.000 până la 15.12 | sub 791 după 15.12 |
+
+Ce **nu** s-a făcut, intenționat: titlurile (înghețate până pe 17.11), textul paginilor de oraș (testul în curs) și marcajul de recenzii (anulat, vezi §6).
+
 ---
 
 ## 6. Decizii (luate pe 10.11)
