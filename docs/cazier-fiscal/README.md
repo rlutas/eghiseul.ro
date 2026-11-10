@@ -34,9 +34,15 @@ Același repo, același deploy Vercel, aceeași bază de date, același admin, a
 
 Reguli: [`../../.claude/rules/content-and-seo.md`](../../.claude/rules/content-and-seo.md). Maximum un ghid nou pe săptămână. Fără date inventate (fără „3.500 de comenzi” sau rating fără sursă). Fără FAQPage nou.
 
+## Brand separat de eghiseul (decizie 10.11.2026)
+
+Raul a cerut ca site-ul să stea ca brand propriu. Paginile cazierfiscal.com nu mai trimit spre eghiseul.ro: fără „parte din grupul eghiseul.ro” în footer, fără recenziile eghiseul pe pagina Despre, fără `parentOrganization` și `sameAs` în schema. Footerul eghiseul nu mai are link spre cazierfiscal.com. Descoperirea se face prin sitemap-ul trimis în Search Console și prin IndexNow.
+
+Ce rămâne, pentru că e obligatoriu: firma (eDigitalizare SRL, CUI, adresă), ANPC/SOL și avocata care depune cererea. Google poate lega oricum site-urile prin firmă, hosting și contul Search Console. Asta nu e o penalizare. Penalizarea vine din conținut de șablon și rețele de pagini-doorway, nu din proprietar comun.
+
 ## Pași pentru lansare
 
-1. **Migrarea 204** pe baza eghiseul. Fără ea, comanda de pe hostul nou cade la constrângerea `orders_platform_check`.
+1. ✅ **Migrarea 204** aplicată pe 10.11.2026. Fără ea, comanda de pe hostul nou cade la constrângerea `orders_platform_check`.
 2. ✅ **Domeniul:** `cazierfiscal.com` e cumpărat în Vercel (DNS pe Vercel). `cazierfiscal.com` și `www.cazierfiscal.com` sunt în proiectul `eghiseul-ro`.
 3. **Resend:** blocat, planul Resend a atins limita de domenii. După upgrade: se verifică `cazierfiscal.com` și se adaugă în `RESEND_VERIFIED_DOMAINS`. Până atunci emailurile pleacă de pe adresa eghiseul (fallback automat).
 4. ✅ **Search Console:** proprietatea Domain `sc-domain:cazierfiscal.com` e verificată prin TXT; contul de serviciu claude-seo e owner.

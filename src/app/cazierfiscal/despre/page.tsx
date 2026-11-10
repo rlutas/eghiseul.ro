@@ -4,7 +4,7 @@ import { HeaderCazierFiscal } from '@/components/cazierfiscal/header';
 import { Card, Eyebrow, H2, Section } from '@/components/documentero/ui';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { cazierFiscalBreadcrumb, cazierFiscalOrganizationNode, cazierFiscalWebsiteNode } from '@/lib/seo/cazierfiscal-schema';
-import { ORGANIZATION, SOCIAL_PROOF } from '@/lib/seo/constants';
+import { ORGANIZATION } from '@/lib/seo/constants';
 import { BRANDS } from '@/lib/brand/brands';
 import { SUPPORT_HOURS_SHORT } from '@/config/contact';
 import { CAZIERFISCAL_INDEXABLE, CAZIERFISCAL_ORDER_HREF } from '@/config/cazierfiscal-nav';
@@ -17,13 +17,12 @@ export const metadata = buildPageMetadata({
   brand: 'cazierfiscal',
   title: 'Despre noi: cine obține cazierul fiscal pentru tine',
   description:
-    'cazierfiscal.com este un serviciu al eDigitalizare SRL (eghiseul.ro), Satu Mare. Cererea la ANAF o depune avocat Tarța Ana Gabriela, Baroul Satu Mare.',
+    'cazierfiscal.com este un serviciu al eDigitalizare SRL, Satu Mare. Cererea la ANAF o depune avocat Tarța Ana Gabriela, Baroul Satu Mare.',
   path: PATH,
   noindex: !CAZIERFISCAL_INDEXABLE,
 });
 
 export default function DesprePage() {
-  const rating = SOCIAL_PROOF.ratingValue.toString().replace('.', ',');
   const graph = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -52,10 +51,9 @@ export default function DesprePage() {
             Un singur document, făcut bine: cazierul fiscal.
           </h1>
           <p className="m-0 max-w-[760px] text-[17px] leading-[1.6] text-d-muted sm:text-[18px]">
-            cazierfiscal.com este un serviciu al {ORGANIZATION.legalName}, firma din Satu Mare din spatele{' '}
-            <a href={BRANDS.eghiseul.baseUrl} className="underline underline-offset-2">eghiseul.ro</a>. Din 2023 obținem
-            documente de la instituțiile din România pentru oameni care nu au timp de ghișeu sau nu au cont SPV. Pe
-            eghiseul.ro avem peste {SOCIAL_PROOF.roundedDown} de recenzii pe Google, cu nota {rating} din 5.
+            cazierfiscal.com este un serviciu al {ORGANIZATION.legalName}, firmă din Satu Mare. Din 2023 obținem
+            documente de la instituțiile din România pentru oameni care nu au timp de ghișeu sau nu au cont SPV. Aici
+            facem un singur lucru: cazierul fiscal pentru persoane fizice.
           </p>
         </Section>
 
@@ -75,8 +73,8 @@ export default function DesprePage() {
               <span className="text-[22px] font-bold tracking-[-0.02em]">{LAWYER.name}</span>
               <span className="text-[14px] text-d-muted">{LAWYER.title} · {LAWYER.experience}</span>
               <p className="m-0 text-[15px] leading-[1.6] text-d-body">
-                Cabinet individual în Satu Mare ({LAWYER.office}). Lucrează pentru clienții eghiseul.ro, documentero.ro
-                și cazierfiscal.com.
+                Cabinet individual în Satu Mare ({LAWYER.office}). Depune cererile clienților cazierfiscal.com pe bază
+                de împuternicire avocațială.
               </p>
               <a href={LAWYER.site} target="_blank" rel="noopener" className="mt-1 text-[14px] font-semibold text-d-ink underline decoration-d-acc underline-offset-2">avocat-tarta.ro</a>
             </div>

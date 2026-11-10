@@ -35,11 +35,6 @@ export function FooterCazierFiscal() {
             <CazierFiscalLogo size={19} />
             <p className="m-0 max-w-[360px] text-[14px] leading-relaxed text-d-muted">
               Cazier fiscal pentru persoane fizice, obținut prin avocat, fără cont SPV și fără drum la ANAF.
-              Parte din grupul{' '}
-              <a href={BRANDS.eghiseul.baseUrl} className="underline underline-offset-2">
-                eghiseul.ro
-              </a>
-              .
             </p>
             <p className="m-0 text-[14px] text-d-muted">
               <a href={`mailto:${brand.contactEmail}`} className="hover:text-d-ink">
