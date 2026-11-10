@@ -22,6 +22,9 @@ Din rădăcina repo-ului, o dată pe lună (ideal pe 2–3 ale lunii):
 - Ia credențialele contului de serviciu `claude-seo` din `~/.config/claude-seo/` (sau din variabila
   `GSC_SERVICE_ACCOUNT`). Nu le afișează și nu le scrie nicăieri.
 - Fereastra se termină implicit cu 3 zile în urmă, pentru că GSC are întârziere.
+- Secțiunea **Bing** (din 10.11.2026): clicuri și afișări pe aceleași două perioade, din API-ul Bing
+  Webmaster, cu cheia `bing_api_key` din `~/.config/claude-seo/google-api.json`. Fără cheie, raportul
+  iese doar cu GSC. Bing are câteva zile de întârziere, deci ultimele zile pot lipsi.
 - Dacă raportul lunii există deja, scriptul refuză să-l suprascrie, ca să nu se piardă ce s-a
   completat de mână. Pentru o rulare nouă: `--force`. Alte opțiuni: `--month 2026-12`,
   `--end-date 2026-11-30`, `--out-dir`.

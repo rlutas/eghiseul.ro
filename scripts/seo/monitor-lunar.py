@@ -2,7 +2,8 @@
 """Monitorizare SEO lunara: eghiseul.ro, documentero.ro, cazierjudiciaronline.com, ecazier.ro.
 
 Trage din Google Search Console (API, cont de serviciu, doar citire) ultimele 28 de
-zile fata de cele 28 de dinainte si scrie:
+zile fata de cele 28 de dinainte, plus clicurile si afisarile din Bing Webmaster
+(API, cheia `bing_api_key` din ~/.config/claude-seo/google-api.json; optional), si scrie:
 
     docs/seo/monitorizare/YYYY-MM.md   raport in romana (ce a urcat / coborat, top 10)
     docs/seo/monitorizare/YYYY-MM.csv  aceleasi cifre, format lung
@@ -30,13 +31,15 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import os
 import re
 import sys
 import time
 from datetime import date, timedelta
 from pathlib import Path
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlencode
+from urllib.request import urlopen
 
 try:
     from google.oauth2 import service_account
@@ -289,6 +292,45 @@ class GSC:
         return {r["keys"][0]: Metrics.from_row(r) for r in self.query(site, start, end, [dim])}
 
 
+# --------------------------------------------------------------------------- Bing
+
+BING_CONFIG = "~/.config/claude-seo/google-api.json"   # cheia `bing_api_key`
+BING_SITES = {"eghiseul": "https://eghiseul.ro/", "documentero": "https://documentero.ro/",
+              "cjo": "https://cazierjudiciaronline.com/", "ecazier": "https://ecazier.ro/"}
+
+
+def bing_key() -> str | None:
+    try:
+        with open(os.path.expanduser(BING_CONFIG)) as fh:
+            return json.load(fh).get("bing_api_key") or None
+    except (OSError, ValueError):
+        return None
+
+
+def bing_totals(key: str, cur, prev) -> dict[str, dict]:
+    """Clicuri si afisari Bing pe aceleasi doua ferestre. Bing nu da pozitie pe zi."""
+    out = {}
+    for site_key, url in BING_SITES.items():
+        try:
+            q = urlencode({"siteUrl": url, "apikey": key})
+            with urlopen(f"https://ssl.bing.com/webmaster/api.svc/json/GetRankAndTrafficStats?{q}",
+                         timeout=30) as resp:
+                days = json.load(resp)["d"]
+        except Exception as e:  # Bing e optional: raportul GSC nu cade din cauza lui
+            print(f"  Bing {url}: {e}", file=sys.stderr)
+            continue
+        tot = {"clicks_cur": 0, "clicks_prev": 0, "impr_cur": 0, "impr_prev": 0, "last": None}
+        for d in days:
+            day = date.fromtimestamp(int(re.search(r"\d+", d["Date"]).group()) / 1000)
+            for tag, (a, b) in (("cur", cur), ("prev", prev)):
+                if a <= day <= b:
+                    tot[f"clicks_{tag}"] += d["Clicks"]
+                    tot[f"impr_{tag}"] += d["Impressions"]
+            tot["last"] = max(tot["last"] or day, day)
+        out[site_key] = tot
+    return out
+
+
 # --------------------------------------------------------------------------- collect
 
 def collect(gsc: GSC, cur: tuple[date, date], prev: tuple[date, date]) -> list[dict]:
@@ -383,7 +425,8 @@ def serp_url(q: str) -> str:
     return f"https://www.google.com/search?q={quote_plus(q)}&pws=0&gl=ro&hl=ro&num=20"
 
 
-def render(rows: list[dict], month: str, cur, prev, generated: date) -> str:
+def render(rows: list[dict], month: str, cur, prev, generated: date,
+           bing: dict[str, dict] | None = None) -> str:
     by = lambda sec: [r for r in rows if r["section"] == sec]
     L: list[str] = []
     L.append(f"# Monitorizare SEO {month} — eghiseul, documentero, CJO, ecazier")
@@ -443,6 +486,26 @@ def render(rows: list[dict], month: str, cur, prev, generated: date) -> str:
                      f"{fmt_int(r['clicks_prev'])} → {fmt_int(r['clicks_cur'])} | "
                      f"{fmt_int(r['impr_prev'])} → {fmt_int(r['impr_cur'])} | "
                      f"{fmt_pos(r['pos_prev'])} → {fmt_pos(r['pos_cur'])} | {'; '.join(flags_for(r))} |")
+    L.append("")
+
+    # ---- bing
+    L.append("## Bing")
+    L.append("")
+    if not bing:
+        L.append("Fără date: lipsește `bing_api_key` din configul claude-seo sau API-ul Bing nu a răspuns.")
+    else:
+        last = max((t["last"] for t in bing.values() if t["last"]), default=None)
+        L.append("Aceleași două perioade, din Bing Webmaster (API). Bing raportează cu întârziere de "
+                 "câteva zile" + (f"; ultima zi cu date: {last.strftime('%d.%m.%Y')}" if last else "")
+                 + ", deci finalul perioadei curente poate fi incomplet.")
+        L.append("")
+        L.append("| Site | Clicuri | Δ clicuri | Afișări | Δ afișări |")
+        L.append("|---|---:|---:|---:|---:|")
+        for key, name, _, _ in SITES:
+            t = bing.get(key)
+            if t:
+                L.append(f"| {name} | {fmt_int(t['clicks_cur'])} | {fmt_delta_int(t['clicks_cur'], t['clicks_prev'])} "
+                         f"| {fmt_int(t['impr_cur'])} | {fmt_delta_int(t['impr_cur'], t['impr_prev'])} |")
     L.append("")
 
     # ---- top 10
@@ -602,9 +665,11 @@ def main():
     gsc = GSC(os.environ.get("GSC_SERVICE_ACCOUNT", DEFAULT_SA))
     print(f"GSC {cur[0]}..{cur[1]} vs {prev[0]}..{prev[1]}", file=sys.stderr)
     rows = collect(gsc, cur, prev)
+    key = bing_key()
+    bing = bing_totals(key, cur, prev) if key else None
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    md_path.write_text(render(rows, month, cur, prev, today), encoding="utf-8")
+    md_path.write_text(render(rows, month, cur, prev, today, bing), encoding="utf-8")
     write_csv(csv_path, rows, cur, prev)
     print(f"Scris: {md_path}\nScris: {csv_path}\n({gsc.calls} apeluri GSC)", file=sys.stderr)
 

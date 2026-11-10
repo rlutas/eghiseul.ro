@@ -7,7 +7,7 @@
 - Un client nu primește emailul dacă a mai comandat în ultimele 14 zile, dacă a primit alt email de la noi în ultimele 3 zile sau dacă s-a dezabonat.
 - Clienții ecazier.ro **nu** primesc acest email: ecazier e cabinetul avocatei și nu trimitem campanii de acolo.
 - Trimiterea a pornit pe 10.11: primii 120 de clienți au primit emailul. Restul (aproximativ 360) îl primesc automat, câte 120 pe zi, până pe 13.11.
-- Bing (motorul de căutare Microsoft) a fost verificat pe toate cele 4 site-uri: sitemap-urile se citesc fără erori. Detaliile sunt mai jos.
+- Bing (motorul de căutare Microsoft) a fost verificat pe toate cele 4 site-uri: sitemap-urile se citesc fără erori. Pe eghiseul, clicurile din Bing au crescut cu 25% în ultima lună, deși pe Google au scăzut. Raportul SEO lunar include acum și Bing.
 
 ---
 
@@ -42,4 +42,5 @@ După 16.11, scoate `black_friday` din `LIFECYCLE_EMAILS`. Codul nu mai trimite 
 | documentero.ro (30 zile) | 0 | 22 | aproape absent |
 
 - Sitemap-urile se citesc fără erori. Pe eghiseul au rămas două intrări vechi din WordPress (`sitemap_index.xml`, din care una pe `www`), cu ultima citire în octombrie 2025. Le poți șterge din Bing.
-- Cheia API Bing nu este generată. Pasul îl face Raul, din Settings → API access → API Key. Cheia se pune în `~/.config/claude-seo/google-api.json`, la `bing_api_key`.
+- Cheia API Bing a fost generată pe 10.11 și salvată local în `~/.config/claude-seo/google-api.json` (`bing_api_key`). Cheia vede toate cele 19 site-uri din cont.
+- `scripts/seo/monitor-lunar.py` are acum o secțiune Bing: clicuri și afișări pe aceleași 28 de zile ca GSC. Prima măsurătoare (11.10–07.11 față de 13.09–10.10): eghiseul are 2.545 clicuri față de 2.031 (+25%), CJO are 55 față de 63.
