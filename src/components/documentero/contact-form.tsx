@@ -23,7 +23,20 @@ const field =
   'h-12 w-full rounded-xl border-[1.5px] border-d-line bg-d-bg px-4 text-[15px] text-d-ink outline-none transition-colors placeholder:text-d-muted focus:border-d-acc';
 const label = 'text-[13px] font-bold text-d-ink';
 
-export function ContactFormDocumentero({ whatsappHref }: { whatsappHref: string }) {
+/**
+ * Copy that changes per site. documentero passes nothing (civil-status
+ * defaults); cazier-fiscal.ro passes its own topics (2026-11-10).
+ */
+export interface ContactFormCopy {
+  topics?: ReadonlyArray<readonly [string, string]>;
+  topicLabel?: string;
+  contextLabel?: string;
+  contextPlaceholder?: string;
+  messagePlaceholder?: string;
+}
+
+export function ContactFormDocumentero({ whatsappHref, copy = {} }: { whatsappHref: string; copy?: ContactFormCopy }) {
+  const topics = copy.topics ?? ACTE;
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [error, setError] = useState('');
 
@@ -34,7 +47,7 @@ export function ContactFormDocumentero({ whatsappHref }: { whatsappHref: string 
     setError('');
     const form = e.currentTarget;
     const data = new FormData(form);
-    const act = ACTE.find(([k]) => k === String(data.get('act')))?.[1] ?? 'nespecificat';
+    const act = topics.find(([k]) => k === String(data.get('act')))?.[1] ?? 'nespecificat';
     const tara = String(data.get('tara') ?? '').trim();
     const orderNumber = String(data.get('orderNumber') ?? '').trim();
     const message = [`Act: ${act}`, tara ? `Țara / instituția: ${tara}` : null, '', String(data.get('message') ?? '').trim()].filter((x) => x !== null).join('\n');
@@ -95,14 +108,14 @@ export function ContactFormDocumentero({ whatsappHref }: { whatsappHref: string 
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="act" className={label}>Ce act ai nevoie?</label>
-          <select id="act" name="act" defaultValue="nastere" className={`${field} appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%230F2A22%22 stroke-width=%222.4%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>')] bg-[length:16px] bg-[right_14px_center] bg-no-repeat pr-10`}>
-            {ACTE.map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          <label htmlFor="act" className={label}>{copy.topicLabel ?? 'Ce act ai nevoie?'}</label>
+          <select id="act" name="act" defaultValue={topics[0]?.[0]} className={`${field} appearance-none bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%230F2A22%22 stroke-width=%222.4%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22m6 9 6 6 6-6%22/></svg>')] bg-[length:16px] bg-[right_14px_center] bg-no-repeat pr-10`}>
+            {topics.map(([k, v]) => <option key={k} value={k}>{v}</option>)}
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="tara" className={label}>Pentru ce țară sau instituție? <span className="font-normal text-d-muted">(opțional)</span></label>
-          <input id="tara" name="tara" maxLength={120} placeholder="Italia, primăria din Torino" className={field} />
+          <label htmlFor="tara" className={label}>{copy.contextLabel ?? 'Pentru ce țară sau instituție?'} <span className="font-normal text-d-muted">(opțional)</span></label>
+          <input id="tara" name="tara" maxLength={120} placeholder={copy.contextPlaceholder ?? 'Italia, primăria din Torino'} className={field} />
         </div>
       </div>
 
@@ -119,7 +132,7 @@ export function ContactFormDocumentero({ whatsappHref }: { whatsappHref: string 
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="message" className={label}>Ce vrei să știi?</label>
-        <textarea id="message" name="message" required minLength={10} maxLength={5000} rows={5} placeholder="Ex.: mă căsătoresc în Spania în decembrie, ce acte îmi trebuie și cât durează?" className={`${field} h-auto resize-y py-3`} />
+        <textarea id="message" name="message" required minLength={10} maxLength={5000} rows={5} placeholder={copy.messagePlaceholder ?? 'Ex.: mă căsătoresc în Spania în decembrie, ce acte îmi trebuie și cât durează?'} className={`${field} h-auto resize-y py-3`} />
       </div>
 
       {status === 'error' && (

@@ -67,6 +67,8 @@ export async function POST(request: NextRequest) {
       'https://www.eghiseul.ro',
       'https://documentero.ro',
       'https://www.documentero.ro',
+      'https://cazier-fiscal.ro',
+      'https://www.cazier-fiscal.ro',
     ].filter(Boolean);
 
     const isValidOrigin = allowedOrigins.some(allowed =>

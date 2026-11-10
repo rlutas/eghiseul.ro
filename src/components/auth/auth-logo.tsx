@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useBrand } from '@/lib/brand/client';
 import { DocumenteroLogo } from '@/components/documentero/logo';
+import { CazierFiscalLogo } from '@/components/cazierfiscal/logo';
 
 /**
  * The brand lockup for screens with a dark background, on the brand of the host.
@@ -16,6 +17,13 @@ import { DocumenteroLogo } from '@/components/documentero/logo';
  */
 export function AuthLogo({ size = 'sm' }: { size?: 'sm' | 'lg' }) {
   const brand = useBrand();
+  if (brand.id === 'cazierfiscal') {
+    return (
+      <Link href="/" className="inline-flex items-center" aria-label="cazier-fiscal.ro — acasă">
+        <CazierFiscalLogo size={size === 'lg' ? 24 : 20} onDark />
+      </Link>
+    );
+  }
   if (brand.id === 'documentero') {
     return (
       <Link href="/" className="inline-flex items-center" aria-label="documentero.ro — acasă">

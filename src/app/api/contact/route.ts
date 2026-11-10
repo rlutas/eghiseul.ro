@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
       email,
       phone: phone || undefined,
       orderNumber: orderNumber || undefined,
-      subject: brand.id === 'documentero' ? `[documentero] ${subjectLabel}` : subjectLabel,
+      subject: brand.id === 'eghiseul' ? subjectLabel : `[${brand.id}] ${subjectLabel}`,
       message,
     });
     await sendEmail({ to: INBOX, subject: mail.subject, html: mail.html, text: mail.text, replyTo: email });

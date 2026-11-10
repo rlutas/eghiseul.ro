@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
     const service = searchParams.get('service') || '';
     const search = searchParams.get('search') || '';
     const platformFilter = searchParams.get('platform');
-    const platform = platformFilter === 'eghiseul' || platformFilter === 'documentero' ? platformFilter : '';
+    const platform = platformFilter === 'eghiseul' || platformFilter === 'documentero' || platformFilter === 'cazierfiscal' ? platformFilter : '';
 
     const hiddenList = `(${HIDDEN_FROM_DEFAULT.map((s) => `"${s}"`).join(',')})`;
     const processingList = `(${PROCESSING_GROUP.map((s) => `"${s}"`).join(',')})`;

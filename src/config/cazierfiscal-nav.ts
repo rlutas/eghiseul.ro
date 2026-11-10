@@ -1,0 +1,24 @@
+/**
+ * Navigation + indexing switch for cazier-fiscal.ro (third brand, 2026-11-10).
+ * One service, so no mega menu: the order button goes straight to the wizard.
+ */
+
+/** Flip to true once the domain points at Vercel and the content is reviewed. */
+export const CAZIERFISCAL_INDEXABLE = false;
+
+export const CAZIERFISCAL_ORDER_HREF = '/comanda/cazier-fiscal/';
+export const CAZIERFISCAL_TRACK_HREF = '/comanda/status/';
+
+export const CAZIERFISCAL_NAV = [
+  { label: 'Cum funcționează', href: '/#cum-functioneaza' },
+  { label: 'Preț', href: '/#pret' },
+  { label: 'Ghiduri', href: '/ghiduri/' },
+  { label: 'Despre', href: '/despre/' },
+  { label: 'Contact', href: '/contact/' },
+] as const;
+
+/**
+ * Guides published on the site. A guide goes here only once its page exists:
+ * the footer, /ghiduri/ and the sitemap all read this list.
+ */
+export const CAZIERFISCAL_GUIDES: ReadonlyArray<{ href: string; label: string; hint: string; updated: string }> = [];

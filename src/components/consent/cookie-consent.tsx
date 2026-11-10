@@ -17,9 +17,14 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 // documentero.ro has its own GA4 data stream (own property, own reports).
 // Empty → the eghiseul stream also collects documentero traffic (before 21.09.2026 that was the case).
 const GA_ID_DOCUMENTERO = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID_DOCUMENTERO || GA_ID;
-type BrandKey = 'eghiseul' | 'documentero';
+// cazier-fiscal.ro: own stream once created; until then the eghiseul stream
+// collects it (hostname separates it in reports).
+const GA_ID_CAZIERFISCAL = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID_CAZIERFISCAL || GA_ID;
+type BrandKey = 'eghiseul' | 'documentero' | 'cazierfiscal';
 function gaIdFor(brand: BrandKey): string | undefined {
-  return brand === 'documentero' ? GA_ID_DOCUMENTERO : GA_ID;
+  if (brand === 'documentero') return GA_ID_DOCUMENTERO;
+  if (brand === 'cazierfiscal') return GA_ID_CAZIERFISCAL;
+  return GA_ID;
 }
 // Google Ads: eticheta de conversie a contului 677-995-5005. Se încarcă DOAR
 // cu consimțământ de marketing; conversia „Purchase" se declanșează din pagina
@@ -29,8 +34,12 @@ const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 // documentero.ro has its own Google Ads account (05.10.2026). No fallback to
 // the eghiseul account: documentero conversions must never land there.
 const ADS_ID_DOCUMENTERO = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID_DOCUMENTERO;
+// cazier-fiscal.ro: no Ads account yet, and no fallback to eghiseul's.
+const ADS_ID_CAZIERFISCAL = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID_CAZIERFISCAL;
 function adsIdFor(brand: BrandKey): string | undefined {
-  return brand === 'documentero' ? ADS_ID_DOCUMENTERO : ADS_ID;
+  if (brand === 'documentero') return ADS_ID_DOCUMENTERO;
+  if (brand === 'cazierfiscal') return ADS_ID_CAZIERFISCAL;
+  return ADS_ID;
 }
 
 // The success page already declares a narrower Window.gtag type — use a

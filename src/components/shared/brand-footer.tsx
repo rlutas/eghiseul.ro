@@ -2,6 +2,7 @@
 
 import { Footer } from '@/components/home/footer';
 import { FooterDocumentero } from '@/components/documentero/footer';
+import { FooterCazierFiscal } from '@/components/cazierfiscal/footer';
 import { useBrand } from '@/lib/brand/client';
 
 /**
@@ -12,5 +13,7 @@ import { useBrand } from '@/lib/brand/client';
  */
 export function BrandFooter() {
   const brand = useBrand();
-  return brand.id === 'documentero' ? <FooterDocumentero /> : <Footer />;
+  if (brand.id === 'documentero') return <FooterDocumentero />;
+  if (brand.id === 'cazierfiscal') return <FooterCazierFiscal />;
+  return <Footer />;
 }

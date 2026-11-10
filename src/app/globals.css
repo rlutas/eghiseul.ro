@@ -455,6 +455,74 @@
   font-family: var(--font-bricolage), var(--font-inter), system-ui, sans-serif;
 }
 
+/* ========================================
+   cazier-fiscal.ro (al treilea brand, 10.11.2026) — vinete + coral.
+   Aceleași componente ca documentero (tokenii `d-*`) și același wizard;
+   doar paleta diferă. docs/cazier-fiscal/README.md
+   ======================================== */
+[data-brand="cazierfiscal"] {
+  --d-ink: #2A1438;
+  --d-acc: #FF8A5B;
+  --d-bg: #FBF8F6;
+  --d-card: #FFFFFF;
+  --d-line: #E9DEE3;
+  --d-muted: #5E4F59;
+  --d-soft: #FFE8DE;
+  --d-body: #2F2430;
+  --d-dark-muted: #CDBBC6;
+
+  --primary-50: #FFF3EE;
+  --primary-100: #FFE8DE;
+  --primary-200: #FFD0BC;
+  --primary-300: #FFB396;
+  --primary-400: #FF9E78;
+  --primary-500: #FF8A5B; /* Coral */
+  --primary-600: #E86E3F;
+  --primary-700: #C2552C;
+  --primary-800: #9A4222;
+  --primary-900: #73311A;
+  --primary-950: #4A1F10;
+  --primary: var(--primary-500);
+  --primary-foreground: #2A1438;
+
+  --secondary-50: #F6F0F4;
+  --secondary-100: #E9DEE3;
+  --secondary-200: #CDBBC6;
+  --secondary-300: #A890A0;
+  --secondary-400: #80657A;
+  --secondary-500: #5E4559;
+  --secondary-600: #4A3247;
+  --secondary-700: #3A2440;
+  --secondary-800: #321B3D;
+  --secondary-900: #2A1438; /* Vinete */
+  --secondary-950: #1A0C24;
+  --secondary: var(--secondary-100);
+  --secondary-foreground: var(--secondary-900);
+
+  --neutral-50: #FBF8F6;
+  --neutral-100: #F4EFEC;
+  --neutral-200: #E9DEE3;
+  --neutral-300: #D3C6CC;
+  --neutral-400: #A2949B;
+  --neutral-500: #7A6C74;
+  --neutral-600: #5E4F59;
+  --neutral-700: #463A43;
+  --neutral-800: #2F2430;
+  --neutral-900: #1E1720;
+  --neutral-950: #100B11;
+
+  --background: #FBF8F6;
+  --card: #FFFFFF;
+  --border: #E9DEE3;
+  --input: #E9DEE3;
+  --ring: #FF8A5B;
+  --accent: #FFE8DE;
+  --accent-foreground: #2A1438;
+  --muted: #F4EFEC;
+  --muted-foreground: #5E4F59;
+  font-family: var(--font-bricolage), var(--font-inter), system-ui, sans-serif;
+}
+
 .dark {
   /* ========================================
      DARK MODE (Optional - Future Phase)
@@ -619,21 +687,21 @@
    `scripting: enabled`: un crawler fără JS (GPTBot, ClaudeBot) vede tot.
    ======================================== */
 @media (scripting: enabled) {
-  [data-brand="documentero"] [data-reveal] {
+  [data-brand="documentero"] [data-reveal], [data-brand="cazierfiscal"] [data-reveal] {
     opacity: 0;
     transform: translateY(18px);
     transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: opacity, transform;
   }
-  [data-brand="documentero"] [data-reveal].is-in {
+  [data-brand="documentero"] [data-reveal].is-in, [data-brand="cazierfiscal"] [data-reveal].is-in {
     opacity: 1;
     transform: none;
   }
-  [data-brand="documentero"] [data-reveal].no-anim {
+  [data-brand="documentero"] [data-reveal].no-anim, [data-brand="cazierfiscal"] [data-reveal].no-anim {
     transition: none;
   }
 }
-[data-brand="documentero"] .d-rise {
+[data-brand="documentero"] .d-rise, [data-brand="cazierfiscal"] .d-rise {
   animation: d-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @keyframes d-rise {
@@ -641,7 +709,7 @@
   to { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-brand="documentero"] [data-reveal] { transform: none; transition-duration: 0.3s; }
-  [data-brand="documentero"] .d-rise { animation-duration: 0.3s; }
+  [data-brand="documentero"] [data-reveal], [data-brand="cazierfiscal"] [data-reveal] { transform: none; transition-duration: 0.3s; }
+  [data-brand="documentero"] .d-rise, [data-brand="cazierfiscal"] .d-rise { animation-duration: 0.3s; }
   @keyframes d-rise { from { opacity: 0; transform: none; } to { opacity: 1; } }
 }

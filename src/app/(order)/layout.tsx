@@ -12,6 +12,7 @@ import { Header } from '@/components/shared/header';
 import { BlackFridayBar } from '@/components/shared/black-friday-bar';
 import { WhatsAppFloat } from '@/components/shared/whatsapp-float';
 import { HeaderDocumentero } from '@/components/documentero/header';
+import { HeaderCazierFiscal } from '@/components/cazierfiscal/header';
 import { BrandProvider } from '@/lib/brand/client';
 import { getBrand } from '@/lib/brand/server';
 import { CookieConsent } from '@/components/consent/cookie-consent';
@@ -41,23 +42,25 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function OrderLayout({ children }: { children: React.ReactNode }) {
   const brand = await getBrand();
-  const isDocumentero = brand.id === 'documentero';
+  // documentero and cazier-fiscal share the `d-*` design system; only the
+  // palette (globals.css, [data-brand=…]) and the header differ.
+  const isSatellite = brand.id !== 'eghiseul';
   const body = (
     <>
       {/* After the header: the eghiseul one is fixed, and its spacer pushes the bar below it. */}
-      {isDocumentero ? <HeaderDocumentero /> : <Header />}
-      <BlackFridayBar belowFixedHeader={!isDocumentero} />
+      {brand.id === 'documentero' ? <HeaderDocumentero /> : brand.id === 'cazierfiscal' ? <HeaderCazierFiscal /> : <Header />}
+      <BlackFridayBar belowFixedHeader={!isSatellite} />
       {children}
-      {!isDocumentero && <WhatsAppFloat />}
+      {!isSatellite && <WhatsAppFloat />}
       <CookieConsent />
     </>
   );
   return (
     <BrandProvider brandId={brand.id}>
-      {isDocumentero ? (
+      {isSatellite ? (
         // Re-colors every shared component through the brand tokens in
         // globals.css ([data-brand="documentero"]): gold → mint, navy → forest.
-        <div data-brand="documentero" className={`${bricolage.variable} min-h-screen bg-neutral-50`}>
+        <div data-brand={brand.id} className={`${bricolage.variable} min-h-screen bg-neutral-50`}>
           {body}
         </div>
       ) : (

@@ -41,6 +41,7 @@ const KIND_LABEL: Record<string, string> = {
 const PLATFORM_LABEL: Record<string, string> = {
   eghiseul: 'eghiseul',
   documentero: 'documentero',
+  cazierfiscal: 'cazier-fiscal',
   cjo: 'CJO',
   ecazier: 'ecazier',
 };
@@ -163,7 +164,7 @@ export default async function ClientErrorsPage({
 
   // Link eghiseul/documentero refs to the admin order page (uuid route).
   const localRefs = Array.from(byOrder.entries())
-    .filter(([, o]) => o.platform === 'eghiseul' || o.platform === 'documentero')
+    .filter(([, o]) => o.platform === 'eghiseul' || o.platform === 'documentero' || o.platform === 'cazierfiscal')
     .map(([ref]) => ref);
   const orderIdByRef = new Map<string, string>();
   if (localRefs.length) {

@@ -364,7 +364,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // was placed on (orders.platform): a documentero customer must come back
     // to documentero.ro after Stripe, whatever host this request came in on.
     // eghiseul keeps the NEXT_PUBLIC_APP_URL dev override (localhost fallback).
-    const origin = (order as { platform?: string | null }).platform === 'documentero'
+    const origin = ((order as { platform?: string | null }).platform ?? 'eghiseul') !== 'eghiseul'
       ? appBaseForOrder(order as { platform?: string | null })
       : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000')
 

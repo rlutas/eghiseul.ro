@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
       else if (testFilter === 'hide') q = q.eq('is_test', false);
       // Brand filter (`?platform=eghiseul|documentero`) — the two public sites
       // share this list; the chip narrows it to one of them.
-      if (platformFilter === 'eghiseul' || platformFilter === 'documentero') {
+      if (platformFilter === 'eghiseul' || platformFilter === 'documentero' || platformFilter === 'cazierfiscal') {
         q = q.eq('platform', platformFilter);
       }
       // Service filter — exact match on service_id (UUID). The UI passes the

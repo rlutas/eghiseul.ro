@@ -403,7 +403,7 @@ export default function AdminOrdersPage() {
       {/* Brand: the two public sites share this list (2026-09-19). */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <span className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Platformă:</span>
-        <SandboxChip active={urlPlatform === ''} label="Ambele" onClick={() => updateParams({ platform: null })} />
+        <SandboxChip active={urlPlatform === ''} label="Toate" onClick={() => updateParams({ platform: null })} />
         <SandboxChip
           active={urlPlatform === 'eghiseul'}
           label="eghiseul.ro"
@@ -413,6 +413,11 @@ export default function AdminOrdersPage() {
           active={urlPlatform === 'documentero'}
           label="documentero.ro"
           onClick={() => updateParams({ platform: urlPlatform === 'documentero' ? null : 'documentero' })}
+        />
+        <SandboxChip
+          active={urlPlatform === 'cazierfiscal'}
+          label="cazier-fiscal.ro"
+          onClick={() => updateParams({ platform: urlPlatform === 'cazierfiscal' ? null : 'cazierfiscal' })}
         />
       </div>
 
@@ -623,6 +628,14 @@ export default function AdminOrdersPage() {
                           className="inline-flex items-center rounded border border-red-300 bg-red-50 px-1 py-0 text-[9px] font-semibold uppercase tracking-wide text-red-800"
                         >
                           documentero
+                        </span>
+                      )}
+                      {order.platform === 'cazierfiscal' && (
+                        <span
+                          title="Comandă plasată pe cazier-fiscal.ro"
+                          className="inline-flex items-center rounded border border-orange-300 bg-orange-50 px-1 py-0 text-[9px] font-semibold uppercase tracking-wide text-orange-800"
+                        >
+                          cazier-fiscal
                         </span>
                       )}
                       {order.payment_status === 'paid' && !order.invoice_number && (

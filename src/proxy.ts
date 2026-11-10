@@ -25,14 +25,14 @@ const WORDPRESS_GONE = /^\/(wp-admin|wp-content|wp-includes|wp-json)(\/|$)|^\/(w
  * Middleware sees the path as the user sent it, before the rewrite, so this
  * never touches the rewritten requests.
  */
-const DOCUMENTERO_INTERNAL = /^\/documentero(\/|$)/
+const BRAND_INTERNAL = /^\/(documentero|cazierfiscal)(\/|$)/  // + cazier-fiscal.ro group (2026-11-10)
 /**
  * The only files under `/documentero/` that must stay reachable: the icons
  * Next.js emits from `src/app/documentero/icon.png` and `apple-icon.png`
  * (their <link> href is the segment path, `/documentero/icon.png?<hash>`).
  * Without this the documentero tab showed eghiseul's favicon (19.09.2026).
  */
-const DOCUMENTERO_STATIC_ICON = /^\/documentero\/(icon|apple-icon)\d*\.(png|svg|ico)$/
+const BRAND_STATIC_ICON = /^\/(documentero|cazierfiscal)\/(icon|apple-icon)\d*\.(png|svg|ico)$/
 
 export async function proxy(request: NextRequest) {
   if (WORDPRESS_GONE.test(request.nextUrl.pathname)) {
@@ -42,8 +42,8 @@ export async function proxy(request: NextRequest) {
     })
   }
   if (
-    DOCUMENTERO_INTERNAL.test(request.nextUrl.pathname) &&
-    !DOCUMENTERO_STATIC_ICON.test(request.nextUrl.pathname)
+    BRAND_INTERNAL.test(request.nextUrl.pathname) &&
+    !BRAND_STATIC_ICON.test(request.nextUrl.pathname)
   ) {
     return new NextResponse(null, {
       status: 404,
@@ -108,6 +108,8 @@ export const config = {
     // Grupul intern documentero — literal, nu prin rewrite-ul de host.
     '/documentero',
     '/documentero/:path*',
+    '/cazierfiscal',
+    '/cazierfiscal/:path*',
     // Rutele moarte de WordPress — prinse ca să răspundă 410, nu 403.
     '/wp-admin/:path*',
     '/wp-content/:path*',

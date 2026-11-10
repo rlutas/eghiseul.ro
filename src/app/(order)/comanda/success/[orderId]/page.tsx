@@ -312,7 +312,9 @@ export default function SuccessPage() {
       const adsLabel =
         brand.id === 'documentero'
           ? process.env.NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL_DOCUMENTERO
-          : process.env.NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL;
+          : brand.id === 'cazierfiscal'
+            ? process.env.NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL_CAZIERFISCAL
+            : process.env.NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL;
       if (adsLabel) {
         // Enhanced conversions (hashed by gtag; sent only with ad_user_data granted).
         const ecEmail = order.customer_data?.contact?.email?.trim().toLowerCase();

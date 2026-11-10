@@ -16,6 +16,21 @@ const DOCUMENTERO_HOSTS = [
 const DOCUMENTERO_HOST_RE = `(?:${DOCUMENTERO_HOSTS.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`;
 const onDocumentero = [{ type: 'host' as const, value: DOCUMENTERO_HOST_RE }];
 
+/**
+ * Hosts served as cazier-fiscal.ro (third brand, 2026-11-10): same pattern as
+ * documentero, route group `src/app/cazierfiscal/`.
+ */
+const CAZIERFISCAL_HOSTS = [
+  'cazier-fiscal.ro',
+  'www.cazier-fiscal.ro',
+  ...(process.env.CAZIERFISCAL_EXTRA_HOSTS ?? '')
+    .split(',')
+    .map((h) => h.trim().toLowerCase())
+    .filter(Boolean),
+];
+const CAZIERFISCAL_HOST_RE = `(?:${CAZIERFISCAL_HOSTS.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`;
+const onCazierFiscal = [{ type: 'host' as const, value: CAZIERFISCAL_HOST_RE }];
+
 const nextConfig: NextConfig = {
   // Knowledge Center (/admin/ghid) citește markdown-ul din `docs/` la runtime.
   // Vercel împachetează în funcție DOAR fișierele urmărite static, iar
@@ -54,7 +69,7 @@ const nextConfig: NextConfig = {
    * eghiseul.ro/documentero/… can never be crawled as a duplicate.
    */
   async rewrites() {
-    const SHARED = 'api|_next|comanda|account|orders|auth|completare|reincarca-poza|documentero|images|og|icons|fonts|favicon\\.ico|icon\\.png|apple-icon\\.png|manifest\\.json|\\.well-known';
+    const SHARED = 'api|_next|comanda|account|orders|auth|completare|reincarca-poza|documentero|cazierfiscal|images|og|icons|fonts|favicon\\.ico|icon\\.png|apple-icon\\.png|manifest\\.json|\\.well-known';
     return {
       beforeFiles: [
         // IndexNow key file, per host (src/lib/seo/indexnow.ts). First, so the
@@ -71,6 +86,17 @@ const nextConfig: NextConfig = {
           source: `/:path((?!(?:${SHARED})(?:/|$)).+)`,
           has: onDocumentero,
           destination: '/documentero/:path',
+        },
+        // cazier-fiscal.ro — same rules, its own group.
+        { source: '/', has: onCazierFiscal, destination: '/cazierfiscal' },
+        { source: '/robots.txt', has: onCazierFiscal, destination: '/cazierfiscal/robots.txt' },
+        { source: '/sitemap.xml', has: onCazierFiscal, destination: '/cazierfiscal/sitemap.xml' },
+        { source: '/llms.txt', has: onCazierFiscal, destination: '/cazierfiscal/llms.txt' },
+        { source: '/favicon.ico', has: onCazierFiscal, destination: '/images/cazierfiscal/favicon.ico' },
+        {
+          source: `/:path((?!(?:${SHARED})(?:/|$)).+)`,
+          has: onCazierFiscal,
+          destination: '/cazierfiscal/:path',
         },
         // The internal group path (`/documentero/…` typed literally, on any
         // host) is refused in src/proxy.ts — middleware sees the ORIGINAL
@@ -343,7 +369,7 @@ const nextConfig: NextConfig = {
       { source: '/category/informatii-utile/extras-de-carte-funciara', destination: '/servicii/extras-de-carte-funciara/', permanent: true },
       { source: '/cookies-policy', destination: '/politica-cookies/', permanent: true },
     ];
-    return rules.map((r) => ({ ...r, missing: [...(('missing' in r && Array.isArray(r.missing)) ? r.missing : []), ...onDocumentero] }));
+    return rules.map((r) => ({ ...r, missing: [...(('missing' in r && Array.isArray(r.missing)) ? r.missing : []), ...onDocumentero, ...onCazierFiscal] }));
   },
 
   // Baseline security headers on every route. HSTS is already added by Vercel
