@@ -132,7 +132,9 @@ export default async function OrderPage({ params, searchParams }: OrderPageProps
       <Suspense fallback={<WizardLoading />}>
         <ModularWizardProvider initialPrefill={initialPrefill}>
           <ModularOrderWizard
-            initialService={serviceData.service}
+            // SEO fields stay server-side: their text names eghiseul.ro and the
+            // client never reads them (satellite brands are kept separate).
+            initialService={{ ...serviceData.service, meta_title: null, meta_description: null } as Service}
             initialOptions={serviceData.options}
             headerExtra={switcher}
           />

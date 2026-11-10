@@ -28,7 +28,7 @@ const bricolage = Bricolage_Grotesque({
 export const metadata: Metadata = {
   metadataBase: new URL(brand.baseUrl),
   title: {
-    default: 'Cazier fiscal online prin avocat, fără SPV | cazierfiscal.com',
+    absolute: 'Cazier fiscal online | cazierfiscal.com',
     template: '%s | cazierfiscal.com',
   },
   authors: [{ name: brand.name }],
@@ -37,7 +37,8 @@ export const metadata: Metadata = {
   alternates: {},
   verification: {},
   creator: brand.name,
-  openGraph: { siteName: brand.name, locale: 'ro_RO', type: 'website' },
+  openGraph: { siteName: brand.name, locale: 'ro_RO', type: 'website', images: [{ url: `${brand.baseUrl}${brand.ogDefault}` }] },
+  twitter: { card: 'summary_large_image', images: [`${brand.baseUrl}${brand.ogDefault}`] },
   robots: CAZIERFISCAL_INDEXABLE ? { index: true, follow: true } : { index: false, follow: false },
 };
 

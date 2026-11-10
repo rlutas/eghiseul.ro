@@ -70,8 +70,8 @@ Auditul `/seo` (tehnic, conținut, schema, performanță, SERP) a dat: Lighthous
 
 ### Ce rămâne (de făcut de Raul)
 
-1. **GA4 propriu:** proprietate nouă în contul Google al lui Raul (nu în proprietatea eghiseul), apoi `NEXT_PUBLIC_GA_MEASUREMENT_ID_CAZIERFISCAL` în Vercel și redeploy.
+1. **GA4 propriu:** cont GA nou „cazierfiscal” (nu în contul eghiseul și nici în alt cont existent; crearea cere acceptarea termenilor Google, deci o face Raul), apoi `NEXT_PUBLIC_GA_MEASUREMENT_ID_CAZIERFISCAL` în Vercel și redeploy.
 2. **Google Ads:** cont/etichetă de conversie proprie, apoi `NEXT_PUBLIC_GOOGLE_ADS_ID_CAZIERFISCAL` și `NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL_CAZIERFISCAL` în Vercel. Fără ele nu se măsoară conversiile din reclame.
-3. **Search Console în contul lui Raul:** proprietatea Domain e verificată de contul de serviciu; Raul o adaugă în contul lui (verificarea DNS TXT o pune Claude în Vercel DNS).
+3. ✅ **Search Console în contul lui Raul:** proprietatea Domain `cazierfiscal.com` e verificată și în contul lui (TXT propriu în Vercel DNS, 10.11.2026), pe lângă contul de serviciu.
 4. **Urme care rămân:** telefonul (+40 757 708 181) e același cu eghiseul; firma, CUI-ul și ANPC sunt obligatorii; codul JS conține configurația tuturor brandurilor (vizibilă doar citind bundle-ul); emailurile tranzacționale pleacă de pe eghiseul până la upgrade Resend.
 5. **Ghiduri:** cel mult 1–2 pe săptămână (regula 2 din content-and-seo). Următoarele candidate: diferența cazier fiscal / atestare fiscală, cazier fiscal pentru angajare.
