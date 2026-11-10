@@ -6,7 +6,7 @@
 - Clienții care au cumpărat de pe CazierJudiciarOnline.com primesc **un singur email** de Black Friday, cu numele site-ului CJO, nu cu eghiseul. Reducerea de 20% se aplică singură în formular, până luni, 16.11, ora 23:59.
 - Un client nu primește emailul dacă a mai comandat în ultimele 14 zile, dacă a primit alt email de la noi în ultimele 3 zile sau dacă s-a dezabonat.
 - Clienții ecazier.ro **nu** primesc acest email: ecazier e cabinetul avocatei și nu trimitem campanii de acolo.
-- Pornirea trimiterii o decide Raul. Până atunci nu pleacă nimic.
+- Trimiterea a pornit pe 10.11: primii 120 de clienți au primit emailul. Restul (aproximativ 360) îl primesc automat, câte 120 pe zi, până pe 13.11.
 - Bing (motorul de căutare Microsoft) a fost verificat pe toate cele 4 site-uri: sitemap-urile se citesc fără erori. Detaliile sunt mai jos.
 
 ---
@@ -23,11 +23,14 @@ Commit CJO `d3b98f3c`. Este un nou tip de email lifecycle, `black_friday`, în `
 
 De ce a fost nevoie: campania BF de pe eghiseul filtrează pe `contacts.stripe_last_paid_at`, care vine din contul Stripe al eghiseul. Cei 769 de cumpărători CJO din `contacts` nu au trecut acest filtru, deci campania i-a sărit pe toți.
 
-Pași pentru pornire:
-1. rulezi migrarea 045 pe baza CJO;
-2. copiezi în `email_suppressions` (CJO) adresele dezabonate pe eghiseul;
-3. adaugi `black_friday` în `LIFECYCLE_EMAILS` (Vercel, proiectul `cazierjudiciaronline-com`) și redeploy;
-4. rulezi cronul cu `?dry=1` și verifici numărul.
+Pornit pe 10.11.2026:
+1. migrarea 045 rulată pe baza CJO;
+2. 372 de adrese dezabonate sau blocate pe eghiseul (`contacts.marketing_status` `unsubscribed`/`suppressed`) copiate în `email_suppressions` pe CJO, cu `reason` `eghiseul_unsubscribed`/`eghiseul_suppressed` (total 400);
+3. `LIFECYCLE_EMAILS=expiry_reminder,review_request,cross_sell,black_friday` pe Vercel, apoi redeploy;
+4. rulare locală fără trimitere: 482 de adrese eligibile;
+5. cronul pornit manual (`vercel crons run /api/cron/lifecycle-emails`): 120 trimise, 0 eșuate. Restul pleacă cu cronul zilnic de la 07:20 UTC.
+
+După 16.11, scoate `black_friday` din `LIFECYCLE_EMAILS`. Codul nu mai trimite oricum după `BLACK_FRIDAY_ENDS_AT`.
 
 ## Bing Webmaster (date până pe 07.11)
 
