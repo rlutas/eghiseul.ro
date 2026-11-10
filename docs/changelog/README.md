@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-10 | 🟣 **CJO: casetă de comandă pe 5 ghiduri; marcajul de recenzii anulat** — `OrderShortcutBox` pe model cerere, reabilitare, ștergere, valabilitate, angajare; review schema încalcă ghidul Google | [2026-11-10-cjo-faza-1-caseta-comanda.md](2026-11-10-cjo-faza-1-caseta-comanda.md) |
 | 2026-11-10 | 🔴 **CJO: Faza 0 SEO tehnic** — 404 pe sluguri de oraș necunoscute, meniuri în HTML de server, 301 Oradea, noindex status-comanda, spațiu în H1, 3 ghiduri în hub-ul home | [2026-11-10-cjo-faza-0-seo-tehnic.md](2026-11-10-cjo-faza-0-seo-tehnic.md) |
 | 2026-11-10 | 🔵 **Plan de creștere organic pe 4 site-uri** — GSC 16 luni, GA4 + comenzi, Bing, crawl CJO, SERP real; CJO prioritar (404 pe sluguri de oraș, meniu SSR, canibalizare), eghiseul paginile de bani 1/săpt., fără site nou | [2026-11-10-plan-crestere-organic.md](2026-11-10-plan-crestere-organic.md) |
 | 2026-11-10 | 🟣 **CJO și ecazier: email Black Friday către clienții vechi (pornit, 220/zi); Bing API + GA4 pe 4 site-uri** — lifecycle `black_friday` (o dată/adresă, 120/rulare, doar listat explicit), migrarea CJO 045; Bing: eghiseul stabil, CJO/ecazier/documentero aproape absente | [2026-11-10-cjo-email-black-friday-bing.md](2026-11-10-cjo-email-black-friday-bing.md) |

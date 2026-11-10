@@ -132,6 +132,8 @@ Depinde de verdictul din 17.11. Dacă cele 4 orașe rescrise (Iași, Brașov, Ti
 | 1.5 | Drum spre comandă pe paginile informaționale care rankează: o casetă „Nu vrei să mergi la ghișeu? Îl obținem noi”, cu preț și termen, pe model cerere, reabilitare, după cât timp se șterge, valabilitate, angajare | ~2.100 de sesiuni, 0 vânzări pe primele două | 0 comenzi din aceste pagini după 4 săptămâni | `begin_checkout` cu `landing` pe aceste pagini (atribuirea CJO există din 06.10) |
 | 1.6 | Recenzii Google reale ca marcaj, doar unde se poate cinstit: Review sau aggregateRating pe `Service`/`Product`, cu recenziile vizibile în pagină și sursa curentă | stelele au dispărut (3,8k afișări → 0); scoaterea a fost corectă, dar acum avem recenzii reale | Google nu reafișează stelele în 4 săptămâni → nu insistăm | `REVIEW_SNIPPET` în GSC |
 
+**Stare 10.11:** 1.5 livrat (CJO `d6426af0`). 1.6 **anulat**: ghidul Google interzice recenziile agregate de pe alt site și pe cele „self-serving” despre firmă, iar `Service` nu e eligibil. Detalii în [changelog](../../changelog/2026-11-10-cjo-faza-1-caseta-comanda.md). 1.1–1.4 schimbă titluri, deci pornesc după 17.11, câte 2 pe săptămână.
+
 Regula de ritm: 1.1–1.4 sunt 4 pagini rescrise, deci se fac pe 2 săptămâni. 1.5 e o componentă, nu un text nou.
 
 ### Faza 2: decembrie – ianuarie. Eghiseul, paginile de bani, câte una pe săptămână
@@ -203,7 +205,7 @@ Bing IndexNow e deja pe ambele repo-uri. Bing urmărit lunar în raportul `monit
 
 ## 6. Decizii (luate pe 10.11)
 
-1. **Recenziile ca marcaj (1.6): DA, pe CJO.** Recenziile Google reale stau vizibile în pagină, iar pagina spune clar că vin din profilul eGhișeul.ro. Intră în Faza 1, după verdictul din 17.11.
+1. **Recenziile ca marcaj (1.6): aprobat, apoi anulat pe 10.11.** Ghidul Google pentru fragmentele cu recenzii nu permite recenzii agregate de pe alt site sau despre firma care le afișează. Recenziile rămân vizibile în pagină, fără schema.
 2. **Profil de companie Google (3.3): NU facem unul nou.** Sursa recenziilor rămâne profilul eGhișeul existent.
 3. **Comunicatul cu date agregate (3.2): DA.** Doar termene medii pe județ, calculate din comenzi; fără nume, fără date despre clienți, fără cifre de vânzări. Faza 3.
 4. **Proprietate GSC veche pentru CJO: EXISTĂ.** `https://cazierjudiciaronline.com/` (prefix URL), pe contul Google care deține CJO, are istoric din iulie 2025. Cifrele înainte/după sunt în §1, CJO. Contul claude-seo o citește prin API din 10.11: e proprietar verificat pe domeniu, deci a adăugat-o singur în lista lui (`sites.add`). Datele zilnice încep pe 01.07.2025.
