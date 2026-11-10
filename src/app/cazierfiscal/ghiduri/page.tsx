@@ -28,7 +28,7 @@ export default function GhiduriPage() {
       <main id="main-content">
         <Section reveal={false} className="mt-12 flex flex-col gap-4 lg:mt-20">
           <Eyebrow>Ghiduri</Eyebrow>
-          <h1 className="m-0 text-[36px] font-bold leading-[1.04] tracking-[-0.035em] sm:text-[52px]">Despre cazierul fiscal, pe scurt.</h1>
+          <h1 className="m-0 text-[36px] font-bold leading-[1.04] tracking-[-0.035em] sm:text-[52px]">Ghiduri despre cazierul fiscal</h1>
         </Section>
         <Section className="mt-10 grid gap-5 md:grid-cols-2">
           {CAZIERFISCAL_GUIDES.length === 0 ? (

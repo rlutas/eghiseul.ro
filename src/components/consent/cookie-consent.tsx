@@ -19,7 +19,9 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 const GA_ID_DOCUMENTERO = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID_DOCUMENTERO || GA_ID;
 // cazierfiscal.com: own stream once created; until then the eghiseul stream
 // collects it (hostname separates it in reports).
-const GA_ID_CAZIERFISCAL = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID_CAZIERFISCAL || GA_ID;
+// No fallback to the eghiseul stream: cazierfiscal.com must not report into
+// eghiseul's GA property (kept separate on purpose, 10.11.2026).
+const GA_ID_CAZIERFISCAL = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID_CAZIERFISCAL || '';
 type BrandKey = 'eghiseul' | 'documentero' | 'cazierfiscal';
 function gaIdFor(brand: BrandKey): string | undefined {
   if (brand === 'documentero') return GA_ID_DOCUMENTERO;
@@ -183,8 +185,12 @@ function applyConsent(state: ConsentState, brand: BrandKey) {
   // Eticheta Google Ads și pixelul OpenAI Ads țin de marketing, nu de analytics.
   if (state.marketing) {
     loadAds(brand);
-    loadOpenAiPixel();
-    loadMetaPixel();
+    // The OpenAI and Meta pixels belong to the eghiseul ad accounts; cazierfiscal.com
+    // stays out of them (separate brand, 10.11.2026).
+    if (brand !== 'cazierfiscal') {
+      loadOpenAiPixel();
+      loadMetaPixel();
+    }
   }
 }
 

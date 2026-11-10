@@ -37,8 +37,8 @@ export function FooterCazierFiscal() {
               Cazier fiscal pentru persoane fizice, obținut prin avocat, fără cont SPV și fără drum la ANAF.
             </p>
             <p className="m-0 text-[14px] text-d-muted">
-              <a href={`mailto:${brand.contactEmail}`} className="hover:text-d-ink">
-                {brand.contactEmail}
+              <a href="/contact/" className="hover:text-d-ink">
+                Formular de contact
               </a>{' '}
               · {brand.phoneDisplay} · {SUPPORT_HOURS_SHORT}
             </p>

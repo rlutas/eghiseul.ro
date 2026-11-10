@@ -54,3 +54,24 @@ Ce rămâne, pentru că e obligatoriu: firma (eDigitalizare SRL, CUI, adresă), 
 - **Săptămâna 1–2:** indexarea paginii principale (GSC → Inspectare URL).
 - **Săptămâna 3–6:** afișări pe „cazier fiscal online” și „cazier fiscal persoana fizica”. Pozițiile vin după afișări.
 - **Comenzi** cu badge „cazier-fiscal” în admin. Le comparăm cu comenzile de fiscal de pe CJO, ca să vedem dacă se mută comenzi sau se adaugă.
+
+
+## Audit SEO și curățenie, 10.11.2026 (după lansare)
+
+Auditul `/seo` (tehnic, conținut, schema, performanță, SERP) a dat: Lighthouse mobil 98/96/100/100, LCP 1,1 s, CLS 0. Ce am reparat în aceeași zi:
+
+- **Urme eghiseul în HTML:** pagina 404 și wizardul aveau canonical `https://eghiseul.ro/`, autor „eGhiseul.ro” și codul de verificare Search Console al eghiseul. Acum 404-ul are pagina lui (`src/app/cazierfiscal/not-found.tsx` + catch-all), iar layout-urile suprascriu `alternates`, `verification`, `authors`.
+- **404-ul rădăcină** (`src/app/not-found.tsx`) e acum neutru, fără footerul eghiseul: arborele lui intră în payload-ul RSC al fiecărei pagini, pe orice host, așa că linkurile spre ecazier/documentero apăreau și în HTML-ul cazierfiscal.com.
+- **Email:** `contact@eghiseul.ro` nu mai apare nicăieri pe site. Contactul trece prin formularul de pe `/contact/`, care trimite tot în căsuța eghiseul.
+- **GA:** nu mai cade pe streamul eghiseul. Fără `NEXT_PUBLIC_GA_MEASUREMENT_ID_CAZIERFISCAL`, site-ul nu încarcă GA deloc. Pixelii OpenAI și Meta (conturile eghiseul) nu se încarcă pe cazierfiscal.com.
+- **Hero:** fără eticheta de deasupra H1; pe mobil ordinea e H1, cardul de preț cu butonul, apoi textul și bifele. Animațiile de apariție sunt oprite pe acest brand (pagina „apărea și dispărea” pe telefon).
+- **Conținut:** secțiune „Cazier fiscal fără SPV” pe pagina principală și primele două ghiduri: `/ghiduri/cazier-fiscal-din-spv/` și `/ghiduri/cazier-fiscal-din-strainatate/`. Autorul articolelor e brandul (autorul global al site-urilor are pagina pe eghiseul.ro).
+- **Schema:** `Offer` simplu în loc de `AggregateOffer` cu un singur preț.
+
+### Ce rămâne (de făcut de Raul)
+
+1. **GA4 propriu:** proprietate nouă în contul Google al lui Raul (nu în proprietatea eghiseul), apoi `NEXT_PUBLIC_GA_MEASUREMENT_ID_CAZIERFISCAL` în Vercel și redeploy.
+2. **Google Ads:** cont/etichetă de conversie proprie, apoi `NEXT_PUBLIC_GOOGLE_ADS_ID_CAZIERFISCAL` și `NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL_CAZIERFISCAL` în Vercel. Fără ele nu se măsoară conversiile din reclame.
+3. **Search Console în contul lui Raul:** proprietatea Domain e verificată de contul de serviciu; Raul o adaugă în contul lui (verificarea DNS TXT o pune Claude în Vercel DNS).
+4. **Urme care rămân:** telefonul (+40 757 708 181) e același cu eghiseul; firma, CUI-ul și ANPC sunt obligatorii; codul JS conține configurația tuturor brandurilor (vizibilă doar citind bundle-ul); emailurile tranzacționale pleacă de pe eghiseul până la upgrade Resend.
+5. **Ghiduri:** cel mult 1–2 pe săptămână (regula 2 din content-and-seo). Următoarele candidate: diferența cazier fiscal / atestare fiscală, cazier fiscal pentru angajare.

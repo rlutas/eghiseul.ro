@@ -37,6 +37,10 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: { siteName: brand.name, locale: 'ro_RO', type: 'website', images: [{ url: `${brand.baseUrl}${brand.ogDefault}` }] },
     twitter: { card: 'summary_large_image', images: [`${brand.baseUrl}${brand.ogDefault}`] },
     robots: { index: false, follow: false },
+    authors: [{ name: brand.name }],
+    creator: brand.name,
+    alternates: {},
+    verification: {},
   };
 }
 

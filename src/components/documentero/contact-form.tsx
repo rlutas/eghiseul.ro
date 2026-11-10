@@ -33,6 +33,8 @@ export interface ContactFormCopy {
   contextLabel?: string;
   contextPlaceholder?: string;
   messagePlaceholder?: string;
+  /** Newsletter checkbox text; null hides the checkbox. */
+  newsletterLabel?: string | null;
 }
 
 export function ContactFormDocumentero({ whatsappHref, copy = {} }: { whatsappHref: string; copy?: ContactFormCopy }) {
@@ -139,10 +141,12 @@ export function ContactFormDocumentero({ whatsappHref, copy = {} }: { whatsappHr
         <p className="m-0 rounded-xl border border-[#E0B4A8] bg-[#FBEDE8] px-4 py-3 text-[14px] text-[#7A2E1C]" role="alert">{error}</p>
       )}
 
-      <label className="flex cursor-pointer items-start gap-2.5 text-[13px] leading-[1.5] text-d-muted">
-        <input type="checkbox" name="newsletter" className="mt-0.5 h-4 w-4 rounded border-d-line accent-d-acc" />
-        <span>Vreau să primesc pe email ghidurile noi de pe documentero.ro. Mă pot dezabona oricând, cu un click.</span>
-      </label>
+      {copy.newsletterLabel !== null && (
+        <label className="flex cursor-pointer items-start gap-2.5 text-[13px] leading-[1.5] text-d-muted">
+          <input type="checkbox" name="newsletter" className="mt-0.5 h-4 w-4 rounded border-d-line accent-d-acc" />
+          <span>{copy.newsletterLabel ?? 'Vreau să primesc pe email ghidurile noi de pe documentero.ro. Mă pot dezabona oricând, cu un click.'}</span>
+        </label>
+      )}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <button type="submit" disabled={status === 'sending'} className="inline-flex h-[52px] items-center justify-center rounded-xl bg-d-acc px-6 text-[16px] font-bold text-d-ink transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60">

@@ -3,11 +3,9 @@ import { LegalLayoutCazierFiscal } from '@/components/cazierfiscal/legal-layout'
 import { CookieSettingsLink } from '@/components/consent/cookie-settings-link';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { cazierFiscalBreadcrumb, cazierFiscalOrganizationNode, cazierFiscalWebsiteNode } from '@/lib/seo/cazierfiscal-schema';
-import { BRANDS } from '@/lib/brand/brands';
 import { CAZIERFISCAL_INDEXABLE } from '@/config/cazierfiscal-nav';
 
 const PATH = '/politica-cookies/';
-const brand = BRANDS.cazierfiscal;
 
 export const metadata = buildPageMetadata({
   brand: 'cazierfiscal',
@@ -159,7 +157,7 @@ export default function Page() {
 
         <h2>Contact</h2>
         <p>
-          Întrebări despre cookie-uri sau date: <a href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a>.
+          Întrebări despre cookie-uri sau date: <a href="/contact/">formularul de contact</a>.
         </p>
       </LegalLayoutCazierFiscal>
     </>

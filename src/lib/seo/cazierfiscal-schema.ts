@@ -9,7 +9,6 @@
  */
 import { BRANDS } from '@/lib/brand/brands';
 import { ORGANIZATION } from './constants';
-import { authorNode, authorSchemaId, SITE_AUTHOR } from './author';
 
 const brand = BRANDS.cazierfiscal;
 const BASE = brand.baseUrl;
@@ -32,7 +31,7 @@ export function cazierFiscalOrganizationNode() {
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: ORGANIZATION.contactPoint.telephone,
-      email: brand.contactEmail,
+      url: `${BASE}/contact/`,
       contactType: 'customer service',
       areaServed: 'RO',
       availableLanguage: ['Romanian', 'English'],
@@ -92,14 +91,10 @@ export function cazierFiscalServiceGraph(input: CazierFiscalServiceInput) {
         areaServed: { '@type': 'Country', name: 'România' },
         // Service + Offer only (02.11.2026): the Product node carried a false
         // free-shipping detail and pulled the page into Merchant listings.
-        offers: {
-          '@type': 'AggregateOffer',
-          lowPrice: Math.min(...prices),
-          highPrice: Math.max(...prices),
-          priceCurrency: 'RON',
-          offerCount: input.offers.length,
-          url,
-        },
+        offers:
+          input.offers.length === 1
+            ? { '@type': 'Offer', name: input.offers[0].name, price: input.offers[0].price, priceCurrency: 'RON', availability: 'https://schema.org/InStock', url: `${BASE}/comanda/cazier-fiscal/` }
+            : { '@type': 'AggregateOffer', lowPrice: Math.min(...prices), highPrice: Math.max(...prices), priceCurrency: 'RON', offerCount: input.offers.length, url },
       },
       {
         '@type': 'WebPage',
@@ -139,7 +134,6 @@ export function cazierFiscalArticleGraph(input: {
   faq?: Array<{ q: string; a: string }>;
 }) {
   const url = `${BASE}${input.path}`;
-  const author = { name: SITE_AUTHOR.name, url: SITE_AUTHOR.url };
   return {
     '@context': 'https://schema.org',
     '@graph': [
@@ -155,12 +149,13 @@ export function cazierFiscalArticleGraph(input: {
         datePublished: input.datePublished,
         dateModified: input.dateModified,
         ...(input.image ? { image: `${BASE}${input.image}` } : {}),
-        author: { '@id': authorSchemaId(author) },
+        // Author = the brand, not SITE_AUTHOR: that person's page lives on
+        // eghiseul.ro, and this brand is kept separate (10.11.2026).
+        author: { '@id': `${BASE}/#organization` },
         publisher: { '@id': `${BASE}/#organization` },
         mainEntityOfPage: { '@type': 'WebPage', '@id': url },
         inLanguage: 'ro-RO',
       },
-      authorNode(author),
       ...(input.faq && input.faq.length > 0
         ? [
             {

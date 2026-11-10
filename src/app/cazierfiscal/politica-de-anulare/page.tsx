@@ -2,12 +2,11 @@ import Link from 'next/link';
 import { LegalLayoutCazierFiscal } from '@/components/cazierfiscal/legal-layout';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { cazierFiscalBreadcrumb, cazierFiscalOrganizationNode, cazierFiscalWebsiteNode } from '@/lib/seo/cazierfiscal-schema';
-import { BRANDS, CAZIERFISCAL_SERVICE_SLUGS } from '@/lib/brand/brands';
+import { CAZIERFISCAL_SERVICE_SLUGS } from '@/lib/brand/brands';
 import { CAZIERFISCAL_INDEXABLE, CAZIERFISCAL_TRACK_HREF } from '@/config/cazierfiscal-nav';
 import { createPublicClient } from '@/lib/supabase/public';
 
 const PATH = '/politica-de-anulare/';
-const brand = BRANDS.cazierfiscal;
 
 export const metadata = buildPageMetadata({
   brand: 'cazierfiscal',
@@ -146,7 +145,7 @@ export default async function Page() {
           autorități, iar serviciul este personalizat pe datele tale. Conform OUG 34/2014 art. 16
           lit. m), dreptul legal de retragere nu se aplică după începerea efectivă a prestării
           serviciului. Dacă ai o situație specială, scrie-ne la{' '}
-          <a href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a> sau pe WhatsApp; analizăm
+          <a href="/contact/">formularul de contact</a> sau pe WhatsApp; analizăm
           fiecare caz.
         </p>
 

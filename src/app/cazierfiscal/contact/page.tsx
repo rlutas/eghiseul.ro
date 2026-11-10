@@ -28,7 +28,7 @@ export default function ContactPage() {
   const wa = `https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent('Bună! Am o întrebare despre cazierul fiscal (cazierfiscal.com).')}`;
   const channels = [
     { k: 'W', t: `WhatsApp · ${brand.phoneDisplay}`, d: `${SUPPORT_HOURS_SHORT} · răspuns de obicei sub o oră · poți trimite poze cu ce ți se cere`, h: wa, primary: true },
-    { k: '@', t: brand.contactEmail, d: 'pentru întrebări detaliate; răspundem în aceeași zi lucrătoare', h: `mailto:${brand.contactEmail}`, primary: false },
+    { k: '@', t: 'Formularul de mai jos', d: 'pentru întrebări detaliate; răspundem în aceeași zi lucrătoare', h: '#formular', primary: false },
     { k: '☎', t: `Telefon · ${brand.phoneDisplay}`, d: SUPPORT_HOURS_SHORT, h: `tel:${brand.phoneDisplay.replace(/\s/g, '')}`, primary: false },
   ];
   return (
@@ -63,6 +63,7 @@ export default function ContactPage() {
               <span className="text-[22px] font-bold tracking-[-0.02em]">Scrie-ne</span>
               <span className="text-[14px] text-d-muted">Trei rânduri ajung. Răspundem pe email, în orele de program.</span>
             </div>
+            <div id="formular" className="scroll-mt-24" />
             <ContactFormDocumentero
               whatsappHref={wa}
               copy={{
@@ -75,6 +76,7 @@ export default function ContactPage() {
                 topicLabel: 'Despre ce e vorba?',
                 contextLabel: 'Pentru ce dosar sau instituție?',
                 contextPlaceholder: 'angajare, licitație, bancă…',
+                newsletterLabel: null,
                 messagePlaceholder: 'Ex.: îmi trebuie pentru o licitație până vineri, nu am cont SPV. Se poate?',
               }}
             />

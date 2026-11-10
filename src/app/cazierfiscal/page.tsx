@@ -108,38 +108,14 @@ export default async function CazierFiscalHome() {
         <section className="relative overflow-hidden bg-d-ink text-white">
           <div aria-hidden="true" className="pointer-events-none absolute -right-40 -top-40 h-[520px] w-[520px] rounded-full bg-d-acc/25 blur-[120px]" />
           <div aria-hidden="true" className="pointer-events-none absolute -bottom-48 -left-32 h-[420px] w-[420px] rounded-full bg-[#7B3F8C]/40 blur-[120px]" />
-          <div className="relative mx-auto grid max-w-[1312px] items-center gap-10 px-4 pb-16 pt-10 sm:px-6 lg:grid-cols-12 lg:px-8 lg:pb-24 lg:pt-16">
-            <div className="flex flex-col gap-6 lg:col-span-7">
-              <span className="d-rise inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-[13px] font-semibold text-white/80">
-                <span className="h-2 w-2 rounded-full bg-d-acc" />
-                Persoane fizice · serviciu privat, nu suntem ANAF
-              </span>
-              <h1 style={{ animationDelay: '80ms' }} className="d-rise m-0 text-[42px] font-bold leading-[1] tracking-[-0.04em] sm:text-[60px] lg:text-[72px]">
-                Cazier fiscal <span className="text-d-acc">online</span>
-              </h1>
-              <p style={{ animationDelay: '160ms' }} className="d-rise m-0 max-w-[600px] text-[18px] leading-[1.55] text-white/75 sm:text-[20px]">
-                Fără cont SPV și fără drum la ghișeu. Completezi formularul pe telefon, avocatul depune cererea la ANAF,
-                iar certificatul de cazier fiscal îl primești pe email.
-              </p>
-              <div style={{ animationDelay: '240ms' }} className="d-rise flex flex-wrap items-center gap-3">
-                <Link
-                  href={ORDER}
-                  className="inline-flex h-14 items-center gap-2.5 rounded-xl bg-d-acc px-7 text-[17px] font-bold text-d-ink shadow-[0_12px_32px_rgba(255,138,91,0.35)] transition-transform hover:-translate-y-0.5"
-                >
-                  Comandă cazierul fiscal <Arrow />
-                </Link>
-                <span className="text-[15px] text-white/70">
-                  <strong className="text-[22px] font-extrabold text-white">{lei(p.basePrice)} lei</strong> · {term}
-                </span>
-              </div>
-              <ul className="m-0 grid list-none gap-3 p-0 pt-2 text-[15px] text-white/80 sm:grid-cols-3">
-                {['Depunere prin avocat', 'Certificatul pe email', 'Originalul prin curier'].map((t) => (
-                  <li key={t} className="flex items-center gap-2"><Check className="shrink-0 text-d-acc" />{t}</li>
-                ))}
-              </ul>
-            </div>
+          {/* Mobile order (Raul, 10.11.2026): H1, then the price card with the order
+              button, then the text and the ticks. On desktop the card sits right. */}
+          <div className="relative mx-auto grid max-w-[1312px] gap-8 px-4 pb-16 pt-10 sm:px-6 lg:grid-cols-12 lg:gap-x-10 lg:gap-y-6 lg:px-8 lg:pb-24 lg:pt-20">
+            <h1 className="m-0 text-[44px] font-bold leading-[1] tracking-[-0.04em] sm:text-[60px] lg:col-span-7 lg:row-start-1 lg:self-end lg:text-[76px]">
+              Cazier fiscal <span className="text-d-acc">online</span>
+            </h1>
 
-            <aside style={{ animationDelay: '200ms' }} className="d-rise flex flex-col gap-4 rounded-3xl bg-d-card p-6 text-d-ink shadow-[0_30px_80px_rgba(0,0,0,0.35)] sm:p-7 lg:col-span-5 lg:col-start-8 xl:col-span-4 xl:col-start-9">
+            <aside className="flex flex-col gap-4 rounded-3xl bg-d-card p-6 text-d-ink shadow-[0_30px_80px_rgba(0,0,0,0.35)] sm:p-7 lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1 lg:self-center xl:col-span-4 xl:col-start-9">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex flex-col gap-1">
                   <span className="text-[14px] font-semibold text-d-muted">Certificat de cazier fiscal</span>
@@ -169,6 +145,29 @@ export default async function CazierFiscalHome() {
                 Începe comanda <Arrow />
               </Link>
             </aside>
+
+            <div className="flex flex-col gap-6 lg:col-span-7 lg:row-start-2">
+              <p className="m-0 max-w-[600px] text-[18px] leading-[1.55] text-white/75 sm:text-[20px]">
+                Fără cont SPV și fără drum la ghișeu. Completezi formularul pe telefon, avocatul depune cererea la ANAF,
+                iar certificatul de cazier fiscal îl primești pe email.
+              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  href={ORDER}
+                  className="inline-flex h-14 items-center gap-2.5 rounded-xl bg-d-acc px-7 text-[17px] font-bold text-d-ink shadow-[0_12px_32px_rgba(255,138,91,0.35)] transition-transform hover:-translate-y-0.5"
+                >
+                  Comandă cazierul fiscal <Arrow />
+                </Link>
+                <span className="text-[15px] text-white/70">
+                  <strong className="text-[22px] font-extrabold text-white">{lei(p.basePrice)} lei</strong> · {term}
+                </span>
+              </div>
+              <ul className="m-0 grid list-none gap-3 p-0 text-[15px] text-white/80 sm:grid-cols-3">
+                {['Depunere prin avocat', 'Certificatul pe email', 'Originalul prin curier'].map((t) => (
+                  <li key={t} className="flex items-center gap-2"><Check className="shrink-0 text-d-acc" />{t}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
 
@@ -268,6 +267,33 @@ export default async function CazierFiscalHome() {
                 Comandă online <Arrow />
               </Link>
             </div>
+          </div>
+        </Section>
+
+        <Section id="fara-spv" className="mt-24 grid scroll-mt-24 gap-8 lg:mt-32 lg:grid-cols-12">
+          <div className="flex flex-col gap-4 lg:col-span-7">
+            <Eyebrow>Fără SPV</Eyebrow>
+            <H2>Cazier fiscal fără SPV: ce poți face</H2>
+            <p className="m-0 text-[17px] leading-[1.7] text-d-body">
+              Fără cont în Spațiul Privat Virtual ai două drumuri: mergi la orice ghișeu ANAF cu actul de identitate sau
+              trimiți pe cineva împuternicit. Legea permite ca cererea să fie depusă de un împuternicit sau de un avocat
+              (OG 39/2015, art. 9 alin. 1).
+            </p>
+            <p className="m-0 text-[17px] leading-[1.7] text-d-body">
+              La noi, împuternicitul e avocatul. Nu ai nevoie de certificat digital, de programare sau de cerere
+              tipărită: semnezi împuternicirea pe telefon și primești certificatul pe email.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3 self-start lg:col-span-4 lg:col-start-9">
+            <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-d-muted">Ghiduri</span>
+            <Link href="/ghiduri/cazier-fiscal-din-spv/" className="flex flex-col gap-1 rounded-2xl border border-d-line bg-d-card p-5 hover:border-d-acc">
+              <span className="text-[16px] font-bold">Cazier fiscal din SPV, pas cu pas</span>
+              <span className="text-[14px] text-d-muted">Dacă ai cont, îl ceri singur, gratuit.</span>
+            </Link>
+            <Link href="/ghiduri/cazier-fiscal-din-strainatate/" className="flex flex-col gap-1 rounded-2xl border border-d-line bg-d-card p-5 hover:border-d-acc">
+              <span className="text-[16px] font-bold">Cazier fiscal din străinătate</span>
+              <span className="text-[14px] text-d-muted">Fără drum în țară: SPV, împuternicit sau avocat.</span>
+            </Link>
           </div>
         </Section>
 

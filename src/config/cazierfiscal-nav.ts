@@ -21,4 +21,17 @@ export const CAZIERFISCAL_NAV = [
  * Guides published on the site. A guide goes here only once its page exists:
  * the footer, /ghiduri/ and the sitemap all read this list.
  */
-export const CAZIERFISCAL_GUIDES: ReadonlyArray<{ href: string; label: string; hint: string; updated: string }> = [];
+export const CAZIERFISCAL_GUIDES: ReadonlyArray<{ href: string; label: string; hint: string; updated: string }> = [
+  {
+    href: '/ghiduri/cazier-fiscal-din-spv/',
+    label: 'Cazier fiscal din SPV',
+    hint: 'Cum îl ceri singur, gratuit, din Spațiul Privat Virtual, și ce faci dacă nu ai cont.',
+    updated: '2026-11-10',
+  },
+  {
+    href: '/ghiduri/cazier-fiscal-din-strainatate/',
+    label: 'Cazier fiscal din străinătate',
+    hint: 'SPV, împuternicit sau avocat; valabilitatea de 30 de zile, traducerea și apostila.',
+    updated: '2026-11-10',
+  },
+];

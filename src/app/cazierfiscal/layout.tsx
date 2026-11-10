@@ -32,6 +32,10 @@ export const metadata: Metadata = {
     template: '%s | cazierfiscal.com',
   },
   authors: [{ name: brand.name }],
+  // Override the root layout's eghiseul values: its canonical and its GSC
+  // token must not reach this host (GSC here is verified by DNS TXT).
+  alternates: {},
+  verification: {},
   creator: brand.name,
   openGraph: { siteName: brand.name, locale: 'ro_RO', type: 'website' },
   robots: CAZIERFISCAL_INDEXABLE ? { index: true, follow: true } : { index: false, follow: false },

@@ -238,8 +238,8 @@ export default function Page() {
         <h2>17. Reclamații, legislație aplicabilă și soluționarea litigiilor</h2>
         <p>
           Pentru orice nelămuriri, sugestii sau reclamații ne poți contacta pe{' '}
-          <a href={`https://wa.me/${brand.whatsappNumber}`} target="_blank" rel="noopener noreferrer">WhatsApp</a> sau la{' '}
-          <a href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a>. Ne angajăm să răspundem prompt și să
+          <a href={`https://wa.me/${brand.whatsappNumber}`} target="_blank" rel="noopener noreferrer">WhatsApp</a> sau prin{' '}
+          <a href="/contact/">formularul de contact</a>. Ne angajăm să răspundem prompt și să
           tratăm toate sesizările cu seriozitate.
         </p>
         <p>
@@ -253,8 +253,8 @@ export default function Page() {
 
         <h2>18. Contact</h2>
         <p>
-          eDigitalizare SRL · CUI RO49278701 · Reg. Com. J2023001097301 · email:{' '}
-          <a href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a> · telefon/WhatsApp:{' '}
+          eDigitalizare SRL · CUI RO49278701 · Reg. Com. J2023001097301 · contact:{' '}
+          <a href="/contact/">formularul de contact</a> · telefon/WhatsApp:{' '}
           <a href={`tel:${brand.phoneDisplay.replace(/\s/g, '')}`}>{brand.phoneDisplay}</a>.
         </p>
       </LegalLayoutCazierFiscal>

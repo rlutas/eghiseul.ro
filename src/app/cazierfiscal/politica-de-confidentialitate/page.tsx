@@ -34,7 +34,7 @@ export default function Page() {
       cazierFiscalBreadcrumb([{ name: 'Acasă', path: '/' }, { name: 'Politica de confidențialitate', path: PATH }], PATH),
     ],
   };
-  const email = <a href={`mailto:${brand.contactEmail}`}>{brand.contactEmail}</a>;
+  const email = <a href="/contact/">formularul de contact</a>;
   const phone = <a href={`tel:${brand.phoneDisplay.replace(/\s/g, '')}`}>{brand.phoneDisplay}</a>;
   return (
     <>
@@ -194,7 +194,7 @@ export default function Page() {
           <li><strong>Dreptul de a retrage consimțământul</strong> în orice moment, fără a afecta legalitatea prelucrării anterioare.</li>
         </ul>
         <p>
-          Pentru exercitarea acestor drepturi, scrie-ne la {email}. Răspundem în termenul legal de cel mult 30 de zile.
+          Pentru exercitarea acestor drepturi, scrie-ne prin {email} sau prin poștă, la sediul firmei. Răspundem în termenul legal de cel mult 30 de zile.
         </p>
 
         <h2>10. Cookie-uri</h2>

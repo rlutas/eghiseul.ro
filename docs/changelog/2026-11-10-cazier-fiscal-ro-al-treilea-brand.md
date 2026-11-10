@@ -9,6 +9,8 @@
 - Dacă un client sună de pe cazierfiscal.com: suntem aceeași firmă, iar el plătește asistența avocatului, nu documentul (la ANAF și în SPV certificatul e gratuit).
 - Site-ul e live din 10.11.2026. Pe site nu există procesare urgentă la cazierul fiscal, iar termenul afișat e 1–3 zile lucrătoare.
 - Site-ul nu face trimitere la eghiseul.ro. Firma și datele legale sunt aceleași.
+- Pe site nu mai apare adresa de email. Clienții scriu prin formularul de contact, iar mesajele ajung tot la noi, pe adresa obișnuită.
+- Pe site sunt două ghiduri: cazier fiscal din SPV și cazier fiscal din străinătate. Le poți trimite clienților care întreabă.
 
 ---
 

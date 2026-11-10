@@ -85,7 +85,7 @@ export default function DesprePage() {
           {[
             ['Ce nu suntem', 'Nu suntem ANAF și nu lucrăm pentru ANAF. Certificatul îl eliberează doar ANAF, iar tu îl poți cere și singur, gratuit.'],
             ['Ce facem', 'Ne ocupăm de cerere, de drum și de ridicare. Îți trimitem certificatul scanat pe email, iar originalul prin curier, dacă îl vrei.'],
-            ['Cum ne găsești', `${brand.phoneDisplay} pe WhatsApp sau telefon, ${brand.contactEmail}. ${SUPPORT_HOURS_SHORT}.`],
+            ['Cum ne găsești', `${brand.phoneDisplay} pe WhatsApp sau telefon, sau prin formularul de contact. ${SUPPORT_HOURS_SHORT}.`],
           ].map(([t, d]) => (
             <Card key={t} className="flex flex-col gap-2.5 rounded-2xl p-6">
               <span className="text-[18px] font-bold">{t}</span>
