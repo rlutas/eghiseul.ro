@@ -1,4 +1,4 @@
-# 10.11.2026 — CJO: email Black Friday către clienții vechi; verificare Bing
+# 10.11.2026 — CJO: email Black Friday către clienții vechi; Bing și GA4 conectate
 <!-- categorie: automatizari -->
 
 ## Pentru echipă
@@ -8,6 +8,8 @@
 - Clienții ecazier.ro **nu** primesc acest email: ecazier e cabinetul avocatei și nu trimitem campanii de acolo.
 - Trimiterea a pornit pe 10.11: primii 120 de clienți au primit emailul. Restul (aproximativ 360) îl primesc automat, câte 120 pe zi, până pe 13.11.
 - Bing (motorul de căutare Microsoft) a fost verificat pe toate cele 4 site-uri: sitemap-urile se citesc fără erori. Pe eghiseul, clicurile din Bing au crescut cu 25% în ultima lună, deși pe Google au scăzut. Raportul SEO lunar include acum și Bing.
+- Am șters din Bing sitemap-urile vechi de pe WordPress (pe eghiseul și pe CJO). Fiecare site are acum un singur sitemap, cel bun.
+- Google Analytics se poate citi automat pe toate cele 4 site-uri, nu doar pe eghiseul.
 
 ---
 
@@ -32,6 +34,21 @@ Pornit pe 10.11.2026:
 
 După 16.11, scoate `black_friday` din `LIFECYCLE_EMAILS`. Codul nu mai trimite oricum după `BLACK_FRIDAY_ENDS_AT`.
 
+## Google Analytics 4: acces pe toate site-urile
+
+Contul de serviciu `claude-seo@caziere.iam.gserviceaccount.com` a fost adăugat ca Participant (doar citire, fără notificare pe email) pe proprietățile CJO (`402467033`) și ecazier (`536020358`). Pe documentero (`555162763`) avea deja rolul Analist, moștenit din contul eGhiseul. ID-urile sunt în `~/.config/claude-seo/google-api.json`, la `ga4_properties`.
+
+Verificat prin Data API, sesiuni și evenimente-cheie pe ultimele 28 de zile:
+
+| Site | Sesiuni | Evenimente-cheie |
+|---|---:|---:|
+| eghiseul.ro | 12.347 | 86 |
+| cazierjudiciaronline.com | 3.549 | 36 |
+| documentero.ro | 84 | 0 |
+| ecazier.ro | 51 | 0 |
+
+Cifrele pe ecazier sunt reale: în aceleași 28 de zile, ecazier nu a avut nicio comandă (CJO a avut 53, din care 40 plătite). GA se încarcă doar după acordul pentru cookie-uri, deci sesiunile reale sunt ceva mai multe.
+
 ## Bing Webmaster (date până pe 07.11)
 
 | Site | Clicuri | Afișări | Observație |
@@ -41,6 +58,8 @@ După 16.11, scoate `black_friday` din `LIFECYCLE_EMAILS`. Codul nu mai trimite 
 | ecazier.ro (30 zile) | 0 | 58 | aproape absent |
 | documentero.ro (30 zile) | 0 | 22 | aproape absent |
 
-- Sitemap-urile se citesc fără erori. Pe eghiseul au rămas două intrări vechi din WordPress (`sitemap_index.xml`, din care una pe `www`), cu ultima citire în octombrie 2025. Le poți șterge din Bing.
+- Sitemap-urile se citesc fără erori. Intrările vechi din WordPress (`sitemap_index.xml` pe eghiseul, pe `www.eghiseul.ro` și pe CJO, ultima citire în octombrie 2025) au fost șterse pe 10.11.
+- Statistici de crawl prin API (`GetCrawlStats`, `GetCrawlIssues`): nicio problemă raportată, 0 erori 5xx, 0 timeout. Paginile în index Bing: eghiseul 180, CJO 78, documentero 20, ecazier 13.
+- IndexNow e deja implementat pe ambele repo-uri (`src/lib/seo/indexnow.ts` + cron).
 - Cheia API Bing a fost generată pe 10.11 și salvată local în `~/.config/claude-seo/google-api.json` (`bing_api_key`). Cheia vede toate cele 19 site-uri din cont.
 - `scripts/seo/monitor-lunar.py` are acum o secțiune Bing: clicuri și afișări pe aceleași 28 de zile ca GSC. Prima măsurătoare (11.10–07.11 față de 13.09–10.10): eghiseul are 2.545 clicuri față de 2.031 (+25%), CJO are 55 față de 63.
