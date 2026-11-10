@@ -6101,6 +6101,7 @@ const CIVIL_STATUS_LABELS: Array<[string, string]> = [
   ['bornAbroad', 'Născut(ă) în străinătate'],
   ['birthLocality', 'Localitatea nașterii'],
   ['birthCounty', 'Județul nașterii'],
+  ['birthCountry', 'Țara nașterii'],
   ['nationality', 'Naționalitate'],
   ['birthName', 'Numele la naștere'],
   ['fatherName', 'Numele tatălui'],

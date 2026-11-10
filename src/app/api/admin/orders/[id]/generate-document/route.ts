@@ -224,12 +224,14 @@ export async function POST(
       previous_name: personal.previousName || civil.birthName || '',
       birth_date: personal.birthDate || '',
       birth_county: personal.birthPlace || personal.birthCounty || '',
-      birth_country: personal.birthCountry || 'ROMANIA',
+      birth_country: personal.birthCountry || civil.birthCountry || 'ROMANIA',
       // Extras multilingv (ANEXA 4): localitatea + județul nașterii, separate.
       // Localitatea = pasul civil-status (celibat) sau OCR-ul CI (birthPlace,
       // curățat de prefixe în generator); județul = civil-status sau CNP.
       birth_locality: civil.birthLocality || personal.birthPlace || '',
-      birth_judet: civil.birthCounty || '',
+      // Born abroad (celibat): no Romanian county exists — print the country
+      // instead of letting buildJudetNastere fall back to the CNP county code.
+      birth_judet: (civil.bornAbroad && civil.birthCountry) || civil.birthCounty || '',
       // Extras multilingv căsătorie (ANEXA 4): soțul/soția + data + locul
       // căsătoriei (registrationPlace = județul care a înregistrat actul).
       // La certificat-nastere registrationPlace = județul actului de NAȘTERE

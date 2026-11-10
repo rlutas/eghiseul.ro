@@ -664,6 +664,7 @@ export interface CivilStatusState {
   bornAbroad?: boolean;             // Nașterea a avut loc în străinătate
   birthLocality?: string;           // Localitatea în care v-ați născut (celibat)
   birthCounty?: string;             // Județul / Sectorul în care v-ați născut (celibat)
+  birthCountry?: string;            // Țara nașterii când bornAbroad (celibat, în loc de birthCounty)
   nationality?: string;             // Naționalitatea (celibat)
   currentlyMarried?: boolean;       // Sunteți căsătorit(ă)?
   maritalStatus?: 'necasatorit' | 'casatorit' | 'divortat' | 'vaduv';

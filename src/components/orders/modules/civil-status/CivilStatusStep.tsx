@@ -160,7 +160,10 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
     if (fields.birthPlace) req(cs.bornAbroad !== undefined, 'Unde s-a înregistrat nașterea (România sau străinătate)');
     if (fields.birthLocality) {
       req(!!cs.birthLocality?.trim(), 'Localitatea nașterii');
-      req(bcComplete, 'Județul (și sectorul, pentru București) nașterii');
+      if (!fields.birthPlace) req(cs.bornAbroad !== undefined, 'Țara nașterii (România sau străinătate)');
+      if (cs.bornAbroad && !fields.birthPlace) req(!!cs.birthCountry?.trim(), 'Țara în care v-ați născut');
+      else if (cs.bornAbroad !== undefined || fields.birthPlace)
+        req(bcComplete, 'Județul (și sectorul, pentru București) nașterii');
     }
     if (fields.marriageAbroadIntent && cs.marriageAbroadIntent === true) {
       req(!!cs.futureSpouseName?.trim(), 'Numele viitorului soț / viitoarei soții');
@@ -307,7 +310,33 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
           </Field>
         )}
 
-        {fields.birthLocality && (
+        {/* Celibat: nașterea poate fi în străinătate (act transcris în
+            România). Fără asta, clienții născuți afară erau forțați să
+            aleagă un județ românesc (cerere echipă, 10.11.2026). Când
+            serviciul are deja întrebarea birthPlace, nu o dublăm. */}
+        {fields.birthLocality && !fields.birthPlace && (
+          <Field label="Țara în care v-ați născut:" required>
+            <ChoiceRow
+              current={cs.bornAbroad === undefined ? undefined : cs.bornAbroad ? 'strainatate' : 'ro'}
+              onChange={(v) =>
+                updateCivilStatus(
+                  v === 'strainatate'
+                    ? { bornAbroad: true, birthCounty: undefined }
+                    : { bornAbroad: false, birthCountry: undefined }
+                )
+              }
+              options={PLACE}
+            />
+            {cs.bornAbroad && (
+              <Notice tone="warn">
+                Dacă nașterea a avut loc în străinătate și <strong>nu a fost transcrisă</strong> în România,
+                nu putem elibera documentul solicitat.
+              </Notice>
+            )}
+          </Field>
+        )}
+
+        {fields.birthLocality && (fields.birthPlace || cs.bornAbroad !== undefined) && (
           <div className="grid sm:grid-cols-2 gap-4">
             <Field label="Localitatea în care v-ați născut" required>
               <Input
@@ -316,6 +345,16 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
                 placeholder="Oraș / comună"
               />
             </Field>
+            {cs.bornAbroad && !fields.birthPlace ? (
+              <Field label="Țara în care v-ați născut" required>
+                <SearchableSelect
+                  options={COUNTRIES.filter((c) => c !== 'România')}
+                  value={cs.birthCountry ?? ''}
+                  placeholder="Caută țara..."
+                  onChange={(country) => updateCivilStatus({ birthCountry: country })}
+                />
+              </Field>
+            ) : (
             <Field label="Județul în care v-ați născut" required>
               <SearchableSelect
                 options={CIVIL_COUNTY_OPTIONS}
@@ -343,6 +382,7 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
                 </div>
               )}
             </Field>
+            )}
           </div>
         )}
 
