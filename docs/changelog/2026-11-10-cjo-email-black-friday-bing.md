@@ -1,12 +1,12 @@
-# 10.11.2026 — CJO: email Black Friday către clienții vechi; Bing și GA4 conectate
+# 10.11.2026 — CJO și ecazier: email Black Friday către clienții vechi; Bing și GA4 conectate
 <!-- categorie: automatizari -->
 
 ## Pentru echipă
 
 - Clienții care au cumpărat de pe CazierJudiciarOnline.com primesc **un singur email** de Black Friday, cu numele site-ului CJO, nu cu eghiseul. Reducerea de 20% se aplică singură în formular, până luni, 16.11, ora 23:59.
 - Un client nu primește emailul dacă a mai comandat în ultimele 14 zile, dacă a primit alt email de la noi în ultimele 3 zile sau dacă s-a dezabonat.
-- Clienții ecazier.ro **nu** primesc acest email: ecazier e cabinetul avocatei și nu trimitem campanii de acolo.
-- Trimiterea a pornit pe 10.11: primii 120 de clienți au primit emailul. Restul (aproximativ 360) îl primesc automat, câte 120 pe zi, până pe 13.11.
+- Clienții ecazier.ro primesc și ei emailul, cu numele și logo-ul ecazier, de pe adresa ecazier (decizia lui Raul, 10.11). Doar cei care au plătit; comenzile deschise și neplătite nu primesc nimic. Celelalte emailuri automate (expirare, recenzie, recomandări) rămân doar pe CJO.
+- Trimiterea a pornit pe 10.11. Până acum au primit emailul 340 de clienți (152 CJO, 188 ecazier). Restul, aproximativ 410, îl primesc automat, câte 220 pe zi, până pe 12.11.
 - Bing (motorul de căutare Microsoft) a fost verificat pe toate cele 4 site-uri: sitemap-urile se citesc fără erori. Pe eghiseul, clicurile din Bing au crescut cu 25% în ultima lună, deși pe Google au scăzut. Raportul SEO lunar include acum și Bing.
 - Am șters din Bing sitemap-urile vechi de pe WordPress (pe eghiseul și pe CJO). Fiecare site are acum un singur sitemap, cel bun.
 - Google Analytics se poate citi automat pe toate cele 4 site-uri, nu doar pe eghiseul.
@@ -19,9 +19,18 @@ Commit CJO `d3b98f3c`. Este un nou tip de email lifecycle, `black_friday`, în `
 
 - se trimite o singură dată pe adresă și se leagă de ultima comandă;
 - nu se trimite dacă adresa a plătit în ultimele 14 zile (`BLACK_FRIDAY_RECENT_ORDER_DAYS`) sau a primit alt email lifecycle în ultimele 3 zile (`BLACK_FRIDAY_QUIET_DAYS`);
-- are plafonul lui, 120 pe rulare (`BLACK_FRIDAY_MAX_PER_RUN`), și se oprește singur după `BLACK_FRIDAY_ENDS_AT`;
+- are plafonul lui, 220 pe rulare (`BLACK_FRIDAY_MAX_PER_RUN`; era 120 până la intrarea ecazier), și se oprește singur după `BLACK_FRIDAY_ENDS_AT`;
 - nu intră în `LIFECYCLE_EMAILS=all`; se trimite doar dacă e listat explicit în variabila de mediu;
 - migrarea CJO `045_lifecycle_black_friday.sql` adaugă `black_friday` în `lifecycle_emails_kind_check`.
+
+### ecazier (commit CJO `f9d351ef`)
+
+- `load.ts` încarcă comenzile plătite din ambele surse (`cazierjudiciaronline`, `ecazier`). Cele ecazier contează și la verificările de tip „a mai cumpărat”.
+- `isEligibleBase(o, ctx, allowEcazier)`: comenzile ecazier sunt eligibile doar pentru `black_friday`. Tipurile zilnice rămân doar pe CJO, iar testul o verifică.
+- Emailul e scris despre ultima comandă plătită a adresei. O adresă primește un singur email BF, indiferent de site; marca o dă sursa comenzii.
+- Pe ecazier: `comenzi@ecazier.ro`, layoutul cabinetului (`cabinetLifecycleHtml` din `email-cabinet.ts`), link spre ecazier.ro, dezabonare pe `ecazier.ro/api/email/unsubscribe`. Pagina de dezabonare arată linkul și adresa de contact ale site-ului pe care a fost deschisă.
+- Eligibili la pornire: 271 ecazier + 362 CJO. Prima rulare după deploy: 220 trimise (188 ecazier, 32 CJO), 0 eșuate.
+- Primul build de producție a picat la descărcarea fonturilor Google (`next/font/google`, eroare de rețea, nu de cod). A trecut la redeploy.
 
 De ce a fost nevoie: campania BF de pe eghiseul filtrează pe `contacts.stripe_last_paid_at`, care vine din contul Stripe al eghiseul. Cei 769 de cumpărători CJO din `contacts` nu au trecut acest filtru, deci campania i-a sărit pe toți.
 
