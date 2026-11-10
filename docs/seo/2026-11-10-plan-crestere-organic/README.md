@@ -204,7 +204,7 @@ Bing IndexNow e deja pe ambele repo-uri. Bing urmărit lunar în raportul `monit
 1. **Recenziile ca marcaj (1.6): DA, pe CJO.** Recenziile Google reale stau vizibile în pagină, iar pagina spune clar că vin din profilul eGhișeul.ro. Intră în Faza 1, după verdictul din 17.11.
 2. **Profil de companie Google (3.3): NU facem unul nou.** Sursa recenziilor rămâne profilul eGhișeul existent.
 3. **Comunicatul cu date agregate (3.2): DA.** Doar termene medii pe județ, calculate din comenzi; fără nume, fără date despre clienți, fără cifre de vânzări. Faza 3.
-4. **Proprietate GSC veche pentru CJO: EXISTĂ.** `https://cazierjudiciaronline.com/` (prefix URL), pe contul Google care deține CJO, are istoric din iulie 2025. Cifrele înainte/după sunt în §1, CJO. Contul claude-seo nu e încă adăugat pe ea: trebuie adăugat manual (Setări → Utilizatori și permisiuni → Adaugă, permisiune „Restricționată”). După asta, scriptul lunar poate citi și august.
+4. **Proprietate GSC veche pentru CJO: EXISTĂ.** `https://cazierjudiciaronline.com/` (prefix URL), pe contul Google care deține CJO, are istoric din iulie 2025. Cifrele înainte/după sunt în §1, CJO. Contul claude-seo o citește prin API din 10.11: e proprietar verificat pe domeniu, deci a adăugat-o singur în lista lui (`sites.add`). Datele zilnice încep pe 01.07.2025.
 
 ---
 
