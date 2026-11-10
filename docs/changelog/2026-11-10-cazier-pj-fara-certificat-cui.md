@@ -7,6 +7,7 @@
 - **De ce:** clienții veneau din emailurile de reactivare, pe formularul de cazier unde alegi „persoană fizică / firmă” pe loc. Acolo pasul „Documente firmă” nu era pornit. Pe formularul dedicat „cazier pentru firmă” documentul se cerea, de aceea acolo n-a lipsit niciodată.
 - **Ce s-a schimbat:** pe ambele formulare, clientul firmă nu mai poate trece mai departe fără certificatul CUI. Dacă totuși ajunge la plată fără el, comanda e oprită și i se cere să revină la pasul „Documente firmă”.
 - **cazierjudiciaronline.com și ecazier.ro:** câmpul pentru certificat exista, dar nu era obligatoriu. Toate comenzile de firmă din septembrie–octombrie îl au, pentru că clienții l-au încărcat singuri. Acum e obligatoriu și acolo.
+- **Pe CJO, cererea și împuternicirea** se salvează ca Word (DOCX) când nu se pot face PDF, ca pe eghiseul. Nu se schimbă nimic pentru voi: documentul se deschide la fel din comandă.
 - **Comenzile deja venite fără CUI:** E-261019-CX84E, E-261105-JGZ3U, E-261105-27GS2, E-261105-7ZTJ7, E-261106-7UKTJ. Toate sunt finalizate. Dacă vreuna mai are nevoie de document, folosiți „Solicită documente” pe pagina comenzii: certificatul CUI e acum bifat implicit în listă.
 
 ---
@@ -19,3 +20,7 @@
 - `/api/orders/[id]/submit`: guard nou după `settleCompanyDocuments` cu codul de eroare `COMPANY_DOCUMENTS_INCOMPLETE` (400). Se activează când serviciul cere documentele, comanda are `company.cui` și `clientType` ≠ `pf`. Fiecare tip din `requiredDocuments` trebuie să aibă un `s3Key` care nu e `foreign` (vezi `classifyCompanyDocumentKey`).
 - CJO `Step3Documents.tsx`: validarea pune eroarea `errs.cert` pentru PJ fără certificat, iar `FileUploadField` primește `required` și `error`.
 - Am comparat fluxul combinat cu cele dedicate: prețul și opțiunile sunt identice. Diferențe rămase, fără impact pe acte: `urgent_days` 2 pe combinat față de 3 pe PJ dedicat, iar combinatul cere datele părinților și de la reprezentantul PJ.
+
+### CJO: cererea și împuternicirea în DOCX fără zgomot în loguri
+
+Pe CJO, `/api/admin/cerere` și `/api/admin/delegation` foloseau `convertDocxToPdf` sincron, care rula `soffice` pe calea macOS și pe Vercel. Pe Vercel calea nu există, așa că apărea status 127 în logurile de eroare la fiecare generare. Răspunsul era totuși 200, iar DOCX-ul se salva ca rezervă. Acum funcția întoarce `null` fără `exec` când `findSoffice()` nu găsește LibreOffice, ca pe eghiseul. Fără `CLOUDCONVERT_API_KEY`, echipa primește DOCX, iar deschiderea din admin (`/api/admin/orders/[id]/doc`) încearcă în continuare PDF-ul și cade pe DOCX.
