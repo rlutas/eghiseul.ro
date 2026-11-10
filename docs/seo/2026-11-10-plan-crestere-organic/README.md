@@ -163,6 +163,26 @@ Indicator: afișările săptămânale pe `/servicii/` (anexa 01 §1.2). Primul s
 - Fiecare ghid are drum spre comandă: documentero are 0 comenzi organice.
 - Lipsește evenimentul `purchase` în GA4 pe documentero; se adaugă.
 
+### Faza 2c: long tail pe ecazier și documentero (decizia lui Raul, 10.11)
+
+Raul vrea ca ecazier și documentero să concureze în organic, pe cuvinte long tail unde site-urile mari nu apar bine. Date GSC, 08.08–07.11 (ecazier, documentero) și 01.05–07.11 (eghiseul):
+
+| Site | Afișări / clicuri, 90 zile | Unde stă | Ce înseamnă |
+|---|---|---|---|
+| ecazier | 1.764 / 32 | cazier auto: 12–18 (`/acte-necesare-cazier-auto` 13, `/cazier-auto` 13–18); fiscal: 20–55 | auto e nișa reală; fiscalul îl pierde în fața CJO (care rankează fiscalul cu home, tot slab: 8–17) |
+| documentero | 629 / 9 | ghidul „certificat de naștere vechi” 2,6–8; „celibat online” 6; „certificat de naștere pierdut” 75 | concurează cu eghiseul, care pe aceleași interogări stă pe 2–7 (59k afișări, 3k clicuri în 6 luni) |
+
+**ecazier: clusterul cazier auto, câte un ghid pe săptămână, doar pe întrebări fără răspuns pe niciun site al nostru.**
+- Primul: **taxa pentru cazierul auto / cazier pentru școala de șoferi.** „taxa cazier auto” are 438 de afișări (CJO pe 9,3 cu home, ecazier pe 15), „taxa cazier pentru scoala de soferi” 214 (CJO 10,6, ecazier 23). Nicio pagină nu răspunde la întrebare. Faptele (taxă, ghiseul.ro, ce cere DRPCIV) se verifică pe surse oficiale înainte de scris.
+  **Livrat 10.11** (`7a820a2b`): `ecazier.ro/taxa-cazier-auto`, plus corecturi de fapt pe CJO și ecazier (`1fa7ea98`). Detalii în [changelog](../../changelog/2026-11-10-ecazier-taxa-cazier-auto-corecturi.md). Următorul ghid ecazier: nu mai devreme de 17.11.
+- Fiscalul rămâne pe CJO. Două domenii ale aceleiași firme pe aceeași interogare se taie între ele.
+
+**documentero: fără pagini noi pe stare civilă în noiembrie.** Are deja 7 ghiduri (pierdut, acte, cât durează, vechi tipizat, apostilă, procură, celibat). Nu-i lipsește conținutul. Pierde pentru că eghiseul, mai puternic, răspunde la aceleași întrebări. O pagină nouă ar tăia din eghiseul fără să câștige.
+- documentero câștigă doar întrebări foarte precise („certificatul de naștere vechi mai este valabil” 2,6; „declarație că nu sunt căsătorit” 1,0). Ghidurile noi vin doar pe asemenea întrebări, după ce verificăm că eghiseul nu are pagină pe ele.
+- `purchase` în GA4 pe documentero: codul există (pagina de succes e comună, cu ID-ul GA documentero setat în Vercel). 0 evenimente pentru că n-au fost vânzări cu acord de cookie-uri, nu dintr-o eroare. Se verifică la prima comandă.
+
+**eghiseul: întrebările „unde / de unde se scoate / ce acte / cât durează” pentru certificatul de naștere** (~700 de afișări în 6 luni) cad pe pagina de serviciu, pe 7–12. Există `/acte-necesare-certificat-de-nastere`, dar Google nu o alege. Intră în Faza 2, la rescrierea paginii de certificat de naștere: răspunsuri directe în pagină și link clar spre pagina de acte.
+
 ### Faza 3: off-page, fără linkuri cumpărate
 
 | # | Acțiune | De ce |
