@@ -68,7 +68,7 @@ export default function Page() {
         <ul>
           <li><strong>Certificatul constatator pentru firmă</strong> (societate, PFA, întreprindere individuală sau familială), în varianta de bază sau extinsă;</li>
           <li><strong>Certificatul constatator pentru persoană fizică</strong>, care arată calitățile unei persoane în firmele înregistrate la ONRC;</li>
-          <li><strong>Certificatul constatator cu istoric</strong>, care cuprinde și modificările înregistrate în timp.</li>
+          <li><strong>Raportul istoric despre o firmă</strong> (numit și certificat constatator cu istoric), care cuprinde și modificările înregistrate în timp; ONRC îl emite în cel mult 30 de zile.</li>
         </ul>
         <p>Nu prestăm alte servicii pe această platformă.</p>
 

@@ -91,3 +91,13 @@ Candidate, în ordinea cererii: tipurile de certificat constatator (de bază, ex
 - Comenzile cu badge „constatator” în admin, comparate cu constatatorul de pe eghiseul (2–5 pe săptămână acum).
 - Reclame: cost pe comandă sub 40 de lei (echilibru) după două săptămâni, altfel oprim și ajustăm.
 - Organic: indexare în săptămâna 1–2, afișări pe „certificat constatator online” în săptămânile 3–6.
+
+## Fapte verificate pe surse ONRC (11.11.2026)
+
+- Taxa certificatului constatator: 30 lei (Ordinul MJ 380/C/2024, anexa pct. 1), aceeași pentru SRL, PFA, II, IF. Pagina ONRC „Certificate constatatoare” o confirmă.
+- „Cu istoric” = oficial **raport istoric despre o firmă**, 250 lei/firmă (anexa pct. 2), emis în cel mult 30 de zile; de la înființare sau pe o perioadă aleasă (formularul 11-10-188, pct. 4.2).
+- „Extins” / „detaliat” nu există ca tip oficial: un singur certificat, scopul se bifează (licitație, bancă, viză, leasing, notariat, fonduri IMM, CAS, insolvență, altele).
+- Certificat pentru persoană fizică după CNP: există, 30 lei. Nu am confirmat că se poate cere online (InfoCert); de aceea pagina promite viteza doar la certificatul de bază pe firmă.
+- „Furnizare informații” e alt serviciu (liste de firme după criteriu, 9 lei/criteriu/firmă).
+- Emitere electronică cu semnătură/sigiliu calificat: Legea 265/2022 art. 11 alin. 3; InfoCert 24/7, plată cu cardul.
+- Valabilitate: nicio lege nu o fixează; „30 de zile” e cerința instituțiilor care primesc certificatul.

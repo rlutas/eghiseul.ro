@@ -231,12 +231,12 @@ export default async function ConstatatorHome() {
             rows={[
               ['Pe firmă', 'Situația la zi: denumire, CUI, sediu, capital, asociați, administratori, coduri CAEN, puncte de lucru', `${lei(p.firma)} lei`],
               ['Pe persoană fizică', 'În ce firme o persoană e asociat sau administrator; se emite și pentru PFA, II și IF', `${lei(p.pf)} lei`],
-              ['Cu istoric', 'Toate mențiunile din registru, de la înființarea firmei până azi', `${lei(p.istoric)} lei`],
+              ['Cu istoric', 'Raportul istoric ONRC: mențiunile din registru, de la înființare sau pe o perioadă aleasă. ONRC îl emite în cel mult 30 de zile', `${lei(p.istoric)} lei`],
             ]}
           />
           <p className="m-0 max-w-[760px] text-[15px] leading-[1.65] text-d-muted">
             „Extins” și „detaliat” nu sunt documente separate: așa îi spun unele instituții certificatului pe firmă.
-            Taxa ONRC e de 30 lei pentru certificatul pe firmă sau pe persoană și de 250 lei pentru cel cu istoric.
+            Taxa ONRC e de 30 lei pentru certificatul pe firmă sau pe persoană și de 250 lei pentru raportul istoric (Ordinul MJ 380/C/2024).
           </p>
           <div>
             <Link href={ORDER} className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-d-ink px-6 text-[15px] font-bold text-white hover:opacity-90">
