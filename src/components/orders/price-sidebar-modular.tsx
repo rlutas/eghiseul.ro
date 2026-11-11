@@ -16,7 +16,7 @@ import { SystemStatus } from '@/components/services/system-status';
 import { useCivilStatusTerms } from '@/hooks/use-civil-status-terms';
 import { resolveCivilTermTier } from '@/lib/civil-status/delivery-terms';
 import { instantPlatformProvider, platformStatusProvider } from '@/lib/services/platform-services';
-import { getServiceSpecimen } from '@/config/service-specimens';
+import { getServiceSpecimen, BRAND_SPECIMENS } from '@/config/service-specimens';
 import { useBrand } from '@/lib/brand/client';
 import Image from 'next/image';
 
@@ -118,9 +118,9 @@ export function PriceSidebarModular({ service, variant = 'full' }: PriceSidebarM
         ? `${estimate.minDays} zile lucrătoare`
         : `${estimate.minDays}-${estimate.maxDays} zile lucrătoare`;
 
-  // Specimen images carry the eGhișeul lettering — hidden on other brands until they get their own.
+  // Shared specimen images carry the eGhișeul lettering; other brands only show their own clean ones.
   const brand = useBrand();
-  const specimen = brand.id === 'eghiseul' ? getServiceSpecimen(service.slug) : null;
+  const specimen = brand.id === 'eghiseul' ? getServiceSpecimen(service.slug) : (BRAND_SPECIMENS[brand.id]?.[service.slug] ?? null);
 
   return (
     <div className="space-y-3">

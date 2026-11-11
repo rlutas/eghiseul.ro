@@ -7,6 +7,7 @@
 - Datele firmei (nume, CUI, Reg. Com.) rămân doar în Termeni și condiții, Confidențialitate și Contact, cum cere legea. Pagina Despre și pagina principală nu le mai afișează.
 - Iconița site-ului apare corect și pe pagina de comandă și pe telefon.
 - Cele două ghiduri (SPV, străinătate) au o casetă „Pe scurt” sus și au fost recitite pe lege; câteva formulări greșite au fost corectate.
+- Pe pagina principală e acum o poză cu specimenul certificatului de cazier fiscal și explicația fiecărei părți; aceeași poză apare și lângă formularul de comandă.
 - Comenzile de pe cazierfiscal.com se măsoară acum într-un Google Analytics separat.
 - Rețeta după care am făcut site-ul, ca s-o repetăm pentru alte servicii: playbook-ul din documentația SEO.
 
@@ -23,3 +24,4 @@
 - GA4: cont nou „cazierfiscal”, `G-DGW62V4WXX` în `NEXT_PUBLIC_GA_MEASUREMENT_ID_CAZIERFISCAL` (Vercel, production).
 - Docs: `docs/seo/playbook-site-de-nisa-un-serviciu.md` (nou), `docs/cazier-fiscal/README.md` (secțiunea 11.11 + harta cuvintelor cheie), date în `docs/cazier-fiscal/cuvinte-cheie-2026-11/`.
 - Completare (11.11, a doua livrare): scos rândul cu firma/CUI/Reg. Com. de pe `/despre/` și numele firmei din intro și din meta description; FAQ-ul „Sunteți ANAF?” trimite la T&C pentru datele firmei; schema `Organization` fără `legalName` și `address`. `CAZIERFISCAL_ALL_GUIDES` + `published`: ghidurile pregătite dau 404 în producție până la publicare (se văd doar în `next dev`).
+- Specimen (11.11, a treia livrare): `public/images/cazierfiscal/specimen-cazier-fiscal.webp` (specimenul eghiseul fără logo), secțiunea „Cum arată certificatul de cazier fiscal” pe `/`, `BRAND_SPECIMENS` în `src/config/service-specimens.ts` pentru sidebar-ul wizardului pe alte branduri.

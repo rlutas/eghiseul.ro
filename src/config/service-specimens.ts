@@ -24,6 +24,17 @@ export const SERVICE_SPECIMENS: Record<string, ServiceSpecimen> = {
   'rovinieta': { src: '/images/specimens/rovinieta.webp', alt: 'Specimen rovinietă' },
 };
 
+/**
+ * Specimens without the eGhișeul lettering, per brand. The shared ones in
+ * SERVICE_SPECIMENS carry the eghiseul logo, so other brands only get a
+ * specimen from here (cazierfiscal.com, 11.11.2026).
+ */
+export const BRAND_SPECIMENS: Partial<Record<string, Record<string, ServiceSpecimen>>> = {
+  cazierfiscal: {
+    'cazier-fiscal': { src: '/images/cazierfiscal/specimen-cazier-fiscal.webp', alt: 'Specimen certificat de cazier fiscal' },
+  },
+};
+
 export function getServiceSpecimen(slug: string | null | undefined): ServiceSpecimen | null {
   if (!slug) return null;
   return SERVICE_SPECIMENS[slug] ?? null;

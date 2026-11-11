@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { HeaderCazierFiscal } from '@/components/cazierfiscal/header';
 import { Arrow, Card, Check, Eyebrow, FaqList, H2, InfoTable, Section, UpdatedLine } from '@/components/documentero/ui';
@@ -337,6 +338,49 @@ export default async function CazierFiscalHome() {
               Certificatul e valabil 30 de zile de la emitere și doar pentru scopul pe care îl treci în cerere: angajare,
               licitație, credit sau alt dosar. Dacă îl ceri prea devreme, poate expira înainte de depunere, așa că
               comandă-l când știi data.
+            </p>
+          </div>
+        </Section>
+
+        <Section className="mt-24 grid items-start gap-10 lg:mt-32 lg:grid-cols-12">
+          <figure className="m-0 lg:col-span-5">
+            <div className="overflow-hidden rounded-[20px] border border-d-line bg-white p-3 shadow-[0_20px_50px_rgba(42,20,56,0.10)]">
+              <Image
+                src="/images/cazierfiscal/specimen-cazier-fiscal.webp"
+                alt="Specimen de certificat de cazier fiscal (formularul 504 ANAF), cu mențiunea „NU are fapte înscrise în cazierul fiscal”"
+                width={1000}
+                height={1414}
+                sizes="(min-width: 1024px) 480px, 100vw"
+                className="h-auto w-full"
+              />
+            </div>
+            <figcaption className="mt-3 text-[13px] leading-[1.5] text-d-muted">
+              Specimen. Datele contribuabilului sunt șterse, iar exemplarul e marcat „SPECIMEN”.
+            </figcaption>
+          </figure>
+          <div className="flex flex-col gap-4 lg:col-span-6 lg:col-start-7">
+            <Eyebrow>Cum arată</Eyebrow>
+            <H2>Cum arată certificatul de cazier fiscal</H2>
+            <p className="m-0 text-[17px] leading-[1.7] text-d-body">
+              Este formularul 504 al ANAF, pe o singură pagină. Pe el găsești, de sus în jos:
+            </p>
+            <ul className="m-0 flex list-none flex-col gap-3 p-0">
+              {[
+                ['Unitatea fiscală', 'unitatea ANAF care l-a emis, cu numărul de înregistrare și data.'],
+                ['Contribuabilul', 'numele, codul de identificare fiscală (CNP-ul, la persoane fizice) și domiciliul fiscal.'],
+                ['Rezultatul', 'o singură frază: „NU are fapte înscrise în cazierul fiscal” sau faptele înscrise.'],
+                ['Scopul', 'pentru ce a fost cerut, plus mențiunea că e valabil 30 de zile și numai în acel scop.'],
+                ['Semnătura', 'conducătorului unității și ștampila, pe exemplarul de hârtie.'],
+              ].map(([t, d]) => (
+                <li key={t} className="flex gap-3 text-[16px] leading-[1.6] text-d-body">
+                  <Check className="mt-1 shrink-0 text-d-acc" />
+                  <span><strong className="text-d-ink">{t}:</strong> {d}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="m-0 text-[17px] leading-[1.7] text-d-body">
+              Prin noi primești certificatul scanat pe email și, dacă alegi livrarea, originalul pe hârtie prin curier.
+              Din SPV vine ca PDF cu semnătura electronică a Ministerului Finanțelor, nu pe hârtie.
             </p>
           </div>
         </Section>
