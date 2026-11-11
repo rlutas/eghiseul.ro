@@ -115,3 +115,22 @@ Ce nu au ghidurile, intenționat: nicio instituție numită drept cea care cere 
 - „Furnizare informații” e alt serviciu (liste de firme după criteriu, 9 lei/criteriu/firmă).
 - Emitere electronică cu semnătură/sigiliu calificat: Legea 265/2022 art. 11 alin. 3; InfoCert 24/7, plată cu cardul.
 - Valabilitate: nicio lege nu o fixează; „30 de zile” e cerința instituțiilor care primesc certificatul.
+
+## Conversii Google Ads (verificat 11.11.2026)
+
+Ce e deja în cod:
+
+- Eticheta Google (GA4 `G-X5Q7NDPHPL` și, când există, contul Ads) se încarcă doar după acordul pentru cookie-uri. Implicit totul e `denied` (Consent Mode v2).
+- Pe pagina de succes, după plata confirmată (`payment_status = 'paid'` sau Stripe `redirect_status = succeeded`), pleacă:
+  - evenimentul GA4 `purchase` (valoare reală, RON, `transaction_id` = codul comenzii, produsele);
+  - conversia Ads (`send_to` = `NEXT_PUBLIC_GOOGLE_ADS_ID_CONSTATATOR/…LABEL_CONSTATATOR`), cu aceeași valoare și același `transaction_id`, deci un refresh nu o numără de două ori. Enhanced conversions trimit emailul și telefonul hash-uite, doar cu acord de marketing.
+- Fără fallback pe alte conturi: dacă variabilele constatator lipsesc, conversia Ads nu pleacă nicăieri.
+- Meta și pixelul OpenAI nu se încarcă pe acest brand.
+- `gclid` se salvează pe comandă (atribuirea de canal), deci conversiile pot fi importate și offline, inclusiv pentru clienții care au refuzat cookie-urile.
+
+De făcut la crearea contului Ads:
+
+1. În contul Ads nou: o acțiune de conversie „Purchase” (Website, setată manual cu cod), valoare din tag, numărare „Una”, enhanced conversions pornite.
+2. Din fragmentul de eveniment copiezi `AW-XXXXXXXXX/eticheta`. În Vercel (production) pui `NEXT_PUBLIC_GOOGLE_ADS_ID_CONSTATATOR = AW-XXXXXXXXX` și `NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL_CONSTATATOR = eticheta`. Apoi un build nou (variabilele `NEXT_PUBLIC_` intră doar la build).
+3. Leagă GA4 (proprietatea 563726213) de contul Ads. `purchase` e eveniment-cheie implicit în GA4. În Ads, conversia GA4 rămâne secundară, ca să nu se numere de două ori cu eticheta Ads.
+4. Test: o comandă reală de 89 lei, cu acordul la cookie-uri, apoi verifici în Tag Assistant că pleacă `conversion` cu `send_to` corect. Comanda se rambursează după aceea.
