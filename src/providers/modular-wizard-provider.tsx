@@ -286,6 +286,13 @@ interface ModularDraftCache {
     property?: PropertyState | null;
     vehicle?: VehicleState | null;
     signature?: SignatureState | null;
+    /**
+     * The consent given when signing. Cached together with the signature:
+     * without it a reload restored the signature but reset every consent
+     * flag to false, so /submit recorded terms_accepted=false on ~55% of
+     * paid orders (audit 11.11.2026, E-260711-TFVDH).
+     */
+    consent?: ConsentState;
     billing?: BillingState | null;
     selectedOptions?: SelectedOptionState[];
     delivery?: DeliveryState;
@@ -555,6 +562,8 @@ function modularWizardReducer(
       return {
         ...state,
         consent: { ...state.consent, ...action.payload },
+        // Dirty so the local cache picks up a ticked/unticked box.
+        isDirty: true,
       };
 
     case 'APPLY_COUPON':
@@ -666,6 +675,11 @@ function modularWizardReducer(
         property: cache.data.property ?? state.property,
         vehicle: cache.data.vehicle ?? state.vehicle,
         signature: cache.data.signature ?? state.signature,
+        // Consent only travels with the signature that expressed it.
+        consent:
+          cache.data.signature?.signatureBase64 && cache.data.consent
+            ? { ...state.consent, ...cache.data.consent }
+            : state.consent,
         billing: cache.data.billing ?? state.billing,
         selectedOptions: cache.data.selectedOptions || [],
         delivery: cache.data.delivery || createInitialDeliveryState(),
@@ -1455,6 +1469,7 @@ export function ModularWizardProvider({
         property: state.property,
         vehicle: state.vehicle,
         signature: state.signature,
+        consent: state.consent,
         billing: state.billing,
         selectedOptions: state.selectedOptions,
         delivery: state.delivery,

@@ -39,7 +39,7 @@ export default function Page() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
-      <LegalLayoutDocumentero title="Termeni și condiții" path={PATH}>
+      <LegalLayoutDocumentero title="Termeni și condiții" path={PATH} updated="11 noiembrie 2026">
         <p>
           Acești Termeni și Condiții reglementează utilizarea platformei <strong>documentero.ro</strong>, operată de
           <strong> eDigitalizare SRL</strong> (CUI RO49278701, Reg. Com. J2023001097301, sediul în Jud. Satu Mare,
@@ -161,6 +161,7 @@ export default function Page() {
           <li><strong>În primele 30 de minute</strong> de la confirmarea plății poți solicita anularea din pagina de <Link href={DOCUMENTERO_TRACK_HREF}>verificare status comandă</Link> și primești <strong>70%</strong> din suma plătită (30% acoperă costurile administrative și de procesare). Dreptul de anulare în această fereastră se păstrează chiar dacă procesarea internă a comenzii a început deja.</li>
           <li><strong>După expirarea celor 30 de minute</strong>, anularea online nu mai este posibilă: cererea este deja în curs de procesare la autorități.</li>
           <li><strong>Dacă serviciul nu poate fi prestat din culpa Prestatorului</strong>, primești rambursare integrală (100%).</li>
+          <li><strong>Dacă documentul nu poate fi eliberat din cauza unei cerințe care ține de tine</strong> (de exemplu un act de naștere sau de căsătorie întocmit în străinătate și netranscris în România, un divorț pronunțat în străinătate și neînregistrat în România, un act în original sau o semnătură pe care doar tu le poți da), te anunțăm în scris (email sau WhatsApp) și comanda se suspendă până rezolvi cerința. Dacă nu o rezolvi în 90 de zile sau ne spui că nu o vei rezolva, comanda se închide: păstrăm contravaloarea serviciului de bază și onorariul avocatului, pentru demersurile deja făcute, și îți returnăm, în 10 zile lucrătoare, ce n-a fost început (traducere, legalizare, apostilă, livrare). Poți relua comanda în 12 luni fără să plătești din nou serviciul de bază.</li>
         </ul>
         <p>
           Rambursările se procesează prin aceeași metodă de plată, în 5–10 zile lucrătoare. Detalii
@@ -206,6 +207,7 @@ export default function Page() {
           <li>Să încarce documente lizibile și valabile, acolo unde sunt necesare.</li>
           <li>Să achite integral tariful înainte de începerea procesării.</li>
           <li>Să răspundă solicitărilor de informații suplimentare în maximum 48 de ore.</li>
+          <li>Să îndeplinească, la cererea noastră, demersurile pe care doar el le poate face pentru eliberarea documentului (de exemplu transcrierea în România a unui act din străinătate). Până atunci comanda este suspendată (vezi secțiunea 8).</li>
           <li>Să nu utilizeze serviciile în scopuri ilegale și să nu furnizeze datele altor persoane fără acordul/împuternicirea acestora.</li>
         </ul>
         <p>

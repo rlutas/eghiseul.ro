@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { generateDocument, type DocumentContext, type ClientData, type CompanyData, type LawyerData } from '@/lib/documents/generator';
+import { generateDocument, idDocumentKindFrom, type DocumentContext, type ClientData, type CompanyData, type LawyerData } from '@/lib/documents/generator';
 import { downloadFile } from '@/lib/aws/s3';
 import mammoth from 'mammoth';
 import { formatPersonName } from '@/lib/format/person-name';
@@ -155,6 +155,7 @@ export async function POST(request: NextRequest) {
       phone: body.contact.phone || '',
       address: formatAddress(personal.address),
       ci_series: personal.documentSeries || '',
+      id_document_type: idDocumentKindFrom(personal),
       ci_number: personal.documentNumber || '',
       document_issued_by: personal.documentIssuedBy || '',
       document_issue_date: personal.documentIssueDate || '',

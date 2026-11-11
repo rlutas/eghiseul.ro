@@ -10,6 +10,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
   generateDocument,
+  idDocumentKindFrom,
   type DocumentContext,
   type ClientData,
   type CompanyData,
@@ -157,6 +158,7 @@ export async function autoGenerateOrderDocuments(
     phone: contact.phone || '',
     address: formatAddress(personal.address) || billingAddressStr,
     ci_series: personal.documentSeries || personal.ci_series || '',
+    id_document_type: idDocumentKindFrom(personal),
     ci_number: personal.documentNumber || personal.ci_number || '',
     document_issued_by: personal.documentIssuedBy || personal.issuedBy || '',
     document_issue_date: personal.documentIssueDate || personal.issueDate || '',

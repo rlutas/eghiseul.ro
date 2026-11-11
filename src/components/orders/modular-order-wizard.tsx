@@ -340,6 +340,19 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
       return;
     }
 
+    // A signature restored from an older cache can come back without the
+    // consent given with it. Never submit a signed order with
+    // terms_accepted=false: send the customer back to tick the box.
+    if (state.signature && !state.consent.termsAccepted && visibleSteps.some((st) => st.id === 'signature')) {
+      const message = 'Bifează acordul cu termenii și condițiile de sub semnătură, apoi apasă din nou „Plătește”.';
+      setSubmitError({ message, stepId: 'signature' });
+      goToStep('signature');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      toast.error(message);
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       // Flush the draft first. Autosave is debounced and SAVE_SUCCESS clears
       // `isDirty` even when a field changed while the save was in flight, so
@@ -391,7 +404,7 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
       toast.error('Eroare de conexiune la trimiterea comenzii. Verifică internetul și încearcă din nou.');
       setIsSubmitting(false);
     }
-  }, [state.orderId, priceBreakdown.totalPrice, state.signature?.signatureBase64, state.signature?.termsAccepted, state.consent, saveDraftNow, visibleSteps, goToStep]);
+  }, [state.orderId, priceBreakdown.totalPrice, state.signature, state.consent, saveDraftNow, visibleSteps, goToStep]);
 
   // Handle next
   const handleNext = () => {

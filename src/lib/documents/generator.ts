@@ -48,6 +48,9 @@ export interface ClientData {
   address?: string;
   ci_series?: string;
   ci_number?: string;
+  /** Which identity document the customer used: drives the „CI” / „pașaport”
+   *  label in the contracts (complaint 11.11.2026: passport orders said „CI”). */
+  id_document_type?: 'ci' | 'passport';
   document_issued_by?: string;
   document_issue_date?: string;
   company_name?: string;
@@ -319,6 +322,36 @@ export function resolveTemplateSlug(
  * PF: name, CI details, CNP, domiciliu (structured address)
  * PJ: company name, CUI, Nr. Reg. Com., sediu, reprezentant with CI/CNP
  */
+/**
+ * Decide the identity document kind from the wizard's personal data.
+ * `idDocumentType` is the customer's explicit pick; `documentType` is the
+ * OCR-detected one (e.g. 'passport_opened'). Defaults to CI.
+ */
+export function idDocumentKindFrom(personal: unknown): 'ci' | 'passport' {
+  const p = (personal && typeof personal === 'object' ? personal : {}) as Record<string, unknown>;
+  const pick = typeof p.idDocumentType === 'string' ? p.idDocumentType : '';
+  const ocr = typeof p.documentType === 'string' ? p.documentType : '';
+  return pick === 'passport' || (!pick && ocr.startsWith('passport')) ? 'passport' : 'ci';
+}
+
+/**
+ * „legitimat/ă cu CI seria X nr. Y, emisă de Z” or
+ * „legitimat/ă cu pașaportul nr. Y, emis de Z”. Romanian passports have no
+ * series, so the passport form needs only the number.
+ */
+function buildIdentityClause(client: ClientData): string {
+  if (client.id_document_type === 'passport') {
+    if (!client.ci_number) return '';
+    let text = `legitimat/ă cu pașaportul${client.ci_series ? ` seria ${client.ci_series}` : ''} nr. ${client.ci_number}`;
+    if (client.document_issued_by) text += `, emis de ${client.document_issued_by}`;
+    return text;
+  }
+  if (!client.ci_series || !client.ci_number) return '';
+  let text = `legitimat/ă cu CI seria ${client.ci_series} nr. ${client.ci_number}`;
+  if (client.document_issued_by) text += `, emisă de ${client.document_issued_by}`;
+  return text;
+}
+
 export function buildClientDetailsBlock(client: ClientData): string {
   const parts: string[] = [];
 
@@ -332,10 +365,8 @@ export function buildClientDetailsBlock(client: ClientData): string {
     const repName = formatPersonName(client.lastName, client.firstName);
     if (repName) {
       let repText = `reprezentată prin ${repName}`;
-      if (client.ci_series && client.ci_number) {
-        repText += `, legitimat/ă cu CI seria ${client.ci_series} nr. ${client.ci_number}`;
-        if (client.document_issued_by) repText += `, emisă de ${client.document_issued_by}`;
-      }
+      const idClause = buildIdentityClause(client);
+      if (idClause) repText += `, ${idClause}`;
       if (client.cnp) repText += `, CNP ${client.cnp}`;
       parts.push(repText);
     }
@@ -343,12 +374,9 @@ export function buildClientDetailsBlock(client: ClientData): string {
     // PF format: proper legal identification
     parts.push(formatPersonName(client.lastName, client.firstName, client.name));
 
-    // CI details
-    if (client.ci_series && client.ci_number) {
-      let ciText = `legitimat/ă cu CI seria ${client.ci_series} nr. ${client.ci_number}`;
-      if (client.document_issued_by) ciText += `, emisă de ${client.document_issued_by}`;
-      parts.push(ciText);
-    }
+    // Identity document (CI or passport)
+    const idClause = buildIdentityClause(client);
+    if (idClause) parts.push(idClause);
 
     // CNP
     if (client.cnp) parts.push(`CNP ${client.cnp}`);
@@ -372,6 +400,9 @@ export function buildClientDetailsBlock(client: ClientData): string {
       parts.push(`cu domiciliul în ${client.address}`);
     }
   }
+
+  // E-mail: the address where we send notices under the contract (art. 9.8).
+  if (client.email?.trim()) parts.push(`e-mail ${client.email.trim()}`);
 
   return parts.join(', ');
 }

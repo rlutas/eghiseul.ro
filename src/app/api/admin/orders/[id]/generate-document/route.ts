@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
-import { generateDocument, type DocumentContext, type ClientData, type CompanyData, type LawyerData } from '@/lib/documents/generator';
+import { generateDocument, idDocumentKindFrom, type DocumentContext, type ClientData, type CompanyData, type LawyerData } from '@/lib/documents/generator';
 import { uploadFile, generateDocumentKey, downloadFile, deleteFile, getClientSignatureBase64 } from '@/lib/aws/s3';
 import { allocateNumber, findExistingNumber, getRegistryClient } from '@/lib/registry/client';
 import { brandForOrder } from '@/lib/brand/for-order';
@@ -202,6 +202,7 @@ export async function POST(
       phone: contact.phone || '',
       address: formatAddress(personal.address),
       ci_series: personal.documentSeries || personal.ci_series || '',
+      id_document_type: idDocumentKindFrom(personal),
       ci_number: personal.documentNumber || personal.ci_number || '',
       document_issued_by: personal.documentIssuedBy || personal.issuedBy || '',
       document_issue_date: personal.documentIssueDate || personal.issueDate || '',

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildClientDetailsBlock,
+  idDocumentKindFrom,
   hasUrgentOption,
   buildDeliveryTerms,
   buildInstitutie,
@@ -45,6 +46,23 @@ describe('buildClientDetailsBlock — PF (persoană fizică)', () => {
     expect(text).toContain('Str. Bujorului');
     expect(text).toContain('Localitatea Slobozia');
     expect(text).toContain('Jud. Ialomița');
+  });
+
+  it('labels a passport as pașaport, not CI (11.11.2026 complaint)', () => {
+    const text = buildClientDetailsBlock({ ...baseClient, ci_series: '', ci_number: '064797599', id_document_type: 'passport' });
+    expect(text).toContain('legitimat/ă cu pașaportul nr. 064797599, emis de SPCLEP Slobozia');
+    expect(text).not.toContain('CI seria');
+  });
+
+  it('adds the e-mail address to the identification block', () => {
+    expect(buildClientDetailsBlock(baseClient)).toContain('e-mail ion@example.com');
+  });
+
+  it('detects the passport from the picker or the OCR type', () => {
+    expect(idDocumentKindFrom({ idDocumentType: 'passport' })).toBe('passport');
+    expect(idDocumentKindFrom({ idDocumentType: null, documentType: 'passport_opened' })).toBe('passport');
+    expect(idDocumentKindFrom({ idDocumentType: 'ci_nou', documentType: 'passport_opened' })).toBe('ci');
+    expect(idDocumentKindFrom(undefined)).toBe('ci');
   });
 
   it('omits CI emisă de when document_issued_by is missing', () => {
