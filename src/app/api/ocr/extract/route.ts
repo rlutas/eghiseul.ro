@@ -69,6 +69,7 @@ export async function POST(request: NextRequest) {
       'https://www.documentero.ro',
       'https://cazierfiscal.com',
       'https://www.cazierfiscal.com',
+      'https://certificat-constatator-express.ro',
     ].filter(Boolean);
 
     const isValidOrigin = allowedOrigins.some(allowed =>

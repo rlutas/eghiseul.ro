@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useBrand } from '@/lib/brand/client';
 import { DocumenteroLogo } from '@/components/documentero/logo';
 import { CazierFiscalLogo } from '@/components/cazierfiscal/logo';
+import { ConstatatorLogo } from '@/components/constatator/logo';
 
 /**
  * The brand lockup for screens with a dark background, on the brand of the host.
@@ -21,6 +22,13 @@ export function AuthLogo({ size = 'sm' }: { size?: 'sm' | 'lg' }) {
     return (
       <Link href="/" className="inline-flex items-center" aria-label="cazierfiscal.com — acasă">
         <CazierFiscalLogo size={size === 'lg' ? 24 : 20} onDark />
+      </Link>
+    );
+  }
+  if (brand.id === 'constatator') {
+    return (
+      <Link href="/" className="inline-flex items-center" aria-label="certificat-constatator-express.ro — acasă">
+        <ConstatatorLogo size={size === 'lg' ? 22 : 18} onDark />
       </Link>
     );
   }

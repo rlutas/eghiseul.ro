@@ -20,6 +20,7 @@ export const INDEXNOW_KEYS: Record<string, string> = {
   'eghiseul.ro': '5559960a430bdbd96eec4bded0919eda',
   'documentero.ro': '2f5ec717a8dbf488bd1d940efd5e7570',
   'cazierfiscal.com': 'd1d21e69dc68809e05c16ee075f553a5',
+  'certificat-constatator-express.ro': '46dd4324a4520825c492a01d5c18e109',
 };
 
 /** Hosts the cron submits for, with their sitemap. */
@@ -27,6 +28,7 @@ export const INDEXNOW_SITES = [
   { host: 'eghiseul.ro', sitemap: 'https://eghiseul.ro/sitemap.xml' },
   { host: 'documentero.ro', sitemap: 'https://documentero.ro/sitemap.xml' },
   { host: 'cazierfiscal.com', sitemap: 'https://cazierfiscal.com/sitemap.xml' },
+  { host: 'certificat-constatator-express.ro', sitemap: 'https://certificat-constatator-express.ro/sitemap.xml' },
 ] as const;
 
 /**
@@ -38,6 +40,7 @@ export function canonicalHost(rawHost: string | null | undefined): string | null
   const host = rawHost.toLowerCase().split(':')[0]!.replace(/^www\./, '');
   if (host === 'documentero.ro' || host === 'documentero.localhost') return 'documentero.ro';
   if (host === 'cazierfiscal.com' || host === 'cazierfiscal.localhost') return 'cazierfiscal.com';
+  if (host === 'certificat-constatator-express.ro' || host === 'constatator.localhost') return 'certificat-constatator-express.ro';
   if (host === 'eghiseul.ro' || host === 'localhost' || host === 'eghiseul.localhost') return 'eghiseul.ro';
   return null;
 }

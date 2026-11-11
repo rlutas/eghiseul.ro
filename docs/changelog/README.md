@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-11 | 🟣 **certificat-constatator-express.ro: al patrulea brand (doar certificat constatator), live cu noindex** — rutare pe host, `orders.platform='constatator'` (migr. 205), admin filtru+badge, pagini legale proprii, prețuri din același rând `certificat-constatator` | [2026-11-11-constatator-al-patrulea-brand.md](2026-11-11-constatator-al-patrulea-brand.md) |
 | 2026-11-11 | 🔴 **Emailurile documentero pierdute din 19.10 (domeniu scos din Resend); rezervă automată pe adresa eghiseul.ro cu numele brandului** — retry pe 403 „domain is not verified”, `fallbackFrom` | [2026-11-11-emailuri-documentero-domeniu-resend.md](2026-11-11-emailuri-documentero-domeniu-resend.md) |
 | 2026-11-11 | ✅ **Căutări lungi din GSC ca subtitluri pe 8 pagini, 5 site-uri; FAQ vizibil pe ecazier** — regex 4+ cuvinte, fără pagini noi; test cu citire 09.12 | [2026-11-11-cautari-lungi-gsc-subtitluri.md](2026-11-11-cautari-lungi-gsc-subtitluri.md) |
 | 2026-11-11 | 🔴 **Contract: clauze pentru blocaje din partea clientului (9.8/9.9), pașaport în loc de „CI”, email în contract, acordul la termeni nu se mai pierde la restaurare** — T&C §8/§12 pe 3 branduri, `idDocumentKindFrom`, consent în `ModularDraftCache` | [2026-11-11-contract-cerinte-client-pasaport-acord.md](2026-11-11-contract-cerinte-client-pasaport-acord.md) |

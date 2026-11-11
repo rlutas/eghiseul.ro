@@ -48,6 +48,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Cum adaug un serviciu nou:** [`technical/specs/modular-wizard-guide.md`](technical/specs/modular-wizard-guide.md)
 - **documentero.ro (al doilea brand): dosarul site-ului** — de ce, design, conținut/SEO, formular, lansare: [`documentero/`](documentero/README.md); legătura tehnică: [`technical/specs/multi-brand.md`](technical/specs/multi-brand.md)
 - **cazierfiscal.com (al treilea brand, doar cazier fiscal)** — de ce, ce e gata, pașii de lansare: [`cazier-fiscal/`](cazier-fiscal/README.md)
+- **certificat-constatator-express.ro (al patrulea brand, doar certificat constatator)** — de ce, analiza concurenței, plan pe faze: [`certificat-constatator/`](certificat-constatator/README.md)
 - **Playbook: site de nișă pe un singur serviciu** (rețeta cazierfiscal.com, de repetat pentru alte servicii): [`seo/playbook-site-de-nisa-un-serviciu.md`](seo/playbook-site-de-nisa-un-serviciu.md)
 - **Document generation:** [`technical/specs/admin-document-system.md`](technical/specs/admin-document-system.md)
 - **Convenția cu topograful (angajament de execuție):** [`technical/specs/conventie-topograf.md`](technical/specs/conventie-topograf.md)

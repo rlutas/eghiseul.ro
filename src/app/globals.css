@@ -523,6 +523,74 @@
   font-family: var(--font-bricolage), var(--font-inter), system-ui, sans-serif;
 }
 
+/* ========================================
+   certificat-constatator-express.ro (al patrulea brand, 11.11.2026) —
+   cerneală indigo + verde-lime („express”). Aceleași componente `d-*`.
+   docs/certificat-constatator/README.md
+   ======================================== */
+[data-brand="constatator"] {
+  --d-ink: #161A33;
+  --d-acc: #C6F432;
+  --d-bg: #F8F9F4;
+  --d-card: #FFFFFF;
+  --d-line: #DFE2D6;
+  --d-muted: #4E5368;
+  --d-soft: #EEFBC8;
+  --d-body: #262A40;
+  --d-dark-muted: #B9BDCF;
+
+  --primary-50: #F8FEE8;
+  --primary-100: #EEFBC8;
+  --primary-200: #E0F796;
+  --primary-300: #D4F66A;
+  --primary-400: #CCF54C;
+  --primary-500: #C6F432; /* Lime */
+  --primary-600: #A6D11C;
+  --primary-700: #7E9F14;
+  --primary-800: #5C7410;
+  --primary-900: #3F500C;
+  --primary-950: #253006;
+  --primary: var(--primary-500);
+  --primary-foreground: #161A33;
+
+  --secondary-50: #F1F2F7;
+  --secondary-100: #E2E4EE;
+  --secondary-200: #C3C7DA;
+  --secondary-300: #9AA0BD;
+  --secondary-400: #707798;
+  --secondary-500: #4E5574;
+  --secondary-600: #3A405C;
+  --secondary-700: #2B3049;
+  --secondary-800: #20243D;
+  --secondary-900: #161A33; /* Indigo */
+  --secondary-950: #0C0F21;
+  --secondary: var(--secondary-100);
+  --secondary-foreground: var(--secondary-900);
+
+  --neutral-50: #F8F9F4;
+  --neutral-100: #F0F2EA;
+  --neutral-200: #DFE2D6;
+  --neutral-300: #C8CCBE;
+  --neutral-400: #9A9E92;
+  --neutral-500: #73776C;
+  --neutral-600: #4E5368;
+  --neutral-700: #3B3F52;
+  --neutral-800: #262A40;
+  --neutral-900: #171A28;
+  --neutral-950: #0B0D16;
+
+  --background: #F8F9F4;
+  --card: #FFFFFF;
+  --border: #DFE2D6;
+  --input: #DFE2D6;
+  --ring: #A6D11C;
+  --accent: #EEFBC8;
+  --accent-foreground: #161A33;
+  --muted: #F0F2EA;
+  --muted-foreground: #4E5368;
+  font-family: var(--font-bricolage), var(--font-inter), system-ui, sans-serif;
+}
+
 .dark {
   /* ========================================
      DARK MODE (Optional - Future Phase)
@@ -701,7 +769,7 @@
     transition: none;
   }
 }
-[data-brand="documentero"] .d-rise, [data-brand="cazierfiscal"] .d-rise {
+[data-brand="documentero"] .d-rise, [data-brand="cazierfiscal"] .d-rise, [data-brand="constatator"] .d-rise {
   animation: d-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 @keyframes d-rise {
@@ -710,6 +778,6 @@
 }
 @media (prefers-reduced-motion: reduce) {
   [data-brand="documentero"] [data-reveal] { transform: none; transition-duration: 0.3s; }
-  [data-brand="documentero"] .d-rise, [data-brand="cazierfiscal"] .d-rise { animation-duration: 0.3s; }
+  [data-brand="documentero"] .d-rise, [data-brand="cazierfiscal"] .d-rise, [data-brand="constatator"] .d-rise { animation-duration: 0.3s; }
   @keyframes d-rise { from { opacity: 0; transform: none; } to { opacity: 1; } }
 }

@@ -3,6 +3,7 @@
 import { Footer } from '@/components/home/footer';
 import { FooterDocumentero } from '@/components/documentero/footer';
 import { FooterCazierFiscal } from '@/components/cazierfiscal/footer';
+import { FooterConstatator } from '@/components/constatator/footer';
 import { useBrand } from '@/lib/brand/client';
 
 /**
@@ -15,5 +16,6 @@ export function BrandFooter() {
   const brand = useBrand();
   if (brand.id === 'documentero') return <FooterDocumentero />;
   if (brand.id === 'cazierfiscal') return <FooterCazierFiscal />;
+  if (brand.id === 'constatator') return <FooterConstatator />;
   return <Footer />;
 }

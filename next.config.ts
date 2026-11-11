@@ -31,6 +31,23 @@ const CAZIERFISCAL_HOSTS = [
 const CAZIERFISCAL_HOST_RE = `(?:${CAZIERFISCAL_HOSTS.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`;
 const onCazierFiscal = [{ type: 'host' as const, value: CAZIERFISCAL_HOST_RE }];
 
+/**
+ * Hosts served as certificat-constatator-express.ro (fourth brand,
+ * 2026-11-11), route group `src/app/constatator/`. The spelling without
+ * hyphens (certificatconstatatorexpress.ro) and both `www` hosts are 308
+ * redirects at the Vercel domain level, so they never reach the app.
+ */
+const CONSTATATOR_HOSTS = [
+  'certificat-constatator-express.ro',
+  'www.certificat-constatator-express.ro',
+  ...(process.env.CONSTATATOR_EXTRA_HOSTS ?? '')
+    .split(',')
+    .map((h) => h.trim().toLowerCase())
+    .filter(Boolean),
+];
+const CONSTATATOR_HOST_RE = `(?:${CONSTATATOR_HOSTS.map((h) => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`;
+const onConstatator = [{ type: 'host' as const, value: CONSTATATOR_HOST_RE }];
+
 const nextConfig: NextConfig = {
   // Knowledge Center (/admin/ghid) citește markdown-ul din `docs/` la runtime.
   // Vercel împachetează în funcție DOAR fișierele urmărite static, iar
@@ -69,7 +86,7 @@ const nextConfig: NextConfig = {
    * eghiseul.ro/documentero/… can never be crawled as a duplicate.
    */
   async rewrites() {
-    const SHARED = 'api|_next|comanda|account|orders|auth|completare|reincarca-poza|documentero|cazierfiscal|images|og|icons|fonts|favicon\\.ico|icon\\.png|apple-icon\\.png|manifest\\.json|\\.well-known';
+    const SHARED = 'api|_next|comanda|account|orders|auth|completare|reincarca-poza|documentero|cazierfiscal|constatator|images|og|icons|fonts|favicon\\.ico|icon\\.png|apple-icon\\.png|manifest\\.json|\\.well-known';
     return {
       beforeFiles: [
         // IndexNow key file, per host (src/lib/seo/indexnow.ts). First, so the
@@ -106,6 +123,21 @@ const nextConfig: NextConfig = {
           source: `/:path((?!(?:${SHARED})(?:/|$)).+)`,
           has: onCazierFiscal,
           destination: '/cazierfiscal/:path',
+        },
+        // certificat-constatator-express.ro — same rules, its own group.
+        { source: '/', has: onConstatator, destination: '/constatator' },
+        { source: '/robots.txt', has: onConstatator, destination: '/constatator/robots.txt' },
+        { source: '/sitemap.xml', has: onConstatator, destination: '/constatator/sitemap.xml' },
+        { source: '/llms.txt', has: onConstatator, destination: '/constatator/llms.txt' },
+        { source: '/favicon.ico', has: onConstatator, destination: '/images/constatator/favicon.ico' },
+        { source: '/icon.png', has: onConstatator, destination: '/images/constatator/icon.png' },
+        { source: '/apple-icon.png', has: onConstatator, destination: '/images/constatator/apple-icon.png' },
+        { source: '/apple-touch-icon.png', has: onConstatator, destination: '/images/constatator/apple-icon.png' },
+        { source: '/apple-touch-icon-precomposed.png', has: onConstatator, destination: '/images/constatator/apple-icon.png' },
+        {
+          source: `/:path((?!(?:${SHARED})(?:/|$)).+)`,
+          has: onConstatator,
+          destination: '/constatator/:path',
         },
         // The internal group path (`/documentero/…` typed literally, on any
         // host) is refused in src/proxy.ts — middleware sees the ORIGINAL
@@ -378,7 +410,7 @@ const nextConfig: NextConfig = {
       { source: '/category/informatii-utile/extras-de-carte-funciara', destination: '/servicii/extras-de-carte-funciara/', permanent: true },
       { source: '/cookies-policy', destination: '/politica-cookies/', permanent: true },
     ];
-    return rules.map((r) => ({ ...r, missing: [...(('missing' in r && Array.isArray(r.missing)) ? r.missing : []), ...onDocumentero, ...onCazierFiscal] }));
+    return rules.map((r) => ({ ...r, missing: [...(('missing' in r && Array.isArray(r.missing)) ? r.missing : []), ...onDocumentero, ...onCazierFiscal, ...onConstatator] }));
   },
 
   // Baseline security headers on every route. HSTS is already added by Vercel

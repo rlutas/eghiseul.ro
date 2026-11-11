@@ -130,6 +130,7 @@ const NETWORK: Array<[RegExp, string]> = [
   [/(^|\.)eghiseul\.ro$/, 'eghiseul'],
   [/(^|\.)documentero\.ro$/, 'documentero'],
   [/(^|\.)cazierfiscal\.com$/, 'cazierfiscal'],
+  [/(^|\.)certificat-?constatator-?express\.ro$/, 'constatator'],
   [/(^|\.)ecazier\.ro$/, 'ecazier'],
   [/(^|\.)cazierjudiciaronline\.com$/, 'cazierjudiciaronline'],
   [/(^|\.)avocat-tarta\.ro$/, 'avocat-tarta'],

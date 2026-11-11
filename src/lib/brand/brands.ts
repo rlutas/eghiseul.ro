@@ -22,7 +22,7 @@
 
 import type { RegistryPlatform } from '@/lib/registry/client';
 
-export type BrandId = 'eghiseul' | 'documentero' | 'cazierfiscal';
+export type BrandId = 'eghiseul' | 'documentero' | 'cazierfiscal' | 'constatator';
 
 export interface Brand {
   id: BrandId;
@@ -88,6 +88,14 @@ export const DOCUMENTERO_SERVICE_SLUGS = [
  * on the fiscal queries and CJO at 7–9. CJO keeps its fiscal pages.
  */
 export const CAZIERFISCAL_SERVICE_SLUGS = ['cazier-fiscal'] as const;
+
+/**
+ * certificat-constatator-express.ro (2026-11-11): single-service site for
+ * the ONRC certificat constatator, same backend. eghiseul lost the
+ * constatator queries in the August 2026 spam update; Google Ads is allowed
+ * on this topic, so the site lives on ads first. docs/certificat-constatator/.
+ */
+export const CONSTATATOR_SERVICE_SLUGS = ['certificat-constatator'] as const;
 
 export const BRANDS: Record<BrandId, Brand> = {
   eghiseul: {
@@ -163,10 +171,37 @@ export const BRANDS: Record<BrandId, Brand> = {
     legalTagline:
       'eDigitalizare SRL · CUI RO49278701 · cazierfiscal.com este un serviciu privat de asistență la obținerea cazierului fiscal; nu suntem instituție de stat și nu suntem afiliați ANAF.',
   },
+  constatator: {
+    id: 'constatator',
+    name: 'certificat-constatator-express.ro',
+    domain: 'certificat-constatator-express.ro',
+    baseUrl: 'https://certificat-constatator-express.ro',
+    // No mailbox on the new domain, as on cazierfiscal: replies land in the
+    // eghiseul inbox and sending falls back to the eghiseul sender (Resend is
+    // at its domain limit, src/lib/email/resend.ts).
+    contactEmail: 'contact@eghiseul.ro',
+    phoneDisplay: '+40 757 708 181',
+    whatsappNumber: '40757708181',
+    emailFrom: 'Certificat Constatator Express <contact@certificat-constatator-express.ro>',
+    emailLogoUrl: 'https://certificat-constatator-express.ro/images/constatator/email-logo.png',
+    // Palette: docs/certificat-constatator/README.md (indigo ink + lime).
+    emailHeaderBg: '#161A33',
+    emailCtaBg: '#C6F432',
+    emailCtaFg: '#161A33',
+    ogDefault: '/og/constatator-default.png',
+    serviceSlugs: CONSTATATOR_SERVICE_SLUGS,
+    // Same company, Stripe and admin as eghiseul; the constatator has no
+    // lawyer and no Barou number, so the registry platform only matters as
+    // a fallback.
+    registryPlatform: 'eghiseul',
+    legalBaseUrl: 'https://certificat-constatator-express.ro',
+    legalTagline:
+      'eDigitalizare SRL · CUI RO49278701 · certificat-constatator-express.ro este un serviciu privat de asistență la obținerea certificatului constatator; nu suntem instituție de stat și nu suntem afiliați ONRC.',
+  },
 };
 
 export function isBrandId(value: unknown): value is BrandId {
-  return value === 'eghiseul' || value === 'documentero' || value === 'cazierfiscal';
+  return value === 'eghiseul' || value === 'documentero' || value === 'cazierfiscal' || value === 'constatator';
 }
 
 /** Brand by id; unknown/missing ids fall back to eghiseul. */

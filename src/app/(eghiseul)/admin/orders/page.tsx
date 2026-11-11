@@ -419,6 +419,11 @@ export default function AdminOrdersPage() {
           label="cazierfiscal.com"
           onClick={() => updateParams({ platform: urlPlatform === 'cazierfiscal' ? null : 'cazierfiscal' })}
         />
+        <SandboxChip
+          active={urlPlatform === 'constatator'}
+          label="certificat-constatator-express.ro"
+          onClick={() => updateParams({ platform: urlPlatform === 'constatator' ? null : 'constatator' })}
+        />
       </div>
 
       {/* Filtre rapide + Stadiu chips (parity cazierjudiciaronline.com) */}
@@ -636,6 +641,14 @@ export default function AdminOrdersPage() {
                           className="inline-flex items-center rounded border border-orange-300 bg-orange-50 px-1 py-0 text-[9px] font-semibold uppercase tracking-wide text-orange-800"
                         >
                           cazierfiscal
+                        </span>
+                      )}
+                      {order.platform === 'constatator' && (
+                        <span
+                          title="Comandă plasată pe certificat-constatator-express.ro"
+                          className="inline-flex items-center rounded border border-lime-400 bg-lime-50 px-1 py-0 text-[9px] font-semibold uppercase tracking-wide text-lime-800"
+                        >
+                          constatator
                         </span>
                       )}
                       {order.payment_status === 'paid' && !order.invoice_number && (

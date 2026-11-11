@@ -13,6 +13,7 @@ import { BlackFridayBar } from '@/components/shared/black-friday-bar';
 import { WhatsAppFloat } from '@/components/shared/whatsapp-float';
 import { HeaderDocumentero } from '@/components/documentero/header';
 import { HeaderCazierFiscal } from '@/components/cazierfiscal/header';
+import { HeaderConstatator } from '@/components/constatator/header';
 import { BrandProvider } from '@/lib/brand/client';
 import { getBrand } from '@/lib/brand/server';
 import { CookieConsent } from '@/components/consent/cookie-consent';
@@ -52,7 +53,7 @@ export default async function OrderLayout({ children }: { children: React.ReactN
   const body = (
     <>
       {/* After the header: the eghiseul one is fixed, and its spacer pushes the bar below it. */}
-      {brand.id === 'documentero' ? <HeaderDocumentero /> : brand.id === 'cazierfiscal' ? <HeaderCazierFiscal /> : <Header />}
+      {brand.id === 'documentero' ? <HeaderDocumentero /> : brand.id === 'cazierfiscal' ? <HeaderCazierFiscal /> : brand.id === 'constatator' ? <HeaderConstatator /> : <Header />}
       <BlackFridayBar belowFixedHeader={!isSatellite} />
       {children}
       {!isSatellite && <WhatsAppFloat />}

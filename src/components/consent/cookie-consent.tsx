@@ -22,10 +22,13 @@ const GA_ID_DOCUMENTERO = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID_DOCUMENTERO 
 // No fallback to the eghiseul stream: cazierfiscal.com must not report into
 // eghiseul's GA property (kept separate on purpose, 10.11.2026).
 const GA_ID_CAZIERFISCAL = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID_CAZIERFISCAL || '';
-type BrandKey = 'eghiseul' | 'documentero' | 'cazierfiscal';
+// certificat-constatator-express.ro (11.11.2026): same rule, own stream or nothing.
+const GA_ID_CONSTATATOR = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID_CONSTATATOR || '';
+type BrandKey = 'eghiseul' | 'documentero' | 'cazierfiscal' | 'constatator';
 function gaIdFor(brand: BrandKey): string | undefined {
   if (brand === 'documentero') return GA_ID_DOCUMENTERO;
   if (brand === 'cazierfiscal') return GA_ID_CAZIERFISCAL;
+  if (brand === 'constatator') return GA_ID_CONSTATATOR;
   return GA_ID;
 }
 // Google Ads: eticheta de conversie a contului 677-995-5005. Se încarcă DOAR
@@ -38,9 +41,12 @@ const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 const ADS_ID_DOCUMENTERO = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID_DOCUMENTERO;
 // cazierfiscal.com: no Ads account yet, and no fallback to eghiseul's.
 const ADS_ID_CAZIERFISCAL = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID_CAZIERFISCAL;
+// certificat-constatator-express.ro: own Ads account, no fallback either.
+const ADS_ID_CONSTATATOR = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID_CONSTATATOR;
 function adsIdFor(brand: BrandKey): string | undefined {
   if (brand === 'documentero') return ADS_ID_DOCUMENTERO;
   if (brand === 'cazierfiscal') return ADS_ID_CAZIERFISCAL;
+  if (brand === 'constatator') return ADS_ID_CONSTATATOR;
   return ADS_ID;
 }
 
@@ -185,9 +191,10 @@ function applyConsent(state: ConsentState, brand: BrandKey) {
   // Eticheta Google Ads și pixelul OpenAI Ads țin de marketing, nu de analytics.
   if (state.marketing) {
     loadAds(brand);
-    // The OpenAI and Meta pixels belong to the eghiseul ad accounts; cazierfiscal.com
-    // stays out of them (separate brand, 10.11.2026).
-    if (brand !== 'cazierfiscal') {
+    // The OpenAI and Meta pixels belong to the eghiseul ad accounts. Only the
+    // brands that use those accounts load them: an allowlist, so a new brand
+    // stays out by default (cazierfiscal 10.11, constatator 11.11.2026).
+    if (brand === 'eghiseul' || brand === 'documentero') {
       loadOpenAiPixel();
       loadMetaPixel();
     }
