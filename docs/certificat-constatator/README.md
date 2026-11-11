@@ -134,3 +134,5 @@ De făcut la crearea contului Ads:
 2. Din fragmentul de eveniment copiezi `AW-XXXXXXXXX/eticheta`. În Vercel (production) pui `NEXT_PUBLIC_GOOGLE_ADS_ID_CONSTATATOR = AW-XXXXXXXXX` și `NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL_CONSTATATOR = eticheta`. Apoi un build nou (variabilele `NEXT_PUBLIC_` intră doar la build).
 3. Leagă GA4 (proprietatea 563726213) de contul Ads. `purchase` e eveniment-cheie implicit în GA4. În Ads, conversia GA4 rămâne secundară, ca să nu se numere de două ori cu eticheta Ads.
 4. Test: o comandă reală de 89 lei, cu acordul la cookie-uri, apoi verifici în Tag Assistant că pleacă `conversion` cu `send_to` corect. Comanda se rambursează după aceea.
+
+Pachetul pentru contul Google Ads nou (decizia din 11.11, campania, anunțul, conversia): [`google-ads-cont-nou.md`](google-ads-cont-nou.md).
