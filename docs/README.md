@@ -64,6 +64,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Meta Conversions API (tracking server-side):** [`technical/specs/meta-capi-tracking.md`](technical/specs/meta-capi-tracking.md)
 - **Webhook Resend (bounce → banner admin + alertă):** [`technical/specs/resend-bounce-webhook.md`](technical/specs/resend-bounce-webhook.md)
 - **Client blocat în formular / probleme la act:** [`admin/client-blocat-in-formular.md`](admin/client-blocat-in-formular.md)
+- **Comandă blocată din cauza clientului (contract 9.8/9.9, 90 de zile, oferta de 70% pe comenzi vechi):** [`admin/comanda-blocata-de-client.md`](admin/comanda-blocata-de-client.md)
 - **Credit Gemini (OCR) + Erori clienți:** [`admin/credit-gemini-si-erori-clienti.md`](admin/credit-gemini-si-erori-clienti.md); API: [`technical/api/monitoring-api.md`](technical/api/monitoring-api.md)
 - **Decontări Stripe (reconciliere cross-platform + proforme extra):** [`technical/specs/decontari-stripe-reconciliation.md`](technical/specs/decontari-stripe-reconciliation.md); API: [`technical/api/decontari-api.md`](technical/api/decontari-api.md)
 - **Decontări: cum citești liniile (anulări 70%, plăți extra, dispute bancare) — echipă + contabil:** [`admin/decontari-cum-citesti.md`](admin/decontari-cum-citesti.md)

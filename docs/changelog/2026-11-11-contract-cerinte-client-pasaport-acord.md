@@ -10,7 +10,9 @@
 - **Contractul conține și adresa de email a clientului** (acolo trimitem notificările din contract).
 - Pe cazierjudiciaronline.com și ecazier.ro bifa nu avea problema: comanda nu trece fără ea.
 - **Bifa „Sunt de acord cu termenii” nu se mai pierde** când clientul revine în formular. Înainte, aproape jumătate din comenzile plătite din iulie aveau acordul salvat ca „nu”, deși clientul semnase. Acum butonul „Plătește” nu trece mai departe fără bifă. Comenzile vechi nu se pot corecta retroactiv.
-- Comenzile de cazier judiciar pe varianta veche a serviciului primeau o versiune mai veche a contractului de prestări (fără clauzele noi și fără linkul la termenii site-ului). De azi primesc același contract ca restul.
+- Comenzile de cazier judiciar pe varianta veche a serviciului primeau o versiune mai veche a contractului de prestări (fără clauzele noi și fără linkul la termenii site-ului), iar cererea de cazier fără antetul oficial. De azi primesc aceleași documente ca restul.
+- În formularele de stare civilă, declarația de lângă semnătură spune acum și că transcrierea actelor din străinătate o face clientul, iar până atunci comanda e suspendată.
+- Procedura completă, pas cu pas: [Comandă blocată din cauza clientului](../admin/comanda-blocata-de-client.md).
 - Clauzele noi le revizuiește avocata înainte să ne bazăm pe ele într-o dispută.
 
 ---
@@ -25,4 +27,7 @@
 - CJO/ecazier (repo `cazierjudiciaronline.com`, `dc5e1939`): 8.3 în `Step5Contract.tsx` + `contract-pdf.ts`, T&C §6/§9 pe ambele. Consimțământul acolo e impus server-side (`accept_terms: z.literal(true)`), deci fără bug.
 - `src/templates/cazier-judiciar/contract-prestari.docx` și `contract-complet.docx` șterse: `loadTemplate()` le prefera pentru slug-ul activ `cazier-judiciar` (6 comenzi plătite din septembrie), iar ele erau versiunea veche (fără `SITE_NAME`/`TC_URL`/`CONTRACT_SERIA`, fără 9.8/9.9). Acum cade pe `shared/`. `contract-asistenta` și `imputernicire` din folder sunt identice cu shared, rămân.
 - Acord la termeni, comenzi plătite pe 90 de zile: eghiseul 189/321 cu `termsAccepted=false`, documentero 0/3, cazierfiscal fără comenzi.
+- Șters și `cazier-judiciar/cerere-eliberare-pf.docx` (fără antetul „Anexa nr. 7”); slug-ul legacy și cererea secundară de pe integritate cad pe `shared/`.
+- `SignatureStep.tsx`: propoziție nouă în declarația de stare civilă (transcrierea actelor din străinătate). `handleSubmit` are `state.resumeToken` în deps.
+- Ghid nou pentru echipă: `docs/admin/comanda-blocata-de-client.md` + `CURATED_GUIDES`; link din `statusuri-comenzi.md` (Așteptare client).
 - Teste: 3 noi în `tests/unit/lib/documents/generator.test.ts` (pașaport, email, detecție).

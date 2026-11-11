@@ -404,7 +404,7 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
       toast.error('Eroare de conexiune la trimiterea comenzii. Verifică internetul și încearcă din nou.');
       setIsSubmitting(false);
     }
-  }, [state.orderId, priceBreakdown.totalPrice, state.signature, state.consent, saveDraftNow, visibleSteps, goToStep]);
+  }, [state.orderId, state.resumeToken, priceBreakdown.totalPrice, state.signature, state.consent, saveDraftNow, visibleSteps, goToStep]);
 
   // Handle next
   const handleNext = () => {

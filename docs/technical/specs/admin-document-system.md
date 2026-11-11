@@ -334,6 +334,33 @@ cu varianta cu antet. Test de regresie:
 > Când modifici un șablon de cazier, modifică-l în `shared/` (sau sincronizează
 > ambele). Un fișier pus doar în `cazier-judiciar/` NU ajunge în producție.
 
+> **Corecție 11.11.2026.** Slug-ul `cazier-judiciar` NU e mort: 6 comenzi plătite
+> din septembrie. Pentru ele, `contract-prestari`, `contract-complet` și
+> `cerere-eliberare-pf` din `cazier-judiciar/` câștigau în fața `shared/`, deși erau
+> copii vechi (fără `SITE_NAME`/`TC_URL`/`CONTRACT_SERIA`, fără 9.8/9.9, cererea
+> fără antetul oficial „Anexa nr. 7”). Cele trei au fost șterse, deci cad pe
+> `shared/`. Au rămas `contract-asistenta`, `imputernicire`, `cerere-eliberare-pj`,
+> identice cu `shared/` (verificat pe text). Regula rămâne: un singur loc,
+> `shared/`.
+
+### Identificarea clientului în contract (11.11.2026)
+
+`buildClientDetailsBlock()` (`{{CLIENT_DETAILS_BLOCK}}`, paragraful 1.2 din
+contractul de prestări și din cel de asistență):
+
+- tipul actului vine din `idDocumentKindFrom(personal)`: alegerea clientului
+  (`personal.idDocumentType`), apoi OCR (`personal.documentType` care începe cu
+  `passport`); implicit CI. Setat în `ClientData.id_document_type` de toți cei trei
+  apelanți (`auto-generate.ts`, `admin/orders/[id]/generate-document`,
+  `contracts/preview`);
+- pașaport: „legitimat/ă cu pașaportul nr. X, emis de Z” (seria e opțională,
+  pașapoartele românești nu o au); CI: „legitimat/ă cu CI seria X nr. Y, emisă de Z”;
+- la final: `e-mail <adresa>` (adresa de notificare din contract, art. 9.8).
+
+Clauzele 9.8/9.9 (cerință care ține de beneficiar, 90 de zile, reținerea
+serviciului de bază + onorariu) stau în `shared/contract-prestari.docx`.
+Procedura echipei: `docs/admin/comanda-blocata-de-client.md`.
+
 Împuternicirile de **stare civilă** (naștere / căsătorie / celibat / extras
 multilingv) sunt un document diferit — formularul oficial UNBR „Anexa nr. II", cu
 antetul Baroului și alte placeholder-e (`ACTIVITATI_SC`, `AUTORITATE_SC`,
@@ -343,12 +370,9 @@ antetul Baroului și alte placeholder-e (`ACTIVITATI_SC`, `AUTORITATE_SC`,
 
 ```
 src/templates/
-├── cazier-judiciar/              # Service-specific templates (priority)
-│   ├── contract-complet.docx
-│   ├── contract-prestari.docx
+├── cazier-judiciar/              # Legacy slug; copies identical to shared/
 │   ├── contract-asistenta.docx
 │   ├── imputernicire.docx
-│   ├── cerere-eliberare-pf.docx
 │   └── cerere-eliberare-pj.docx
 ├── cazier-fiscal/                # ANAF-specific templates (2026-06-12)
 │   └── cerere-eliberare-pf.docx  # Official ANAF "Cerere de eliberare a

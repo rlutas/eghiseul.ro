@@ -10,7 +10,7 @@ departe. Scris pe 21.09.2026 din platformă. Butoanele în detaliu:
 | Tabul | Ce e acolo | Ce faceți |
 |---|---|---|
 | **Așteptare plată** | comenzi pe transfer bancar, banii neconfirmați (chiar dacă lucrul a pornit pe dovadă) | comparați extrasul; **„Confirmă plata”** cu referința tranzacției. Pe dovadă: **„Dovadă verificată — pornește lucrul”**. Dacă banii nu vin: „Banii nu au venit — abandonează”. [Procedura](plata-transfer-bancar.md) |
-| **Așteptare client** | comenzi oprite pentru că lipsește ceva de la client (acte cerute, date imobil) | sunați sau scrieți-i din cardul „Mesaje cu clientul” de pe comandă (primește email, răspunde din pagina comenzii); când a încărcat ce s-a cerut, comanda iese singură. Termenul e pe pauză cât stă aici |
+| **Așteptare client** | comenzi oprite pentru că lipsește ceva de la client (acte cerute, date imobil) | sunați sau scrieți-i din cardul „Mesaje cu clientul” de pe comandă (primește email, răspunde din pagina comenzii); când a încărcat ce s-a cerut, comanda iese singură. Termenul e pe pauză cât stă aici. Dacă actul nu se poate elibera fără ceva ce doar clientul poate face (ex. transcrierea căsătoriei), vezi [Comandă blocată din cauza clientului](comanda-blocata-de-client.md) |
 | **Blocat instituție** | instituția e indisponibilă (ANCPI picat, registru închis); termen pe pauză, nu e vina clientului | nimic de apăsat; când revine instituția, cine lucrează comanda o scoate de aici |
 
 Plus **„Plătite”** = comenzi la care nimeni nu a apăsat încă „Începe

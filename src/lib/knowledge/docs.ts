@@ -127,6 +127,13 @@ export interface GuideLink {
  */
 export const CURATED_GUIDES: GuideLink[] = [
   {
+    title: 'Comandă blocată din cauza clientului: ce faci',
+    slug: 'admin/comanda-blocata-de-client',
+    category: 'comenzi',
+    description:
+      'Căsătorie din străinătate netranscrisă, act original, rectificare: îi scrii clientului, „Așteptare client”, 90 de zile, ce rambursăm. Plus oferta de 70% pe comenzile vechi, bifa de acord pierdută și contractul cu pașaport.',
+  },
+  {
     title: 'Client blocat în formular sau cu probleme la act: ce faci',
     slug: 'admin/client-blocat-in-formular',
     category: 'comenzi',

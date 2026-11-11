@@ -1,5 +1,11 @@
 # eGhiseul.ro - Status Curent
 
+> **🔴 Update 2026-11-11 — contract: comenzi blocate de client, pașaport, acordul la termeni.**
+> - **Contract + Termeni pe toate 5 site-urile:** dacă actul nu se poate elibera din cauza a ceva ce doar clientul poate face (ex. transcrierea căsătoriei din străinătate), comanda se suspendă după un mesaj scris; după 90 de zile sau refuz reținem serviciul de bază + onorariul și rambursăm doar ce nu am început. Valabil pentru comenzile de pe 11.11. **De revizuit de avocată.** [procedura echipei](admin/comanda-blocata-de-client.md)
+> - **Contractul scrie „pașaportul nr. …”** la comenzile cu pașaport și conține emailul clientului. Comenzile vechi: regenerare din admin.
+> - **Bug acord la termeni (eghiseul):** 189/321 comenzi plătite în 90 de zile au `termsAccepted=false` deși clientul a semnat (cache-ul local nu păstra bifa). Reparat; comenzile vechi nu se pot corecta. CJO/ecazier nu aveau bug-ul.
+> - **Slug-ul `cazier-judiciar`** lua contractul și cererea din copii vechi; acum din `shared/`. [changelog](changelog/2026-11-11-contract-cerinte-client-pasaport-acord.md)
+
 > **🟣 Update 2026-11-11 — cazierfiscal.com: separat de eghiseul, ghiduri în coadă, Bing.**
 > - **Live:** fără date de firmă în footer și pe Despre (doar în T&C), fără telefon, favicon corect pe mobil, GA4 nou, specimenul certificatului pe pagina principală și lângă formular. Bing Webmaster: verificat, sitemap trimis.
 > - **Ghiduri pregătite, NEPUBLICATE, câte unul pe săptămână:** 17.11 valabilitate și ce conține · 24.11 administrator / PFA · 01.12 cazier fiscal vs certificat fiscal. Publicare = `published: true` în `src/config/cazierfiscal-nav.ts` + datele din pagină + deploy + IndexNow. [coada](cazier-fiscal/README.md)
