@@ -10,6 +10,7 @@
 - **Contractul conține și adresa de email a clientului** (acolo trimitem notificările din contract).
 - Pe cazierjudiciaronline.com și ecazier.ro bifa nu avea problema: comanda nu trece fără ea.
 - **Bifa „Sunt de acord cu termenii” nu se mai pierde** când clientul revine în formular. Înainte, aproape jumătate din comenzile plătite din iulie aveau acordul salvat ca „nu”, deși clientul semnase. Acum butonul „Plătește” nu trece mai departe fără bifă. Comenzile vechi nu se pot corecta retroactiv.
+- Comenzile de cazier judiciar pe varianta veche a serviciului primeau o versiune mai veche a contractului de prestări (fără clauzele noi și fără linkul la termenii site-ului). De azi primesc același contract ca restul.
 - Clauzele noi le revizuiește avocata înainte să ne bazăm pe ele într-o dispută.
 
 ---
@@ -22,4 +23,6 @@
 - `modular-wizard-provider.tsx`: `ModularDraftCache.data.consent` salvat și restaurat (doar dacă există semnătură); `UPDATE_CONSENT` setează `isDirty`. Cauza: cache-ul local păstra semnătura dar nu consimțământul, deci restaurarea punea `termsAccepted=false`, iar `/submit` scria `signature_metadata.consent` fals (~55% din comenzile plătite din iulie).
 - `modular-order-wizard.tsx`: guard în `handleSubmit` — semnătură fără `termsAccepted` duce clientul la pasul semnătură cu mesaj.
 - CJO/ecazier (repo `cazierjudiciaronline.com`, `dc5e1939`): 8.3 în `Step5Contract.tsx` + `contract-pdf.ts`, T&C §6/§9 pe ambele. Consimțământul acolo e impus server-side (`accept_terms: z.literal(true)`), deci fără bug.
+- `src/templates/cazier-judiciar/contract-prestari.docx` și `contract-complet.docx` șterse: `loadTemplate()` le prefera pentru slug-ul activ `cazier-judiciar` (6 comenzi plătite din septembrie), iar ele erau versiunea veche (fără `SITE_NAME`/`TC_URL`/`CONTRACT_SERIA`, fără 9.8/9.9). Acum cade pe `shared/`. `contract-asistenta` și `imputernicire` din folder sunt identice cu shared, rămân.
+- Acord la termeni, comenzi plătite pe 90 de zile: eghiseul 189/321 cu `termsAccepted=false`, documentero 0/3, cazierfiscal fără comenzi.
 - Teste: 3 noi în `tests/unit/lib/documents/generator.test.ts` (pașaport, email, detecție).
