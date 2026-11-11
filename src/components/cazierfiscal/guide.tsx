@@ -7,6 +7,15 @@ import { fmtDateRo } from '@/lib/documentero/content';
 import { CAZIERFISCAL_GUIDES, CAZIERFISCAL_ORDER_HREF, cazierFiscalGuideVisible } from '@/config/cazierfiscal-nav';
 
 /**
+ * In-body link to another guide. Renders plain text while the target is still
+ * queued (published: false), so a live guide never links to a 404; the link
+ * appears by itself on the day the target is published.
+ */
+export function GuideLink({ href, children }: { href: string; children: ReactNode }) {
+  return cazierFiscalGuideVisible(href) ? <Link href={href}>{children}</Link> : <>{children}</>;
+}
+
+/**
  * Shell for a cazierfiscal.com guide: breadcrumb, H1, lead, date and reading
  * time, a "Pe scurt" box (answers, not teasers) with the table of contents,
  * the body (plain prose with h2/p/ul styled by the wrapper; each h2 carries the
@@ -104,7 +113,7 @@ export function CazierFiscalGuide({
 
         <Section
           reveal={false}
-          className="mt-4 max-w-[820px] text-[17px] leading-[1.75] text-d-body [&_a]:font-semibold [&_a]:text-d-ink [&_a]:underline [&_a]:decoration-d-acc [&_a]:underline-offset-2 [&_h2]:mb-3 [&_h2]:mt-12 [&_h2]:scroll-mt-24 [&_h2]:text-[26px] [&_h2]:font-bold [&_h2]:leading-[1.15] [&_h2]:tracking-[-0.03em] [&_h2]:text-d-ink sm:[&_h2]:text-[30px] [&_li]:mb-2 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-4 [&_ul]:my-4 [&_ul]:list-disc [&_ul]:pl-6"
+          className="mt-4 max-w-[820px] text-[17px] leading-[1.75] text-d-body [&_a]:font-semibold [&_a]:text-d-ink [&_a]:underline [&_a]:decoration-d-acc [&_a]:underline-offset-2 [&_h2]:mb-3 [&_h2]:mt-12 [&_h2]:scroll-mt-24 [&_h2]:text-[26px] [&_h2]:font-bold [&_h2]:leading-[1.15] [&_h2]:tracking-[-0.03em] [&_h2]:text-d-ink sm:[&_h2]:text-[30px] [&_li]:mb-2 [&_ol]:my-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-4 [&_ul]:my-4 [&_ul]:list-disc [&_ul]:pl-6 [&_table]:my-4 [&_table]:w-full [&_table]:min-w-[560px] [&_table]:border-collapse [&_table]:text-[15px] [&_td]:border-b [&_td]:border-d-line [&_td]:p-2 [&_td]:align-top [&_th]:border-b-2 [&_th]:border-d-line [&_th]:p-2 [&_th]:text-left [&_th]:font-bold [&_th]:text-d-ink [&_td:first-child]:font-semibold [&_td:first-child]:text-d-ink"
         >
           {children}
         </Section>

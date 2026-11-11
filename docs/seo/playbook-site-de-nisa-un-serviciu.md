@@ -73,6 +73,8 @@ sitemap.xml, robots.txt, llms.txt, IndexNow
 
 Lista de ghiduri trăiește într-un singur loc (`src/config/<brand>-nav.ts`): footerul, hub-ul, sitemap-ul și blocul „Citește și” o citesc de acolo. Un ghid nou intră în listă doar când pagina există.
 
+**Coada de ghiduri.** Ghidurile se scriu în avans, dar ies câte unul pe săptămână. Fiecare intrare din listă are `published` (și `planned`, data din coadă). Cu `published: false` pagina dă 404 în producție, lipsește din meniu, hub, sitemap, llms.txt și „Citește și”, dar se vede în `next dev`. Linkurile din corp spre alt ghid se fac cu `GuideLink`, care randează text simplu până când ținta e publicată. Publicarea = `published: true` + datele din pagină + deploy + IndexNow.
+
 ## 5. Șablonul de ghid
 
 Componenta `src/components/cazierfiscal/guide.tsx` (copiaz-o pentru brandul nou). Ordinea, preluată de la cazierauto.ro + digigov.ro:
@@ -89,6 +91,8 @@ Componenta `src/components/cazierfiscal/guide.tsx` (copiaz-o pentru brandul nou)
 Fără FAQPage nou în schema; FAQ-ul vizibil rămâne. Fără autor persoană dacă persoana nu are pagină pe site. Recenzor (ex. avocata) doar dacă chiar a citit textul și are pagină proprie.
 
 ## 6. Verificarea faptelor, înainte de publicare
+
+Textul se trece întâi prin skill-ul `/humanizer` (fără liniuțe lungi, fără triade forțate, fără vocabular de AI, ritm variat), apoi prin verificarea juridică de mai jos.
 
 Fiecare afirmație juridică se verifică pe textul consolidat (legislatie.just.ro), cu articol și alineat, de un agent separat de cel care a scris textul. La cazier fiscal, verificarea din 11.11 a corectat:
 

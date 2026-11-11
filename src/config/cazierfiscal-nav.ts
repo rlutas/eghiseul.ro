@@ -50,6 +50,30 @@ export const CAZIERFISCAL_ALL_GUIDES: ReadonlyArray<CazierFiscalGuideEntry> = [
     updated: '2026-11-11',
     published: true,
   },
+  {
+    href: '/ghiduri/valabilitate-cazier-fiscal/',
+    label: 'Valabilitate și conținut',
+    hint: 'Cât e valabil certificatul, ce fapte se înscriu și după cât timp se șterg.',
+    updated: '2026-11-17',
+    published: false,
+    planned: '2026-11-17',
+  },
+  {
+    href: '/ghiduri/cazier-fiscal-administrator-pfa/',
+    label: 'Pentru administrator, firmă sau PFA',
+    hint: 'Când îl verifică singur Registrul Comerțului și cum te blochează o firmă inactivă.',
+    updated: '2026-11-24',
+    published: false,
+    planned: '2026-11-24',
+  },
+  {
+    href: '/ghiduri/cazier-fiscal-sau-certificat-fiscal/',
+    label: 'Cazier fiscal sau certificat fiscal',
+    hint: 'Cazier, atestare fiscală ANAF și certificatul de la primărie: ce arată fiecare.',
+    updated: '2026-12-01',
+    published: false,
+    planned: '2026-12-01',
+  },
 ];
 
 /** Live guides only: the footer, /ghiduri/, the sitemap and "Citește și" read this list. */

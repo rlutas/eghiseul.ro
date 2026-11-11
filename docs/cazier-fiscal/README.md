@@ -92,11 +92,19 @@ Auditul `/seo` (tehnic, conținut, schema, performanță, SERP) a dat: Lighthous
 | cazier fiscal online, cazier fiscal, persoană fizică, certificat de cazier fiscal, eliberare, cerere, acte, de unde se scoate, cazier financiar | ~4–5k | pagina principală (title, H1, H2, FAQ) |
 | SPV / ANAF online | ~300 | `/ghiduri/cazier-fiscal-din-spv/` |
 | străinătate, în engleză, traducere, apostilă | < 30, intenție mare | `/ghiduri/cazier-fiscal-din-strainatate/` |
-| valabilitate + ce conține + ștergere | ~350 | ghid nou (după 17.11) |
-| ce este / verificare / cazier fiscal vs certificat fiscal | ~380 | ghid nou sau unit cu cel de mai sus |
-| administrator firmă, PFA, înființare | ~100–150 | ghid nou |
+| valabilitate + ce conține + ștergere | ~350 | `/ghiduri/valabilitate-cazier-fiscal/` (scris, iese 17.11) |
+| ce este / verificare / cazier fiscal vs certificat fiscal | ~380 | `/ghiduri/cazier-fiscal-sau-certificat-fiscal/` (scris, iese 01.12) |
+| administrator firmă, PFA, înființare | ~100–150 | `/ghiduri/cazier-fiscal-administrator-pfa/` (scris, iese 24.11) |
 | orașe, sectoare, „certificat fiscal” (primărie), persoane juridice | — | NU |
 
 Sezonalitate: sep–dec e de 5–9× vara (clicurile eghiseul, oct 2025 vs mai–iul 2026).
 
-**Următoarele ghiduri, câte unul pe săptămână, de la 17.11:** valabilitate și ce conține cazierul fiscal → cazier fiscal pentru administrator / PFA → ce este cazierul fiscal și cum nu-l confunzi cu certificatul fiscal. Fiecare intră în `CAZIERFISCAL_GUIDES`, deci primește automat linkuri din footer, hub, sitemap și „Citește și”.
+**Coada de ghiduri (scrise 11.11, verificate pe textul legii, NEPUBLICATE):**
+
+| Data | Ghid | Cum îl publici |
+|---|---|---|
+| 17.11 | `/ghiduri/valabilitate-cazier-fiscal/` | în `src/config/cazierfiscal-nav.ts`: `published: true`, `updated` = data; în pagină `PUBLISHED`/`UPDATED` = data; deploy; IndexNow |
+| 24.11 | `/ghiduri/cazier-fiscal-administrator-pfa/` | idem |
+| 01.12 | `/ghiduri/cazier-fiscal-sau-certificat-fiscal/` | idem |
+
+Până la publicare, paginile dau 404 în producție și lipsesc din meniu, hub, sitemap, llms.txt și „Citește și”; în `next dev` se văd, pentru verificare. Linkurile dintre ghidurile din coadă folosesc `GuideLink` (`src/components/cazierfiscal/guide.tsx`): cât timp ținta e nepublicată se randează ca text simplu, deci un ghid live nu trimite niciodată spre 404. Textul legal (OG 39/2015, CPF art. 158–160, anexa HG 1568/2022) e rezumat în raportul din 11.11; anexa actuală are 251 de fapte și nu mai conține sancțiuni.
