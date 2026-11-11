@@ -4,6 +4,7 @@
 > - **Contract + Termeni pe toate 5 site-urile:** dacă actul nu se poate elibera din cauza a ceva ce doar clientul poate face (ex. transcrierea căsătoriei din străinătate), comanda se suspendă după un mesaj scris; după 90 de zile sau refuz reținem serviciul de bază + onorariul și rambursăm doar ce nu am început. Valabil pentru comenzile de pe 11.11. **De revizuit de avocată.** [procedura echipei](admin/comanda-blocata-de-client.md)
 > - **Contractul scrie „pașaportul nr. …”** la comenzile cu pașaport și conține emailul clientului. Comenzile vechi: regenerare din admin.
 > - **Bug acord la termeni (eghiseul):** 189/321 comenzi plătite în 90 de zile au `termsAccepted=false` deși clientul a semnat (cache-ul local nu păstra bifa). Reparat; comenzile vechi nu se pot corecta. CJO/ecazier nu aveau bug-ul.
+> - **Emailuri documentero pierdute 19.10–11.11** (domeniul scos din Resend, cont la limita de 10 domenii). Reparat cu rezervă: pleacă de pe adresa eghiseul.ro cu numele brandului; confirmările a 2 comenzi retrimise. Mutarea stanbaculescu + avocat-tarta într-un cont Resend gratuit, ca documentero și cazierfiscal să aibă domeniul lor: **amânată** până cresc comenzile pe ele. [changelog](changelog/2026-11-11-emailuri-documentero-domeniu-resend.md)
 > - **Slug-ul `cazier-judiciar`** lua contractul și cererea din copii vechi; acum din `shared/`. [changelog](changelog/2026-11-11-contract-cerinte-client-pasaport-acord.md)
 
 > **🟣 Update 2026-11-11 — cazierfiscal.com: separat de eghiseul, ghiduri în coadă, Bing.**
