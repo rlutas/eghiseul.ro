@@ -2,11 +2,9 @@ import Link from 'next/link';
 import { LegalLayoutCazierFiscal } from '@/components/cazierfiscal/legal-layout';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { cazierFiscalBreadcrumb, cazierFiscalOrganizationNode, cazierFiscalWebsiteNode } from '@/lib/seo/cazierfiscal-schema';
-import { BRANDS } from '@/lib/brand/brands';
 import { CAZIERFISCAL_INDEXABLE } from '@/config/cazierfiscal-nav';
 
 const PATH = '/politica-de-confidentialitate/';
-const brand = BRANDS.cazierfiscal;
 
 export const metadata = buildPageMetadata({
   brand: 'cazierfiscal',
@@ -35,7 +33,6 @@ export default function Page() {
     ],
   };
   const email = <a href="/contact/">formularul de contact</a>;
-  const phone = <a href={`tel:${brand.phoneDisplay.replace(/\s/g, '')}`}>{brand.phoneDisplay}</a>;
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
@@ -52,7 +49,7 @@ export default function Page() {
         <p>
           Operatorul de date cu caracter personal pentru platforma cazierfiscal.com este <strong>eDigitalizare SRL</strong>,
           cu datele de identificare de mai sus. Pentru orice solicitare privind datele tale, ne poți contacta la{' '}
-          {email} sau {phone}.
+          {email}.
         </p>
 
         <h2>2. Ce date colectăm</h2>
@@ -213,7 +210,7 @@ export default function Page() {
 
         <h2>12. Contact și plângeri</h2>
         <p>
-          Pentru orice întrebare privind datele tale: <strong>eDigitalizare SRL</strong> · {email} · {phone}.
+          Pentru orice întrebare privind datele tale: <strong>eDigitalizare SRL</strong> · {email}.
         </p>
         <p>
           Dacă apreciezi că prelucrarea îți încalcă drepturile, te poți adresa{' '}

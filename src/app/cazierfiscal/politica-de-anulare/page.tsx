@@ -145,7 +145,7 @@ export default async function Page() {
           autorități, iar serviciul este personalizat pe datele tale. Conform OUG 34/2014 art. 16
           lit. m), dreptul legal de retragere nu se aplică după începerea efectivă a prestării
           serviciului. Dacă ai o situație specială, scrie-ne la{' '}
-          <a href="/contact/">formularul de contact</a> sau pe WhatsApp; analizăm
+          <a href="/contact/">formularul de contact</a>; analizăm
           fiecare caz.
         </p>
 

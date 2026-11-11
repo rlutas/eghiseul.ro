@@ -2,11 +2,9 @@ import Link from 'next/link';
 import { LegalLayoutCazierFiscal } from '@/components/cazierfiscal/legal-layout';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { cazierFiscalBreadcrumb, cazierFiscalOrganizationNode, cazierFiscalWebsiteNode } from '@/lib/seo/cazierfiscal-schema';
-import { BRANDS } from '@/lib/brand/brands';
 import { CAZIERFISCAL_INDEXABLE, CAZIERFISCAL_TRACK_HREF } from '@/config/cazierfiscal-nav';
 
 const PATH = '/termeni-si-conditii/';
-const brand = BRANDS.cazierfiscal;
 
 export const metadata = buildPageMetadata({
   brand: 'cazierfiscal',
@@ -142,7 +140,7 @@ export default function Page() {
           Certificatul de cazier fiscal se trimite scanat pe email în ziua ridicării. Originalul se livrează prin
           curier, în România sau în străinătate, la adresa indicată în comandă, atunci când alegi această opțiune.
           Costul livrării în România și tarifele pentru livrarea internațională sunt afișate înainte de plată sau
-          comunicate prin email/WhatsApp împreună cu opțiunile disponibile. Numărul de urmărire (AWB) se trimite pe
+          comunicate prin email împreună cu opțiunile disponibile. Numărul de urmărire (AWB) se trimite pe
           email la predarea coletului.
         </p>
 
@@ -207,14 +205,13 @@ export default function Page() {
           Este esențial ca datele furnizate în formularul de comandă să fie corecte și complete: orice eroare poate
           genera întârzieri, acte incorecte sau chiar imposibilitatea prestării serviciului, fără drept de
           rambursare. Verifică atent informațiile înainte de trimitere. Dacă observi o greșeală, contactează-ne cât
-          mai repede, cel mai rapid pe{' '}
-          <a href={`https://wa.me/${brand.whatsappNumber}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>.
+          mai repede, prin <a href="/contact/">formularul de contact</a>.
         </p>
 
         <h2>13. Obligațiile prestatorului</h2>
         <ul>
           <li>Să proceseze cererile cu diligență profesională, în termenele estimate.</li>
-          <li>Să informeze clientul despre stadiul comenzii (email și/sau telefon).</li>
+          <li>Să informeze clientul despre stadiul comenzii (pe email).</li>
           <li>Să asigure confidențialitatea datelor conform GDPR.</li>
           <li>Să trimită certificatul scanat pe email și, dacă ai ales livrarea, originalul prin curier.</li>
           <li>Să notifice clientul în cel mai scurt timp în cazul oricărui impediment.</li>
@@ -237,8 +234,7 @@ export default function Page() {
 
         <h2>17. Reclamații, legislație aplicabilă și soluționarea litigiilor</h2>
         <p>
-          Pentru orice nelămuriri, sugestii sau reclamații ne poți contacta pe{' '}
-          <a href={`https://wa.me/${brand.whatsappNumber}`} target="_blank" rel="noopener noreferrer">WhatsApp</a> sau prin{' '}
+          Pentru orice nelămuriri, sugestii sau reclamații ne poți contacta prin{' '}
           <a href="/contact/">formularul de contact</a>. Ne angajăm să răspundem prompt și să
           tratăm toate sesizările cu seriozitate.
         </p>
@@ -254,8 +250,7 @@ export default function Page() {
         <h2>18. Contact</h2>
         <p>
           eDigitalizare SRL · CUI RO49278701 · Reg. Com. J2023001097301 · contact:{' '}
-          <a href="/contact/">formularul de contact</a> · telefon/WhatsApp:{' '}
-          <a href={`tel:${brand.phoneDisplay.replace(/\s/g, '')}`}>{brand.phoneDisplay}</a>.
+          <a href="/contact/">formularul de contact</a>.
         </p>
       </LegalLayoutCazierFiscal>
     </>

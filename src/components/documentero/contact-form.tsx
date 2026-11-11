@@ -37,7 +37,7 @@ export interface ContactFormCopy {
   newsletterLabel?: string | null;
 }
 
-export function ContactFormDocumentero({ whatsappHref, copy = {} }: { whatsappHref: string; copy?: ContactFormCopy }) {
+export function ContactFormDocumentero({ whatsappHref, copy = {} }: { whatsappHref?: string; copy?: ContactFormCopy }) {
   const topics = copy.topics ?? ACTE;
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [error, setError] = useState('');
@@ -67,14 +67,14 @@ export function ContactFormDocumentero({ whatsappHref, copy = {} }: { whatsappHr
       const res = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       const json = await res.json();
       if (!res.ok || !json.success) {
-        setError(json.error || 'A apărut o eroare. Încearcă din nou sau scrie-ne pe WhatsApp.');
+        setError(json.error || (whatsappHref ? 'A apărut o eroare. Încearcă din nou sau scrie-ne pe WhatsApp.' : 'A apărut o eroare. Încearcă din nou peste câteva minute.'));
         setStatus('error');
         return;
       }
       setStatus('sent');
       form.reset();
     } catch {
-      setError('Nu am putut trimite mesajul. Verifică conexiunea sau scrie-ne pe WhatsApp.');
+      setError(whatsappHref ? 'Nu am putut trimite mesajul. Verifică conexiunea sau scrie-ne pe WhatsApp.' : 'Nu am putut trimite mesajul. Verifică conexiunea și încearcă din nou.');
       setStatus('error');
     }
   }
@@ -84,7 +84,7 @@ export function ContactFormDocumentero({ whatsappHref, copy = {} }: { whatsappHr
       <div className="flex flex-col items-start gap-3 rounded-2xl bg-d-soft p-7">
         <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-d-acc text-d-ink"><Check /></span>
         <span className="text-[22px] font-bold tracking-[-0.02em]">Mesaj trimis.</span>
-        <p className="m-0 text-[15px] leading-[1.6] text-d-muted">Răspundem pe email în orele de program, de obicei sub o oră. Dacă e urgent, scrie-ne și pe WhatsApp.</p>
+        <p className="m-0 text-[15px] leading-[1.6] text-d-muted">Răspundem pe email în orele de program, de obicei sub o oră.{whatsappHref ? ' Dacă e urgent, scrie-ne și pe WhatsApp.' : ''}</p>
         <button type="button" onClick={() => setStatus('idle')} className="text-[14px] font-semibold underline underline-offset-2 hover:text-d-acc">Trimite alt mesaj</button>
       </div>
     );
@@ -123,7 +123,7 @@ export function ContactFormDocumentero({ whatsappHref, copy = {} }: { whatsappHr
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="phone" className={label}>Telefon <span className="font-normal text-d-muted">(opțional, pentru WhatsApp)</span></label>
+          <label htmlFor="phone" className={label}>Telefon <span className="font-normal text-d-muted">{whatsappHref ? '(opțional, pentru WhatsApp)' : '(opțional)'}</span></label>
           <input id="phone" name="phone" type="tel" maxLength={40} autoComplete="tel" placeholder="+40 7xx xxx xxx" className={field} />
         </div>
         <div className="flex flex-col gap-1.5">
@@ -152,9 +152,11 @@ export function ContactFormDocumentero({ whatsappHref, copy = {} }: { whatsappHr
         <button type="submit" disabled={status === 'sending'} className="inline-flex h-[52px] items-center justify-center rounded-xl bg-d-acc px-6 text-[16px] font-bold text-d-ink transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60">
           {status === 'sending' ? 'Se trimite…' : 'Trimite mesajul'}
         </button>
-        <a href={whatsappHref} className="inline-flex h-[52px] items-center justify-center rounded-xl border-[1.5px] border-d-line bg-d-card px-6 text-[16px] font-semibold hover:border-d-acc">
-          Sau scrie pe WhatsApp
-        </a>
+        {whatsappHref && (
+          <a href={whatsappHref} className="inline-flex h-[52px] items-center justify-center rounded-xl border-[1.5px] border-d-line bg-d-card px-6 text-[16px] font-semibold hover:border-d-acc">
+            Sau scrie pe WhatsApp
+          </a>
+        )}
       </div>
       <p className="m-0 text-[12px] leading-[1.5] text-d-muted">
         Prin trimitere ești de acord cu <Link href="/politica-de-confidentialitate/" className="underline underline-offset-2 hover:text-d-acc">politica de confidențialitate</Link>. Nu trimite poze cu acte aici; le încarci în comandă, criptat.

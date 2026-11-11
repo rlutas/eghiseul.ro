@@ -11,11 +11,11 @@ export const revalidate = 3600;
 const PATH = '/';
 const ORDER = '/comanda/cazier-fiscal/';
 const PUBLISHED = '2026-11-10';
-const UPDATED = '2026-11-10';
+const UPDATED = '2026-11-11';
 /** Short, exact-match title (Raul, 10.11.2026): the query is „cazier fiscal online”. */
 const TITLE = 'Cazier fiscal online – certificat de cazier fiscal fără SPV';
 const DESCRIPTION =
-  'Cazier fiscal online pentru persoane fizice: completezi formularul pe telefon, avocatul depune cererea la ANAF, iar certificatul de cazier fiscal îl primești pe email. Fără cont SPV.';
+  'Cazier fiscal online pentru persoane fizice, fără cont SPV: completezi cererea pe telefon, avocatul o depune la ANAF pentru eliberare, iar certificatul de cazier fiscal îl primești pe email în 1–3 zile lucrătoare.';
 
 export const metadata = buildPageMetadata({
   brand: 'cazierfiscal',
@@ -25,10 +25,11 @@ export const metadata = buildPageMetadata({
   noindex: !CAZIERFISCAL_INDEXABLE,
 });
 
-/** Read and checked on 10.11.2026. */
+/** Read 10.11.2026, re-checked 11.11.2026 (OG 39/2015 consolidated 08.11.2025). */
 const SOURCES = [
   ['OG nr. 39/2015 privind cazierul fiscal, text consolidat (legislatie.just.ro)', 'https://legislatie.just.ro/Public/DetaliiDocument/303156'],
-  ['OPANAF nr. 2594/2015: procedura și formularul de cerere (legislatie.just.ro)', 'https://legislatie.just.ro/Public/DetaliiDocument/171984'],
+  ['OPANAF nr. 2594/2015: procedura de eliberare (legislatie.just.ro)', 'https://legislatie.just.ro/Public/DetaliiDocument/171983'],
+  ['OPANAF nr. 2048/2023: formularele actuale de cerere și certificat (legislatie.just.ro)', 'https://legislatie.just.ro/Public/DetaliiDocument/277749'],
   ['ANAF: înregistrarea în Spațiul Privat Virtual', 'https://www.anaf.ro/anaf/internet/ANAF/servicii_online/inregistrare_utilizatori'],
 ] as const;
 
@@ -50,7 +51,7 @@ const FAQ = [
   },
   {
     q: 'Apar datoriile mele în cazierul fiscal?',
-    a: 'Nu. Certificatul spune doar dacă ai sau nu fapte înscrise în cazierul fiscal. Datoriile la buget apar în certificatul de atestare fiscală, care este alt document.',
+    a: 'Nu ca atare. Datoriile restante la buget apar în certificatul de atestare fiscală, care este alt document. Excepția: dacă ANAF ți-a atras răspunderea solidară pentru datoriile unei firme, decizia se înscrie în cazierul fiscal (OG 39/2015, art. 4 alin. 4).',
   },
   {
     q: 'Cât timp e valabil certificatul de cazier fiscal?',
@@ -58,11 +59,27 @@ const FAQ = [
   },
   {
     q: 'Poate cere altcineva cazierul fiscal pentru mine?',
-    a: 'Da, un împuternicit sau un avocat (OG 39/2015, art. 9 alin. 1). La noi, cererea o depune avocatul, pe baza împuternicirii avocațiale pe care o semnezi în formular.',
+    a: 'Da, un împuternicit (OG 39/2015, art. 9 alin. 1), inclusiv un avocat cu împuternicire avocațială (Codul de procedură fiscală, art. 18 alin. 3). La noi, cererea o depune avocatul, pe baza împuternicirii avocațiale pe care o semnezi în formular.',
   },
   {
     q: 'Sunt cetățean străin. Am nevoie de el?',
-    a: 'Dacă nu ești înregistrat fiscal în România, legea nu îți cere certificatul: ajunge o declarație autentică pe propria răspundere (OG 39/2015, art. 8 alin. 4). Întreabă instituția care ți-l cere înainte să comanzi.',
+    a: 'Dacă nu ești înregistrat fiscal în România, la Registrul Comerțului (înființare de firmă, cesiune de părți sociale, numire de administrator) nu ți se cere certificatul: ajunge o declarație autentică, la notar, pe propria răspundere (OG 39/2015, art. 8 alin. 4). Pentru alte dosare, întreabă instituția care ți-l cere înainte să comanzi.',
+  },
+  {
+    q: 'Cât durează eliberarea cazierului fiscal prin voi?',
+    a: '1–3 zile lucrătoare de la plată și semnarea împuternicirii. Certificatul scanat îl primești pe email; originalul, dacă l-ai cerut, vine prin curier.',
+  },
+  {
+    q: 'De unde se scoate cazierul fiscal?',
+    a: 'De la ANAF: din Spațiul Privat Virtual, dacă ai cont, sau de la ghișeul oricărei unități ANAF, indiferent de domiciliu (OG 39/2015, art. 9). Fără SPV și fără drum la ghișeu, îl poți obține prin avocat, ca aici.',
+  },
+  {
+    q: 'Se poate cere de pe ghiseul.ro sau de pe Hub MAI?',
+    a: 'Nu. Ghiseul.ro e portalul de plată al statului, iar Hub MAI ține de Ministerul Afacerilor Interne; niciunul nu eliberează cazierul fiscal. Certificatul îl eliberează doar ANAF și nu are taxă. Noi nu suntem nici ghiseul.ro, nici ANAF.',
+  },
+  {
+    q: 'Cazierul financiar e același lucru?',
+    a: 'Da, „cazier financiar” e un nume folosit des pentru cazierul fiscal. Documentul oficial se numește certificat de cazier fiscal și îl emite ANAF. Nu îl confunda cu certificatul fiscal de la primărie (pentru impozitele locale), care e alt act.',
   },
   {
     q: 'Merge și pentru o firmă?',
@@ -234,7 +251,7 @@ export default async function CazierFiscalHome() {
         <Section id="variante" className="mt-24 flex scroll-mt-24 flex-col gap-7 lg:mt-32">
           <div className="flex flex-col gap-3">
             <Eyebrow>Ai trei variante</Eyebrow>
-            <H2>De unde iei cazierul fiscal: SPV, ghișeu sau prin avocat</H2>
+            <H2>De unde se scoate cazierul fiscal: SPV, ghișeu sau prin avocat</H2>
             <p className="m-0 max-w-[760px] text-[17px] leading-[1.65] text-d-muted">Două sunt gratuite. Ți le spunem pe toate, alegi ce ți se potrivește.</p>
           </div>
           <div className="grid gap-5 md:grid-cols-3">
@@ -244,7 +261,7 @@ export default async function CazierFiscalHome() {
               <p className="m-0 text-[15px] leading-[1.6] text-d-muted">
                 Dacă ai cont în{' '}
                 <a href={ANAF_SPV} target="_blank" rel="nofollow noopener" className="underline underline-offset-2">Spațiul Privat Virtual</a>,
-                ceri din Solicitări → Eliberare documente. Primești certificatul în SPV, ca PDF cu semnătura electronică a
+                ceri din Solicitări → Eliberare documente → Certificat de cazier fiscal. Primești certificatul în SPV, ca PDF cu semnătura electronică a
                 Ministerului Finanțelor.
               </p>
             </Card>
@@ -252,8 +269,8 @@ export default async function CazierFiscalHome() {
               <span className="text-[13px] font-bold uppercase tracking-[0.06em] text-d-muted">Gratuit</span>
               <h3 className="m-0 text-[20px] font-bold">La ghișeul ANAF</h3>
               <p className="m-0 text-[15px] leading-[1.6] text-d-muted">
-                La orice unitate ANAF, indiferent de domiciliu. Mergi cu actul de identitate în programul ghișeului, iar
-                certificatul se eliberează pe loc.
+                La orice unitate ANAF, indiferent de domiciliu. Mergi cu actul de identitate în programul ghișeului; legea
+                cere ca certificatul să se elibereze „de îndată”.
               </p>
             </Card>
             <div className="flex flex-col gap-3 rounded-[20px] bg-d-ink p-6 text-white">
@@ -302,9 +319,11 @@ export default async function CazierFiscalHome() {
             <Eyebrow>Ce arată</Eyebrow>
             <H2>Ce scrie în certificatul de cazier fiscal</H2>
             <p className="m-0 text-[17px] leading-[1.7] text-d-body">
-              În cazierul fiscal se înscriu faptele sancționate contravențional sau penal prevăzute de lege, plus
-              situații precum inactivitatea fiscală. Faptele sancționate doar cu avertisment nu se înscriu. Certificatul
-              spune scurt dacă ai sau nu fapte înscrise.
+              În cazierul fiscal se înscriu faptele sancționate contravențional sau penal de legile fiscale, contabile,
+              vamale și de disciplină financiară, după lista din HG 1000/2015. Se mai înscriu răspunderea solidară
+              pentru datoriile unei firme și inactivitatea fiscală a firmei, în cazierul celor care o reprezentau
+              legal. Faptele sancționate doar cu avertisment nu se înscriu. Certificatul spune scurt dacă ai sau nu
+              fapte înscrise.
             </p>
             <p className="m-0 text-[17px] leading-[1.7] text-d-body">
               Mulți îl confundă cu certificatul de atestare fiscală. Datoriile la buget apar în acela, nu în cazierul
@@ -330,7 +349,7 @@ export default async function CazierFiscalHome() {
           <InfoTable
             head={['Document', 'Ce arată', 'Cine îl eliberează']}
             rows={[
-              ['Certificat de cazier fiscal', 'Fapte fiscale sancționate contravențional sau penal, inactivitate fiscală', 'ANAF'],
+              ['Certificat de cazier fiscal', 'Fapte fiscale, contabile, vamale sancționate contravențional sau penal; răspundere solidară; inactivitatea firmei', 'ANAF'],
               ['Certificat de atestare fiscală', 'Datoriile la bugetul de stat', 'ANAF'],
               ['Certificat de cazier judiciar', 'Condamnări penale', 'Poliția Română'],
             ]}
@@ -340,7 +359,7 @@ export default async function CazierFiscalHome() {
         <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-4 lg:col-span-6">
             <Eyebrow>Ce îți trebuie</Eyebrow>
-            <H2>Ce trimiți pentru cazierul fiscal</H2>
+            <H2>Acte necesare pentru cazierul fiscal</H2>
             <p className="m-0 text-[17px] leading-[1.7] text-d-body">
               Nu ai nevoie de cont SPV, de programare sau de cerere tipărită. Formularul îl completezi de pe telefon, în
               câteva minute, și semnezi pe ecran.

@@ -26,12 +26,12 @@ export const CAZIERFISCAL_GUIDES: ReadonlyArray<{ href: string; label: string; h
     href: '/ghiduri/cazier-fiscal-din-spv/',
     label: 'Cazier fiscal din SPV',
     hint: 'Cum îl ceri singur, gratuit, din Spațiul Privat Virtual, și ce faci dacă nu ai cont.',
-    updated: '2026-11-10',
+    updated: '2026-11-11',
   },
   {
     href: '/ghiduri/cazier-fiscal-din-strainatate/',
     label: 'Cazier fiscal din străinătate',
     hint: 'SPV, împuternicit sau avocat; valabilitatea de 30 de zile, traducerea și apostila.',
-    updated: '2026-11-10',
+    updated: '2026-11-11',
   },
 ];

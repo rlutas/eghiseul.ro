@@ -1,6 +1,6 @@
 # cazierfiscal.com: al treilea brand, doar cazier fiscal
 
-**Stare (10.11.2026):** codul e gata pe branch-ul `feat/brand-cazier-fiscal`. Domeniul e cumpărat în Vercel și legat de proiect, iar proprietatea Search Console e verificată. Site-ul intră live după migrarea 204 și merge.
+**Stare (11.11.2026):** LIVE din 10.11.2026. GA4 propriu activ din 11.11. Rețeta, ca s-o repetăm pentru alte servicii: [`../seo/playbook-site-de-nisa-un-serviciu.md`](../seo/playbook-site-de-nisa-un-serviciu.md).
 
 ## De ce
 
@@ -70,8 +70,33 @@ Auditul `/seo` (tehnic, conținut, schema, performanță, SERP) a dat: Lighthous
 
 ### Ce rămâne (de făcut de Raul)
 
-1. **GA4 propriu:** cont GA nou „cazierfiscal” (nu în contul eghiseul și nici în alt cont existent; crearea cere acceptarea termenilor Google, deci o face Raul), apoi `NEXT_PUBLIC_GA_MEASUREMENT_ID_CAZIERFISCAL` în Vercel și redeploy.
-2. **Google Ads:** cont/etichetă de conversie proprie, apoi `NEXT_PUBLIC_GOOGLE_ADS_ID_CAZIERFISCAL` și `NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL_CAZIERFISCAL` în Vercel. Fără ele nu se măsoară conversiile din reclame.
+1. ✅ **GA4 propriu (11.11.2026):** cont GA „cazierfiscal” pe login-ul serviciiseonethut (decizia lui Raul), proprietatea `cazierfiscal.com` (RON, ora României), fluxul web `G-DGW62V4WXX`, pus în Vercel ca `NEXT_PUBLIC_GA_MEASUREMENT_ID_CAZIERFISCAL`.
+2. **Google Ads:** Raul face un cont Ads nou, separat; apoi eticheta de conversie proprie, apoi `NEXT_PUBLIC_GOOGLE_ADS_ID_CAZIERFISCAL` și `NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL_CAZIERFISCAL` în Vercel. Fără ele nu se măsoară conversiile din reclame.
 3. ✅ **Search Console în contul lui Raul:** proprietatea Domain `cazierfiscal.com` e verificată și în contul lui (TXT propriu în Vercel DNS, 10.11.2026), pe lângă contul de serviciu.
 4. **Urme care rămân:** telefonul (+40 757 708 181) e același cu eghiseul; firma, CUI-ul și ANPC sunt obligatorii; codul JS conține configurația tuturor brandurilor (vizibilă doar citind bundle-ul); emailurile tranzacționale pleacă de pe eghiseul până la upgrade Resend.
 5. **Ghiduri:** cel mult 1–2 pe săptămână (regula 2 din content-and-seo). Următoarele candidate: diferența cazier fiscal / atestare fiscală, cazier fiscal pentru angajare.
+
+
+## 11.11.2026: separare completă, favicon, ghiduri verificate, cuvinte cheie
+
+**Footer și contact.** Footerul nu mai are firma, CUI-ul, adresa și „Telefonul Consumatorului”; rămân pictogramele ANPC SAL/SOL, disclosure-ul de neafiliere și un link „Datele firmei” spre T&C. Telefonul și WhatsApp-ul (linie comună cu eghiseul) au ieșit de pe toate paginile publice și din schema; contactul trece doar prin formular. În wizard (blocat în robots.txt) cardul de ajutor rămâne.
+
+**Favicon.** `/comanda/cazier-fiscal/` și cererile directe la `/icon.png` primeau scutul eghiseul. Iconițele stau acum în `public/images/cazierfiscal/` și sunt servite pe host prin rewrite (`/icon.png`, `/apple-icon.png`, `/apple-touch-icon(-precomposed).png`, `/favicon.ico`). Google poate avea nevoie de câteva zile ca să schimbe iconița din rezultate.
+
+**Ghiduri.** Design nou: „Pe scurt” cu bife, cuprins cu ancore, timp de citire, „Citește și” automat, surse emise ca `Article.citation`. Faptele recitite pe OG 39/2015 (consolidat 08.11.2025), OPANAF 2594/2015 + 2048/2023 și Codul de procedură fiscală; corecturile sunt în playbook, secțiunea 6.
+
+**Cuvinte cheie.** Date în [`cuvinte-cheie-2026-11/`](cuvinte-cheie-2026-11/): cerere estimată din GSC (eghiseul mai–iul 2026 + CJO ultimele 76 de zile, poziții 5–9), 273 sugestii Autocomplete, Keyword Planner (intervale). Pe scurt:
+
+| Grup | Cerere / lună (estimat) | Unde |
+|---|---|---|
+| cazier fiscal online, cazier fiscal, persoană fizică, certificat de cazier fiscal, eliberare, cerere, acte, de unde se scoate, cazier financiar | ~4–5k | pagina principală (title, H1, H2, FAQ) |
+| SPV / ANAF online | ~300 | `/ghiduri/cazier-fiscal-din-spv/` |
+| străinătate, în engleză, traducere, apostilă | < 30, intenție mare | `/ghiduri/cazier-fiscal-din-strainatate/` |
+| valabilitate + ce conține + ștergere | ~350 | ghid nou (după 17.11) |
+| ce este / verificare / cazier fiscal vs certificat fiscal | ~380 | ghid nou sau unit cu cel de mai sus |
+| administrator firmă, PFA, înființare | ~100–150 | ghid nou |
+| orașe, sectoare, „certificat fiscal” (primărie), persoane juridice | — | NU |
+
+Sezonalitate: sep–dec e de 5–9× vara (clicurile eghiseul, oct 2025 vs mai–iul 2026).
+
+**Următoarele ghiduri, câte unul pe săptămână, de la 17.11:** valabilitate și ce conține cazierul fiscal → cazier fiscal pentru administrator / PFA → ce este cazierul fiscal și cum nu-l confunzi cu certificatul fiscal. Fiecare intră în `CAZIERFISCAL_GUIDES`, deci primește automat linkuri din footer, hub, sitemap și „Citește și”.

@@ -30,7 +30,6 @@ export function cazierFiscalOrganizationNode() {
     },
     contactPoint: {
       '@type': 'ContactPoint',
-      telephone: ORGANIZATION.contactPoint.telephone,
       url: `${BASE}/contact/`,
       contactType: 'customer service',
       areaServed: 'RO',
@@ -132,6 +131,8 @@ export function cazierFiscalArticleGraph(input: {
   breadcrumb: Array<{ name: string; path: string }>;
   /** Only when the same questions are rendered on the page (FaqList). */
   faq?: Array<{ q: string; a: string }>;
+  /** The "Surse oficiale" list shown under the guide: [label, url]. */
+  citations?: ReadonlyArray<readonly [string, string]>;
 }) {
   const url = `${BASE}${input.path}`;
   return {
@@ -155,6 +156,9 @@ export function cazierFiscalArticleGraph(input: {
         publisher: { '@id': `${BASE}/#organization` },
         mainEntityOfPage: { '@type': 'WebPage', '@id': url },
         inLanguage: 'ro-RO',
+        ...(input.citations && input.citations.length > 0
+          ? { citation: input.citations.map(([name, href]) => ({ '@type': 'CreativeWork', name, url: href })) }
+          : {}),
       },
       ...(input.faq && input.faq.length > 0
         ? [

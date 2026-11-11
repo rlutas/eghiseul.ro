@@ -5,17 +5,15 @@ import { ContactFormDocumentero } from '@/components/documentero/contact-form';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { cazierFiscalBreadcrumb, cazierFiscalOrganizationNode, cazierFiscalWebsiteNode } from '@/lib/seo/cazierfiscal-schema';
 import { ORGANIZATION } from '@/lib/seo/constants';
-import { BRANDS } from '@/lib/brand/brands';
 import { SUPPORT_HOURS_SHORT } from '@/config/contact';
 import { CAZIERFISCAL_INDEXABLE } from '@/config/cazierfiscal-nav';
 
 const PATH = '/contact/';
-const brand = BRANDS.cazierfiscal;
 
 export const metadata = buildPageMetadata({
   brand: 'cazierfiscal',
-  title: 'Contact: WhatsApp, email, telefon',
-  description: 'Întreabă înainte să comanzi. Spune-ne pentru ce dosar îți trebuie cazierul fiscal și până când. WhatsApp, email, telefon, luni–vineri 8–16; răspuns de obicei sub o oră.',
+  title: 'Contact',
+  description: 'Întreabă înainte să comanzi. Spune-ne pentru ce dosar îți trebuie cazierul fiscal și până când. Răspundem pe email, în aceeași zi lucrătoare.',
   path: PATH,
   noindex: !CAZIERFISCAL_INDEXABLE,
 });
@@ -25,11 +23,10 @@ export default function ContactPage() {
     '@context': 'https://schema.org',
     '@graph': [cazierFiscalOrganizationNode(), cazierFiscalWebsiteNode(), cazierFiscalBreadcrumb([{ name: 'Acasă', path: '/' }, { name: 'Contact', path: PATH }], PATH)],
   };
-  const wa = `https://wa.me/${brand.whatsappNumber}?text=${encodeURIComponent('Bună! Am o întrebare despre cazierul fiscal (cazierfiscal.com).')}`;
+  // No phone or WhatsApp on this site (decision Raul, 11.11.2026): the line is
+  // shared with eghiseul.ro. Contact goes through the form only.
   const channels = [
-    { k: 'W', t: `WhatsApp · ${brand.phoneDisplay}`, d: `${SUPPORT_HOURS_SHORT} · răspuns de obicei sub o oră · poți trimite poze cu ce ți se cere`, h: wa, primary: true },
-    { k: '@', t: 'Formularul de mai jos', d: 'pentru întrebări detaliate; răspundem în aceeași zi lucrătoare', h: '#formular', primary: false },
-    { k: '☎', t: `Telefon · ${brand.phoneDisplay}`, d: SUPPORT_HOURS_SHORT, h: `tel:${brand.phoneDisplay.replace(/\s/g, '')}`, primary: false },
+    { k: '@', t: 'Formularul de contact', d: `răspundem pe email în aceeași zi lucrătoare · ${SUPPORT_HOURS_SHORT}`, h: '#formular', primary: true },
   ];
   return (
     <>
@@ -65,7 +62,6 @@ export default function ContactPage() {
             </div>
             <div id="formular" className="scroll-mt-24" />
             <ContactFormDocumentero
-              whatsappHref={wa}
               copy={{
                 topics: [
                   ['pf', 'Cazier fiscal pentru mine (persoană fizică)'],

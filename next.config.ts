@@ -93,6 +93,15 @@ const nextConfig: NextConfig = {
         { source: '/sitemap.xml', has: onCazierFiscal, destination: '/cazierfiscal/sitemap.xml' },
         { source: '/llms.txt', has: onCazierFiscal, destination: '/cazierfiscal/llms.txt' },
         { source: '/favicon.ico', has: onCazierFiscal, destination: '/images/cazierfiscal/favicon.ico' },
+        // The root icon.png / apple-icon.png links (src/app/icon.png) are emitted
+        // on every page, including the shared wizard; on this host they must
+        // serve cazierfiscal's icon, not the eghiseul shield (bug 11.11.2026:
+        // /comanda/cazier-fiscal/ showed the eghiseul favicon). iOS also asks
+        // for /apple-touch-icon(-precomposed).png without reading the <link>.
+        { source: '/icon.png', has: onCazierFiscal, destination: '/images/cazierfiscal/icon.png' },
+        { source: '/apple-icon.png', has: onCazierFiscal, destination: '/images/cazierfiscal/apple-icon.png' },
+        { source: '/apple-touch-icon.png', has: onCazierFiscal, destination: '/images/cazierfiscal/apple-icon.png' },
+        { source: '/apple-touch-icon-precomposed.png', has: onCazierFiscal, destination: '/images/cazierfiscal/apple-icon.png' },
         {
           source: `/:path((?!(?:${SHARED})(?:/|$)).+)`,
           has: onCazierFiscal,

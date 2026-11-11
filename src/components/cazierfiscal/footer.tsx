@@ -1,12 +1,9 @@
 import Link from 'next/link';
-import { BRANDS } from '@/lib/brand/brands';
 import { SUPPORT_HOURS_SHORT } from '@/config/contact';
-import { ORGANIZATION } from '@/lib/seo/constants';
 import { CAZIERFISCAL_GUIDES } from '@/config/cazierfiscal-nav';
 import { CookieSettingsLink } from '@/components/consent/cookie-settings-link';
 import { CazierFiscalLogo } from './logo';
 
-const brand = BRANDS.cazierfiscal;
 
 function Col({ title, items }: { title: string; items: ReadonlyArray<{ label: string; href: string }> }) {
   return (
@@ -22,9 +19,10 @@ function Col({ title, items }: { title: string; items: ReadonlyArray<{ label: st
 }
 
 /**
- * cazierfiscal.com footer. Same legal obligations as the documentero and
- * eghiseul footers: company data, ANPC badges (SAL + EU consumer redress),
- * the consumer phone line and the non-affiliation disclosure (ANAF).
+ * cazierfiscal.com footer: ANPC badges (SAL + EU consumer redress), the
+ * non-affiliation disclosure (ANAF) and a link to the company data in the
+ * T&C. Unlike the eghiseul/documentero footers it carries no company line
+ * and no consumer phone line (decision Raul, 11.11.2026).
  */
 export function FooterCazierFiscal() {
   return (
@@ -40,7 +38,7 @@ export function FooterCazierFiscal() {
               <a href="/contact/" className="hover:text-d-ink">
                 Formular de contact
               </a>{' '}
-              · {brand.phoneDisplay} · {SUPPORT_HOURS_SHORT}
+              · {SUPPORT_HOURS_SHORT}
             </p>
           </div>
           <div className="md:col-span-4">
@@ -65,22 +63,16 @@ export function FooterCazierFiscal() {
           </div>
         </div>
 
-        {/* Bottom bar: company on the left, ANPC badges on the right, disclosure under both */}
+        {/* Bottom bar: ANPC badges + disclosure. Company data (name, CUI, address)
+            lives in /termeni-si-conditii/ and /contact/, not here (Raul, 11.11.2026):
+            the footer repeats on every page and is the strongest visual tie to
+            the other brands of the same company. */}
         <div className="mt-10 border-t border-d-line pt-6">
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-col gap-1 text-[12px] leading-relaxed text-d-muted">
-              <span>© {new Date().getFullYear()} cazierfiscal.com · {ORGANIZATION.legalName}</span>
-              <span>
-                CUI {ORGANIZATION.cui} · Reg. Com. {ORGANIZATION.regCom} · {ORGANIZATION.address.region},{' '}
-                {ORGANIZATION.address.locality}, {ORGANIZATION.address.street}
-              </span>
-              {/* Ordinul ANPC 72/2010 art. 1: „Telefonul Consumatorului" și adresa site-ului ANPC. */}
-              <span>
-                Telefonul Consumatorului:{' '}
-                <a href="tel:0219551" className="hover:text-d-ink">021 9551</a> ·{' '}
-                <a href="https://anpc.ro/" target="_blank" rel="nofollow noopener" className="hover:text-d-ink">anpc.ro</a>
-              </span>
-            </div>
+            <span className="text-[12px] leading-relaxed text-d-muted">
+              © {new Date().getFullYear()} cazierfiscal.com ·{' '}
+              <Link href="/termeni-si-conditii/" className="hover:text-d-ink">Datele firmei</Link>
+            </span>
             <div className="flex shrink-0 items-center gap-3">
               <a href="https://anpc.ro/ce-este-sal/" target="_blank" rel="nofollow noopener" aria-label="ANPC — Soluționarea Alternativă a Litigiilor">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -94,7 +86,7 @@ export function FooterCazierFiscal() {
             </div>
           </div>
           <p className="m-0 mt-5 text-[12px] leading-relaxed text-d-muted">
-            cazierfiscal.com este un serviciu privat de asistență și intermediere al {ORGANIZATION.legalName}. Nu suntem
+            cazierfiscal.com este un serviciu privat de asistență și intermediere. Nu suntem
             instituție de stat și nu suntem afiliați ANAF sau altei autorități. Certificatul de cazier fiscal îl eliberează
             exclusiv ANAF și poate fi obținut și direct, gratuit, la ghișeu sau din SPV; tariful nostru acoperă asistența,
             reprezentarea prin avocat înscris în Barou și livrarea.

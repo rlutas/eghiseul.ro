@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-11 | ✅ **cazierfiscal.com: fără firmă/telefon în pagini, favicon pe host, ghiduri verificate pe lege, GA4 propriu, playbook site de nișă** — footer fără date de firmă, rewrite iconițe pe host, „Pe scurt” + cuprins + „Citește și”, corecturi OG 39/2015, `G-DGW62V4WXX` | [2026-11-11-cazierfiscal-separare-favicon-ghiduri.md](2026-11-11-cazierfiscal-separare-favicon-ghiduri.md) |
 | 2026-11-10 | 🟣 **cazierfiscal.com: al treilea brand (doar cazier fiscal), pregătit pe branch** — rutare pe host, `orders.platform='cazierfiscal'` (migr. 204), admin filtru+badge, pagini noindex până la lansare | [2026-11-10-cazier-fiscal-ro-al-treilea-brand.md](2026-11-10-cazier-fiscal-ro-al-treilea-brand.md) |
 | 2026-11-10 | 🟣 **ecazier: ghid „Cât costă cazierul auto”; corecturi CJO (DRPCIV → Poliția Rutieră, fără „6 luni” legal)** — `/taxa-cazier-auto`; Ordin MAI 69/2026: fără cazier judiciar la examenul auto | [2026-11-10-ecazier-taxa-cazier-auto-corecturi.md](2026-11-10-ecazier-taxa-cazier-auto-corecturi.md) |
 | 2026-11-10 | 🟣 **CJO: casetă de comandă pe 5 ghiduri; marcajul de recenzii anulat** — `OrderShortcutBox` pe model cerere, reabilitare, ștergere, valabilitate, angajare; review schema încalcă ghidul Google | [2026-11-10-cjo-faza-1-caseta-comanda.md](2026-11-10-cjo-faza-1-caseta-comanda.md) |
