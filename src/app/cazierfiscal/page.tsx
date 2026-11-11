@@ -43,7 +43,7 @@ const FAQ = [
   },
   {
     q: 'Sunteți ANAF?',
-    a: 'Nu. cazierfiscal.com este un serviciu privat al eDigitalizare SRL. Certificatul de cazier fiscal îl eliberează numai ANAF; noi depunem cererea în numele tău, prin avocat, și ți-l trimitem.',
+    a: 'Nu. cazierfiscal.com este un serviciu privat; datele firmei sunt în Termeni și condiții. Certificatul de cazier fiscal îl eliberează numai ANAF; noi depunem cererea în numele tău, prin avocat, și ți-l trimitem.',
   },
   {
     q: 'Pot să-l iau gratuit?',

@@ -4,7 +4,7 @@
 ## Pentru echipă
 
 - Pe cazierfiscal.com nu mai apar telefonul, WhatsApp-ul și datele firmei în footer. Clienții de acolo scriu doar prin formularul de contact; mesajele ajung în aceeași căsuță ca până acum.
-- Datele firmei rămân în Termeni și condiții, Confidențialitate, Contact și Despre, cum cere legea.
+- Datele firmei (nume, CUI, Reg. Com.) rămân doar în Termeni și condiții, Confidențialitate și Contact, cum cere legea. Pagina Despre și pagina principală nu le mai afișează.
 - Iconița site-ului apare corect și pe pagina de comandă și pe telefon.
 - Cele două ghiduri (SPV, străinătate) au o casetă „Pe scurt” sus și au fost recitite pe lege; câteva formulări greșite au fost corectate.
 - Comenzile de pe cazierfiscal.com se măsoară acum într-un Google Analytics separat.
@@ -22,3 +22,4 @@
 - Pagina principală: 4 întrebări noi (durată, de unde se scoate, ghiseul.ro/Hub MAI, cazier financiar), H2-uri pe interogări reale, descriere cu „eliberare” și termen.
 - GA4: cont nou „cazierfiscal”, `G-DGW62V4WXX` în `NEXT_PUBLIC_GA_MEASUREMENT_ID_CAZIERFISCAL` (Vercel, production).
 - Docs: `docs/seo/playbook-site-de-nisa-un-serviciu.md` (nou), `docs/cazier-fiscal/README.md` (secțiunea 11.11 + harta cuvintelor cheie), date în `docs/cazier-fiscal/cuvinte-cheie-2026-11/`.
+- Completare (11.11, a doua livrare): scos rândul cu firma/CUI/Reg. Com. de pe `/despre/` și numele firmei din intro și din meta description; FAQ-ul „Sunteți ANAF?” trimite la T&C pentru datele firmei; schema `Organization` fără `legalName` și `address`. `CAZIERFISCAL_ALL_GUIDES` + `published`: ghidurile pregătite dau 404 în producție până la publicare (se văd doar în `next dev`).

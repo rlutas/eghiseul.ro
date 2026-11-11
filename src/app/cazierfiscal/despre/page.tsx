@@ -4,7 +4,6 @@ import { HeaderCazierFiscal } from '@/components/cazierfiscal/header';
 import { Card, Eyebrow, H2, Section } from '@/components/documentero/ui';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { cazierFiscalBreadcrumb, cazierFiscalOrganizationNode, cazierFiscalWebsiteNode } from '@/lib/seo/cazierfiscal-schema';
-import { ORGANIZATION } from '@/lib/seo/constants';
 import { BRANDS } from '@/lib/brand/brands';
 import { SUPPORT_HOURS_SHORT } from '@/config/contact';
 import { CAZIERFISCAL_INDEXABLE, CAZIERFISCAL_ORDER_HREF } from '@/config/cazierfiscal-nav';
@@ -17,7 +16,7 @@ export const metadata = buildPageMetadata({
   brand: 'cazierfiscal',
   title: 'Despre noi: cine obține cazierul fiscal pentru tine',
   description:
-    'cazierfiscal.com este un serviciu al eDigitalizare SRL, Satu Mare. Cererea la ANAF o depune avocat Tarța Ana Gabriela, Baroul Satu Mare.',
+    'cazierfiscal.com obține certificatul de cazier fiscal pentru persoane fizice, fără cont SPV. Cererea la ANAF o depune avocat Tarța Ana Gabriela, Baroul Satu Mare.',
   path: PATH,
   noindex: !CAZIERFISCAL_INDEXABLE,
 });
@@ -51,7 +50,7 @@ export default function DesprePage() {
             Un singur document, făcut bine: cazierul fiscal.
           </h1>
           <p className="m-0 max-w-[760px] text-[17px] leading-[1.6] text-d-muted sm:text-[18px]">
-            cazierfiscal.com este un serviciu al {ORGANIZATION.legalName}, firmă din Satu Mare. Din 2023 obținem
+            cazierfiscal.com e un serviciu privat din Satu Mare. Din 2023 obținem
             documente de la instituțiile din România pentru oameni care nu au timp de ghișeu sau nu au cont SPV. Aici
             facem un singur lucru: cazierul fiscal pentru persoane fizice.
           </p>
@@ -100,9 +99,6 @@ export default function DesprePage() {
             <Link href={CAZIERFISCAL_ORDER_HREF} className="inline-flex h-14 items-center rounded-xl bg-d-acc px-6 text-[17px] font-bold text-d-ink hover:opacity-90">Comandă cazierul fiscal</Link>
             <Link href="/contact/" className="inline-flex h-14 items-center rounded-xl border-[1.5px] border-d-line bg-d-card px-6 text-[17px] font-semibold text-d-ink">Întreabă-ne întâi</Link>
           </div>
-          <p className="m-0 text-[13px] text-d-muted">
-            {ORGANIZATION.legalName} · CUI {ORGANIZATION.cui} · Reg. Com. {ORGANIZATION.regCom}
-          </p>
         </Section>
       </main>
     </>

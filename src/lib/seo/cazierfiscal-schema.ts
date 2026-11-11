@@ -1,14 +1,13 @@
 /**
  * JSON-LD for cazierfiscal.com, copied from documentero-schema.ts with the
- * brand swapped. Same legal entity (ORGANIZATION.legalName, required by law on
- * every page), but no parentOrganization / sameAs to the eghiseul.ro brand:
- * cazierfiscal.com stands as its own brand (decision 10.11.2026).
+ * brand swapped. No legalName, address, parentOrganization or sameAs: the
+ * company data lives only in the legal pages, and cazierfiscal.com stands as
+ * its own brand (decisions 10–11.11.2026).
  * No aggregateRating, no invented authors (content rules §3), and no new
  * FAQPage: Google retired FAQ rich results on 07.05.2026, so callers do not
  * pass `faq`.
  */
 import { BRANDS } from '@/lib/brand/brands';
-import { ORGANIZATION } from './constants';
 
 const brand = BRANDS.cazierfiscal;
 const BASE = brand.baseUrl;
@@ -18,16 +17,8 @@ export function cazierFiscalOrganizationNode() {
     '@type': 'Organization',
     '@id': `${BASE}/#organization`,
     name: brand.name,
-    legalName: ORGANIZATION.legalName,
     url: BASE,
     logo: `${BASE}${brand.ogDefault}`,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: ORGANIZATION.address.street,
-      addressLocality: ORGANIZATION.address.locality,
-      addressRegion: ORGANIZATION.address.region,
-      addressCountry: ORGANIZATION.address.country,
-    },
     contactPoint: {
       '@type': 'ContactPoint',
       url: `${BASE}/contact/`,

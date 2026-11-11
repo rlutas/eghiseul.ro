@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { HeaderCazierFiscal } from './header';
 import { Arrow, Section } from '@/components/documentero/ui';
 import { fmtDateRo } from '@/lib/documentero/content';
-import { CAZIERFISCAL_GUIDES, CAZIERFISCAL_ORDER_HREF } from '@/config/cazierfiscal-nav';
+import { CAZIERFISCAL_GUIDES, CAZIERFISCAL_ORDER_HREF, cazierFiscalGuideVisible } from '@/config/cazierfiscal-nav';
 
 /**
  * Shell for a cazierfiscal.com guide: breadcrumb, H1, lead, date and reading
@@ -43,6 +44,8 @@ export function CazierFiscalGuide({
   readMinutes: number;
   children: ReactNode;
 }) {
+  // Queued guides (published: false in cazierfiscal-nav.ts) 404 in production.
+  if (!cazierFiscalGuideVisible(path)) notFound();
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />

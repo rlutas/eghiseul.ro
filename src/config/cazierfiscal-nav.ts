@@ -17,21 +17,50 @@ export const CAZIERFISCAL_NAV = [
   { label: 'Contact', href: '/contact/' },
 ] as const;
 
-/**
- * Guides published on the site. A guide goes here only once its page exists:
- * the footer, /ghiduri/ and the sitemap all read this list.
- */
-export const CAZIERFISCAL_GUIDES: ReadonlyArray<{ href: string; label: string; hint: string; updated: string }> = [
+export interface CazierFiscalGuideEntry {
+  href: string;
+  label: string;
+  hint: string;
+  updated: string;
+  /**
+   * false = written and reviewed, but not live yet: the page answers 404 in
+   * production and the guide is left out of the menu, footer, hub, sitemap,
+   * llms.txt and "Citește și". Content rule §2: at most one new guide per
+   * week, so drafts wait here and go live by flipping this to true (and
+   * setting `updated` to the publish date).
+   */
+  published: boolean;
+  /** Planned publish date, for the weekly queue (docs/cazier-fiscal/README.md). */
+  planned?: string;
+}
+
+/** Every guide, live or queued. Read the live ones through CAZIERFISCAL_GUIDES. */
+export const CAZIERFISCAL_ALL_GUIDES: ReadonlyArray<CazierFiscalGuideEntry> = [
   {
     href: '/ghiduri/cazier-fiscal-din-spv/',
     label: 'Cazier fiscal din SPV',
     hint: 'Cum îl ceri singur, gratuit, din Spațiul Privat Virtual, și ce faci dacă nu ai cont.',
     updated: '2026-11-11',
+    published: true,
   },
   {
     href: '/ghiduri/cazier-fiscal-din-strainatate/',
     label: 'Cazier fiscal din străinătate',
     hint: 'SPV, împuternicit sau avocat; valabilitatea de 30 de zile, traducerea și apostila.',
     updated: '2026-11-11',
+    published: true,
   },
 ];
+
+/** Live guides only: the footer, /ghiduri/, the sitemap and "Citește și" read this list. */
+export const CAZIERFISCAL_GUIDES = CAZIERFISCAL_ALL_GUIDES.filter((g) => g.published);
+
+/**
+ * Whether a guide page may render. Queued guides render in `next dev` so they
+ * can be reviewed locally, and 404 everywhere else.
+ */
+export function cazierFiscalGuideVisible(href: string): boolean {
+  const g = CAZIERFISCAL_ALL_GUIDES.find((x) => x.href === href);
+  if (!g) return false;
+  return g.published || process.env.NODE_ENV === 'development';
+}
