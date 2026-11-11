@@ -38,6 +38,8 @@ Caută întrebări reale despre cazier fiscal și răspunde complet, ca un om ca
 
 Limite găsite pe 11.11: Reddit e blocat în browserul lui Claude, iar căutarea pe Softpedia cere cont logat. Linkurile din Reddit și Softpedia sunt `nofollow`: nu mută clasamentul direct, dar aduc trafic, mențiuni ale brandului și citări în răspunsurile AI (Reddit e printre sursele cele mai citate). Ambele forumuri șterg postările promoționale de pe conturi noi: răspuns complet întâi, linkul doar unde chiar ajută, cu precizarea că e serviciul nostru.
 
+Softpedia, verificat 11.11 cu contul lui Raul: căutarea „cazier fiscal” găsește un singur subiect, din 2018 („Cazier fiscal cu popriri”); prin Google apare încă unul, din 2014 (dosar școală de șoferi). În subforumul Contabilitate nu e nicio discuție curentă despre cazier. Concluzie: pe Softpedia nu avem unde răspunde acum. Nu redeschidem subiecte vechi de ani doar ca să punem un link (necro-posting = spam), și nu deschidem întrebări false ca să ne răspundem singuri. Reverificăm lunar; Reddit rămâne de verificat de Raul (blocat în browserul lui Claude).
+
 Claude pregătește textul răspunsului pentru fiecare întrebare găsită; postarea o face Raul sau un coleg, din contul lor (sau Claude, cu aprobarea explicită a lui Raul pentru fiecare postare).
 
 ## Nivelul 3: linkuri editoriale, cu un motiv real (lunar)
