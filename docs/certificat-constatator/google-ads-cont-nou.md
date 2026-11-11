@@ -98,3 +98,4 @@ Cuvinte care **nu** apar, pentru că au omorât anunțuri pe 19.08: „oficial�
 | Data | Ce s-a întâmplat |
 |---|---|
 | 11.11.2026 | Decizie cont nou; pachetul de campanie pregătit. |
+| 11.11.2026 | Cont creat: **881-388-1795** (RON, București, facturare de Raul, oferta de 1.500 RON credit la 1.500 RON cheltuiți până pe 10.01.2027). Conversia „Purchase” (Achiziție, principală, valoare din tag, rezervă 89 RON, „Fiecare”, 90 de zile). `NEXT_PUBLIC_GOOGLE_ADS_ID_CONSTATATOR = AW-18568994286` și `..._PURCHASE_LABEL_CONSTATATOR = AW-18568994286/4JMLCJCZorYdEO67sZZF` setate în Vercel. Conversiile optimizate cer acceptarea condițiilor de prelucrare a datelor: o face Raul. |
