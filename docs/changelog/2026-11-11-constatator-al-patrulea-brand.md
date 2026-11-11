@@ -40,7 +40,7 @@
 ## Deschis
 
 - Search Console și în contul lui Raul (TXT propriu).
-- Google Ads: campania e live din 11.11 (ID 24460904128); lipsește redeploy-ul de producție care pune eticheta Ads în site. Microsoft Ads.
+- Google Ads: campania e live din 11.11 (ID 24460904128); eticheta Ads e live pe site (verificat în bundle). Microsoft Ads.
 - Emailurile pleacă prin fallback de pe adresa eghiseul (Resend la 10/10 domenii).
 
 Plan complet: [`../certificat-constatator/README.md`](../certificat-constatator/README.md).
