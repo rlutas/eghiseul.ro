@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   // token must not reach this host (GSC here is verified by DNS TXT).
   alternates: {},
   // GSC is verified by DNS TXT; Bing gets its own token at launch.
-  verification: {},
+  verification: { other: { 'msvalidate.01': '9C4B5028C58015034AD413B180D830BE' } },
   creator: brand.name,
   openGraph: { siteName: brand.name, locale: 'ro_RO', type: 'website', images: [{ url: `${brand.baseUrl}${brand.ogDefault}` }] },
   twitter: { card: 'summary_large_image', images: [`${brand.baseUrl}${brand.ogDefault}`] },
