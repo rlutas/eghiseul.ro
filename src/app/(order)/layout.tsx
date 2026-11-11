@@ -54,7 +54,8 @@ export default async function OrderLayout({ children }: { children: React.ReactN
     <>
       {/* After the header: the eghiseul one is fixed, and its spacer pushes the bar below it. */}
       {brand.id === 'documentero' ? <HeaderDocumentero /> : brand.id === 'cazierfiscal' ? <HeaderCazierFiscal /> : brand.id === 'constatator' ? <HeaderConstatator /> : <Header />}
-      <BlackFridayBar belowFixedHeader={!isSatellite} />
+      {/* certificat-constatator-express.ro launched 11.11 at its list price; no Black Friday there. */}
+      {brand.id !== 'constatator' && <BlackFridayBar belowFixedHeader={!isSatellite} />}
       {children}
       {!isSatellite && <WhatsAppFloat />}
       <CookieConsent />

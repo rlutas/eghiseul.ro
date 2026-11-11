@@ -1,6 +1,6 @@
 # certificat-constatator-express.ro: al patrulea brand, doar certificat constatator
 
-**Stare (11.11.2026):** în construcție. Domeniile sunt cumpărate de Raul pe 11.11.2026. Rețeta e cea de la cazierfiscal.com: [`../seo/playbook-site-de-nisa-un-serviciu.md`](../seo/playbook-site-de-nisa-un-serviciu.md) și [`../cazier-fiscal/README.md`](../cazier-fiscal/README.md).
+**Stare (11.11.2026):** LIVE și indexabil din 11.11.2026; GSC și Bing verificate, sitemap trimis. Fără Black Friday pe acest brand. Deschis: GA4, Google Ads cont nou, Microsoft Ads. Rețeta e cea de la cazierfiscal.com: [`../seo/playbook-site-de-nisa-un-serviciu.md`](../seo/playbook-site-de-nisa-un-serviciu.md) și [`../cazier-fiscal/README.md`](../cazier-fiscal/README.md).
 
 ## Domeniile (cumpărate 11.11.2026)
 

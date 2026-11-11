@@ -9,7 +9,7 @@
  * this host) and the similarity check against the eghiseul constatator pages
  * passes (content rule §1). Then true + sitemap + IndexNow.
  */
-export const CONSTATATOR_INDEXABLE = false;
+export const CONSTATATOR_INDEXABLE = true;
 
 export const CONSTATATOR_ORDER_HREF = '/comanda/certificat-constatator/';
 export const CONSTATATOR_TRACK_HREF = '/comanda/status/';

@@ -210,7 +210,7 @@ export default function CheckoutPage() {
     // price. A code from the URL still wins.
     const urlCode = searchParams.get('coupon')?.trim().toUpperCase();
     const blackFridayCode =
-      order && isBlackFridayActive() && blackFridayRate(order.service_slug) > 0 ? BLACK_FRIDAY_CODE : null;
+      order && brand.id !== 'constatator' && isBlackFridayActive() && blackFridayRate(order.service_slug) > 0 ? BLACK_FRIDAY_CODE : null;
     const code = urlCode || blackFridayCode;
     if (!code || !order || order.coupon_code || order.payment_status === 'paid' || autoCouponTriedRef.current) return;
     autoCouponTriedRef.current = true;
@@ -226,7 +226,7 @@ export default function CheckoutPage() {
         // manual input remains as fallback
       }
     })();
-  }, [order, orderId, searchParams, fetchOrder]);
+  }, [order, orderId, searchParams, fetchOrder, brand.id]);
 
   // Coupon change → re-fetch order so the total + summary update. There's
   // no PaymentIntent to invalidate any more (hosted Checkout creates a
