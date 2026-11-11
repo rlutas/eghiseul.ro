@@ -1,5 +1,11 @@
 # eGhiseul.ro - Status Curent
 
+> **🟣 Update 2026-11-11 — cazierfiscal.com: separat de eghiseul, ghiduri în coadă, Bing.**
+> - **Live:** fără date de firmă în footer și pe Despre (doar în T&C), fără telefon, favicon corect pe mobil, GA4 nou, specimenul certificatului pe pagina principală și lângă formular. Bing Webmaster: verificat, sitemap trimis.
+> - **Ghiduri pregătite, NEPUBLICATE, câte unul pe săptămână:** 17.11 valabilitate și ce conține · 24.11 administrator / PFA · 01.12 cazier fiscal vs certificat fiscal. Publicare = `published: true` în `src/config/cazierfiscal-nav.ts` + datele din pagină + deploy + IndexNow. [coada](cazier-fiscal/README.md)
+> - **November 2026 core update** a pornit pe 10.11 (ziua lansării): nu tragem concluzii până pe ~01.12. [ce se discută în SEO](seo/2026-11-11-ce-se-discuta-in-seo-noiembrie.md) · [playbook site de nișă](seo/playbook-site-de-nisa-un-serviciu.md)
+> - **De la Raul:** cont Google Ads nou (ID AW- + etichetă achiziție); decizie dacă avocata semnează ca recenzor pe ghiduri.
+
 > **🔵 Update 2026-11-03 — deconturi + de ce scad comenzile.**
 > - **Deconturi octombrie verificate:** topograf 1.161/parte (factură 135 + transfer 1.026), cabinet avocat 3.677,44 pe toate 4 platformele; tabelul „Deconturi închise” în Colaboratori. De plătit amândouă.
 > - **Căderea:** aug 320 → sept 202 → oct 150 comenzi; 1–3.11 = 8 comenzi, CJO zero între 30.10 și 02.11. Clicurile Google au scăzut din 16–19.10 (CJO −68%, eghiseul −44%), iar pozițiile doar puțin. În SERP: Hub MAI „GRATUIT” pe 1–2, plus Ads de la infocazier, caziere.ro, roghiseul, obtinecazier; noi suntem blocați la Ads. **Urmărire în fiecare luni:** [diagnostic + tabel](seo/2026-11-03-cadere-mijloc-octombrie-urmarire.md) · [changelog](changelog/2026-11-03-cadere-octombrie-diagnostic.md)

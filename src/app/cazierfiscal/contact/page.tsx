@@ -12,7 +12,7 @@ const PATH = '/contact/';
 
 export const metadata = buildPageMetadata({
   brand: 'cazierfiscal',
-  title: 'Contact',
+  title: 'Contact: întrebări despre comanda de cazier fiscal',
   description: 'Întreabă înainte să comanzi. Spune-ne pentru ce dosar îți trebuie cazierul fiscal și până când. Răspundem pe email, în aceeași zi lucrătoare.',
   path: PATH,
   noindex: !CAZIERFISCAL_INDEXABLE,

@@ -16,7 +16,7 @@ const UPDATED = '2026-11-11';
 /** Short, exact-match title (Raul, 10.11.2026): the query is „cazier fiscal online”. */
 const TITLE = 'Cazier fiscal online – certificat de cazier fiscal fără SPV';
 const DESCRIPTION =
-  'Cazier fiscal online pentru persoane fizice, fără cont SPV: completezi cererea pe telefon, avocatul o depune la ANAF pentru eliberare, iar certificatul de cazier fiscal îl primești pe email în 1–3 zile lucrătoare.';
+  'Cazier fiscal online, fără SPV: completezi cererea pe telefon, avocatul o depune la ANAF, iar certificatul îl primești pe email în 1–3 zile lucrătoare.';
 
 export const metadata = buildPageMetadata({
   brand: 'cazierfiscal',

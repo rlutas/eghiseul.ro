@@ -108,3 +108,9 @@ Sezonalitate: sep–dec e de 5–9× vara (clicurile eghiseul, oct 2025 vs mai�
 | 01.12 | `/ghiduri/cazier-fiscal-sau-certificat-fiscal/` | idem |
 
 Până la publicare, paginile dau 404 în producție și lipsesc din meniu, hub, sitemap, llms.txt și „Citește și”; în `next dev` se văd, pentru verificare. Linkurile dintre ghidurile din coadă folosesc `GuideLink` (`src/components/cazierfiscal/guide.tsx`): cât timp ținta e nepublicată se randează ca text simplu, deci un ghid live nu trimite niciodată spre 404. Textul legal (OG 39/2015, CPF art. 158–160, anexa HG 1568/2022) e rezumat în raportul din 11.11; anexa actuală are 251 de fapte și nu mai conține sancțiuni.
+
+## 11.11.2026 (seara): verificări finale, Bing
+
+- Bing Webmaster Tools: site adăugat prin API, verificat cu meta tag `msvalidate.01` în `src/app/cazierfiscal/layout.tsx`, sitemap și 6 URL-uri trimise.
+- Verificare live: toate paginile 200, 404 real, redirecturi 308, boții Google/Bing primesc 200, fără `nosnippet`, 0 mențiuni eghiseul. Descrierea paginii principale scurtată (213 → 151 caractere), titlul de contact reparat.
+- Context: November 2026 core update a pornit pe 10.11. Primele cifre utile, din ~01.12. Detalii: [`../seo/2026-11-11-ce-se-discuta-in-seo-noiembrie.md`](../seo/2026-11-11-ce-se-discuta-in-seo-noiembrie.md).
