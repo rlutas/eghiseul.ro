@@ -8,6 +8,7 @@
 - Iconița site-ului apare corect și pe pagina de comandă și pe telefon.
 - Cele două ghiduri (SPV, străinătate) au o casetă „Pe scurt” sus și au fost recitite pe lege; câteva formulări greșite au fost corectate.
 - Sunt scrise încă trei ghiduri (valabilitate și ce conține cazierul; pentru administrator și PFA; cazier fiscal vs certificat fiscal). Nu sunt online: ies câte unul pe săptămână, pe 17.11, 24.11 și 01.12.
+- Întrebările frecvente de pe pagina principală stau acum desfăcute (textul vizibil, nu ascuns sub „+”), pentru că textul ascuns aduce mai puțin trafic din Google.
 - cazierfiscal.com e înscris și în Bing Webmaster (verificat, sitemap trimis).
 - Pe pagina principală e acum o poză cu specimenul certificatului de cazier fiscal și explicația fiecărei părți; aceeași poză apare și lângă formularul de comandă.
 - Comenzile de pe cazierfiscal.com se măsoară acum într-un Google Analytics separat.
@@ -29,3 +30,4 @@
 - Specimen (11.11, a treia livrare): `public/images/cazierfiscal/specimen-cazier-fiscal.webp` (specimenul eghiseul fără logo), secțiunea „Cum arată certificatul de cazier fiscal” pe `/`, `BRAND_SPECIMENS` în `src/config/service-specimens.ts` pentru sidebar-ul wizardului pe alte branduri.
 - Coada de ghiduri (11.11, a patra livrare): `/ghiduri/valabilitate-cazier-fiscal/`, `/ghiduri/cazier-fiscal-administrator-pfa/`, `/ghiduri/cazier-fiscal-sau-certificat-fiscal/` cu `published: false` și `planned` în `CAZIERFISCAL_ALL_GUIDES`; `GuideLink` pentru linkuri între ghiduri din coadă; stiluri de tabel în corpul ghidului. Verificate pe OG 39/2015, CPF art. 158–160 și anexa HG 1568/2022.
 - Bing + verificări finale (11.11, a cincea livrare): `msvalidate.01` în layout, AddSite/VerifySite/SubmitFeed/SubmitUrlBatch prin API; meta description home 151 caractere; titlu contact. Cercetare: `docs/seo/2026-11-11-ce-se-discuta-in-seo-noiembrie.md`.
+- FAQ desfăcut (11.11, a șasea livrare): `FaqList expanded` în `src/components/documentero/ui.tsx`, activ pe `/` cazierfiscal. Docs: playbook §9 (EMD, acordeon, CJO), `docs/seo/backlinks-site-de-nisa.md`.

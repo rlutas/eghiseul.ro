@@ -428,7 +428,7 @@ export default async function CazierFiscalHome() {
             <Eyebrow>Întrebări frecvente</Eyebrow>
             <H2>Întrebări despre cazierul fiscal</H2>
           </div>
-          <div className="lg:col-span-8"><FaqList items={FAQ} /></div>
+          <div className="lg:col-span-8"><FaqList items={FAQ} expanded /></div>
         </Section>
 
         <Section className="mt-24 lg:mt-32">

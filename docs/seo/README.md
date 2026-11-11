@@ -18,6 +18,7 @@ Index al documentației SEO. Status curent al expansiunii: [`SEO-STATUS-2026-06-
 | Fișier | Rol |
 |---|---|
 | [`playbook-site-de-nisa-un-serviciu.md`](playbook-site-de-nisa-un-serviciu.md)
+- [Backlinkuri de bază pentru un site de nișă](backlinks-site-de-nisa.md) — profiluri, răspunsuri pe forumuri, corecturi editoriale (art. 8 OG 39/2015), texte gata, fără cumpărare; cazierfiscal + CJO
 - [Ce se discută în SEO, aug–nov 2026](2026-11-11-ce-se-discuta-in-seo-noiembrie.md) — update-uri confirmate (spam aug/sep, core nov), AI Overviews, ce am verificat pe cazierfiscal.com | Rețeta pentru un site pe un singur serviciu (cazierfiscal.com, 11.11.2026): tehnic, separare de eghiseul, cercetare cuvinte cheie, șablon ghid, verificare fapte, linkuri interne, lansare |
 | [`2026-11-10-plan-crestere-organic/`](2026-11-10-plan-crestere-organic/README.md) | 🔴 **PLANUL CURENT (10.11.2026)**: plan de creștere organic nov 2026 – feb 2027 pe 4 site-uri, din GSC 16 luni, GA4 + comenzi, Bing, crawl CJO și SERP real. CJO prioritar: 404 pe sluguri inventate, meniu randat pe server, canibalizare, drum spre comandă pe ghidurile care rankează; eghiseul: paginile de bani câte una pe săptămână; fără site nou, fără linkuri cumpărate |
 | [`2026-11-04-cjo-diagnostic-trafic.md`](2026-11-04-cjo-diagnostic-trafic.md) | 🔴 **CURENT (04.11.2026)**: diagnostic CJO: fără acțiune manuală sau problemă tehnică; ruptură pe 18–19.10; eghiseul se stabilizează, CJO continuă să scadă |

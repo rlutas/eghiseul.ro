@@ -90,7 +90,25 @@ export function Section({
   );
 }
 
-export function FaqList({ items }: { items: Array<{ q: string; a: string }> }) {
+/**
+ * `expanded`: questions as h3 with the answer always visible, no accordion.
+ * Use it on pages that target a non-brand query (SearchPilot test, 2026: text
+ * fully laid out got ~12% more organic sessions than the same text in tabs).
+ */
+export function FaqList({ items, expanded = false }: { items: Array<{ q: string; a: string }>; expanded?: boolean }) {
+  if (expanded) {
+    return (
+      <div className="flex flex-col">
+        {items.map(({ q, a }) => (
+          <div key={q} className="border-t border-d-line py-5">
+            <h3 className="m-0 text-[18px] font-bold leading-snug text-d-ink">{q}</h3>
+            <p className="m-0 mt-2 text-[15px] leading-relaxed text-d-muted">{a}</p>
+          </div>
+        ))}
+        <div className="border-t border-d-line" />
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col">
       {items.map(({ q, a }) => (

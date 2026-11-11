@@ -117,3 +117,28 @@ Fiecare afirmație juridică se verifică pe textul consolidat (legislatie.just.
 4. Săptămâna 3–6: afișări pe interogarea principală; pozițiile vin după.
 5. Comenzile apar în admin cu badge-ul brandului; compară cu comenzile aceluiași serviciu de pe CJO/eghiseul.
 6. Sezonalitate: la cazier fiscal sep–dec e de 5–9× vara. Nu trage concluzii din vară.
+
+## 9. Lecții din clipurile SEO (11.11.2026), aplicabile și pe cazierjudiciaronline.com
+
+### Domeniu exact match (EMD)
+
+Clip „Build in Public”, după o postare Margatix: bestdatalabs.com, pe locul 1 în Google și citat în AI Overview „în 10 zile”. Rețeta lor: domeniu exact match, cuvântul cheie la începutul conținutului, conținut pe intenția căutării, trimis în GSC, backlinkuri de bază, apoi așteptare.
+
+Ce reținem:
+- EMD ajută puțin, prin potrivirea cu interogarea și prin linkurile care folosesc numele domeniului ca ancoră. Nu ține singur o pagină sus: din 2012 Google retrogradează EMD-urile cu conținut slab.
+- „Zero la șapte cifre în 10 zile” e marketing: o nișă engleză nouă, fără concurență. Nu e reproductibil pe „cazier fiscal” sau „cazier judiciar”, unde rankează ANAF, MAI, ghiseul.ro și digigov.
+- cazierfiscal.com și cazierjudiciaronline.com sunt deja EMD; pașii 2–4 sunt făcuți. Lipsea pasul 5, backlinkurile de bază (secțiunea de mai jos).
+- **NU** cumpărăm domenii exact match în plus pe același serviciu (cazier-fiscal.ro, cazierfiscalonline.ro…). Mai multe site-uri pe aceeași interogare înseamnă doorway, exact tiparul lovit în august 2026.
+
+### Text vizibil, nu în acordeon
+
+Același autor citează un test SearchPilot: aceeași pagină, cu textul vizibil, a adus cu ~12% mai multe sesiuni organice decât varianta cu textul în taburi sau acordeon. E un singur test, nu o regulă Google. Google spune că indexează conținutul din `<details>`, dar e costul cel mai mic să nu riscăm.
+
+- Pe paginile care țintesc o interogare non-brand (pagina de bani, ghiduri), FAQ-ul se afișează desfăcut: `FaqList expanded` (`src/components/documentero/ui.tsx`), întrebarea ca `h3`, răspunsul mereu vizibil. Pe cazierfiscal.com e activ din 11.11.
+- Acordeonul rămâne ok pe pagini fără scop SEO (wizard, status comandă, pagini noindex).
+- **CJO (11.11):** `<details>` pe 6 pagini CJO (de ex. `cazier-fiscal-persoana-juridica`, `cazier-fiscal-vs-cazier-judiciar`, `cazier-judiciar-urgent`, `certificat-integritate-comportamentala`; `ppc/*` sunt noindex) și pe 13 pagini ecazier. De desfăcut întâi pe paginile cu afișări în GSC; câte 1–2 pe săptămână, ca orice schimbare de conținut.
+- Dacă un acordeon e făcut în JS și textul închis nu e în HTML deloc, e mai grav: verifică cu `curl` că răspunsul apare în sursă.
+
+### Backlinkuri de bază, fără cumpărare
+
+Vezi [`backlinks-site-de-nisa.md`](backlinks-site-de-nisa.md): profiluri pe numele brandului, directoare reale, răspunsuri pe forumuri, mențiuni. Conturile le creează Raul (Claude nu creează conturi); textele sunt pregătite acolo.
