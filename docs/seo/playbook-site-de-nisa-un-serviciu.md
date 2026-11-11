@@ -142,3 +142,44 @@ Același autor citează un test SearchPilot: aceeași pagină, cu textul vizibil
 ### Backlinkuri de bază, fără cumpărare
 
 Vezi [`backlinks-site-de-nisa.md`](backlinks-site-de-nisa.md): profiluri pe numele brandului, directoare reale, răspunsuri pe forumuri, mențiuni. Conturile le creează Raul (Claude nu creează conturi); textele sunt pregătite acolo.
+
+### Căutări lungi din GSC (regex de 4+ cuvinte)
+
+Sursa: un clip TikTok (11.11.2026). În Search Console, la Performanță, adaugi
+filtrul Interogare → Regex personalizat: `^([^ ]+ ){3,}[^ ]+$`. Filtrul arată
+căutările de cel puțin 4 cuvinte. Pornești coloana Poziție medie, apoi alegi
+căutările cu multe afișări unde nu ești pe locul 1. Prin API, același filtru
+se aplică local pe exportul `query,page`.
+
+Ce e adevărat: filtrul există și merge. Căutările lungi sunt mai precise și mai
+puțin disputate. Ce NU preluăm: sfatul de a face o pagină nouă pentru fiecare
+căutare. Exact așa arăta clusterul de pagini din șablon care a căzut la spam
+update ([regulile](../../.claude/rules/content-and-seo.md)). La noi varianta
+corectă e cealaltă jumătate a sfatului: căutarea intră ca H2 sau ca primă
+propoziție pe pagina care rankează deja.
+
+Măsurat pe 12.08–09.11.2026 (query+page, max. 25.000 rânduri):
+
+| Site | Clicuri din căutări de 4+ cuvinte | Afișări |
+|---|---|---|
+| eghiseul | 27,5k / 51,1k (54%), mai ales unelte gratuite | 256k / 800k |
+| CJO | 2,4k / 9,7k (25%) | 115k / 370k |
+| ecazier | 0 / 33 | 653 / 1.862 |
+| documentero | 6 / 9 | 465 / 647 |
+
+Primele candidate pe pagini de bani, unde fraza lipsește din titlu și H1–H3:
+
+- CJO `/cazier-fiscal-online`: „cazier fiscal persoana fizica” (1.096 afișări,
+  poziția 6), „anaf cazier fiscal online” (494), „certificat de cazier fiscal”
+  (478), „cazier fiscal online gratuit” (424). Pagina are două H2 identice
+  („Când ai nevoie de cazier fiscal?”) și nicio secțiune pe persoana fizică.
+- CJO `/valabilitate-cazier-judiciar`: „cat e valabil cazierul judiciar”
+  (1.297 afișări pe două variante, poziția ~3,8, 10 clicuri). H1-ul e fără
+  diacritice și în Title Case, iar primul text vizibil e data și cabinetul,
+  nu răspunsul („6 luni”).
+- CJO `/certificat-integritate-comportamentala`: 6.716 afișări la poziția 5,5
+  și doar 5 clicuri. De verificat SERP-ul cu `&pws=0` înainte de orice schimbare.
+- „cazier judiciar online gratuit”: ~10.000 de afișări pe CJO și eghiseul,
+  împărțite între prima pagină și `/cazier-judiciar-gratuit`. Căutarea vrea
+  varianta gratuită, deci conversia e mică. Pagina potrivită e cea despre
+  gratuitate, nu prima pagină.
