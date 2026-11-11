@@ -36,6 +36,8 @@ Caută întrebări reale despre cazier fiscal și răspunde complet, ca un om ca
 - Reddit (r/Romania, r/programare pentru PFA-iști, r/RoMoney), forumul Softpedia;
 - comentarii pe articole de presă despre înființarea firmelor, unde răspunsul corectează o greșeală reală.
 
+Limite găsite pe 11.11: Reddit e blocat în browserul lui Claude, iar căutarea pe Softpedia cere cont logat. Linkurile din Reddit și Softpedia sunt `nofollow`: nu mută clasamentul direct, dar aduc trafic, mențiuni ale brandului și citări în răspunsurile AI (Reddit e printre sursele cele mai citate). Ambele forumuri șterg postările promoționale de pe conturi noi: răspuns complet întâi, linkul doar unde chiar ajută, cu precizarea că e serviciul nostru.
+
 Claude pregătește textul răspunsului pentru fiecare întrebare găsită; postarea o face Raul sau un coleg, din contul lor (sau Claude, cu aprobarea explicită a lui Raul pentru fiecare postare).
 
 ## Nivelul 3: linkuri editoriale, cu un motiv real (lunar)
@@ -74,9 +76,10 @@ cazierauto.ro rankează pe „cazier auto” cu **doar 6 domenii care trimit lin
 | opiniabuzau.ro | 35 | presă Buzău | idem | nu |
 | timisoreni.ro | 44 | ghid de oraș Timișoara | articol sau listare, probabil plătit | nu |
 
+Verificat după (11.11): cazierauto.ro **nu are niciun contor** pe site. Pagina trafic.ro `/statistici/cazierauto.ro` e generată automat (fără dată de înscriere, fără date de contact), iar înscrierea reală la trafic.ro costă 89 € + TVA. topromania.ro indexează singur site-urile românești (923.000 de site-uri) și permite revendicarea listării. Deci cele două linkuri „gratuite” n-au fost efortul lor; vin automat. Pentru noi: un cont gratuit pe topromania.ro, cu revendicarea celor 4 site-uri, fără cod pe site; trafic.ro nu merită plătit.
+
 Ce înseamnă:
 - **Nișele mici se câștigă cu puține linkuri.** Un domeniu exact match, un site curat pe un singur serviciu și 5–6 linkuri le-au ajuns. Diferența o fac conținutul și concentrarea, nu volumul de linkuri.
-- **Partea gratuită** sunt cele două clasamente cu contor (topromania.ro, trafic.ro). Linkul are valoare mică, iar costul e un script de terță parte pe site. La noi se încarcă **doar după acordul pentru cookie-uri de analiză** (banner-ul există deja), altfel e problemă GDPR. Contul îl face Raul; integrarea cu acordul o face Claude.
 - **Presa locală** e de obicei plătită. Regula noastră e fără linkuri cumpărate. Varianta gratuită: un comunicat cu o informație reală (de ex. „la înființarea unui SRL sau PFA nu mai trebuie să duci cazierul fiscal, Registrul îl ia singur de la ANAF”), trimis redacțiilor locale. Unele îl preiau ca știre, cu link.
 - Se aplică la fel pe **ecazier.ro** (cazier auto, concurent direct cu cazierauto.ro) și pe **documentero.ro**.
 
