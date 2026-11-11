@@ -11,6 +11,7 @@
 - Black Friday NU se aplică pe acest site: clientul plătește prețul afișat, 89 lei.
 - Lista de comenzi are un filtru nou: „certificat-constatator-express.ro”.
 - Pe acest site nu scrie nicăieri că depune avocata: certificatul constatator îl cere botul sau echipa, nu avocatul. Nu spuneți la telefon că depune avocata.
+- Din 11.11 rulează o campanie Google Ads de test pentru acest site, pe un cont nou, cu 50 lei/zi. Dacă Google o respinge, o oprim. Nu încercăm s-o păcălim.
 - Google Analytics merge pe site din 11.11. Vânzările se măsoară automat la plată, inclusiv pentru reclamele Google, din momentul în care contul de reclame are codul pus în site.
 
 ---
@@ -39,7 +40,7 @@
 ## Deschis
 
 - Search Console și în contul lui Raul (TXT propriu).
-- Google Ads cont nou; Microsoft Ads.
+- Google Ads: campania e live din 11.11 (ID 24460904128); lipsește redeploy-ul de producție care pune eticheta Ads în site. Microsoft Ads.
 - Emailurile pleacă prin fallback de pe adresa eghiseul (Resend la 10/10 domenii).
 
 Plan complet: [`../certificat-constatator/README.md`](../certificat-constatator/README.md).
