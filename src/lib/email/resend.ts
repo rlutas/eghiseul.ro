@@ -51,13 +51,32 @@ export function defaultReplyToFor(resolvedFrom: string): string {
   return (m ? m[1] : resolvedFrom).trim() || REPLY_TO_DEFAULT;
 }
 
-/** The `from` Resend will accept: the requested one when its domain is verified, else the default. */
+/**
+ * Fallback sender for a brand whose domain Resend won't accept: the brand's
+ * display name on the default (verified) address, e.g.
+ * `documentero.ro <contact@eghiseul.ro>`. The customer still sees the brand
+ * name; Reply-To stays on the brand (see `defaultReplyToFor`, which callers get
+ * from the ORIGINAL from).
+ */
+export function fallbackFrom(from: string): string {
+  const name = from.match(/^\s*([^<]+?)\s*</)?.[1];
+  const m = FROM_DEFAULT.match(/<([^>]+)>/);
+  const addr = (m ? m[1] : FROM_DEFAULT).trim();
+  return name ? `${name} <${addr}>` : FROM_DEFAULT;
+}
+
+/** The `from` Resend will accept: the requested one when its domain is verified, else the brand name on the default address. */
 export function resolveFrom(from: string | undefined): string {
   if (!from) return FROM_DEFAULT;
   const domain = domainOf(from);
   if (VERIFIED_DOMAINS.includes(domain)) return from;
-  console.warn(`[email/resend] from domain "${domain}" not in RESEND_VERIFIED_DOMAINS — sending as default sender`);
-  return FROM_DEFAULT;
+  console.warn(`[email/resend] from domain "${domain}" not in RESEND_VERIFIED_DOMAINS — sending from the default address`);
+  return fallbackFrom(from);
+}
+
+/** Resend's 403 when the `from` domain was removed or never verified in the account. */
+function isUnverifiedDomainError(status: number, text: string): boolean {
+  return status === 403 && /domain is not verified/i.test(text);
 }
 
 export interface SendEmailInput {
@@ -115,7 +134,9 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
     subject: input.subject,
     html: input.html,
     ...(input.text ? { text: input.text } : {}),
-    reply_to: input.replyTo ?? defaultReplyToFor(from),
+    // Reply-To follows the brand the caller asked for, even when the address
+    // had to fall back to the default domain.
+    reply_to: input.replyTo ?? defaultReplyToFor(input.from && from !== input.from ? input.from : from),
     ...(input.headers ? { headers: input.headers } : {}),
   };
 
@@ -134,6 +155,23 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
   });
   if (!res.ok) {
     const text = await res.text();
+    // 11.11.2026: documentero.ro had been removed from the Resend account
+    // (plan limit, 10 domains) and every documentero email since 19.10 was
+    // lost with this 403. Retry once from the default address, brand name kept.
+    const retryFrom = fallbackFrom(from);
+    if (isUnverifiedDomainError(res.status, text) && retryFrom !== from) {
+      console.error(`[email/resend] DOMAIN NOT VERIFIED in Resend: "${domainOf(from)}" — resent from ${retryFrom}. Add the domain back in Resend.`);
+      const retryHeaders = { ...headers };
+      if (input.idempotencyKey) retryHeaders['Idempotency-Key'] = `${input.idempotencyKey}:fallback`;
+      const retry = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: retryHeaders,
+        body: JSON.stringify({ ...body, from: retryFrom }),
+      });
+      if (!retry.ok) throw new ResendError(retry.status, await retry.text());
+      const data = (await retry.json()) as { id?: string };
+      return { id: data.id ?? null, skipped: false, reason: 'from-domain-fallback' };
+    }
     throw new ResendError(res.status, text);
   }
   const data = (await res.json()) as { id?: string };

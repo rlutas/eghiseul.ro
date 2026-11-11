@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-11 | 🔴 **Emailurile documentero pierdute din 19.10 (domeniu scos din Resend); rezervă automată pe adresa eghiseul.ro cu numele brandului** — retry pe 403 „domain is not verified”, `fallbackFrom` | [2026-11-11-emailuri-documentero-domeniu-resend.md](2026-11-11-emailuri-documentero-domeniu-resend.md) |
 | 2026-11-11 | ✅ **Căutări lungi din GSC ca subtitluri pe 8 pagini, 5 site-uri; FAQ vizibil pe ecazier** — regex 4+ cuvinte, fără pagini noi; test cu citire 09.12 | [2026-11-11-cautari-lungi-gsc-subtitluri.md](2026-11-11-cautari-lungi-gsc-subtitluri.md) |
 | 2026-11-11 | 🔴 **Contract: clauze pentru blocaje din partea clientului (9.8/9.9), pașaport în loc de „CI”, email în contract, acordul la termeni nu se mai pierde la restaurare** — T&C §8/§12 pe 3 branduri, `idDocumentKindFrom`, consent în `ModularDraftCache` | [2026-11-11-contract-cerinte-client-pasaport-acord.md](2026-11-11-contract-cerinte-client-pasaport-acord.md) |
 | 2026-11-11 | ✅ **cazierfiscal.com: fără firmă/telefon în pagini, favicon pe host, ghiduri verificate pe lege, GA4 propriu, playbook site de nișă** — footer fără date de firmă, rewrite iconițe pe host, „Pe scurt” + cuprins + „Citește și”, corecturi OG 39/2015, `G-DGW62V4WXX` | [2026-11-11-cazierfiscal-separare-favicon-ghiduri.md](2026-11-11-cazierfiscal-separare-favicon-ghiduri.md) |

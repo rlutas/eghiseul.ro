@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveFrom } from '@/lib/email/resend';
+import { fallbackFrom, resolveFrom } from '@/lib/email/resend';
 
 /**
  * Resend rejects a `from` on a domain it has not verified (403) and the email
@@ -20,6 +20,12 @@ describe('resolveFrom', () => {
     const from = resolveFrom('Alt brand <contact@alt-brand.ro>');
     expect(from).not.toContain('alt-brand.ro');
     expect(from).toContain('@eghiseul.ro');
+  });
+
+  it('keeps the brand name on the default address when falling back (11.11.2026)', () => {
+    expect(resolveFrom('cazierfiscal.com <contact@cazierfiscal.com>')).toBe('cazierfiscal.com <contact@eghiseul.ro>');
+    expect(fallbackFrom('documentero.ro <contact@documentero.ro>')).toBe('documentero.ro <contact@eghiseul.ro>');
+    expect(fallbackFrom('contact@alt.ro')).toContain('@eghiseul.ro');
   });
 
   it('returns the default sender when nothing is requested', () => {
