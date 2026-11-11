@@ -35,7 +35,8 @@ export const metadata: Metadata = {
   // Override the root layout's eghiseul values: its canonical and its GSC
   // token must not reach this host (GSC here is verified by DNS TXT).
   alternates: {},
-  verification: {},
+  // Bing Webmaster Tools (11.11.2026); GSC is verified by DNS TXT.
+  verification: { other: { 'msvalidate.01': '9C4B5028C58015034AD413B180D830BE' } },
   creator: brand.name,
   openGraph: { siteName: brand.name, locale: 'ro_RO', type: 'website', images: [{ url: `${brand.baseUrl}${brand.ogDefault}` }] },
   twitter: { card: 'summary_large_image', images: [`${brand.baseUrl}${brand.ogDefault}`] },
