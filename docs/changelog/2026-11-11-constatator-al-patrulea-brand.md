@@ -10,6 +10,8 @@
 - Site-ul e live din 11.11 și deschis pentru Google. Reclamele pornesc separat, pe un cont Google Ads nou.
 - Black Friday NU se aplică pe acest site: clientul plătește prețul afișat, 89 lei.
 - Lista de comenzi are un filtru nou: „certificat-constatator-express.ro”.
+- Pe acest site nu scrie nicăieri că depune avocata: certificatul constatator îl cere botul sau echipa, nu avocatul. Nu spuneți la telefon că depune avocata.
+- Google Analytics merge pe site din 11.11. Vânzările se măsoară automat la plată, inclusiv pentru reclamele Google, din momentul în care contul de reclame are codul pus în site.
 
 ---
 
@@ -29,6 +31,10 @@
 - Test live: draft creat pe domeniu cu `platform='constatator'`, apoi șters.
 - GA4: cont „constatator”, proprietatea 563726213, stream web 16319189060, ID `G-X5Q7NDPHPL` în `NEXT_PUBLIC_GA_MEASUREMENT_ID_CONSTATATOR` (Vercel, production). Fiind `NEXT_PUBLIC_`, intră în pagină abia la următorul build de producție. gtag se încarcă doar după acordul pentru cookie-uri. Contul de serviciu claude-seo are rol de „Participant” pe proprietate, deci raportul lunar citește și acest site (verificat prin Data API).
 - Verificare 11.11: toate cele 7 URL-uri din sitemap dau 200, au canonical propriu și `index, follow`, fără nicio mențiune „eghiseul”. Fiecare pagină are linkuri spre toate celelalte (header + footer). `/comanda/` e blocat în robots.txt și are `noindex`. `/ghiduri/` rămâne `noindex`, în afara sitemap-ului și a meniului până la primul ghid publicat.
+
+- 11.11: semnătura „cererile le depune av. …” (componenta comună `UpdatedLine`) scoasă de pe pagina principală constatator, înlocuită cu „echipa Constatator Express”. Pe celelalte pagini și în ghiduri nu apărea.
+- Ghiduri: 5 scrise și puse în coadă (`published: false`, 404 în producție), câte unul pe săptămână din 18.11. Coada e în `docs/certificat-constatator/README.md`.
+- Conversii Ads: codul e gata (GA4 `purchase` + conversie Ads cu `transaction_id` și enhanced conversions, fără fallback pe alt cont). Lipsesc doar `NEXT_PUBLIC_GOOGLE_ADS_ID_CONSTATATOR` și `..._PURCHASE_LABEL_CONSTATATOR`. Pașii sunt în README, la „Conversii Google Ads”.
 
 ## Deschis
 
