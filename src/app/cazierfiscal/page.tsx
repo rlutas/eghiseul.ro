@@ -83,7 +83,7 @@ const FAQ = [
     a: 'Da, „cazier financiar” e un nume folosit des pentru cazierul fiscal. Documentul oficial se numește certificat de cazier fiscal și îl emite ANAF. Nu îl confunda cu certificatul fiscal de la primărie (pentru impozitele locale), care e alt act.',
   },
   {
-    q: 'Merge și pentru o firmă?',
+    q: 'Merge și pentru o firmă (persoană juridică)?',
     a: 'Nu. Obținem cazierul fiscal doar pentru persoane fizice. Dacă dosarul firmei cere cazierul asociatului sau al administratorului, îl comanzi pe numele lui, ca persoană fizică.',
   },
   {
@@ -403,7 +403,7 @@ export default async function CazierFiscalHome() {
         <Section className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-4 lg:col-span-6">
             <Eyebrow>Ce îți trebuie</Eyebrow>
-            <H2>Acte necesare pentru cazierul fiscal</H2>
+            <H2>Cazier fiscal pentru persoană fizică: acte necesare</H2>
             <p className="m-0 text-[17px] leading-[1.7] text-d-body">
               Nu ai nevoie de cont SPV, de programare sau de cerere tipărită. Formularul îl completezi de pe telefon, în
               câteva minute, și semnezi pe ecran.

@@ -129,7 +129,7 @@ export default async function CasatoriePage() {
         <Section id="divort" className="mt-24 grid gap-8 lg:mt-32 lg:grid-cols-12">
           <div className="flex flex-col gap-3 lg:col-span-4">
             <Eyebrow>Când ai nevoie de duplicat</Eyebrow>
-            <H2 className="sm:text-[36px]">Patru situații, aceeași cerere</H2>
+            <H2 className="sm:text-[36px]">Certificat de căsătorie pierdut, cu divorț sau pentru străinătate: aceeași cerere</H2>
           </div>
           <div className="grid gap-5 sm:grid-cols-2 lg:col-span-8">
             {CASES.map(([t, d]) => (

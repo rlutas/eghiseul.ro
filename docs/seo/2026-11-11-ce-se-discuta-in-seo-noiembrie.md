@@ -34,6 +34,19 @@ Cercetare din 11.11.2026, făcută la lansarea cazierfiscal.com. Separat: ce a c
 | Bing Webmaster Tools | adăugat + verificat (meta tag), sitemap și 6 URL-uri trimise |
 | Ghidurile verificate de om pe textul legii | ✅ (agent separat, pe textul consolidat) |
 
+## Sfaturi din clipuri: ce e real și cum îl testăm
+
+Fiecare sfat primit (TikTok, X, YouTube) intră aici: ce spune, ce am verificat,
+ce am aplicat și când citim rezultatul. Un sfat rămâne „neconfirmat” până când
+îl vedem în datele noastre.
+
+| Data | Sfatul | Verdict | Aplicat | Citim rezultatul |
+|---|---|---|---|---|
+| 11.11 | Domeniu exact match (cuvântul cheie în domeniu) rankează repede | Parțial. Din 2012 Google retrogradează EMD-urile cu conținut slab; domeniul ajută puțin, prin potrivire și prin linkurile cu numele lui. | cazierfiscal.com e deja EMD | ~01.12, după core update |
+| 11.11 | Textul din acordeon (`<details>`) pierde trafic | Plauzibil: un test SearchPilot a arătat ~12% mai puține sesiuni. Google spune că indexează textul ascuns. | cazierfiscal, întrebările de pe ecazier `/cazier-auto` și `/cazier-fiscal` | 09.12, în [testul cu căutările lungi](2026-11-11-test-cautari-lungi-gsc.md) |
+| 11.11 | Linkuri din directoare și site-uri locale, ca la cazierauto.ro | Real, dar slab: 6 domenii, 2 gratuite. Nu cumpărăm linkuri. | [kit backlinkuri](backlinks-site-de-nisa.md) | după ce Raul face profilurile |
+| 11.11 | GSC: filtrul regex `^([^ ]+ ){3,}[^ ]+$` arată căutările de 4+ cuvinte; faci pagină nouă sau H2 pe ele | Filtrul e real și merge. Căutările lungi sunt 54% din clicurile eghiseul și 25% pe CJO. „Pagină nouă pentru fiecare căutare” NU: e tiparul care a căzut la spam update. Afirmația că „multe sunt căutări făcute de AI” nu are dovezi. | H1/H2 pe 8 pagini existente, pe 5 site-uri | 09.12 și 06.01, în [test](2026-11-11-test-cautari-lungi-gsc.md) |
+
 ## Ce facem
 
 - **Nu judecăm lansarea până după core update** (măsurăm din ~01.12).

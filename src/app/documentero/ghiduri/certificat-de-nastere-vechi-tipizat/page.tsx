@@ -34,7 +34,7 @@ const TOC = [
   ['s2', 'Cum arată modelul nou'],
   ['s3', 'Când trebuie schimbat'],
   ['s4', 'Ce se întâmplă cu certificatul vechi'],
-  ['s5', 'Cum ceri modelul nou'],
+  ['s5', 'Unde schimbi certificatul vechi cu unul nou'],
   ['s6', 'Dacă locuiești în străinătate'],
   ['faq', 'Întrebări frecvente'],
   ['surse', 'Surse'],
@@ -154,7 +154,7 @@ export default async function GhidCertificatVechiPage() {
             <H id="s4">Ce se întâmplă cu certificatul vechi</H>
             <P>Art. 166 alin. (2) spune că eliberarea unui nou certificat de naștere îl anulează pe cel similar emis anterior. Deci din ziua în care ai certificatul nou, pe cel vechi nu-l mai folosești la nicio instituție și nu-l mai pui în dosare. Dacă îl ai în original într-un dosar depus deja, de exemplu la o bancă, nu se întâmplă nimic retroactiv. Doar că de acum înainte prezinți actul nou.</P>
 
-            <H id="s5">Cum ceri modelul nou</H>
+            <H id="s5">Unde schimbi certificatul de naștere vechi cu unul nou</H>
             <P>Din 2024, cererea se poate depune la oricare serviciu public comunitar local de evidență a persoanelor din țară (art. 158 alin. 1). Unde nu există un astfel de serviciu, la primăria comunei. Nu mai trebuie să mergi în localitatea de naștere.</P>
             <ul className="m-0 flex flex-col gap-1.5 pl-6 text-[17px] leading-[1.7] text-d-body sm:text-[18px]">
               <li>Cine cere: titularul, reprezentantul legal pentru minor, o persoană cu procură specială sau un avocat cu împuternicire avocațială (art. 166 alin. 1)</li>

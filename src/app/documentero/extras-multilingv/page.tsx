@@ -188,7 +188,7 @@ export default async function ExtrasMultilingvPage() {
         </Section>
 
         <SeoBlock
-          title="Extras multilingv de naștere online: ce este, cine îl acceptă, cât costă"
+          title="Certificat de naștere multilingv online: ce este extrasul, cine îl acceptă, cât costă"
           intro={[
             'Extrasul multilingv al actului de naștere e documentul prevăzut de Convenția CIEC nr. 16, semnată la Viena în 1976, la care România a aderat prin Legea nr. 65/2012. Are datele din certificatul tău de naștere, cu rubricile în română și franceză și traducerea lor pe verso. De aceea o primărie din Italia, un „Standesamt” din Germania sau un „registro civil” din Spania îl acceptă ca atare: fără traducere autorizată, fără apostilă, fără legalizare. Mulți îl caută drept „certificat de naștere multilingv” sau „certificat de naștere internațional”; e același document.',
             `Îl eliberează orice serviciu de stare civilă din țară (din 2024), la cerere, titularului sau unui avocat cu împuternicire (${LEGAL_BASIS.short}). Se cere de obicei împreună cu duplicatul certificatului, pentru că unele instituții străine vor amândouă. De aceea avem pachetul: extrasul și certificatul, dintr-o singură depunere, ${lei(pN.basePrice)} + ${lei(pachet)} lei.`,
