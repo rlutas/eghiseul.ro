@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { HeaderConstatator } from '@/components/constatator/header';
-import { Arrow, Card, Check, Eyebrow, FaqList, H2, InfoTable, Section, UpdatedLine } from '@/components/documentero/ui';
+import { Arrow, Card, Check, Eyebrow, FaqList, H2, InfoTable, Section } from '@/components/documentero/ui';
+import { fmtDateRo } from '@/lib/documentero/content';
 import { buildPageMetadata } from '@/lib/seo/metadata';
 import { constatatorServiceGraph } from '@/lib/seo/constatator-schema';
 import { lei } from '@/lib/documentero/services';
@@ -197,7 +198,10 @@ export default async function ConstatatorHome() {
               cer băncile, licitațiile, programele de finanțare și partenerii de afaceri. La noi costă {lei(p.firma)} lei
               cu taxa ONRC inclusă și vine pe email ca PDF semnat electronic. {speedSentence}
             </p>
-            <UpdatedLine date={UPDATED} />
+            {/* No lawyer here: ONRC requests go through the bot and the team, not through a lawyer. */}
+            <p className="m-0 text-[13px] text-d-muted">
+              Actualizat la <time dateTime={UPDATED}>{fmtDateRo(UPDATED)}</time> · echipa Constatator Express
+            </p>
           </Card>
         </Section>
 
