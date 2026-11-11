@@ -27,10 +27,11 @@
 - Black Friday: bara și aplicarea automată a codului sunt oprite pe brandul `constatator` (`(order)/layout.tsx`, checkout).
 - Search Console `sc-domain:certificat-constatator-express.ro` verificat prin TXT (contul de serviciu e owner), sitemap trimis. Bing Webmaster verificat (meta `msvalidate.01`), sitemap trimis.
 - Test live: draft creat pe domeniu cu `platform='constatator'`, apoi șters.
+- GA4: cont „constatator”, proprietatea 563726213, stream web 16319189060, ID `G-X5Q7NDPHPL` în `NEXT_PUBLIC_GA_MEASUREMENT_ID_CONSTATATOR` (Vercel, production). Fiind `NEXT_PUBLIC_`, intră în pagină abia la următorul build de producție. gtag se încarcă doar după acordul pentru cookie-uri. Contul de serviciu claude-seo are rol de „Participant” pe proprietate, deci raportul lunar citește și acest site (verificat prin Data API).
+- Verificare 11.11: toate cele 7 URL-uri din sitemap dau 200, au canonical propriu și `index, follow`, fără nicio mențiune „eghiseul”. Fiecare pagină are linkuri spre toate celelalte (header + footer). `/comanda/` e blocat în robots.txt și are `noindex`. `/ghiduri/` rămâne `noindex`, în afara sitemap-ului și a meniului până la primul ghid publicat.
 
 ## Deschis
 
-- GA4: proprietate nouă, ID în `NEXT_PUBLIC_GA_MEASUREMENT_ID_CONSTATATOR`.
 - Search Console și în contul lui Raul (TXT propriu).
 - Google Ads cont nou; Microsoft Ads.
 - Emailurile pleacă prin fallback de pe adresa eghiseul (Resend la 10/10 domenii).

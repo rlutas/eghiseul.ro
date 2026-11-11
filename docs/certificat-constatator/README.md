@@ -1,6 +1,6 @@
 # certificat-constatator-express.ro: al patrulea brand, doar certificat constatator
 
-**Stare (11.11.2026):** LIVE și indexabil din 11.11.2026; GSC și Bing verificate, sitemap trimis. Fără Black Friday pe acest brand. Deschis: GA4, Google Ads cont nou, Microsoft Ads. Rețeta e cea de la cazierfiscal.com: [`../seo/playbook-site-de-nisa-un-serviciu.md`](../seo/playbook-site-de-nisa-un-serviciu.md) și [`../cazier-fiscal/README.md`](../cazier-fiscal/README.md).
+**Stare (11.11.2026):** LIVE și indexabil din 11.11.2026; GSC și Bing verificate, sitemap trimis. Fără Black Friday pe acest brand. GA4 creat (`G-X5Q7NDPHPL`, proprietatea 563726213), activ de la următorul build de producție. Deschis: Google Ads cont nou, Microsoft Ads. Rețeta e cea de la cazierfiscal.com: [`../seo/playbook-site-de-nisa-un-serviciu.md`](../seo/playbook-site-de-nisa-un-serviciu.md) și [`../cazier-fiscal/README.md`](../cazier-fiscal/README.md).
 
 ## Domeniile (cumpărate 11.11.2026)
 
@@ -67,7 +67,7 @@ Date brute în [`cuvinte-cheie-2026-11/`](cuvinte-cheie-2026-11/): GSC eghiseul 
 
 1. Domeniile în Vercel. `www` și `certificatconstatatorexpress.ro` duc prin 308/301 spre `https://certificat-constatator-express.ro`.
 2. Search Console (Domain, prin TXT) + contul de serviciu claude-seo; Bing Webmaster.
-3. GA4: cont nou, ID în `NEXT_PUBLIC_GA_MEASUREMENT_ID_CONSTATATOR`.
+3. ~~GA4: cont nou, ID în `NEXT_PUBLIC_GA_MEASUREMENT_ID_CONSTATATOR`.~~ Făcut 11.11: `G-X5Q7NDPHPL`, setat în Vercel production.
 4. Resend: nu se verifică domeniul (limita de 10). Emailurile pleacă prin fallback de pe adresa eghiseul, cu numele brandului; asta e o legătură vizibilă cu eghiseul până mutăm domeniile mici într-un cont separat.
    Adresa `contact@certificat-constatator-express.ro` nu are MX (DNS-ul e pe Vercel): de adăugat înainte de reclame dacă vrem răspunsuri pe ea.
    Supabase auth: domeniul nou de adăugat în lista de redirect-uri, dacă activăm contul de client pe brand.
@@ -85,6 +85,20 @@ Date brute în [`cuvinte-cheie-2026-11/`](cuvinte-cheie-2026-11/): GSC eghiseul 
 ### Faza 4: ghiduri (câte unul pe săptămână)
 
 Candidate, în ordinea cererii: tipurile de certificat constatator (de bază, extins, cu istoric, detaliat), valabilitatea, certificatul constatator pentru PFA și punct de lucru, pentru licitații și fonduri.
+
+**Coada de ghiduri (scrise 11.11, verificate pe paginile ONRC, formularul 11-10-188, Ordinul 380/C/2024 și Legea 265/2022, NEPUBLICATE):**
+
+| Data | Ghid | Cum îl publici |
+|---|---|---|
+| 18.11 | `/ghiduri/valabilitate-certificat-constatator/` | în `src/config/constatator-nav.ts`: `published: true`, `updated` = data; în pagină `PUBLISHED`/`UPDATED` = data; la primul ghid live adaugă `/ghiduri/` în `src/config/constatator-sitemap.ts` și „Ghiduri” în `CONSTATATOR_NAV`; deploy; IndexNow |
+| 25.11 | `/ghiduri/certificat-constatator-pfa-punct-de-lucru/` | idem |
+| 02.12 | `/ghiduri/certificat-constatator-extins/` | idem |
+| 09.12 | `/ghiduri/raport-istoric-onrc/` | idem |
+| 16.12 | `/ghiduri/certificat-constatator-licitatie-fonduri/` | idem |
+
+Până la publicare, paginile dau 404 în producție și lipsesc din hub, sitemap, llms.txt, footer și „Citește și”; în `next dev` se văd, pentru verificare. Linkurile dintre ghiduri folosesc `GuideLink` (`src/components/constatator/guide.tsx`): cât timp ținta e nepublicată se randează ca text simplu. Fără FAQPage, fără orașe sau județe, fără linkuri spre eghiseul.
+
+Ce nu au ghidurile, intenționat: nicio instituție numită drept cea care cere „30 de zile” (nu există sursă primară); nicio afirmație despre ce înțeleg alți vânzători prin „extins”; nicio promisiune de viteză la raportul istoric (ONRC: cel mult 30 de zile, „în funcție de complexitatea lucrării”). Durata la fonduri IMM și insolvență (operator ONRC, în program, uneori ziua lucrătoare următoare) e observația noastră din workerul ONRC, spusă ca atare în ghid.
 
 ## Ce urmărim
 
