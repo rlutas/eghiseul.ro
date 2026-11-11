@@ -61,6 +61,25 @@ Pași:
 >
 > Dacă vă e util, am explicat pe larg aici: {link ghid}. Mulțumesc pentru articol.
 
+## Ce a făcut cazierauto.ro (captură din instrumentul de backlinkuri al lui Raul, 11.11.2026)
+
+cazierauto.ro rankează pe „cazier auto” cu **doar 6 domenii care trimit linkuri**:
+
+| Domeniu | AS | Ce e | Cum l-au obținut (probabil) | Gratuit pentru noi? |
+|---|---|---|---|---|
+| topromania.ro (3 linkuri) | 2 | top de site-uri românești, „100% gratuit” | înscriere + contorul lor pe site | da, dar cere scriptul lor |
+| trafic.ro | 28 | contor de trafic și clasament | înscriere + contorul lor pe site | da, dar cere scriptul lor |
+| cazier-auto.ro | 2 | domeniul lor secundar, face 301 spre cazierauto.ro | propriu | nu e link real; NU repetăm (domenii EMD în plus) |
+| arq.ro | 30 | știri Arad | presă locală, aproape sigur advertorial plătit | nu |
+| opiniabuzau.ro | 35 | presă Buzău | idem | nu |
+| timisoreni.ro | 44 | ghid de oraș Timișoara | articol sau listare, probabil plătit | nu |
+
+Ce înseamnă:
+- **Nișele mici se câștigă cu puține linkuri.** Un domeniu exact match, un site curat pe un singur serviciu și 5–6 linkuri le-au ajuns. Diferența o fac conținutul și concentrarea, nu volumul de linkuri.
+- **Partea gratuită** sunt cele două clasamente cu contor (topromania.ro, trafic.ro). Linkul are valoare mică, iar costul e un script de terță parte pe site. La noi se încarcă **doar după acordul pentru cookie-uri de analiză** (banner-ul există deja), altfel e problemă GDPR. Contul îl face Raul; integrarea cu acordul o face Claude.
+- **Presa locală** e de obicei plătită. Regula noastră e fără linkuri cumpărate. Varianta gratuită: un comunicat cu o informație reală (de ex. „la înființarea unui SRL sau PFA nu mai trebuie să duci cazierul fiscal, Registrul îl ia singur de la ANAF”), trimis redacțiilor locale. Unele îl preiau ca știre, cu link.
+- Se aplică la fel pe **ecazier.ro** (cazier auto, concurent direct cu cazierauto.ro) și pe **documentero.ro**.
+
 ## Texte pregătite
 
 **cazierfiscal.com, scurt (≤160 caractere):**
