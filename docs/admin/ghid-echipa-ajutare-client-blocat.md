@@ -52,6 +52,16 @@ plătească din nou — doar reîncarcă documentele cerute.
   pe formularul public și clientul nu poate face selfie acum: comanda trece pe
   fluxul telefonic (link de plată → link de completare cu acte + selfie +
   semnătură). Vezi [Comenzi telefonice](comenzi-telefonice/README.md).
+- **„Redeschide formularul (schimbă opțiuni)"** — apare când clientul a apăsat
+  deja „Plătește", dar nu a plătit (În așteptare / Abandonată). Din acel moment
+  formularul e închis și nu se mai poate merge înapoi. Butonul trece comanda
+  înapoi pe **Ciornă** și copiază linkul de continuare (48h): clientul (sau
+  voi) merge înapoi la opțiuni, adaugă de exemplu traducere și legalizare,
+  apoi semnează și apasă din nou „Plătește". **Nu mai trimiteți linkul de
+  plată vechi**: pe el clientul ar plăti suma veche, fără opțiunile noi (dacă
+  se întâmplă, le adăugați după plată cu „Modifică comandă"). Nu apare la
+  comenzile plătite (acolo e „Modifică comandă"), la cele cu transfer bancar
+  în așteptare și la comenzile telefonice.
 (Contractul, KYC-ul și plata rămân mereu la client — pe astea nu le facem noi.)
 
 **6. Clientul spune că „Plătește” nu face nimic (din 21.10.2026):** formularul

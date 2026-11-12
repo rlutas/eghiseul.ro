@@ -127,6 +127,12 @@ telefonică”**: pentru comenzile începute de echipă pe formularul public, le
 trece pe fluxul telefonic (link de plată, apoi link de completare pentru acte,
 selfie și semnătură), fără să mai ceară selfie înainte de plată.
 
+Dacă clientul a apăsat deja „Plătește” fără să plătească (În așteptare sau
+Abandonată), formularul e închis. **„Redeschide formularul (schimbă opțiuni)”**
+trece comanda înapoi pe Ciornă și copiază linkul de continuare, ca să se poată
+adăuga o opțiune uitată; clientul semnează și trimite din nou. Detalii:
+[Client blocat](ghid-echipa-ajutare-client-blocat.md).
+
 ## Date stare civilă / Date imobil / Firmă
 
 Cardurile specifice serviciului: răspunsurile din pasul de stare civilă, CF /

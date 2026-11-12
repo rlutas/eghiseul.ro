@@ -6302,6 +6302,7 @@ function StuckClientBanner({ order, onChanged }: { order: OrderDetail; onChanged
   const [editOpen, setEditOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [finalizing, setFinalizing] = useState(false);
+  const [reopening, setReopening] = useState(false);
   const cd = (order.customer_data as AnyObj | null) ?? {};
   const contact = (cd.contact as AnyObj | null) ?? {};
   const personal = (cd.personal as AnyObj | null) ?? {};
@@ -6341,6 +6342,34 @@ function StuckClientBanner({ order, onChanged }: { order: OrderDetail; onChanged
       toast.error(e instanceof Error ? e.message : 'Nu am putut genera linkul');
     } finally {
       setGenerating(false);
+    }
+  };
+
+  // Comandă trimisă și neplătită: formularul e închis (servește doar ciorne).
+  // O trecem înapoi pe ciornă ca să se poată schimba opțiunile (E-261111-EMRB4).
+  const reopenAsDraft = async () => {
+    if (!window.confirm(
+      'Redeschizi formularul pentru această comandă?\n\n' +
+      'Comanda revine la „ciornă”: clientul (sau tu, cu linkul de continuare) poate merge înapoi ' +
+      'în formular și schimba opțiunile. La final semnează și apasă din nou „Plătește”. ' +
+      'Nu mai trimite linkul de plată vechi: pe el clientul ar plăti fără opțiunile noi.'
+    )) return;
+    setReopening(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/reopen-draft`, { method: 'POST' });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.error || 'Eroare');
+      try {
+        await navigator.clipboard?.writeText(json.data.resumeUrl);
+        toast.success('Formular redeschis — linkul de continuare e copiat (valabil 48h)');
+      } catch {
+        toast.success('Formular redeschis — apasă „Copiază link continuare” pentru link');
+      }
+      onChanged();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Nu am putut redeschide formularul');
+    } finally {
+      setReopening(false);
     }
   };
 
@@ -6423,6 +6452,12 @@ function StuckClientBanner({ order, onChanged }: { order: OrderDetail; onChanged
           <Button size="sm" variant="outline" className="h-7 text-xs" onClick={finalizeAsPhoneOrder} disabled={finalizing}>
             {finalizing ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
             Finalizează ca comandă telefonică
+          </Button>
+        )}
+        {(order.status === 'pending' || order.status === 'abandoned') && order.payment_status !== 'paid' && order.payment_status !== 'awaiting_verification' && (order as { channel?: string | null }).channel !== 'phone' && (
+          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={reopenAsDraft} disabled={reopening}>
+            {reopening ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
+            Redeschide formularul (schimbă opțiuni)
           </Button>
         )}
       </div>
