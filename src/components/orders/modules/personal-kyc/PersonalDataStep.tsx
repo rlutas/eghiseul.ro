@@ -134,6 +134,14 @@ interface PersonalDataStepProps {
   onValidChange: (valid: boolean) => void;
 }
 
+/**
+ * A Romanian citizen can be domiciled abroad (the passport states the country).
+ * An ID card always carries a Romanian address, so the question is skipped there.
+ */
+function asksDomicileAbroad(kyc: { citizenship?: string; idDocumentType?: string | null } | null | undefined): boolean {
+  return !!kyc && kyc.citizenship === 'romanian' && kyc.idDocumentType !== 'ci_vechi' && kyc.idDocumentType !== 'ci_nou';
+}
+
 interface ScanState {
   scanning: boolean;
   progress: number;
@@ -866,6 +874,11 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
     //        - "Da" → Romanian address (street + city + county) is required
     //        - "Nu" → foreignData.foreignAddress + foreignData.birthCountry required
     //          (we re-use birthCountry as the country-of-domicile when foreign)
+    // Romanian citizen who said the domicile is abroad: country + address.
+    if (asksDomicileAbroad(personalKyc) && personalKyc.domicileAbroad) {
+      if (!personalKyc.domicileAbroad.country || !personalKyc.domicileAbroad.address.trim()) return false;
+    }
+
     if (personalKyc.citizenship !== 'romanian') {
       if (!personalKyc.foreignData?.birthCity?.trim()) return false;
       if (!personalKyc.foreignData?.birthCountry) return false;
@@ -921,6 +934,10 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       } else if (docs.length === 0) {
         m.push('Actul de identitate (alege tipul + scanează, sau completează manual)');
       }
+    }
+    if (asksDomicileAbroad(personalKyc) && personalKyc.domicileAbroad) {
+      if (!personalKyc.domicileAbroad.country) m.push('Țara de domiciliu');
+      if (!personalKyc.domicileAbroad.address.trim()) m.push('Adresa din străinătate');
     }
     if (isForeign) {
       if (!personalKyc.foreignData?.birthCity?.trim()) m.push('Localitatea nașterii');
@@ -2210,6 +2227,99 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             </div>
           )}
 
+        {/* Romanian citizen, passport or manual entry: the domicile can be abroad. */}
+        {asksDomicileAbroad(personalKyc) && (
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-3 sm:p-4 space-y-3">
+            <div>
+              <p className="text-secondary-900 font-medium text-sm">Domiciliul tău este în România?</p>
+              <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
+                Dacă în pașaport scrie o țară de domiciliu (de exemplu Spania), alege „Nu” și scrie adresa de acolo.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+              {[
+                { abroad: false, label: 'Da, în România' },
+                { abroad: true, label: 'Nu, în străinătate' },
+              ].map((opt) => {
+                const checked = !!personalKyc.domicileAbroad === opt.abroad;
+                return (
+                  <button
+                    key={String(opt.abroad)}
+                    type="button"
+                    onClick={() => {
+                      if (checked) return;
+                      updatePersonalKyc(
+                        opt.abroad
+                          ? {
+                              domicileAbroad: { country: '', address: '' },
+                              // A Romanian address typed before must not reach the contract or the invoice.
+                              address: { county: '', city: '', street: '', number: '' },
+                            }
+                          : { domicileAbroad: null }
+                      );
+                    }}
+                    aria-pressed={checked}
+                    className={cn(
+                      'rounded-xl border-2 px-3 py-2.5 text-center text-sm font-semibold transition-colors',
+                      checked
+                        ? 'border-primary-500 bg-primary-50 text-secondary-900 shadow-sm'
+                        : 'border-neutral-200 bg-white text-neutral-700 hover:border-primary-300'
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {asksDomicileAbroad(personalKyc) && personalKyc.domicileAbroad && (
+          <div className="space-y-3 rounded-xl border border-neutral-200 bg-white p-3 sm:p-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="domicileCountry" className="text-secondary-900 font-medium">
+                Țara de domiciliu <span className="text-red-500">*</span>
+              </Label>
+              <select
+                id="domicileCountry"
+                value={personalKyc.domicileAbroad.country}
+                onChange={(e) =>
+                  updatePersonalKyc({
+                    domicileAbroad: { country: e.target.value, address: personalKyc.domicileAbroad?.address || '' },
+                  })
+                }
+                className="h-11 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+              >
+                <option value="">Selectează țara</option>
+                {getCountriesForForeignType(undefined)
+                  .filter((c) => c !== 'România')
+                  .map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="domicileAbroadAddress" className="text-secondary-900 font-medium">
+                Adresa din străinătate <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="domicileAbroadAddress"
+                type="text"
+                value={personalKyc.domicileAbroad.address}
+                onChange={(e) =>
+                  updatePersonalKyc({
+                    domicileAbroad: { country: personalKyc.domicileAbroad?.country || '', address: e.target.value },
+                  })
+                }
+                placeholder="Stradă, număr, oraș, cod poștal"
+                className="bg-white placeholder:text-neutral-400"
+              />
+            </div>
+          </div>
+        )}
+
         {/* Romanian address grid — shown when:
               - Romanian citizen (default)
               - OR foreign citizen with hasRomanianAddress === true (default)
@@ -2217,7 +2327,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         {!(
           personalKyc.citizenship !== 'romanian' &&
           personalKyc.foreignData?.hasRomanianAddress === false
-        ) && (
+        ) && !(asksDomicileAbroad(personalKyc) && personalKyc.domicileAbroad) && (
         <>
         {/* Confirmare compactă — adresa deja completată (auto din RO CEI / scan CI) */}
         {addressAutoFilled && !editAddress && (

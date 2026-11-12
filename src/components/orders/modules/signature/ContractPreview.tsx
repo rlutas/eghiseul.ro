@@ -64,6 +64,8 @@ export default function ContractPreview() {
             documentIssuedBy: state.personalKyc.documentIssuedBy,
             documentIssueDate: state.personalKyc.documentIssueDate,
             address: state.personalKyc.address,
+            // Domicile abroad — the preview must print what the signed contract will.
+            domicileAbroad: state.personalKyc.domicileAbroad,
           } : undefined,
           companyData: state.companyKyc ? {
             companyName: state.companyKyc.companyName,

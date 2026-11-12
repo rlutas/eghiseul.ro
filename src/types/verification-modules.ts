@@ -401,6 +401,12 @@ export interface PersonalKYCState {
   // Address (from CI vechi or Certificat Domiciliu)
   address: AddressState;
 
+  /**
+   * Romanian citizen domiciled abroad (the passport states the country).
+   * When set, it replaces `address` on contracts — see `src/lib/orders/domicile.ts`.
+   */
+  domicileAbroad?: { country: string; address: string } | null;
+
   // Foreign citizen data (when citizenship is 'european' or 'foreign')
   foreignData?: {
     birthCity: string;

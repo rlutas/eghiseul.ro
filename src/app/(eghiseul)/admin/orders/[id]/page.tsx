@@ -1944,6 +1944,17 @@ export default function AdminOrderDetailPage() {
                   )}
                 </div>
 
+                {/* Romanian citizen domiciled abroad: free text + country (replaces the Romanian address on contracts). */}
+                {personal.domicileAbroad && (personal.domicileAbroad.address || personal.domicileAbroad.country) && (
+                  <>
+                    <Separator className="my-2" />
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Domiciliu în străinătate</p>
+                    <p className="text-sm font-medium">
+                      {[personal.domicileAbroad.address, personal.domicileAbroad.country].filter(Boolean).join(', ')}
+                    </p>
+                  </>
+                )}
+
                 {/* Address as separate labeled fields */}
                 {personal.address && typeof personal.address === 'object' && (
                   <>

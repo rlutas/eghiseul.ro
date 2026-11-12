@@ -4,6 +4,7 @@ import { generateDocument, idDocumentKindFrom, type DocumentContext, type Client
 import { downloadFile } from '@/lib/aws/s3';
 import mammoth from 'mammoth';
 import { formatPersonName } from '@/lib/format/person-name';
+import { resolveDomicile } from '@/lib/orders/domicile';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
 
 // Cache the company/lawyer signature PNGs (base64) — they almost never change,
@@ -142,7 +143,8 @@ export async function POST(request: NextRequest) {
     // când doar factura e pe firmă (comandă PF cu factura pe angajator).
     const isPJ = !!company.companyName || body.clientType === 'PJ';
 
-    const personalAddress = typeof personal.address === 'object' ? personal.address : undefined;
+    // Same rule as the generated contract: a domicile abroad wins.
+    const domicile = resolveDomicile(personal);
     const companyAddress = typeof company.address === 'object' ? company.address : undefined;
 
     const clientData: ClientData = {
@@ -153,7 +155,7 @@ export async function POST(request: NextRequest) {
       cui: company.cui || billing.cui || '',
       email: body.contact.email,
       phone: body.contact.phone || '',
-      address: formatAddress(personal.address),
+      address: domicile.text,
       ci_series: personal.documentSeries || '',
       id_document_type: idDocumentKindFrom(personal),
       ci_number: personal.documentNumber || '',
@@ -163,14 +165,7 @@ export async function POST(request: NextRequest) {
       company_reg: company.registrationNumber || '',
       company_address: formatAddress(company.address) || billing.companyAddress || '',
       is_pj: isPJ,
-      address_parts: personalAddress ? {
-        county: personalAddress.county, city: personalAddress.city,
-        sector: personalAddress.sector,
-        street: personalAddress.street, number: personalAddress.number,
-        building: personalAddress.building, staircase: personalAddress.staircase,
-        floor: personalAddress.floor, apartment: personalAddress.apartment,
-        postalCode: personalAddress.postalCode,
-      } : undefined,
+      address_parts: domicile.parts,
       company_address_parts: companyAddress ? {
         county: companyAddress.county, city: companyAddress.city,
         street: companyAddress.street, number: companyAddress.number,

@@ -26,28 +26,7 @@ import { isForeignBillingCountry } from '@/lib/orders/billing-validation';
 import { allocateNumber, getRegistryClient, formatRegistryNumber } from '@/lib/registry/client';
 import { brandForOrder } from '@/lib/brand/for-order';
 import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
-
-/**
- * Format an AddressState object (or string) into a human-readable Romanian address.
- */
-function formatAddress(address: unknown): string {
-  if (!address) return '';
-  if (typeof address === 'string') return address;
-  if (typeof address !== 'object') return '';
-
-  const a = address as Record<string, string>;
-  const parts: string[] = [];
-  if (a.street) parts.push(`Str. ${a.street}`);
-  if (a.number) parts.push(`Nr. ${a.number}`);
-  if (a.building) parts.push(`Bl. ${a.building}`);
-  if (a.staircase) parts.push(`Sc. ${a.staircase}`);
-  if (a.floor) parts.push(`Et. ${a.floor}`);
-  if (a.apartment) parts.push(`Ap. ${a.apartment}`);
-  if (a.city) parts.push(a.city);
-  if (a.county) parts.push(`Jud. ${a.county}`);
-  if (a.postalCode) parts.push(a.postalCode);
-  return parts.join(', ');
-}
+import { formatRomanianAddress as formatAddress, resolveDomicile } from '@/lib/orders/domicile';
 
 interface GenerateResult {
   template: string;
@@ -127,7 +106,8 @@ export async function autoGenerateOrderDocuments(
   const billingIsPJ = billing.type === 'persoana_juridica' || billing.source === 'company';
   const isPJ = usesBillingAsParty ? billingIsPJ : isPJForDocumentGeneration(cd);
 
-  const personalAddress = typeof personal.address === 'object' ? personal.address : undefined;
+  // A domicile abroad wins over the Romanian fields and has no structured parts.
+  const domicile = resolveDomicile(personal);
   const companyAddress = typeof company.address === 'object' ? company.address : undefined;
   // Flat billing address (street line + city + county + postal) → one string.
   // Foreign billing: append the country so contracts carry the full address.
@@ -156,7 +136,7 @@ export async function autoGenerateOrderDocuments(
     cui: company.cui || billing.cui || '',
     email: contact.email || '',
     phone: contact.phone || '',
-    address: formatAddress(personal.address) || billingAddressStr,
+    address: domicile.text || billingAddressStr,
     ci_series: personal.documentSeries || personal.ci_series || '',
     id_document_type: idDocumentKindFrom(personal),
     ci_number: personal.documentNumber || personal.ci_number || '',
@@ -209,22 +189,7 @@ export async function autoGenerateOrderDocuments(
     future_spouse_citizenship: civil.nationality || '',
     marriage_country: civil.countryOfUse || '',
     celibacy_purpose: civil.purpose || '',
-    address_parts: personalAddress ? {
-      county: personalAddress.county, city: personalAddress.city,
-      sector: personalAddress.sector,
-      street: personalAddress.street, number: personalAddress.number,
-      building: personalAddress.building, staircase: personalAddress.staircase,
-      floor: personalAddress.floor, apartment: personalAddress.apartment,
-      postalCode: personalAddress.postalCode,
-    } : (usesBillingAsParty && billing.address ? {
-      county: billing.county, city: billing.city,
-      street: billing.address, postalCode: billing.postalCode,
-    } : undefined),
-    company_address_parts: companyAddress ? {
-      county: companyAddress.county, city: companyAddress.city,
-      street: companyAddress.street, number: companyAddress.number,
-      building: companyAddress.building, apartment: companyAddress.apartment,
-    } : undefined,
+    address_parts: domicile.parts,
   };
 
   // Extract selected options from order

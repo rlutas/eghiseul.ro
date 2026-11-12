@@ -11,6 +11,7 @@ import { computeCerereItems } from '@/lib/documents/cerere-items';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
 import { canAllocateBarouNumbers } from '@/lib/documents/barou-allocation-gate';
 import { formatPersonName } from '@/lib/format/person-name';
+import { resolveDomicile } from '@/lib/orders/domicile';
 
 /**
  * Format an AddressState object (or string) into a human-readable Romanian address.
@@ -187,7 +188,8 @@ export async function POST(
       ? (billing?.type === 'persoana_juridica' || billing?.source === 'company')
       : isPJForDocumentGeneration(cd);
 
-    const personalAddress = typeof personal.address === 'object' ? personal.address : undefined;
+    // A domicile abroad wins over the Romanian fields and has no structured parts.
+    const domicile = resolveDomicile(personal);
     const companyAddress = typeof company.address === 'object' ? company.address : undefined;
 
     const clientData: ClientData = {
@@ -200,7 +202,7 @@ export async function POST(
       cui: company.cui || billing.cui || '',
       email: contact.email || '',
       phone: contact.phone || '',
-      address: formatAddress(personal.address),
+      address: domicile.text,
       ci_series: personal.documentSeries || personal.ci_series || '',
       id_document_type: idDocumentKindFrom(personal),
       ci_number: personal.documentNumber || personal.ci_number || '',
@@ -251,14 +253,7 @@ export async function POST(
       future_spouse_citizenship: civil.nationality || '',
       marriage_country: civil.countryOfUse || '',
       celibacy_purpose: civil.purpose || '',
-      address_parts: personalAddress ? {
-        county: personalAddress.county, city: personalAddress.city,
-        sector: personalAddress.sector,
-        street: personalAddress.street, number: personalAddress.number,
-        building: personalAddress.building, staircase: personalAddress.staircase,
-        floor: personalAddress.floor, apartment: personalAddress.apartment,
-        postalCode: personalAddress.postalCode,
-      } : undefined,
+      address_parts: domicile.parts,
       company_address_parts: companyAddress ? {
         county: companyAddress.county, city: companyAddress.city,
         street: companyAddress.street, number: companyAddress.number,
