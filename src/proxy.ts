@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
+import { isOrderPathBlockedOnHost } from '@/lib/brand/order-guard'
 
 /**
  * Cadavrele de WordPress: `/wp-admin/*`, `/wp-content/*`, `/wp-includes/*`,
@@ -45,6 +46,14 @@ export async function proxy(request: NextRequest) {
     BRAND_INTERNAL.test(request.nextUrl.pathname) &&
     !BRAND_STATIC_ICON.test(request.nextUrl.pathname)
   ) {
+    return new NextResponse(null, {
+      status: 404,
+      headers: { 'X-Robots-Tag': 'noindex' },
+    })
+  }
+  // A single-topic site takes orders only for what it sells — a real 404, not
+  // the streamed not-found the page falls back to (see order-guard.ts).
+  if (isOrderPathBlockedOnHost(request.headers.get('host'), request.nextUrl.pathname)) {
     return new NextResponse(null, {
       status: 404,
       headers: { 'X-Robots-Tag': 'noindex' },
