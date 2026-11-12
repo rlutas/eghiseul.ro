@@ -5,6 +5,8 @@
 | Data | Ce s-a întâmplat |
 |---|---|
 | 12.11.2026 | Site pregătit: 404 pe alte servicii, texte verificate. Text de cerere scris. |
+| 12.11.2026 | Cont creat de Raul: **933-520-0143** („cazierfiscal.com”), login `r.lutas@yahoo.com`, România, RON, profil de plăți existent EDIGITALIZARE SRL (7217-8703-9580), Visa ••0827, plată ulterioară, **fără cod de ofertă**. Verificat în cont: 0 campanii. |
+| 12.11.2026 | Formularul de certificare completat de Claude, opțiunea 4: domeniu `cazierfiscal.com`, descrierea de mai jos, contact Raul Lutas, firmă EDIGITALIZARE S.R.L., ID 933-520-0143. **Nebifate și netrimise:** garanția, declarația de veridicitate, „Next”. Le face Raul. |
 
 ## De ce pe cazierfiscal.com
 
@@ -39,7 +41,7 @@
 >
 > The tax record certificate shows whether a person has sanctions recorded under Romanian tax law (Government Ordinance 39/2015). It is not an identification number, a birth or death certificate, a business identifier, a passport, a visa, a driver licence, a vehicle registration or a road fee, and it is not the police criminal record certificate ("cazier judiciar"), which is a different document issued by the Police. We do not offer any of those on this domain: order pages for any other service return 404.
 >
-> No ads have run on this account. We are asking for the review before we create any campaign, because ads for the same service were disapproved under this policy on other accounts. We target keywords such as "cazier fiscal online" because that is the name of the service we sell.
+> No campaigns or ads have been created on this account. We are asking for the review before we create any campaign, because ads for the same service were disapproved under this policy on other accounts of our company. We would target keywords such as "cazier fiscal online" because that is the name of the service we sell.
 >
 > We ask you to confirm whether this service is outside the scope of the Government documents and services policy. If you consider it in scope, please tell us which listed category it falls under.
 
