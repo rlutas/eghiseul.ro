@@ -19,6 +19,10 @@ Acum, pe bannerul galben „Comandă neterminată”, la comenzile **În aștept
 Butonul nu apare la comenzile plătite (acolo folosiți „Modifică comandă”), la
 cele cu transfer bancar în așteptare și la comenzile telefonice.
 
+Tot de azi, linkurile copiate din pagina comenzii (plată, status) se deschid
+pe site-ul de pe care a venit comanda: documentero.ro pentru comenzile
+documentero, nu eghiseul.ro.
+
 Procedura: [Client blocat](../admin/ghid-echipa-ajutare-client-blocat.md).
 
 ---
@@ -58,9 +62,11 @@ deschisă e expirată, dar pagina creează alta la fiecare vizită.
 rulată local. Sesiunea Stripe veche nu a putut fi expirată de acolo (cheia
 locală e de test); expiră singură.
 
-**Găsit pe drum, nereparat:** butonul „Copiază link continuare” pe comenzile
-trimise construiește linkul de checkout din `window.location.origin` (adminul
-eghiseul), nu din brandul comenzii.
+**Linkuri pe brandul comenzii (reparat în aceeași zi).** „Copiază link
+continuare” pe comenzile trimise și „Copiază linkul de status” construiau
+linkul din `window.location.origin` (adminul rulează pe eghiseul.ro), deci o
+comandă documentero primea link pe eghiseul.ro. Acum folosesc
+`appBaseForOrder(order)`.
 
 Cronul `auto-abandon` (număra de la `created_at`) a fost reparat în aceeași zi:
 [auto-abandon de la trimitere](2026-11-12-auto-abandon-de-la-trimitere.md).

@@ -1,6 +1,7 @@
 'use client';
 
 import { classifyAttribution, CHANNEL_LABEL } from '@/lib/analytics/attribution-channel';
+import { appBaseForOrder } from '@/lib/brand/for-order';
 import { listUnbilledExtras } from '@/lib/accounting/extra-invoice-match';
 import { contentSource, PLACEMENT_LABEL } from '@/lib/analytics/content-attribution';
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
@@ -1119,7 +1120,7 @@ export default function AdminOrderDetailPage() {
                   title="Copiază linkul de status (pre-completat) pentru client"
                   className="inline-flex items-center gap-1 rounded border border-neutral-200 px-1.5 py-0.5 text-xs font-medium text-slate-600 hover:bg-slate-50"
                   onClick={async () => {
-                    const url = `${window.location.origin}/comanda/status/?order=${encodeURIComponent(order.friendly_order_id!)}&email=${encodeURIComponent((order.customer_data as AnyObj | null)?.contact?.email || '')}`;
+                    const url = `${appBaseForOrder(order as { platform?: string | null })}/comanda/status/?order=${encodeURIComponent(order.friendly_order_id!)}&email=${encodeURIComponent((order.customer_data as AnyObj | null)?.contact?.email || '')}`;
                     try {
                       await navigator.clipboard.writeText(url);
                       toast.success('Link status copiat');
@@ -6326,7 +6327,9 @@ function StuckClientBanner({ order, onChanged }: { order: OrderDetail; onChanged
 
   const copyResumeLink = async () => {
     if (order.status !== 'draft') {
-      const url = `${window.location.origin}/comanda/checkout/${order.id}`;
+      // The ORDER's brand, not the admin's host: a documentero order must get a
+      // documentero.ro link (E-261111-EMRB4 — the team got an eghiseul.ro one).
+      const url = `${appBaseForOrder(order as { platform?: string | null })}/comanda/checkout/${order.id}`;
       navigator.clipboard?.writeText(url);
       toast.success('Link de checkout copiat — trimite-l clientului');
       return;
