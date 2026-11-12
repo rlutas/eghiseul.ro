@@ -19,6 +19,9 @@ livrarea directă, cât și în formularul de depunere al topografului.
 topograf la depunere nu e trecut pe comandă: rândul de cost lipsește. Adăugați-l
 din cardul „Cost intern & marjă”: furnizor ANCPI, taxă instituție, 75 lei.
 
+**Taxa OCPI la „Actualizare adresă în CF” e 75 lei**, nu 60 cât apărea
+precompletat. Se schimbă din Setări, la serviciu, câmpul de taxă OCPI.
+
 ---
 
 ## Tehnic
@@ -34,6 +37,12 @@ din cardul „Cost intern & marjă”: furnizor ANCPI, taxă instituție, 75 lei
 
 **E-261031-68SFJ:** nota din 03.11 spune „Cost eliberare: 75.00 lei”, dar în
 `order_supplier_costs` nu există niciun rând pe comandă. Inserarea directă în
-bază a fost blocată de permisiuni; se adaugă din admin. Tariful informativ al
-serviciului `actualizare-adresa-cf` e 60 lei în `processing_config`; nu a fost
-schimbat, pentru că nu știm dacă 75 e taxa obișnuită sau un caz anume.
+bază a fost blocată de permisiuni; se adaugă din admin.
+
+**Tariful corect e 75 lei, nu 60.** Verificat după raportare: actualizarea
+adresei e codul 2.6.3 din Ordinul ANCPI („Actualizare informații tehnice”,
+75 lei / imobil, în `src/lib/ancpi/tarife-oficiale.ts`). În configurarea
+serviciului `actualizare-adresa-cf` e trecut 60, de aceea formularul
+topografului precompleta 60. Se corectează din Setări → servicii → taxa OCPI.
+Documentul încărcat de topograf pe 02.11 e o copie de carte funciară, nu are
+legătură cu diferența.
