@@ -1,7 +1,9 @@
 /**
  * POST /api/cron/auto-abandon
  *
- * Flip `status='pending'` orders older than 30 minutes to `status='abandoned'`.
+ * Flip `status='pending'` orders that have waited 30 minutes for payment to
+ * `status='abandoned'`. The clock starts at `submitted_at` (the moment the
+ * customer reached payment), not at `created_at` — see `abandon-due.ts`.
  * Inserts an `order_history` audit row per flipped order so the timeline
  * shows who/when (changed_by='system-cron'). Returns a summary count for
  * monitoring.
@@ -25,6 +27,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { hasProgressBeyondContact } from '@/lib/orders/abandoned-progress';
+import { isAbandonDue } from '@/lib/orders/abandon-due';
 
 const ABANDON_AFTER_MINUTES = 30;
 
@@ -84,9 +87,11 @@ export async function POST(request: NextRequest) {
     Date.now() - ABANDON_AFTER_MINUTES * 60 * 1000
   ).toISOString();
 
-  const { data: candidates, error: fetchError } = await supabase
+  // `created_at < cutoff` is only the coarse SQL filter (submitted_at is never
+  // earlier than created_at); the real test, on submitted_at, runs below.
+  const { data: fetched, error: fetchError } = await supabase
     .from('orders')
-    .select('id, order_number, friendly_order_id, created_at, customer_data')
+    .select('id, order_number, friendly_order_id, created_at, submitted_at, customer_data')
     .eq('status', 'pending')
     // Centură de siguranță pentru transferul bancar: acolo plata durează 1-3
     // zile lucrătoare, deci pragul de 30 de minute nu are ce căuta. Ruta
@@ -107,7 +112,10 @@ export async function POST(request: NextRequest) {
 
   const purgedDrafts = await purgeContactOnlyDrafts(supabase);
 
-  if (!candidates || candidates.length === 0) {
+  const nowMs = Date.now();
+  const candidates = (fetched ?? []).filter((o) => isAbandonDue(o, nowMs, ABANDON_AFTER_MINUTES));
+
+  if (candidates.length === 0) {
     return NextResponse.json({
       success: true,
       data: { abandonedCount: 0, purgedDrafts, processedAt: new Date().toISOString() },
@@ -115,14 +123,18 @@ export async function POST(request: NextRequest) {
   }
 
   // 3. Flip status in bulk.
-  const ids = candidates.map((o) => o.id);
-  const { error: updateError } = await supabase
+  // Guarded on the status: an order paid (or moved to bank transfer) between
+  // the read above and this write keeps its new status.
+  const { data: flipped, error: updateError } = await supabase
     .from('orders')
     .update({
       status: 'abandoned',
       updated_at: new Date().toISOString(),
     })
-    .in('id', ids);
+    .in('id', candidates.map((o) => o.id))
+    .eq('status', 'pending')
+    .neq('payment_status', 'awaiting_verification')
+    .select('id');
 
   if (updateError) {
     console.error('[auto-abandon] update failed:', updateError);
@@ -134,8 +146,15 @@ export async function POST(request: NextRequest) {
 
   // 4. Audit trail. One row per order so the order detail timeline shows the
   //    transition next to whatever the human admin will do later.
-  const historyRows = candidates.map((o) => ({
-    order_id: o.id,
+  const ids = (flipped ?? []).map((o) => o.id);
+  if (ids.length === 0) {
+    return NextResponse.json({
+      success: true,
+      data: { abandonedCount: 0, purgedDrafts, processedAt: new Date().toISOString() },
+    });
+  }
+  const historyRows = ids.map((id) => ({
+    order_id: id,
     event_type: 'abandoned' as const,
     changed_by: 'system-cron',
     new_value: { status: 'abandoned' },
@@ -178,12 +197,14 @@ export async function GET(request: NextRequest) {
   ).toISOString();
   const { data } = await supabase
     .from('orders')
-    .select('id, order_number, status, created_at')
+    .select('id, order_number, status, created_at, submitted_at')
     .eq('status', 'pending')
     .neq('payment_status', 'awaiting_verification')
     .lt('created_at', cutoffIso);
+  const nowMs = Date.now();
+  const due = (data ?? []).filter((o) => isAbandonDue(o, nowMs, ABANDON_AFTER_MINUTES));
   return NextResponse.json({
     success: true,
-    data: { thresholdMinutes: ABANDON_AFTER_MINUTES, cutoff: cutoffIso, candidates: data },
+    data: { thresholdMinutes: ABANDON_AFTER_MINUTES, cutoff: cutoffIso, candidates: due },
   });
 }

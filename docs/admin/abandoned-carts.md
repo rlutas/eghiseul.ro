@@ -44,7 +44,7 @@ Aceste comenzi rămâneau în `pending`/`draft` la nesfârșit și poluau lista 
 **Frecvență:** la fiecare 15 min (vercel.json)
 **Auth:** `Authorization: Bearer ${CRON_SECRET}`
 
-Caută comenzi `status='pending' AND created_at < NOW() - 30 min` și le flip-uiește la `status='abandoned'`. Inserează rând în `order_history` cu:
+Caută comenzi `status='pending'` trimise de peste 30 de minute (`submitted_at`, cu `created_at` ca rezervă) și le flip-uiește la `status='abandoned'`. Inserează rând în `order_history` cu:
 - `event_type: 'abandoned'`
 - `changed_by: 'system-cron'`
 - `notes: 'Auto-abandonat: nicio plată confirmată în 30 min'`

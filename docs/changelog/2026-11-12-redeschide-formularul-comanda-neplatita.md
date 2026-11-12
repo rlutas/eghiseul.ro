@@ -62,7 +62,5 @@ locală e de test); expiră singură.
 trimise construiește linkul de checkout din `window.location.origin` (adminul
 eghiseul), nu din brandul comenzii.
 
-**Tot nereparat:** cronul `auto-abandon` numără cele 30 de minute de
-la `created_at`, nu de la `submitted_at`. O ciornă începută dimineața și
-trimisă seara e marcată abandonată la primul cron (aici, după 6 minute).
-Orice comandă redeschisă cade în același caz la a doua trimitere.
+Cronul `auto-abandon` (număra de la `created_at`) a fost reparat în aceeași zi:
+[auto-abandon de la trimitere](2026-11-12-auto-abandon-de-la-trimitere.md).

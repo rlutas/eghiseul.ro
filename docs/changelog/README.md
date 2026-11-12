@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-12 | 🔴 **Auto-abandon: cele 30 de minute se numără de la trimitere** — `isAbandonDue()` pe `submitted_at` (era `created_at`), update condiționat de `status = 'pending'` | [2026-11-12-auto-abandon-de-la-trimitere.md](2026-11-12-auto-abandon-de-la-trimitere.md) |
 | 2026-11-12 | 🟣 **Admin: „Redeschide formularul” pe comenzile trimise și neplătite** — `POST /api/admin/orders/[id]/reopen-draft` (pending/abandoned → draft, sesiunea Stripe expirată, token de continuare 48h), `src/lib/orders/reopen-draft.ts` | [2026-11-12-redeschide-formularul-comanda-neplatita.md](2026-11-12-redeschide-formularul-comanda-neplatita.md) |
 | 2026-11-11 | 🟣 **certificat-constatator-express.ro: al patrulea brand (doar certificat constatator), live și indexabil** — rutare pe host, `orders.platform='constatator'` (migr. 205), admin filtru+badge, pagini legale proprii, prețuri din același rând `certificat-constatator`; fără Black Friday pe brand; GSC + Bing verificate | [2026-11-11-constatator-al-patrulea-brand.md](2026-11-11-constatator-al-patrulea-brand.md) |
 | 2026-11-11 | 🔴 **Emailurile documentero pierdute din 19.10 (domeniu scos din Resend); rezervă automată pe adresa eghiseul.ro cu numele brandului** — retry pe 403 „domain is not verified”, `fallbackFrom` | [2026-11-11-emailuri-documentero-domeniu-resend.md](2026-11-11-emailuri-documentero-domeniu-resend.md) |
