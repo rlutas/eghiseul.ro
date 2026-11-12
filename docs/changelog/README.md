@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-12 | 🔴 **documentero.ro: iconița corectă pe paginile de comandă** — rewrite pe host pentru `/icon.png` și `/apple-icon.png` (paginile din `(order)` emiteau scutul eghiseul) | [2026-11-12-documentero-favicon-pagini-comanda.md](2026-11-12-documentero-favicon-pagini-comanda.md) |
 | 2026-11-12 | 🔴 **Contract de asistență: documentul corect în fraza de durată** — „pe durata obținerii cazierului judiciar” era text fix în șablon; `{{DOCUMENT_GENITIV}}` din `contractDocumentGenitive(slug)`, 3 șabloane | [2026-11-12-contract-asistenta-document-corect.md](2026-11-12-contract-asistenta-document-corect.md) |
 | 2026-11-12 | 🔴 **Auto-abandon: cele 30 de minute se numără de la trimitere** — `isAbandonDue()` pe `submitted_at` (era `created_at`), update condiționat de `status = 'pending'` | [2026-11-12-auto-abandon-de-la-trimitere.md](2026-11-12-auto-abandon-de-la-trimitere.md) |
 | 2026-11-12 | 🟣 **Admin: „Redeschide formularul” pe comenzile trimise și neplătite** — `POST /api/admin/orders/[id]/reopen-draft` (pending/abandoned → draft, sesiunea Stripe expirată, token de continuare 48h), `src/lib/orders/reopen-draft.ts` | [2026-11-12-redeschide-formularul-comanda-neplatita.md](2026-11-12-redeschide-formularul-comanda-neplatita.md) |

@@ -99,6 +99,14 @@ const nextConfig: NextConfig = {
         // Browsers and crawlers that ignore <link rel="icon"> ask for
         // /favicon.ico; on this host it is documentero's, not eghiseul's.
         { source: '/favicon.ico', has: onDocumentero, destination: '/images/documentero/favicon.ico' },
+        // The shared order pages (wizard, checkout, status, cont) emit the ROOT
+        // icon links (/icon.png, /apple-icon.png = the eghiseul shield). On this
+        // host they must serve documentero's icon — same rule as the two
+        // brands below (reported 12.11.2026 on a /comanda/ continuation link).
+        { source: '/icon.png', has: onDocumentero, destination: '/images/documentero/icon.png' },
+        { source: '/apple-icon.png', has: onDocumentero, destination: '/images/documentero/apple-icon.png' },
+        { source: '/apple-touch-icon.png', has: onDocumentero, destination: '/images/documentero/apple-icon.png' },
+        { source: '/apple-touch-icon-precomposed.png', has: onDocumentero, destination: '/images/documentero/apple-icon.png' },
         {
           source: `/:path((?!(?:${SHARED})(?:/|$)).+)`,
           has: onDocumentero,
