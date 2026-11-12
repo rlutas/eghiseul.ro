@@ -5,6 +5,7 @@
  * /comanda/status/ pre-completat cu numărul comenzii + emailul.
  */
 
+import { SENDER_NOTE_MARKER } from '@/lib/email/resend';
 import { BRANDS, brandById, type Brand, type BrandId } from '@/lib/brand/brands';
 
 export interface OrderConfirmationEmailInput {
@@ -60,7 +61,7 @@ export function renderOrderConfirmationEmail(input: OrderConfirmationEmailInput)
         <p style="margin:22px 0 0;color:#94a3b8;font-size:12px;line-height:1.6;">Te ținem la curent pe email la fiecare pas important. Întrebări? Răspundem rapid pe <a href="${brand.baseUrl}/contact" style="color:${brand.emailHeaderBg};">WhatsApp (pagina de contact)</a> sau la <a href="mailto:${brand.contactEmail}" style="color:${brand.emailHeaderBg};">${brand.contactEmail}</a>.</p>
       </td></tr>
       <tr><td style="background:#f8fafc;border-top:1px solid #e2e8f0;padding:16px 28px;">
-        <p style="margin:0;color:#94a3b8;font-size:11px;line-height:1.6;">${esc(brand.legalTagline)}</p>
+        <p style="margin:0;color:#94a3b8;font-size:11px;line-height:1.6;">${esc(brand.legalTagline)}</p>${brand.id === 'eghiseul' ? '' : SENDER_NOTE_MARKER}
       </td></tr>
     </table>
   </td></tr></table>

@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-12 | ✅ **Emailurile de brand explică adresa @eghiseul.ro** — `applySenderNote()` în `sendEmail`: o linie în footer când un brand trimite de pe alt domeniu (limita de domenii Resend) | [2026-11-12-email-brand-nota-expeditor.md](2026-11-12-email-brand-nota-expeditor.md) |
 | 2026-11-12 | 🔴 **Site-urile de nișă iau comenzi doar pentru serviciul lor** — `/comanda/[service]` răspunde 404 când `brandSellsService()` e fals (cazierfiscal.com deschidea formularul de cazier judiciar, naștere, constatator) | [2026-11-12-site-uri-de-nisa-doar-serviciul-lor.md](2026-11-12-site-uri-de-nisa-doar-serviciul-lor.md) |
 | 2026-11-12 | 🔴 **Previzualizarea contractului: „pașaportul”, nu „CI”** — `ContractPreview` trimite `idDocumentType` / `documentType` la `/api/contracts/preview` | [2026-11-12-previzualizare-contract-pasaport.md](2026-11-12-previzualizare-contract-pasaport.md) |
 | 2026-11-12 | 🔴 **Admin: căutarea de comenzi găsește ciornele, numele complet și firmele** — `applyOrderSearch()` comun listă + contoare, un `or()` pe cuvânt, „Toate” fără `HIDDEN_FROM_DEFAULT` la căutare, răspunsuri vechi ignorate | [2026-11-12-cautare-comenzi-admin.md](2026-11-12-cautare-comenzi-admin.md) |

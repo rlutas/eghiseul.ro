@@ -65,6 +65,30 @@ export function fallbackFrom(from: string): string {
   return name ? `${name} <${addr}>` : FROM_DEFAULT;
 }
 
+/**
+ * Where a brand email may explain its sender. The shells print this marker in
+ * the legal footer; `applySenderNote` turns it into one line — or removes it.
+ *
+ * Why: a documentero / cazierfiscal / constatator email carries that brand's
+ * logo and colors, but when the brand's domain is not verified in Resend it
+ * leaves from an @eghiseul.ro address. A brand name on another site's address
+ * reads like phishing; one honest line says who is sending (Raul, 12.11.2026).
+ * When the email does leave from the brand's own domain, nothing is added.
+ */
+export const SENDER_NOTE_MARKER = '<!--sender-note-->';
+
+export function applySenderNote(html: string, requestedFrom: string | undefined, actualFrom: string): string {
+  if (!html.includes(SENDER_NOTE_MARKER)) return html;
+  const requestedDomain = requestedFrom ? domainOf(requestedFrom) : '';
+  const actualDomain = domainOf(actualFrom);
+  const brand = Object.values(BRANDS).find((b) => b.domain === requestedDomain);
+  const viaOtherDomain = !!brand && !!actualDomain && actualDomain !== requestedDomain;
+  const note = viaOtherDomain
+    ? `<p style="margin:8px 0 0;color:#94a3b8;font-size:11px;line-height:1.6;">Email trimis prin eGhișeul.ro, platforma eDigitalizare SRL care operează și ${brand!.name}. De aceea adresa expeditorului este @${actualDomain}.</p>`
+    : '';
+  return html.replaceAll(SENDER_NOTE_MARKER, note);
+}
+
 /** The `from` Resend will accept: the requested one when its domain is verified, else the brand name on the default address. */
 export function resolveFrom(from: string | undefined): string {
   if (!from) return FROM_DEFAULT;
@@ -132,7 +156,7 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
     from,
     to: [input.to],
     subject: input.subject,
-    html: input.html,
+    html: applySenderNote(input.html, input.from, from),
     ...(input.text ? { text: input.text } : {}),
     // Reply-To follows the brand the caller asked for, even when the address
     // had to fall back to the default domain.
@@ -166,7 +190,7 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
       const retry = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: retryHeaders,
-        body: JSON.stringify({ ...body, from: retryFrom }),
+        body: JSON.stringify({ ...body, from: retryFrom, html: applySenderNote(input.html, input.from, retryFrom) }),
       });
       if (!retry.ok) throw new ResendError(retry.status, await retry.text());
       const data = (await retry.json()) as { id?: string };
