@@ -1212,7 +1212,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                 </span>
               </div>
               <p className="text-xs text-neutral-500 mt-2">
-                JPG, PNG sau PDF, max 10MB
+                JPG sau PNG, max 10MB; PDF, max 1,5MB
               </p>
             </div>
           </div>
