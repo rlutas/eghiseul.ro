@@ -174,6 +174,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     total_price: Number(orderRow.total_price ?? 0),
     base_price: Number(orderRow.base_price ?? 0),
     delivery_price: Number(orderRow.delivery_price ?? 0),
+    discount_amount: Number(orderRow.discount_amount ?? 0),
     refunded_amount: Number(orderRow.refunded_amount ?? 0),
     additional_paid_amount: Number(orderRow.additional_paid_amount ?? 0),
     selected_options: (orderRow.selected_options as OrderForDiff['selected_options']) ?? [],

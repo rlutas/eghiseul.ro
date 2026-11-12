@@ -399,3 +399,50 @@ describe('sharedApostilleCountry — Haga + Notari au o singură țară (E-26091
     expect(sharedApostilleCountry([{ code: 'apostila_notari' }, { code: 'traducere', metadata: { language: 'Engleză (UK)' } }] as never)).toBe('');
   });
 });
+
+describe('computeModifyDiff — comandă cumpărată cu cupon', () => {
+  // E-261111-ZHVGM: cazier judiciar 198 + urgență 80, Black Friday −39,60 pe
+  // bază, plătit 238,40. Echipa adaugă traducere + legalizare.
+  const withCoupon: OrderForDiff = {
+    base_price: 198,
+    delivery_price: 0,
+    discount_amount: 39.6,
+    total_price: 238.4,
+    refunded_amount: 0,
+    additional_paid_amount: 0,
+    selected_options: [URGENTA],
+  };
+  const LEGALIZARE: OrderOptionForDiff = { code: 'legalizare', priceModifier: 99, quantity: 1 };
+
+  it('opțiunile adăugate se taxează la preț de listă; reducerea nu se ia înapoi', () => {
+    const d = computeModifyDiff(withCoupon, { selectedOptions: [URGENTA, TRADUCERE, LEGALIZARE] });
+    expect(d.diff).toBe(277.5); // 178,50 + 99 — înainte ieșea 317,10 (+39,60)
+    expect(d.action).toBe('extra_payment');
+    expect(d.discount).toBe(39.6);
+    expect(d.newTotal).toBe(515.9);
+  });
+
+  it('fără nicio schimbare → niciun ban nu se mișcă', () => {
+    const d = computeModifyDiff(withCoupon, { selectedOptions: [URGENTA] });
+    expect(d.diff).toBe(0);
+    expect(d.action).toBe('none');
+  });
+
+  it('opțiune scoasă → se returnează exact prețul ei', () => {
+    const d = computeModifyDiff(withCoupon, { selectedOptions: [] });
+    expect(d.diff).toBe(-80);
+    expect(d.action).toBe('refund');
+  });
+
+  it('comandă fără cupon → calculul rămâne cel vechi', () => {
+    const d = computeModifyDiff({ ...withCoupon, discount_amount: 0, total_price: 278 }, { selectedOptions: [URGENTA, TRADUCERE] });
+    expect(d.diff).toBe(178.5);
+    expect(d.discount).toBe(0);
+  });
+
+  it('reducerea nu poate depăși noul subtotal', () => {
+    const d = computeModifyDiff({ ...withCoupon, base_price: 10, discount_amount: 39.6, total_price: 50.4 }, { selectedOptions: [] });
+    expect(d.newTotal).toBe(0);
+    expect(d.discount).toBe(10);
+  });
+});

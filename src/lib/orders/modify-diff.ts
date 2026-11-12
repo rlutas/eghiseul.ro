@@ -33,6 +33,13 @@ export interface OrderForDiff {
   total_price: number;
   base_price: number;
   delivery_price: number;
+  /**
+   * Coupon discount granted at purchase (RON), `orders.discount_amount`.
+   * `total_price` is already net of it, so the new total must be too —
+   * otherwise adding an option charges the discount back (E-261111-ZHVGM,
+   * 12.11.2026: Black Friday −39,60 lei, link de plată 317,10 în loc de 277,50).
+   */
+  discount_amount?: number | null;
   /** Cumulative RON refunded so far via previous Modify cycles. */
   refunded_amount?: number | null;
   /** Cumulative RON paid AFTER the original capture (extra-payment flow). */
@@ -62,8 +69,10 @@ export interface ModifyChanges {
 }
 
 export interface DiffResult {
-  /** New computed total (RON). */
+  /** New computed total (RON), net of the coupon discount. */
   newTotal: number;
+  /** Coupon discount kept from the original purchase (RON). */
+  discount: number;
   /** What the customer has effectively paid right now (RON). */
   currentNetPaid: number;
   /** Original total at order creation (RON) — for display. */
@@ -95,8 +104,12 @@ export function computeModifyDiff(order: OrderForDiff, changes: ModifyChanges): 
   const newOptionsSum = sumOptions(changes.selectedOptions);
   const newDelivery = changes.deliveryPrice ?? Number(order.delivery_price ?? 0);
   const customExtraPrice = changes.customExtra ? Number(changes.customExtra.price) : 0;
-  const newTotal =
-    Math.round((basePrice + newOptionsSum + customExtraPrice + newDelivery) * 100) / 100;
+  const newSubtotal = basePrice + newOptionsSum + customExtraPrice + newDelivery;
+  // The discount is the RON amount the customer already got, kept as it was:
+  // options added later are charged at list price, and the discount is not
+  // taken back. Capped at the new subtotal so a total never goes negative.
+  const discount = Math.round(Math.min(Math.max(0, Number(order.discount_amount ?? 0)), newSubtotal) * 100) / 100;
+  const newTotal = Math.round((newSubtotal - discount) * 100) / 100;
 
   const refunded = Number(order.refunded_amount ?? 0);
   const additionalPaid = Number(order.additional_paid_amount ?? 0);
@@ -115,6 +128,7 @@ export function computeModifyDiff(order: OrderForDiff, changes: ModifyChanges): 
 
   return {
     newTotal,
+    discount,
     currentNetPaid,
     originalTotal,
     refunded,
