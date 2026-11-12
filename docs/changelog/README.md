@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-12 | 🔴 **Site-urile de nișă iau comenzi doar pentru serviciul lor** — `/comanda/[service]` răspunde 404 când `brandSellsService()` e fals (cazierfiscal.com deschidea formularul de cazier judiciar, naștere, constatator) | [2026-11-12-site-uri-de-nisa-doar-serviciul-lor.md](2026-11-12-site-uri-de-nisa-doar-serviciul-lor.md) |
 | 2026-11-12 | 🔴 **Previzualizarea contractului: „pașaportul”, nu „CI”** — `ContractPreview` trimite `idDocumentType` / `documentType` la `/api/contracts/preview` | [2026-11-12-previzualizare-contract-pasaport.md](2026-11-12-previzualizare-contract-pasaport.md) |
 | 2026-11-12 | 🔴 **Admin: căutarea de comenzi găsește ciornele, numele complet și firmele** — `applyOrderSearch()` comun listă + contoare, un `or()` pe cuvânt, „Toate” fără `HIDDEN_FROM_DEFAULT` la căutare, răspunsuri vechi ignorate | [2026-11-12-cautare-comenzi-admin.md](2026-11-12-cautare-comenzi-admin.md) |
 | 2026-11-12 | 🟣 **Portal colaborator: rubrici „CF 1, CF 2” la comenzile cu mai multe imobile** — `imobileForWork()` citește și `property.additionalImobile`; avertisment în „Date pentru lucrare”, etichetă „N CF” în listă | [2026-11-12-colaborator-mai-multe-cf-uri.md](2026-11-12-colaborator-mai-multe-cf-uri.md) |

@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { brandSellsService } from '@/lib/brand/brands';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { createPublicClient } from '@/lib/supabase/public';
@@ -90,6 +91,15 @@ export default async function OrderPage({ params, searchParams }: OrderPageProps
   const serviceData = await getService(serviceSlug);
 
   if (!serviceData) {
+    notFound();
+  }
+
+  // A single-topic brand takes orders only for what it sells. The shared
+  // wizard used to open ANY service on ANY host, so cazierfiscal.com/comanda/
+  // cazier-judiciar-persoana-fizica/ (or …/certificat-constatator/) answered
+  // 200 — a site that says it sells one document was able to sell them all.
+  // eghiseul.ro sells everything, so nothing changes there.
+  if (!brandSellsService(await getBrand(), serviceData.service.slug)) {
     notFound();
   }
 
