@@ -142,6 +142,20 @@ function asksDomicileAbroad(kyc: { citizenship?: string; idDocumentType?: string
   return !!kyc && kyc.citizenship === 'romanian' && kyc.idDocumentType !== 'ci_vechi' && kyc.idDocumentType !== 'ci_nou';
 }
 
+/**
+ * Romanian citizen who sees the address section and has not chosen a domicile
+ * abroad. Phone orders are typed by the team, who may not have the address yet.
+ */
+function needsRomanianAddress(
+  kyc: { citizenship?: string; idDocumentType?: string | null; domicileAbroad?: unknown } | null | undefined,
+  requireAddressCertificate: string | undefined,
+  phoneMode: boolean
+): boolean {
+  if (!kyc || kyc.citizenship !== 'romanian' || phoneMode) return false;
+  if (requireAddressCertificate === 'never') return false; // section hidden
+  return !(asksDomicileAbroad(kyc) && kyc.domicileAbroad);
+}
+
 interface ScanState {
   scanning: boolean;
   progress: number;
@@ -897,7 +911,16 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       } else {
         // Living abroad → require foreign address text + country picked.
         if (!personalKyc.foreignData?.foreignAddress?.trim()) return false;
+        if (!personalKyc.foreignData?.domicileCountry) return false;
       }
+    }
+
+    // Romanian citizen, address section shown, domicile in Romania: the
+    // fields carry an asterisk, so they are required. Left empty, the contract
+    // had no domicile at all.
+    // Street is not required: many village addresses have none (only a number).
+    if (needsRomanianAddress(personalKyc, config?.requireAddressCertificate, phoneMode)) {
+      if (!personalKyc.address?.city?.trim() || !personalKyc.address?.county?.trim()) return false;
     }
 
     return true;
@@ -945,7 +968,15 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       const hasRoAddr = personalKyc.foreignData?.hasRomanianAddress ?? true;
       if (hasRoAddr) {
         if (!personalKyc.address?.street?.trim() || !personalKyc.address?.city?.trim() || !personalKyc.address?.county?.trim()) m.push('Adresa de domiciliu');
-      } else if (!personalKyc.foreignData?.foreignAddress?.trim()) m.push('Adresa din străinătate');
+      } else {
+        if (!personalKyc.foreignData?.domicileCountry) m.push('Țara de domiciliu');
+        if (!personalKyc.foreignData?.foreignAddress?.trim()) m.push('Adresa din străinătate');
+      }
+    }
+    if (needsRomanianAddress(personalKyc, config?.requireAddressCertificate, phoneMode)) {
+      if (!personalKyc.address?.city?.trim() || !personalKyc.address?.county?.trim()) {
+        m.push('Adresa de domiciliu (județ și localitate)');
+      }
     }
     return m;
   }, [personalKyc, config, skipsIdScan, phoneMode, mode]);
@@ -2140,6 +2171,8 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                           hasRomanianAddress: opt.value,
                           foreignAddress:
                             personalKyc.foreignData?.foreignAddress,
+                          domicileCountry:
+                            personalKyc.foreignData?.domicileCountry,
                         },
                       })
                     }
@@ -2173,15 +2206,18 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                 </Label>
                 <select
                   id="foreignCountry"
-                  value={personalKyc.foreignData?.birthCountry || ''}
+                  value={personalKyc.foreignData?.domicileCountry || ''}
                   onChange={(e) =>
                     updatePersonalKyc({
                       foreignData: {
                         birthCity: personalKyc.foreignData?.birthCity || '',
-                        birthCountry: e.target.value,
+                        // The country of birth stays what it was: this select
+                        // used to write over it.
+                        birthCountry: personalKyc.foreignData?.birthCountry || '',
                         hasRomanianAddress: false,
                         foreignAddress:
                           personalKyc.foreignData?.foreignAddress,
+                        domicileCountry: e.target.value,
                       },
                     })
                   }
@@ -2217,6 +2253,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                           personalKyc.foreignData?.birthCountry || '',
                         hasRomanianAddress: false,
                         foreignAddress: e.target.value,
+                        domicileCountry: personalKyc.foreignData?.domicileCountry,
                       },
                     })
                   }

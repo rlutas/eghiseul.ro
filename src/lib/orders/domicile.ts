@@ -7,8 +7,8 @@
  * (E-261112-7A93Y, 12.11.2026). `personal.domicileAbroad` holds the country and
  * the address as free text; when present it wins over the Romanian fields.
  *
- * Foreign citizens keep their own fields (`personal.foreignData`); this helper
- * does not read them.
+ * Foreign citizens have their own fields (`personal.foreignData.foreignAddress`
+ * + `domicileCountry`); the same rule applies when they have no Romanian domicile.
  */
 
 export interface DomicileAbroad {
@@ -78,6 +78,15 @@ export function formatRomanianAddress(address: unknown): string {
 export function resolveDomicile(personal: unknown): Domicile {
   const abroad = domicileAbroadOf(personal);
   if (abroad) return { abroad: true, text: formatDomicileAbroad(abroad) };
+
+  // Foreign citizen who answered „no Romanian domicile": free text + country.
+  const foreign = (personal as { foreignData?: { hasRomanianAddress?: boolean; foreignAddress?: string; domicileCountry?: string } } | null | undefined)?.foreignData;
+  if (foreign?.hasRomanianAddress === false && foreign.foreignAddress?.trim()) {
+    return {
+      abroad: true,
+      text: formatDomicileAbroad({ country: (foreign.domicileCountry || '').trim(), address: foreign.foreignAddress.trim() }),
+    };
+  }
 
   const address = (personal as { address?: unknown } | null | undefined)?.address;
   if (address && typeof address === 'object') {

@@ -40,6 +40,4 @@ Comanda E-261112-7A93Y (certificat de celibat, pașaport cu domiciliul în Spani
 ## Limite cunoscute
 
 - Cererea ANAF pentru cazier fiscal (PDF cu câmpuri) rămâne fără adresă la domiciliu în străinătate: formularul are doar câmpuri românești.
-- Facturarea nu se precompletează cu adresa din străinătate; clientul o completează la pasul de facturare, ca până acum.
-- La cetățenii străini, câmpul „Țara de domiciliu" scrie peste țara nașterii (`foreignData.birthCountry`), iar adresa lor din străinătate nu ajunge pe contract. Problemă veche, neatinsă aici.
-- La adresă lăsată goală contractul nu tipărește deloc domiciliul. Comportament vechi, păstrat.
+- Cele trei probleme vechi notate aici la început au fost reparate în aceeași zi: vezi [adresa de domiciliu obligatorie și țara de domiciliu](2026-11-12-adresa-domiciliu-obligatorie-tara-domiciliu.md).

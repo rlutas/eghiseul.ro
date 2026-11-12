@@ -41,9 +41,22 @@ describe('resolveDomicile', () => {
     expect(resolveDomicile(null).text).toBe('');
   });
 
-  it('does not read the foreign-citizen fields', () => {
+  it('prints a foreign citizen\'s address abroad with the country of domicile, not of birth', () => {
+    const d = resolveDomicile({
+      foreignData: { hasRomanianAddress: false, foreignAddress: 'Rue de Rivoli 1, Paris', birthCountry: 'Maroc', domicileCountry: 'Franța' },
+    });
+    expect(d).toEqual({ abroad: true, text: 'Rue de Rivoli 1, Paris, Franța' });
+  });
+
+  it('prints only the address for older orders, where the country of domicile was not stored', () => {
     const d = resolveDomicile({ foreignData: { hasRomanianAddress: false, foreignAddress: 'Rue 1, Paris', birthCountry: 'Franța' } });
-    expect(d).toEqual({ abroad: false, text: '' });
+    expect(d).toEqual({ abroad: true, text: 'Rue 1, Paris' });
+  });
+
+  it('keeps the Romanian address of a foreign citizen who lives in Romania', () => {
+    const d = resolveDomicile({ address: romanian, foreignData: { hasRomanianAddress: true, foreignAddress: 'veche' } });
+    expect(d.abroad).toBe(false);
+    expect(d.parts?.county).toBe('Cluj');
   });
 });
 

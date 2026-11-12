@@ -121,6 +121,15 @@ nașterii, părinții și adresa din act. După salvare, **regenerați cererea �
 împuternicirea**, pentru că cele generate au datele vechi. Factura emisă nu se
 schimbă de aici: datele de facturare se corectează în Oblio.
 
+**Domiciliu în străinătate** (din 12.11.2026): clientul cu pașaport, sau care
+completează manual, răspunde la „Domiciliul tău este în România?”. La „Nu”
+alege țara și scrie adresa de acolo, iar aici apare rândul **„Domiciliu în
+străinătate”**. Contractul, împuternicirea și cererea tipăresc acea adresă.
+Butonul „Corectează datele clientului” schimbă doar adresa din România; dacă
+trebuie pus un domiciliu din străinătate pe o comandă deja plătită, scrieți-i
+lui Raul. Cei cu buletin nu văd întrebarea. Detalii:
+[domiciliu în străinătate pe contract](../changelog/2026-11-12-domiciliu-in-strainatate-pe-contract.md).
+
 Pe comenzile neterminate: banner galben cu **„Copiază link continuare”**
 (link special, 48 de ore, îl duce la pasul lui cu datele lui, merge și fără
 email) și **pasul unde s-a oprit**. Tot acolo e **„Finalizează ca comandă
@@ -159,6 +168,12 @@ Notele interne rămân în „Note Echipă”. Detalii: [Mesajele cu clientul](m
 ## Documente încărcate de client
 
 Actul față / spate, selfie, permisul, cu previzualizare și OCR-ul citit.
+
+Dacă clientul a încărcat actul ca **PDF mare** (peste 1,5 MB), aici vedeți o
+**poză** (JPG): PDF-ul a fost transformat în poză pe dispozitivul lui. La PDF
+cu mai multe pagini intră doar primele două, una sub alta. Dacă actul nu se
+vede, folosiți **Solicită documente** și cereți o poză. Detalii:
+[act ca PDF până la 10 MB](../changelog/2026-11-12-pdf-act-identitate-pana-la-10mb.md).
 
 - **Marchează verificat**: notează cine și când a verificat actele (chip „Verificat de … la …”, cu **Retrage**). Nu schimbă statusul; e urma voastră.
 - **Solicită documente**: bifați ce lipsește (act față / verso / selfie / altele) + motivul; clientul primește email cu link; comanda intră singură în „Așteptare client” și iese singură când a încărcat tot. Cardul de progres arată ✓ pe fiecare fișier; de acolo copiați linkul sau îl trimiteți pe **WhatsApp**. Clientul confirmă întâi emailul comenzii; nu semnează și nu plătește din nou.

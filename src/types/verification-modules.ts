@@ -413,6 +413,8 @@ export interface PersonalKYCState {
     birthCountry: string;
     hasRomanianAddress: boolean;
     foreignAddress?: string;
+    /** Country of the address abroad. Until 12.11.2026 the select wrote over `birthCountry`. */
+    domicileCountry?: string;
   };
 
   // Parent data

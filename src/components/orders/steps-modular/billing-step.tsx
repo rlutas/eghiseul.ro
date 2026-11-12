@@ -40,6 +40,7 @@ import { billingLocalityOptions } from '@/lib/orders/billing-locality';
 import { savedPfBillingPrefill } from '@/lib/wizard/saved-billing-profile';
 import { isBucharestCounty, formatSector } from '@/lib/oblio/address';
 import { COUNTRIES as WORLD_COUNTRIES } from '@/config/countries';
+import { domicileAbroadOf } from '@/lib/orders/domicile';
 import { SearchableSelect } from '@/components/shared/SearchableSelect';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { BillingSource, BillingState } from '@/types/verification-modules';
@@ -277,10 +278,22 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   // Address is kept STRUCTURED — Oblio needs street/locality/county separately.
   // Passport holders have no address on the document, so these come back empty
   // and the customer fills them in (the fields are editable, see below).
-  const prefillFromId = useMemo(() => personalKyc ? {
+  const prefillFromId = useMemo(() => personalKyc ? (domicileAbroadOf(personalKyc) ? {
+    // Domiciled abroad: the invoice starts from that country and address;
+    // the customer adds the locality.
     firstName: personalKyc.firstName,
     lastName: personalKyc.lastName,
     cnp: personalKyc.cnp,
+    address: domicileAbroadOf(personalKyc)!.address,
+    city: '',
+    county: '',
+    postalCode: '',
+    country: domicileAbroadOf(personalKyc)!.country || 'Romania',
+  } : {
+    firstName: personalKyc.firstName,
+    lastName: personalKyc.lastName,
+    cnp: personalKyc.cnp,
+    country: 'Romania',
     address: [
       personalKyc.address?.street,
       personalKyc.address?.number ? `Nr. ${personalKyc.address.number}` : null,
@@ -300,7 +313,8 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
     county: findCounty(personalKyc.address?.county)?.name || '',
     postalCode: personalKyc.address?.postalCode || '',
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  } : undefined, [
+  }) : undefined, [
+    personalKyc?.domicileAbroad?.country, personalKyc?.domicileAbroad?.address,
     personalKyc?.firstName, personalKyc?.lastName, personalKyc?.cnp,
     personalKyc?.address?.street, personalKyc?.address?.number,
     personalKyc?.address?.building, personalKyc?.address?.apartment,
@@ -399,7 +413,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         city: prefillFromId.city,
         county: prefillFromId.county,
         postalCode: prefillFromId.postalCode,
-        country: 'Romania',
+        country: prefillFromId.country,
         type: 'persoana_fizica',
         isValid: isPfBillingComplete({
           firstName: prefillFromId.firstName,
@@ -408,6 +422,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
           address: prefillFromId.address,
           city: prefillFromId.city,
           county: prefillFromId.county,
+          country: prefillFromId.country,
         }),
       });
     }
@@ -534,7 +549,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         city: prefillFromId?.city || '',
         county: prefillFromId?.county || '',
         postalCode: prefillFromId?.postalCode || '',
-        country: 'Romania',
+        country: prefillFromId?.country || 'Romania',
         // Clear company fields
         companyName: undefined,
         cui: undefined,
@@ -548,6 +563,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
           address: prefillFromId?.address,
           city: prefillFromId?.city,
           county: prefillFromId?.county,
+          country: prefillFromId?.country,
         }),
       });
       setUsedSavedPfProfile(false);

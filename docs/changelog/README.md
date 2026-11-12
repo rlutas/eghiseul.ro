@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-12 | 🔴 **Adresa de domiciliu: obligatorie, țara corectă, dusă în facturare** — `needsRomanianAddress()` (județ + localitate), `foreignData.domicileCountry` în loc de scriere peste `birthCountry`, `resolveDomicile()` citește și adresa cetățeanului străin, `prefillFromId` din `domicileAbroad` | [2026-11-12-adresa-domiciliu-obligatorie-tara-domiciliu.md](2026-11-12-adresa-domiciliu-obligatorie-tara-domiciliu.md) |
 | 2026-11-12 | 🟣 **Domiciliu în străinătate pe contract** — `resolveDomicile()` + `personal.domicileAbroad` (țară + adresă), întrebare nouă la „Date Personale” pentru pașaport; contract, previzualizare și generare din admin pe aceeași regulă (E-261112-7A93Y) | [2026-11-12-domiciliu-in-strainatate-pe-contract.md](2026-11-12-domiciliu-in-strainatate-pe-contract.md) |
 | 2026-11-12 | 🟣 **Actul de identitate ca PDF: acceptat până la 10 MB** — `prepareIdPdfForUpload()` + `renderPdfToImage()` (pdf.js 5.7.284, primele 2 pagini → JPEG sub 900 KB, în browser); RO CEI rămâne PDF | [2026-11-12-pdf-act-identitate-pana-la-10mb.md](2026-11-12-pdf-act-identitate-pana-la-10mb.md) |
 | 2026-11-12 | 🔴 **Scanarea actului: limita de PDF afișată corect** — textul din `PersonalDataStep` promitea 10 MB și pentru PDF, `readPdfForUpload()` refuză peste 1,5 MB (E-261112-7A93Y) | [2026-11-12-scanare-act-limita-pdf-afisata-corect.md](2026-11-12-scanare-act-limita-pdf-afisata-corect.md) |

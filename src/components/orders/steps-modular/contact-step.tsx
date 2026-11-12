@@ -350,6 +350,8 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
                         state.personalKyc?.foreignData?.hasRomanianAddress ?? true,
                       foreignAddress:
                         state.personalKyc?.foreignData?.foreignAddress,
+                      domicileCountry:
+                        state.personalKyc?.foreignData?.domicileCountry,
                     },
                   });
                 }}
@@ -498,6 +500,8 @@ export function ContactStepModular({ onValidChange }: ContactStepProps) {
                         state.personalKyc?.foreignData?.hasRomanianAddress ?? true,
                       foreignAddress:
                         state.personalKyc?.foreignData?.foreignAddress,
+                      domicileCountry:
+                        state.personalKyc?.foreignData?.domicileCountry,
                     },
                   });
                 }}
