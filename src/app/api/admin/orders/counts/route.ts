@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { applyOrderSearch, orderSearchTerms } from '@/lib/admin/order-search';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
@@ -85,11 +86,8 @@ export async function GET(request: NextRequest) {
       if (testFilter === 'only') q = q.eq('is_test', true);
       if (platform) q = q.eq('platform', platform);
       if (service) q = q.eq('service_id', service);
-      if (search) {
-        q = q.or(
-          `order_number.ilike.%${search}%,friendly_order_id.ilike.%${search}%,delivery_tracking_number.ilike.%${search}%,customer_data->contact->>email.ilike.%${search}%`
-        );
-      }
+      // Same matcher as the list — the tab badge and the rows must agree.
+      q = applyOrderSearch(q, search);
       return q;
     };
 
@@ -101,7 +99,8 @@ export async function GET(request: NextRequest) {
       stageReadyRes,
     ] =
       await Promise.all([
-        buildQuery().not('status', 'in', hiddenList),
+        // With a search, „Toate" counts every status — the list does the same.
+        orderSearchTerms(search).length > 0 ? buildQuery() : buildQuery().not('status', 'in', hiddenList),
         // „Așteptare plată" — transfer bancar ales, încasare neconfirmată
         // (inclusiv comenzile pornite pe dovadă, deja „În procesare").
         applyStatusFilter(buildQuery(), resolveStatusFilter('awaiting_payment')),

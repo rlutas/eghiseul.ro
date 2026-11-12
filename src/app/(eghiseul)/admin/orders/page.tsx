@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { onrcAutomationBadge } from '@/lib/onrc/automation-badge';
@@ -224,13 +224,22 @@ export default function AdminOrdersPage() {
     return params.toString();
   }, [urlStatus, urlService, urlSearch, urlQuick, urlTest, urlPlatform, urlPage, urlIncludeRecovery]);
 
+  // Only the LATEST request may paint the table: while typing, an older and
+  // slower answer used to land after the newer one and overwrite it (the list
+  // showed results for a search you had already changed).
+  const fetchSeqRef = useRef(0);
   const fetchOrders = useCallback(async () => {
+    const seq = ++fetchSeqRef.current;
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/orders/list?${buildQuery()}`);
       const json = await res.json();
+      if (seq !== fetchSeqRef.current) return;
       if (!res.ok || !json.success) {
         console.error('Error fetching orders:', json.error);
+        // Never leave the previous search's rows under a new search box value.
+        setOrders([]);
+        setTotalCount(0);
         return;
       }
       const typedOrders = (json.data || []).map((row: Record<string, unknown>) => ({
@@ -246,7 +255,7 @@ export default function AdminOrdersPage() {
     } catch (err) {
       console.error('Failed to fetch orders:', err);
     } finally {
-      setLoading(false);
+      if (seq === fetchSeqRef.current) setLoading(false);
     }
   }, [buildQuery]);
 
@@ -385,7 +394,7 @@ export default function AdminOrdersPage() {
           <div className="relative w-full sm:w-80">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Caută nr. comandă, email, telefon…"
+              placeholder="Caută cod comandă, nume, email, telefon, AWB…"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => {

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission, getUserPermissions } from '@/lib/admin/permissions';
 import { applyStatusFilter, parseTestFilter, resolveStatusFilter } from '@/lib/admin/orders-tabs';
+import { applyOrderSearch, orderSearchTerms } from '@/lib/admin/order-search';
 import { LAWYER_SERVICE_SLUGS } from '@/lib/documents/no-lawyer-services';
 import { applyQuickOrStage } from '@/lib/admin/order-quick-filters';
 import { getOpenOutages } from '@/lib/services/platform-services';
@@ -116,7 +117,12 @@ export async function GET(request: NextRequest) {
       // Apply status filter via the shared resolver — supports tab values
       // (paid/processing/shipped/completed/abandoned) plus the all + debug
       // statuses (draft/pending/etc).
-      q = applyStatusFilter(q, resolveStatusFilter(status));
+      // A search on „Toate" looks through EVERY order, drafts and unpaid ones
+      // included: the team types a code and expects to find it, whatever its
+      // status (E-261109-XUJCS, a draft, was «not found» — 12.11.2026). On a
+      // specific tab the search stays inside that tab.
+      const searchingEverything = orderSearchTerms(search).length > 0 && (status === 'all' || status === '');
+      if (!searchingEverything) q = applyStatusFilter(q, resolveStatusFilter(status));
       // Sandbox/test filter — three-state chip group: hide | only | all.
       if (testFilter === 'only') q = q.eq('is_test', true);
       else if (testFilter === 'hide') q = q.eq('is_test', false);
@@ -135,23 +141,9 @@ export async function GET(request: NextRequest) {
       // Quick-filter / workflow-stage chip (overdue | deadline_soon | with_coupon
       // | documents_generated | submitted | received | ready).
       if (quick) q = applyQuickOrStage(q, quick);
-      // Apply search filter (server-side). Parity with sister: also match client
-      // name (first/last), phone and billing name — the team looks people up by name.
-      if (search) {
-        // PostgREST uses -> for JSON traversal, ->> for text extraction.
-        q = q.or(
-          [
-            `order_number.ilike.%${search}%`,
-            `friendly_order_id.ilike.%${search}%`,
-            `delivery_tracking_number.ilike.%${search}%`,
-            `customer_data->contact->>email.ilike.%${search}%`,
-            `customer_data->contact->>phone.ilike.%${search}%`,
-            `customer_data->personal->>firstName.ilike.%${search}%`,
-            `customer_data->personal->>lastName.ilike.%${search}%`,
-            `customer_data->billing->>name.ilike.%${search}%`,
-          ].join(',')
-        );
-      }
+      // Search: every word must match some field (order code, AWB, email,
+      // phone, CNP, person or company name) — src/lib/admin/order-search.ts.
+      q = applyOrderSearch(q, search);
       return q;
     };
     // paid_at first: o comandă creată ca draft ieri și plătită azi trebuie
