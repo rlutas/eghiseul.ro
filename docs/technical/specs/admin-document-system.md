@@ -463,6 +463,7 @@ Templates use `{{PLACEHOLDER}}` syntax. The full mapping is built by `buildPlace
 | `{{NRCOMANDA}}` | Order number (friendly_order_id) |
 | `{{TOTALPLATA}}` | Total price (2 decimals) |
 | `{{NUMESERVICIU}}` | Service name |
+| `{{DOCUMENT_GENITIV}}` | Documentul comenzii la genitiv, în contractul de asistență: „pe durata obținerii certificatului de celibat”. Din `contractDocumentGenitive(slug)` (`src/lib/documents/contract-document-name.ts`); serviciu fără intrare → „documentului solicitat”. Orice slug din `LAWYER_SERVICE_SLUGS` trebuie să aibă intrare (test). |
 | `{{SERVICE_PRICE}}` | Service base price (2 decimals) |
 | `{{DATA}}` | Current date (DD.MM.YYYY) |
 | `{{DATACOMANDA}}` | Order creation date |

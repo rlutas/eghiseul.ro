@@ -1,4 +1,5 @@
 import Docxtemplater from 'docxtemplater';
+import { contractDocumentGenitive } from './contract-document-name';
 import { brandForOrder } from '@/lib/brand/for-order';
 import PizZip from 'pizzip';
 import { readFileSync } from 'fs';
@@ -1241,6 +1242,8 @@ export function buildPlaceholderData(ctx: DocumentContext) {
     NRCOMANDA: ctx.order.friendly_order_id || ctx.order.order_number,
     TOTALPLATA: ctx.order.total_price.toFixed(2),
     NUMESERVICIU: ctx.order.service_name,
+    // „…pe durata obținerii {{DOCUMENT_GENITIV}}." în contractul de asistență.
+    DOCUMENT_GENITIV: contractDocumentGenitive(ctx.order.service_slug),
     SERVICE_PRICE: ctx.order.service_price.toFixed(2),
 
     // Document numbers
