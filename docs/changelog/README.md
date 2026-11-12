@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-12 | 🟣 **Portal colaborator: rubrici „CF 1, CF 2” la comenzile cu mai multe imobile** — `imobileForWork()` citește și `property.additionalImobile`; avertisment în „Date pentru lucrare”, etichetă „N CF” în listă | [2026-11-12-colaborator-mai-multe-cf-uri.md](2026-11-12-colaborator-mai-multe-cf-uri.md) |
 | 2026-11-12 | ✅ **Pagina de plată refăcută (toate site-urile)** — lățime 1200px ca wizardul, coloană rezumat 400px, cupon și metode de plată rescrise, logourile cardurilor, `BrandFooter` în locul `OrderFlowDisclosure` | [2026-11-12-pagina-de-plata-refacuta.md](2026-11-12-pagina-de-plata-refacuta.md) |
 | 2026-11-12 | 🔴 **documentero.ro: iconița corectă pe paginile de comandă** — rewrite pe host pentru `/icon.png` și `/apple-icon.png` (paginile din `(order)` emiteau scutul eghiseul) | [2026-11-12-documentero-favicon-pagini-comanda.md](2026-11-12-documentero-favicon-pagini-comanda.md) |
 | 2026-11-12 | 🔴 **Contract de asistență: documentul corect în fraza de durată** — „pe durata obținerii cazierului judiciar” era text fix în șablon; `{{DOCUMENT_GENITIV}}` din `contractDocumentGenitive(slug)`, 3 șabloane | [2026-11-12-contract-asistenta-document-corect.md](2026-11-12-contract-asistenta-document-corect.md) |

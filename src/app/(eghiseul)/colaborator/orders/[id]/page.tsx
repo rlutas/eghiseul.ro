@@ -11,6 +11,7 @@ import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
 import { taxaEliberare } from '@/lib/ancpi/taxe-eliberare';
 import { IDENTIFICARE_SLUGS } from '@/lib/ancpi/cerere-scope';
 import { COUNTY_NAMES } from '@/lib/ancpi/judete';
+import { imobileForWork } from '@/lib/ancpi/imobile-for-work';
 import { OrderMessagesPanel, type MessageTemplate } from '@/components/orders/OrderMessagesPanel';
 
 interface OrderDoc {
@@ -319,6 +320,7 @@ export default function CollaboratorOrderDetail() {
   if (!order) return <p className="text-sm text-red-600">Comanda nu a fost găsită.</p>;
 
   const property = order.customer_data?.property ?? {};
+  const imobile = imobileForWork(property);
   const hasDocs = order.documents.some((d) => d.metadata?.source === 'collaborator');
   const delivered = order.status === 'document_ready' || order.status === 'completed' || order.status === 'shipped' || order.status === 'delivered';
 
@@ -341,13 +343,44 @@ export default function CollaboratorOrderDetail() {
       {/* Customer + property data */}
       <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
         <h2 className="mb-3 text-sm font-semibold text-slate-900">Date pentru lucrare</h2>
+        {/* Mai multe imobile pe aceeași comandă: fiecare cu rubrica lui (CF 1,
+            CF 2…), aici, unde citește el datele — nu doar jos, la cereri
+            (Mircea, 11.11.2026). */}
+        {imobile.length > 1 && (
+          <div className="mb-4">
+            <p className="mb-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-900">
+              Atenție: comanda are {imobile.length} imobile — {imobile.length} cărți funciare de lucrat.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {imobile.map((im) => (
+                <div key={im.nr} className="rounded-md border border-slate-200 bg-slate-50 p-3">
+                  <p className="mb-2 text-sm font-bold text-slate-900">
+                    CF {im.nr}
+                    <span className="ml-1.5 font-normal text-slate-500">din {imobile.length}</span>
+                  </p>
+                  <dl className="grid grid-cols-2 gap-x-3 gap-y-2">
+                    <Field label="Carte Funciară" value={im.carteFunciara} />
+                    <Field label="Nr. cadastral" value={im.cadastral} />
+                    <Field label="Nr. topografic" value={im.topografic} />
+                    <Field label="UAT" value={im.locality} />
+                    <Field label="Sat / Localitate" value={im.imobilLocality} />
+                  </dl>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <dl className="grid grid-cols-2 gap-4">
           <Field label="Județ" value={property.county} />
-          <Field label="Comună / Oraș (UAT)" value={property.locality} />
-          <Field label="Sat / Localitate" value={property.imobilLocality} />
-          <Field label="Carte Funciară" value={property.carteFunciara} />
-          <Field label="Nr. cadastral" value={property.cadastral} />
-          <Field label="Nr. topografic" value={property.topografic} />
+          {imobile.length <= 1 && (
+            <>
+              <Field label="Comună / Oraș (UAT)" value={property.locality} />
+              <Field label="Sat / Localitate" value={property.imobilLocality} />
+              <Field label="Carte Funciară" value={property.carteFunciara} />
+              <Field label="Nr. cadastral" value={property.cadastral} />
+              <Field label="Nr. topografic" value={property.topografic} />
+            </>
+          )}
           <Field
             label="Adresă imobil"
             value={

@@ -8,6 +8,7 @@ import { usePreviewAs, withPreview } from '@/lib/collaborator/preview';
 import { CERERE_DONE_STATUSES } from '@/lib/ancpi/cerere-scope';
 import { filterCollabOrders, type Etapa } from '@/lib/collaborator/orders-filter';
 import { cereriForOrderSlug, type PropertyLike } from '@/lib/ancpi/cereri-for-order';
+import { imobileForWork } from '@/lib/ancpi/imobile-for-work';
 import { cerereDateRo } from '@/lib/ancpi/cerere-date';
 
 interface CollabOrder {
@@ -220,6 +221,14 @@ export default function CollaboratorOrdersPage() {
                     <Link href={withPreview(`/colaborator/orders/${o.id}`, previewAs)} className="font-medium text-primary-700 hover:underline">
                       {o.friendly_order_id || o.id.slice(0, 8)}
                     </Link>
+                    {imobileForWork(o.customer_data?.property).length > 1 && (
+                      <span
+                        title="Comanda are mai multe imobile — câte o carte funciară pentru fiecare"
+                        className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-900"
+                      >
+                        {imobileForWork(o.customer_data?.property).length} CF
+                      </span>
+                    )}
                     {(o.priority ?? 0) > 0 && (
                       <span className="ml-2 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                         Urgent
