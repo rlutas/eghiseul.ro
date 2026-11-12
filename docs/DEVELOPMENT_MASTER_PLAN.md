@@ -3,7 +3,7 @@
 > **⚡ Header stale (2026-06-10).** Pentru starea reală vezi [`STATUS_CURRENT.md`](STATUS_CURRENT.md) + [`changelog/`](changelog/). De atunci: ONRC + ANCPI live, 36 calculatoare, expansiune SEO (CF/cazier/ONRC/stare civilă), rovinietă, /tools/.
 
 **Version:** 4.8
-**Last Updated:** 2026-10-01
+**Last Updated:** 2026-11-12
 **Status:** Sprint 4 In Progress (98%) | Sprint 5 In Progress (98%) | Admin Workflow ✅ | Document Generation ✅ | Multi-Signature ✅ | Contract Preview ✅ | Contract Legal Validity ✅ | Client Downloads ✅ | Extended RBAC ✅ | Number Registry ✅ | Gemini 2.5 Flash ✅ | KYC S3 Upload ✅ | Admin UI Polish ✅ | Review Step Pricing ✅ | Registry Own Page ✅ | User Invite ✅ | Template Placeholders ✅ | CLIENT_DETAILS_BLOCK Legal Format ✅ | KYC Confidence Tracking ✅
 
 ---
@@ -706,6 +706,25 @@ Două rapoarte ale echipei din `/admin/ghid/rapoarte`, închise în aceeași zi:
 
 Rămase deschise în Rapoarte: termene pe oficii de stare civilă, „cum dau refund la
 cazier” (21.09).
+
+### ADMIN, CONTRACTE, PLATĂ, CONTABILITATE — livrat 12.11.2026
+
+Pornit de la raportări ale echipei. Detalii pe fiecare în `docs/changelog/2026-11-12-*.md`.
+
+- [x] „Redeschide formularul” pe comenzile trimise și neplătite (`reopen-draft`); auto-abandon de la `submitted_at`
+- [x] Căutare comenzi: un matcher comun listă + contoare, `orders.search_text` (migrarea 206, aplicată)
+- [x] Contract de asistență: `{{DOCUMENT_GENITIV}}` pe serviciu; previzualizare cu pașaport; tipul pașaportului nu e serie
+- [x] „Modifică comandă”: reducerea de cupon rămâne; opțiuni noi vs deja plătite în dialog
+- [x] Pagina de plată refăcută (toate brandurile); favicon documentero pe paginile comune
+- [x] Site-urile de nișă: 404 la comenzi pentru servicii nevândute (`order-guard.ts` în proxy)
+- [x] Admin: linkuri pe brandul comenzii, eticheta „Site: …”; notă de expeditor în emailurile de brand
+- [x] Portal topograf: „CF 1, CF 2”; taxă 0 la CF colectivă
+- [x] Decontări: luna din extrasul de bancă; import extras în euro; Stripe în checklistul de facturi
+- [x] CJO + ecazier: GA fără `/admin`
+- [ ] Factură în euro la transfer bancar în euro (așteaptă regula contabilei)
+- [ ] Blocarea plății pe o comandă `draft` prin `/comanda/checkout/<id>`
+- [ ] Rambursare 37,65 lei la E-260719-LS53Y (reducere taxată înapoi în iulie)
+- [ ] Răspunsurile Google Ads: cererea pentru cazierfiscal.com (~26.11) și contestația la constatator
 
 ### BACKLOG / FUTURE FEATURES
 

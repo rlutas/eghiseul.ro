@@ -105,7 +105,29 @@ linia legală.
   proiectul `registru-barou-central` (`ksqkttalapjlgugshuks`), NU pe DB-ul
   eghiseul.
 
+## Ce servicii ia fiecare site (12.11.2026)
+
+Formularul de comandă e comun, dar un site ia comenzi doar pentru serviciile
+din lista lui (`*_SERVICE_SLUGS` în `src/lib/brand/brands.ts`; eghiseul le ia
+pe toate). `isOrderPathBlockedOnHost()` (`src/lib/brand/order-guard.ts`),
+apelat din `src/proxy.ts`, răspunde 404 la `/comanda/<slug>/` pentru un slug pe
+care brandul nu îl vinde. Pagina are și ea `notFound()`, dar segmentul face
+streaming, deci statusul real îl dă proxy-ul.
+
+Paginile comune emit iconițele rădăcinii (`/icon.png`, `/apple-icon.png`);
+fiecare brand le rescrie pe host în `next.config.ts` către
+`/images/<brand>/…`. Un brand nou are nevoie de aceste patru reguli.
+
+Emailurile unui brand al cărui domeniu nu e verificat în Resend pleacă de pe
+adresa eghiseul și primesc o linie care explică asta (`applySenderNote` în
+`src/lib/email/resend.ts`).
+
 ## Admin
+
+Pagina comenzii arată site-ul pe care a comandat clientul („Site: …”), iar
+linkurile copiate de acolo (continuare, plată, status) se construiesc cu
+`appBaseForOrder(order)`, nu din domeniul adminului.
+
 
 - Lista de comenzi: chip „Platformă” (Ambele / eghiseul.ro / documentero.ro),
   parametru `?platform=`; badge roșu „documentero” lângă codul comenzii.

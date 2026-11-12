@@ -64,6 +64,8 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Plată prin transfer bancar (IBAN):** [`admin/plata-transfer-bancar.md`](admin/plata-transfer-bancar.md) — procedura echipei: tab „Așteptare plată", confirmarea încasării din extras, legătura cu decontările
 - **Meta Conversions API (tracking server-side):** [`technical/specs/meta-capi-tracking.md`](technical/specs/meta-capi-tracking.md)
 - **Webhook Resend (bounce → banner admin + alertă):** [`technical/specs/resend-bounce-webhook.md`](technical/specs/resend-bounce-webhook.md)
+- **Google Ads pe documente: jurnalul încercărilor (ce e în așteptare, ce știm, ce nu facem):** [`ads/2026-11-12-google-ads-jurnal-incercari.md`](ads/2026-11-12-google-ads-jurnal-incercari.md)
+- **Decontări: în ce lună intră, contul în euro, factura Stripe:** [`admin/decontari-cum-citesti.md`](admin/decontari-cum-citesti.md)
 - **Cum cauți o comandă în admin (cod parțial, nume, firmă, site-ul comenzii):** [`admin/cautare-comenzi.md`](admin/cautare-comenzi.md)
 - **Client blocat în formular / probleme la act:** [`admin/client-blocat-in-formular.md`](admin/client-blocat-in-formular.md)
 - **Comandă blocată din cauza clientului (contract 9.8/9.9, 90 de zile, oferta de 70% pe comenzi vechi):** [`admin/comanda-blocata-de-client.md`](admin/comanda-blocata-de-client.md)

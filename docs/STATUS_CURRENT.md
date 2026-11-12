@@ -1,12 +1,17 @@
 # eGhiseul.ro - Status Curent
 
-> **🟣 Update 2026-11-12 — admin: redeschidere formular, căutare, contracte, pagina de plată.**
-> - **Comandă trimisă și neplătită:** buton „Redeschide formularul” (înapoi pe ciornă + link de continuare); cronul de auto-abandon numără 30 de minute de la trimitere, nu de la începutul ciornei. [changelog](changelog/2026-11-12-redeschide-formularul-comanda-neplatita.md)
-> - **Căutarea de comenzi** găsește ciornele, numele complet și firmele; pe „Toate” caută în toate statusurile. Migrarea 206 (`orders.search_text`) aplicată: ~0,1 s pe căutare, fără diacritice, și după CNP/CUI. [ghid](admin/cautare-comenzi.md)
-> - **Contracte:** contractul de asistență numește documentul comenzii (era „cazierului judiciar” la toate); previzualizarea din formular arată „pașaportul” la clienții cu pașaport. ~157 de contracte vechi au fraza greșită, neregenerate.
-> - **Pagina de plată** refăcută pe toate site-urile (1200px, logouri carduri, footer complet); iconița documentero pe paginile de comandă; linkurile din admin pe site-ul comenzii, etichetă „Site: …”.
-> - **Portal colaborator:** rubrici „CF 1, CF 2” la comenzile cu mai multe imobile.
-> - **Deschise:** sesiunile Stripe vechi de pe E-261111-EMRB4; plata pe ciornă prin linkul vechi de checkout (posibilă, de decis blocarea).
+> **🟣 Update 2026-11-12 — admin, contracte, pagina de plată, contabilitate, Google Ads.** Tot ce s-a livrat azi, pe zone; fiecare are intrare în [changelog](changelog/README.md).
+> - **Comenzi neterminate:** buton „Redeschide formularul” pe comenzile trimise și neplătite (înapoi pe ciornă + link de continuare); auto-abandon la 30 de minute de la trimitere, nu de la începutul ciornei. [changelog](changelog/2026-11-12-redeschide-formularul-comanda-neplatita.md)
+> - **Căutarea de comenzi:** ciorne și neplătite pe „Toate”, nume în orice ordine, firmă, CNP/CUI, fără diacritice, ~0,1 s (migrarea 206, `orders.search_text`, aplicată). [ghid](admin/cautare-comenzi.md)
+> - **Contracte:** contractul de asistență numește documentul comenzii; previzualizarea din formular arată „pașaportul”; tipul pașaportului („PE”) nu mai apare ca serie. ~157 de contracte vechi au fraza greșită, neregenerate.
+> - **„Modifică comandă”:** păstrează reducerea de cupon (E-261111-ZHVGM: 317,10 → 277,50) și arată separat opțiunile noi de cele deja plătite. E-260719-LS53Y a fost taxată în plus cu 37,65 lei în iulie; nerambursat.
+> - **Site-uri:** pagina de plată refăcută pe toate brandurile; iconița documentero pe paginile de comandă; site-urile de nișă răspund 404 la comenzi pentru servicii pe care nu le vând; linkurile din admin se fac pe site-ul comenzii, cu eticheta „Site: …”; emailurile de brand trimise de pe @eghiseul.ro explică adresa.
+> - **Portal topograf:** rubrici „CF 1, CF 2” la comenzile cu mai multe imobile; cost intern 0 la cartea funciară colectivă.
+> - **Contabilitate:** decontările Stripe se pun în luna din extrasul de bancă (nu după estimarea Stripe); extrasul contului în euro se importă și se leagă de comenzi; factura lunară Stripe e în checklistul de furnizori. Reconciliere septembrie și octombrie: zero diferențe. [changelog](changelog/2026-11-12-decontari-data-banca-euro-stripe.md)
+> - **Google Analytics:** paginile de admin nu mai sunt numărate nici pe CJO și ecazier.
+> - **Google Ads:** anunțul de constatator respins pe politică, contestație trimisă; cont nou 933-520-0143 doar pentru cazierfiscal.com, cu cererea „în afara politicii” trimisă înainte de orice campanie (răspuns până ~26.11). Jurnalul: [ads/2026-11-12-google-ads-jurnal-incercari.md](ads/2026-11-12-google-ads-jurnal-incercari.md).
+> - **De făcut de echipă:** cost 75 lei pe E-261031-68SFJ + taxa OCPI 75 (nu 60) la „Actualizare adresă în CF”, din Setări; adresa clientului de la E-261109-XUJCS (strada e „s”); regenerarea contractului de asistență la cerere.
+> - **Decizii deschise (Raul):** plata și factura în euro la transfer bancar (recomandare: euro doar pentru clienții din străinătate); blocarea plății pe ciornă prin linkul vechi de checkout; rambursarea de 37,65 lei la LS53Y; linia despre expeditor în emailurile cazierfiscal / constatator; sesiunile Stripe vechi de pe E-261111-EMRB4.
 
 > **🔴 Update 2026-11-11 — contract: comenzi blocate de client, pașaport, acordul la termeni.**
 > - **Contract + Termeni pe toate 5 site-urile:** dacă actul nu se poate elibera din cauza a ceva ce doar clientul poate face (ex. transcrierea căsătoriei din străinătate), comanda se suspendă după un mesaj scris; după 90 de zile sau refuz reținem serviciul de bază + onorariul și rambursăm doar ce nu am început. Valabil pentru comenzile de pe 11.11. **De revizuit de avocată.** [procedura echipei](admin/comanda-blocata-de-client.md)

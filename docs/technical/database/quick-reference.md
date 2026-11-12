@@ -843,3 +843,15 @@ Coloane: `platform` (brandul din host), `kind` (allowlist: `image_decode`,
 `page` (fără query), `step`, `service_slug`, `order_ref`, `user_agent`, `meta`
 (doar `mime`, `sizeBucket`, `fallback`, `docType`, `status`, `attempt`, `source`).
 Niciodată CNP, nume, email sau fișiere. Indexuri pe `created_at` și `kind`.
+
+## `orders.search_text` (migrarea 206, 12.11.2026)
+
+Coloană generată (`STORED`), niciodată scrisă de aplicație: codurile comenzii,
+AWB, email, telefon, nume și prenume (contact, personal, facturare), CNP,
+nume de firmă și CUI, cu litere mici și fără diacritice românești. Căutarea
+din admin cere ca fiecare cuvânt tastat să apară în ea
+(`src/lib/admin/order-search.ts`, care normalizează cuvintele la fel).
+Aplicația verifică o dată pe instanță dacă există coloana și cade pe căile
+JSON dacă lipsește. Migrările pe baza platformei se aplică cu
+`node scripts/apply-migration.mjs <fișier.sql>`.
+
