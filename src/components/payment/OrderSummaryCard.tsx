@@ -144,9 +144,11 @@ export function OrderSummaryCard({
                       </p>
                     )}
                     {deliveryTimeText && (
-                      <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-neutral-500">
-                        <Clock className="h-3 w-3 text-primary-500 shrink-0" />
-                        Timp estimat: <span className="font-medium text-secondary-900">{deliveryTimeText}</span>
+                      <p className="mt-0.5 flex items-start gap-1 text-xs text-neutral-500">
+                        <Clock className="mt-0.5 h-3 w-3 shrink-0 text-primary-500" />
+                        <span>
+                          Timp estimat: <span className="font-medium text-secondary-900">{deliveryTimeText}</span>
+                        </span>
                       </p>
                     )}
                   </div>

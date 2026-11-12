@@ -16,6 +16,9 @@ import { useBrand } from '@/lib/brand/client';
  * site-ului vine din brandul cererii (`useBrand`), firma e aceeași.
  *
  * Ținut compact: e o bandă de subsol, nu un banner care mănâncă din conversie.
+ *
+ * Din 12.11.2026 pagina de plată nu o mai folosește: are footerul complet al
+ * brandului (`BrandFooter`), cu aceleași mențiuni. Rămâne pe wizard și pe succes.
  */
 export function OrderFlowDisclosure() {
   const brand = useBrand();

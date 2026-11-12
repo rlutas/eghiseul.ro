@@ -1,10 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Tag, X, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Tag, X, Loader2, TicketPercent, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 interface CouponInputProps {
@@ -88,92 +87,85 @@ export function CouponInput({
     }
   };
 
-  // Applied state — green compact card with remove button.
+  // Applied state — one quiet row: what was applied, how much it saved, undo.
   if (hasApplied) {
     return (
-      <Card className="border-emerald-200 bg-emerald-50/60">
-        <CardContent className="p-3 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0">
-            <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-emerald-800 truncate">
-                Cupon <span className="font-mono">{appliedCode}</span>
-              </p>
-              <p className="text-xs text-emerald-700">
-                −{(appliedDiscount ?? 0).toFixed(2)} RON aplicat
-              </p>
-            </div>
+      <div className="flex items-center justify-between gap-3 rounded-xl border border-dashed border-emerald-300 bg-emerald-50/70 px-4 py-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+            <TicketPercent className="h-[18px] w-[18px]" />
+          </span>
+          <div className="min-w-0">
+            {/* No truncate: on a phone the code itself was cut („BLA…"). */}
+            <p className="text-sm font-semibold leading-snug text-emerald-900">
+              Reducere aplicată:{' '}
+              <span className="whitespace-nowrap font-mono tracking-tight">{appliedCode}</span>
+            </p>
+            <p className="text-xs text-emerald-800">
+              Economisești {(appliedDiscount ?? 0).toFixed(2)} RON la această comandă
+            </p>
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleRemove}
-            disabled={busy}
-            className="h-8 px-2 text-emerald-700 hover:text-emerald-900 hover:bg-emerald-100 shrink-0"
-          >
-            {busy ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <X className="h-3.5 w-3.5" />
-            )}
-            <span className="ml-1 text-xs">Elimină</span>
-          </Button>
-        </CardContent>
-      </Card>
+        </div>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={handleRemove}
+          disabled={busy}
+          className="h-8 shrink-0 px-2.5 text-xs font-medium text-emerald-800 hover:bg-emerald-100 hover:text-emerald-950"
+        >
+          {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <X className="h-3.5 w-3.5" />}
+          <span className="ml-1">Elimină</span>
+        </Button>
+      </div>
     );
   }
 
-  // Default state — input + apply button.
+  // Default state — label, input and button on one line.
   return (
-    <Card className="bg-white">
-      <CardContent className="p-3 space-y-2">
-        <div className="flex items-center gap-2 text-sm font-medium text-secondary-900">
-          <Tag className="h-4 w-4 text-primary-500" />
-          Ai un cod de reducere?
-        </div>
-        <div className="flex items-stretch gap-2">
-          <Input
-            type="text"
-            value={input}
-            onChange={(e) => {
-              setInput(e.target.value.toUpperCase());
-              if (error) setError(null);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                if (!busy) handleApply();
-              }
-            }}
-            placeholder="Cod cupon"
-            className="h-10 font-mono uppercase placeholder:text-neutral-400"
-            disabled={busy}
-            autoComplete="off"
-          />
-          <Button
-            type="button"
-            onClick={handleApply}
-            disabled={busy || !input.trim()}
-            className={cn(
-              'h-10 px-4 bg-primary-500 hover:bg-primary-600 text-secondary-900 font-semibold shrink-0',
-              busy && 'opacity-70'
-            )}
-          >
-            {busy ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              'Aplică'
-            )}
-          </Button>
-        </div>
-        {error && (
-          <p className="text-xs text-red-600 flex items-center gap-1">
-            <AlertCircle className="h-3 w-3 shrink-0" />
-            {error}
-          </p>
-        )}
-      </CardContent>
-    </Card>
+    <div className="rounded-xl border border-neutral-200 bg-white px-4 py-3.5">
+      <label htmlFor="coupon-code" className="flex items-center gap-2 text-sm font-semibold text-secondary-900">
+        <Tag className="h-4 w-4 text-primary-600" />
+        Ai un cod de reducere?
+      </label>
+      <div className="mt-2.5 flex items-stretch gap-2">
+        <Input
+          id="coupon-code"
+          type="text"
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value.toUpperCase());
+            if (error) setError(null);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              if (!busy) handleApply();
+            }
+          }}
+          placeholder="Scrie codul aici"
+          className="h-11 font-mono uppercase placeholder:font-sans placeholder:normal-case placeholder:text-neutral-400"
+          disabled={busy}
+          autoComplete="off"
+          aria-invalid={!!error}
+          aria-describedby={error ? 'coupon-error' : undefined}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleApply}
+          disabled={busy || !input.trim()}
+          className={cn('h-11 shrink-0 border-neutral-300 px-5 font-semibold text-secondary-900', busy && 'opacity-70')}
+        >
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Aplică'}
+        </Button>
+      </div>
+      {error && (
+        <p id="coupon-error" className="mt-2 flex items-center gap-1 text-xs text-red-600">
+          <AlertCircle className="h-3 w-3 shrink-0" />
+          {error}
+        </p>
+      )}
+    </div>
   );
 }

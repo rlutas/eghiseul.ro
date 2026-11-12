@@ -91,8 +91,9 @@ linkuri interne, față de 38 pe site-ul soră neafectat.
 
 Suntem serviciu privat, nu instituție. Pe fiecare pagină publică: neafiliere,
 datele firmei, ANPC/SOL. Inclusiv pe ecranele de comandă — footerul NU e în root
-layout, deci wizardul, checkout-ul și pagina de succes au nevoie de
-`OrderFlowDisclosure`.
+layout, deci wizardul și pagina de succes au nevoie de `OrderFlowDisclosure`.
+Checkout-ul (`/comanda/checkout/[orderId]`) are din 12.11.2026 footerul complet
+al brandului (`BrandFooter`), care conține aceleași mențiuni.
 
 Verbul contează: noi **obținem** documente, instituția le **eliberează**.
 

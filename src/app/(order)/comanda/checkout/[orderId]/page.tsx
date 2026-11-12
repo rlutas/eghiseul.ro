@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, AlertCircle, Lock, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -21,7 +21,7 @@ import { whatsappUrl } from '@/config/contact';
 import { estimateFromSelectedOptions } from '@/lib/delivery-calculator';
 import { cn } from '@/lib/utils';
 import { useBrand } from '@/lib/brand/client';
-import { OrderFlowDisclosure } from '@/components/legal/order-flow-disclosure';
+import { BrandFooter } from '@/components/shared/brand-footer';
 import { BLACK_FRIDAY_CODE, blackFridayRate, isBlackFridayActive } from '@/lib/coupons/black-friday';
 
 interface OrderData {
@@ -341,22 +341,27 @@ export default function CheckoutPage() {
   const orderNumber = order.friendly_order_id || `ORD-${order.order_number}`;
 
   return (
-    <div className="min-h-screen bg-neutral-50/40 pb-28 lg:pb-0">
-      {/* Main Content — breadcrumb + grid combined, no separate sub-header bar */}
-      <div className="container mx-auto px-4 pt-3 pb-8 lg:pt-6 max-w-5xl">
-        <div className="mb-4 flex items-center gap-2 text-sm">
+    // pb on phones = the height of the fixed pay bar, so the footer's last
+    // rows are not hidden behind it.
+    <div className="min-h-screen bg-neutral-50/40 pb-[72px] lg:pb-0">
+      {/* Same width as the wizard (1200px): at 1024px the summary column was
+          ~310px and every row wrapped (Raul, 12.11.2026). */}
+      <div className="container mx-auto max-w-[1200px] px-4 pb-10 pt-4 lg:pb-16 lg:pt-8">
+        <div className="mb-5 lg:mb-7">
           <button
             type="button"
             onClick={() => router.back()}
-            className="inline-flex items-center gap-1 text-neutral-600 hover:text-secondary-900 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-neutral-600 transition-colors hover:text-secondary-900"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Înapoi</span>
+            Înapoi la comandă
           </button>
-          <span className="text-neutral-300">/</span>
-          <h1 className="text-sm font-semibold text-secondary-900">
-            Finalizare Comandă
+          <h1 className="mt-2 text-2xl font-bold tracking-tight text-secondary-900 lg:text-[28px]">
+            Finalizare comandă
           </h1>
+          <p className="mt-1 text-sm text-neutral-600">
+            Verifică rezumatul, alege cum plătești și comanda intră în lucru.
+          </p>
         </div>
         {/* Pagina de plată redusă la esențial (Raul, 14.09.2026, capturi de pe
             telefon): 1) metoda de plată + cuponul, 2) rezumatul comenzii.
@@ -366,8 +371,8 @@ export default function CheckoutPage() {
             deja „Plătește cu cardul") și butonul plutitor WhatsApp (stătea
             peste bară). Pe desktop nu există bară lipită, deci butonul de
             plată apare inline, sub metoda de plată. */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-          <div className="lg:col-span-2 space-y-4 order-1">
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-8 xl:grid-cols-[minmax(0,1fr)_420px]">
+          <div className="order-1 space-y-4">
             {/* Error Alert */}
             {error && (
               <Alert variant="destructive">
@@ -388,8 +393,8 @@ export default function CheckoutPage() {
             />
 
             {/* Payment method + (desktop) pay button in the SAME card */}
-            <Card id="payment-form-anchor" className="scroll-mt-4">
-              <CardContent className="p-4 sm:p-6 space-y-4">
+            <Card id="payment-form-anchor" className="scroll-mt-4 !gap-0 !py-0">
+              <CardContent className="space-y-5 p-4 sm:p-6">
                 <PaymentMethodSelector
                   selected={paymentMethod}
                   onChange={(method) => {
@@ -402,11 +407,11 @@ export default function CheckoutPage() {
                   // Hosted Stripe Checkout — on click, we create a session
                   // server-side and redirect the customer to checkout.stripe.com.
                   // On mobile the sticky bar owns the button; here it's desktop-only.
-                  <div className="space-y-2">
+                  <div className="space-y-3 border-t border-neutral-100 pt-5">
                     <Button
                       onClick={handleCardCheckout}
                       disabled={isRedirecting}
-                      className="hidden lg:flex w-full h-12 bg-primary-500 hover:bg-primary-600 text-secondary-900 text-base font-semibold"
+                      className="hidden h-[52px] w-full bg-primary-500 text-base font-semibold text-secondary-900 hover:bg-primary-600 lg:flex"
                     >
                       {isRedirecting ? (
                         <>
@@ -415,23 +420,27 @@ export default function CheckoutPage() {
                         </>
                       ) : (
                         <>
-                          Plătește cu cardul · RON {Number(order.total_price).toFixed(2)}
+                          <Lock className="mr-2 h-4 w-4" />
+                          Plătește {Number(order.total_price).toFixed(2)} RON
                         </>
                       )}
                     </Button>
-                    <p className="text-xs text-neutral-500 text-center leading-snug">
-                      Apăsând „Plătește” accepți{' '}
-                      <a href="/termeni-si-conditii/" className="underline hover:text-neutral-700">
-                        termenii și condițiile
-                      </a>
-                      . Plata se face pe pagina securizată Stripe; nu vedem și nu
-                      păstrăm datele cardului.
+                    <p className="flex items-start gap-2 text-xs leading-relaxed text-neutral-600">
+                      <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                      <span>
+                        Plata se face pe pagina securizată Stripe; nu vedem și nu păstrăm
+                        datele cardului. Apăsând „Plătește” accepți{' '}
+                        <a href="/termeni-si-conditii/" className="underline underline-offset-2 hover:text-secondary-900">
+                          termenii și condițiile
+                        </a>
+                        .
+                      </span>
                     </p>
                   </div>
                 ) : (
                   // Bank Transfer — details + confirm button (there's no
                   // sticky action for this method; the bar just scrolls here).
-                  <div className="space-y-4">
+                  <div className="space-y-4 border-t border-neutral-100 pt-5">
                     <BankTransferDetails
                       orderNumber={orderNumber}
                       amount={order.total_price}
@@ -499,7 +508,7 @@ export default function CheckoutPage() {
 
           {/* Order Summary — same <OrderSidebar> as the wizard. Mobile: after
               payment + coupon. Desktop: sticky right column. */}
-          <div className="space-y-4 order-2 lg:sticky lg:top-4 lg:self-start">
+          <div className="order-2 space-y-4 lg:sticky lg:top-6 lg:self-start">
             {(() => {
               // Compute delivery estimate from raw options (need `code` +
               // `bundledFor` which the UI-shaped list doesn't carry).
@@ -557,7 +566,7 @@ export default function CheckoutPage() {
 
             {/* Inline help — replaces the floating WhatsApp button, which sat
                 on top of the sticky pay bar on phones. */}
-            <p className="text-xs text-neutral-500 text-center leading-snug">
+            <p className="text-center text-sm leading-snug text-neutral-600">
               Ai nevoie de ajutor?{' '}
               <a
                 href={whatsappUrl(`Bună! Am nevoie de ajutor cu plata comenzii ${orderNumber} (${brand.domain}).`)}
@@ -642,7 +651,10 @@ export default function CheckoutPage() {
           </Button>
         </div>
       </div>
-      <OrderFlowDisclosure />
+      {/* Full site footer of the order's brand (Raul, 12.11.2026). It carries
+          the non-affiliation note, the company data and the ANPC links, so it
+          replaces the compact disclosure strip this page used to end with. */}
+      <BrandFooter />
     </div>
   );
 }
