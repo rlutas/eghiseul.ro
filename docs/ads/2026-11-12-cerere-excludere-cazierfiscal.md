@@ -1,6 +1,10 @@
 # Cerere către Google: cazierfiscal.com în afara politicii „Government documents and services”
 
-**Stare la 12.11.2026:** ciornă. Nimic depus, niciun cont creat.
+**Stare la 12.11.2026:** ciornă. Nimic depus, niciun cont creat. Pagina „Cont Google Ads nou” e deschisă pe loginul `r.lutas@yahoo.com`; contul îl creează Raul (facturare și card).
+
+| Data | Ce s-a întâmplat |
+|---|---|
+| 12.11.2026 | Site pregătit: 404 pe alte servicii, texte verificate. Text de cerere scris. |
 
 ## De ce pe cazierfiscal.com
 
