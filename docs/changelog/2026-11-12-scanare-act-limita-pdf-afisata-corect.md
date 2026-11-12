@@ -3,6 +3,8 @@
 
 ## Pentru echipă
 
+> Actualizare, aceeași zi: PDF-urile de act până la 10 MB sunt acum acceptate. Vezi [actul de identitate ca PDF până la 10 MB](2026-11-12-pdf-act-identitate-pana-la-10mb.md).
+
 La pasul „Date Personale", sub butonul „Încarcă imagine" scria „JPG, PNG sau PDF, max 10MB". Pentru PDF limita reală este 1,5 MB, deci un client cu un PDF de 2 MB primea eroarea „PDF-ul este prea mare" deși respectase ce scria pe ecran.
 
 Acum textul spune „JPG sau PNG, max 10MB; PDF, max 1,5MB", la fel ca la pasul de documente.

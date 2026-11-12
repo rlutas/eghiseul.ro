@@ -53,7 +53,7 @@ import { COUNTY_NAMES, getLocalitiesForCounty, getCountyName, findCounty } from 
 import { fuzzyMatchLocality } from '@/lib/data/locality-fuzzy-match';
 import { ImageCompressionError } from '@/lib/images/compress';
 import { prepareImageForUpload } from '@/lib/images/prepare-upload';
-import { isPdfFile, readPdfForUpload } from '@/lib/images/read-pdf-for-upload';
+import { IdPdfError, isPdfFile, prepareIdPdfForUpload, readPdfForUpload } from '@/lib/images/read-pdf-for-upload';
 import { randomId } from '@/lib/random-id';
 
 // Minimal ID Card Front Illustration (Gold theme)
@@ -140,6 +140,8 @@ interface ScanState {
   error: string | null;
   success: boolean;
   preview: string | null;
+  /** Shown under the card after an upload, e.g. „only the first 2 pages were used". */
+  notice?: string | null;
 }
 
 const initialScanState: ScanState = {
@@ -348,7 +350,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       ro_cei_reader_pdf: setRoCeiPdfScan,
     } as const;
     const setState = setStateMap[type];
-    setState(prev => ({ ...prev, scanning: true, progress: 0, error: null }));
+    setState(prev => ({ ...prev, scanning: true, progress: 0, error: null, notice: null }));
 
     try {
       // PDF branch — Gemini accepts application/pdf natively. Skip image
@@ -359,8 +361,12 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       let preview: string;
       let mimeType: string;
       let sizeAfter: number;
+      // Stored name: a large identity PDF is turned into a JPEG below.
+      let fileName = file.name;
+      let notice: string | null = null;
 
-      if (isPdf) {
+      if (isPdf && type === 'ro_cei_reader_pdf') {
+        // The RO CEI Reader PDF is the proof itself: it is never converted.
         const pdf = await readPdfForUpload(file);
         base64 = pdf.base64;
         mimeType = pdf.mimeType;
@@ -368,6 +374,16 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
         preview = '';
         sizeAfter = pdf.sizeAfter;
         console.log(`[KYC] ${type}: PDF ${(file.size/1024).toFixed(0)}KB`);
+      } else if (isPdf) {
+        // Small PDFs go as they are; larger ones become a picture in the browser.
+        const pdf = await prepareIdPdfForUpload(file, { ...errorCtxRef.current, docType: type });
+        base64 = pdf.base64;
+        mimeType = pdf.mimeType;
+        preview = pdf.dataUrl;
+        sizeAfter = pdf.sizeAfter;
+        fileName = pdf.fileName;
+        notice = pdf.notice;
+        console.log(`[KYC] ${type}: PDF ${(file.size/1024).toFixed(0)}KB${pdf.converted ? ` → JPEG ${(pdf.sizeAfter/1024).toFixed(0)}KB` : ''}`);
       } else {
         // Image branch: compress + decode (EXIF-safe).
         // Falls back to the original JPEG/PNG when this browser cannot decode it.
@@ -382,7 +398,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       // Synthesize a `compressed`-shaped object so downstream code stays the same.
       const compressed = { base64, mimeType, dataUrl: preview, sizeAfter, sizeBefore: file.size };
 
-      setState(prev => ({ ...prev, preview, progress: 20 }));
+      setState(prev => ({ ...prev, preview, notice, progress: 20 }));
       setState(prev => ({ ...prev, progress: 40 }));
 
       // Call OCR API.
@@ -533,7 +549,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
             {
               id: randomId(),
               type,
-              fileName: file.name,
+              fileName,
               fileSize: compressed.sizeAfter,
               mimeType: compressed.mimeType,
               uploadedAt: new Date().toISOString(),
@@ -592,8 +608,8 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
       }
     } catch (error) {
       console.error('OCR error:', error);
-      // Compression failures are reported inside prepareImageForUpload.
-      if (!(error instanceof ImageCompressionError)) {
+      // Compression and PDF-conversion failures are reported where they happen.
+      if (!(error instanceof ImageCompressionError) && !(error instanceof IdPdfError)) {
         const message = error instanceof Error ? error.message : 'Eroare la procesare document';
         const httpStatus = message.match(/\((\d{3})\)/)?.[1];
         reportClientError({
@@ -1212,7 +1228,7 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
                 </span>
               </div>
               <p className="text-xs text-neutral-500 mt-2">
-                JPG sau PNG, max 10MB; PDF, max 1,5MB
+                {type === 'ro_cei_reader_pdf' ? 'PDF, max 1,5MB' : 'JPG, PNG sau PDF, max 10MB'}
               </p>
             </div>
           </div>
@@ -1222,6 +1238,13 @@ export default function PersonalDataStep({ config, onValidChange }: PersonalData
           <div className="flex items-center gap-2 mt-2 text-red-600">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span className="text-xs">{scanState.error}</span>
+          </div>
+        )}
+
+        {scanState.notice && !scanState.error && (
+          <div className="flex items-start gap-2 mt-2 text-amber-700">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <span className="text-xs">{scanState.notice}</span>
           </div>
         )}
 

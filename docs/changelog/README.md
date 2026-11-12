@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-12 | 🟣 **Actul de identitate ca PDF: acceptat până la 10 MB** — `prepareIdPdfForUpload()` + `renderPdfToImage()` (pdf.js 5.7.284, primele 2 pagini → JPEG sub 900 KB, în browser); RO CEI rămâne PDF | [2026-11-12-pdf-act-identitate-pana-la-10mb.md](2026-11-12-pdf-act-identitate-pana-la-10mb.md) |
 | 2026-11-12 | 🔴 **Scanarea actului: limita de PDF afișată corect** — textul din `PersonalDataStep` promitea 10 MB și pentru PDF, `readPdfForUpload()` refuză peste 1,5 MB (E-261112-7A93Y) | [2026-11-12-scanare-act-limita-pdf-afisata-corect.md](2026-11-12-scanare-act-limita-pdf-afisata-corect.md) |
 | 2026-11-12 | 🔴 **Decontări: luna din extrasul de bancă, cont în euro, factura Stripe în checklist** — `payoutAccountingDate()`, `accountCurrency()` / `ronEquivalent()`, `stripeFeeGroup()`; reconciliere sept + oct la zero | [2026-11-12-decontari-data-banca-euro-stripe.md](2026-11-12-decontari-data-banca-euro-stripe.md) |
 | 2026-11-12 | ✅ **CJO și ecazier: Google Analytics fără paginile de admin** — `isInternalPath('/admin')` + `ga-disable-<ID>` în `cookie-consent.tsx` (repo CJO, `a1e4f7f7`) | [2026-11-12-cjo-ecazier-ga-fara-admin.md](2026-11-12-cjo-ecazier-ga-fara-admin.md) |

@@ -39,7 +39,7 @@ import { cn } from '@/lib/utils';
 import type { PersonalKYCConfig, DocumentType, UploadedDocumentState } from '@/types/verification-modules';
 import { ImageCompressionError } from '@/lib/images/compress';
 import { prepareImageForUpload } from '@/lib/images/prepare-upload';
-import { isPdfFile, readPdfForUpload } from '@/lib/images/read-pdf-for-upload';
+import { IdPdfError, isPdfFile, prepareIdPdfForUpload } from '@/lib/images/read-pdf-for-upload';
 import { reportClientError } from '@/lib/client-errors/report';
 import { sizeBucket } from '@/lib/client-errors/schema';
 import { randomId } from '@/lib/random-id';
@@ -60,6 +60,8 @@ interface UploadState {
   uploading: boolean;
   progress: number;
   error: string | null;
+  /** Shown under the card after an upload, e.g. „only the first 2 pages were used". */
+  notice?: string | null;
 }
 
 const initialUploadState: UploadState = {
@@ -429,21 +431,30 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
 
   // Upload and validate document
   const handleUpload = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async (type: KYCDocType, file: File, preview: string) => {
       setUploads((prev) => ({
         ...prev,
-        [type]: { ...prev[type], uploading: true, progress: 0, error: null },
+        [type]: { ...prev[type], uploading: true, progress: 0, error: null, notice: null },
       }));
 
       try {
         // Compress + decode (EXIF-safe). Reduces 3-7MB phone photos to ~250KB JPEG.
         // Falls back to the original JPEG/PNG when this browser cannot decode it.
         const pdfUpload = type !== 'selfie' && isPdfFile(file);
-        const compressed = pdfUpload
-          ? await readPdfForUpload(file)
-          : await prepareImageForUpload(file, { ...errorCtxRef.current, docType: type });
+        // A PDF up to 1.5 MB goes as it is; a larger one becomes a picture in the browser.
+        const pdf = pdfUpload
+          ? await prepareIdPdfForUpload(file, { ...errorCtxRef.current, docType: type })
+          : null;
+        const compressed = pdf ?? (await prepareImageForUpload(file, { ...errorCtxRef.current, docType: type }));
         const base64 = compressed.base64;
+        if (pdf?.converted) {
+          // Show the picture that is actually sent, not the PDF it came from.
+          URL.revokeObjectURL(preview);
+          setUploads((prev) => ({
+            ...prev,
+            [type]: { ...prev[type], preview: pdf.dataUrl, notice: pdf.notice },
+          }));
+        }
 
         // Same picture as another document → refuse here; /submit would
         // refuse it later anyway, after the customer has left this step.
@@ -500,7 +511,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
         const newDoc: UploadedDocumentState = {
           id: randomId(),
           type: type,
-          fileName: file.name,
+          fileName: pdf?.fileName ?? file.name,
           fileSize: compressed.sizeAfter,
           mimeType: compressed.mimeType,
           uploadedAt: new Date().toISOString(),
@@ -525,8 +536,8 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
         }));
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Încărcarea a eșuat';
-        // Compression failures are reported inside prepareImageForUpload.
-        if (!(error instanceof ImageCompressionError)) {
+        // Compression and PDF-conversion failures are reported where they happen.
+        if (!(error instanceof ImageCompressionError) && !(error instanceof IdPdfError)) {
           reportClientError({
             kind: 'upload_failed',
             code: /aceeași poză|identică/.test(errorMessage) ? 'DUPLICATE' : 'UPLOAD',
@@ -794,7 +805,7 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
                   Trage fișierul aici sau click pentru a selecta
                 </p>
                 <p className="text-xs text-neutral-500">
-                  JPEG sau PNG, max 10MB; PDF, max 1,5MB
+                  JPEG, PNG sau PDF, max 10MB
                 </p>
               </div>
             )}
@@ -806,6 +817,13 @@ export default function KYCDocumentsStep({ config, onValidChange }: KYCDocuments
           <div className="flex items-center gap-2 mt-3 text-red-600">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span className="text-sm">{uploadState.error}</span>
+          </div>
+        )}
+
+        {uploadState.notice && !uploadState.error && (
+          <div className="flex items-start gap-2 mt-3 text-amber-700">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <span className="text-sm">{uploadState.notice}</span>
           </div>
         )}
 
