@@ -88,5 +88,27 @@ export function groupBySupplier(
   return [...groups.values()].sort((a, b) => b.total_bani - a.total_bani);
 }
 
+/**
+ * Stripe in the checklist. Its fees never show up as a bank debit — they are
+ * withheld from each payout — so no statement line brings Stripe into the
+ * list, and the monthly fee invoice was easy to forget. Stripe publishes it
+ * around the 7th of the following month (October's arrived on 07.11.2026).
+ * One row per month that has payouts; the amount is the fees of that month.
+ */
+export const STRIPE_SUPPLIER_KEY = 'stripe';
+
+export function stripeFeeGroup(payoutCount: number, feeBani: number): SupplierGroup | null {
+  if (payoutCount <= 0) return null;
+  return {
+    key: STRIPE_SUPPLIER_KEY,
+    label: 'Stripe (comisioane de procesare)',
+    where:
+      'dashboard.stripe.com → Settings → Documents (Tax invoices). Factura lunii apare în jurul datei de 7 a lunii următoare.',
+    count: payoutCount,
+    total_bani: Math.max(0, Math.round(feeBani)),
+    payments: [],
+  };
+}
+
 export const CHECK_STEPS = ['downloaded', 'printed', 'handed'] as const;
 export type CheckStep = (typeof CHECK_STEPS)[number];

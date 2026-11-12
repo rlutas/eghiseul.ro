@@ -23,6 +23,10 @@ interface Payout {
   currency: string;
   status: string;
   arrival_date: string | null;
+  /** Data din extrasul de bancă, când payout-ul e legat de o linie de extras. */
+  bank_date?: string | null;
+  /** Data după care se pune în lună: bancă → ziua creării → estimarea Stripe. */
+  accounting_date?: string | null;
   tx_count: number;
   matched_count: number;
   synced_at: string;
@@ -144,7 +148,7 @@ export default function DecontariPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-neutral-50 text-left text-neutral-600">
-                  <th className="px-4 py-3 font-medium">Data sosirii</th>
+                  <th className="px-4 py-3 font-medium">Data în bancă</th>
                   <th className="px-4 py-3 font-medium">Payout</th>
                   <th className="px-4 py-3 font-medium text-right">Sumă netă</th>
                   <th className="px-4 py-3 font-medium text-center">Tranzacții</th>
@@ -159,7 +163,14 @@ export default function DecontariPage() {
                   const fullyMatched = p.tx_count > 0 && p.matched_count >= p.tx_count;
                   return (
                     <tr key={p.id} className="border-b last:border-b-0 hover:bg-neutral-50">
-                      <td className="px-4 py-3 whitespace-nowrap">{p.arrival_date ?? '—'}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {p.accounting_date ?? p.arrival_date ?? '—'}
+                        {!p.bank_date && (
+                          <span className="ml-1.5 text-xs text-neutral-400" title="Încă nelegat de extrasul de bancă: data e ziua în care Stripe a trimis banii">
+                            estimat
+                          </span>
+                        )}
+                      </td>
                       <td className="px-4 py-3 font-mono text-xs text-neutral-500">{p.id.slice(0, 18)}…</td>
                       <td className="px-4 py-3 text-right font-semibold whitespace-nowrap">
                         {ron(p.amount_bani)} RON

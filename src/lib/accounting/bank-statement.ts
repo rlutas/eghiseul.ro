@@ -35,13 +35,55 @@ export interface BankEntry {
  */
 export function payerFromDescription(desc: string): string | null {
   const parts = desc.split(';').map((p) => p.trim());
-  const ibanAt = parts.findIndex((p) => IBAN_RE.test(p.replace(/\s+/g, '')));
+  const ibanAt = parts.findIndex(isIbanSegment);
   if (ibanAt < 1) return null;
   const name = parts[ibanAt - 1];
-  return name && !IBAN_RE.test(name.replace(/\s+/g, '')) ? name.slice(0, 60) : null;
+  return name && !isIbanSegment(name) ? name.slice(0, 60) : null;
 }
 
 const IBAN_RE = /\bRO\d{2}[A-Z]{4}[A-Z0-9]{16}\b/;
+/** Any country's IBAN, as a WHOLE `;` segment (DE10320500000065491649). */
+const FOREIGN_IBAN_SEGMENT_RE = /^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/;
+
+/**
+ * A description segment that is the payer's IBAN. Romanian ones may sit inside
+ * a longer segment; a foreign one counts only when it is the whole segment, so
+ * a reference or a tax number is never taken for an IBAN. Foreign payers pay
+ * into the EUR account (SEPA) — with the RO-only pattern those lines had no
+ * payer and fell on „altele" (10.2026, two transfers typed by hand).
+ */
+function isIbanSegment(segment: string): boolean {
+  const s = segment.replace(/\s+/g, '').toUpperCase();
+  return IBAN_RE.test(s) || FOREIGN_IBAN_SEGMENT_RE.test(s);
+}
+
+/** True when a credit line carries a payer IBAN (Romanian or foreign). */
+export function hasPayerIban(desc: string): boolean {
+  return IBAN_RE.test(desc.replace(/\s+/g, '')) || desc.split(';').some((p) => FOREIGN_IBAN_SEGMENT_RE.test(p.replace(/\s+/g, '').toUpperCase()));
+}
+
+/**
+ * Currency of a BT account, read from its IBAN: `RO82BTRL RON CRT…`,
+ * `RO29BTRL EUR CRT…`. Amounts in `debit_bani` / `credit_bani` are in THIS
+ * currency's cents — the EUR account holds euro cents, not bani.
+ */
+export function accountCurrency(account: string | null | undefined): 'RON' | 'EUR' | 'USD' | 'GBP' {
+  const code = (account ?? '').replace(/\s+/g, '').toUpperCase().slice(8, 11);
+  return code === 'EUR' || code === 'USD' || code === 'GBP' ? code : 'RON';
+}
+
+/**
+ * The RON value BT prints on a foreign-currency line:
+ * `…;CURS 5.337 RON ECHIVALENT LEI 945.34` → 94534 (bani), rate 5.337.
+ */
+export function ronEquivalent(desc: string | null | undefined): { bani: number; rate: number | null } | null {
+  const m = (desc ?? '').match(/ECHIVALENT\s+LEI\s+([\d.]+)/i);
+  if (!m) return null;
+  const bani = Math.round(parseFloat(m[1]) * 100);
+  if (!Number.isFinite(bani) || bani <= 0) return null;
+  const r = (desc ?? '').match(/CURS\s+([\d.]+)\s+RON/i);
+  return { bani, rate: r ? parseFloat(r[1]) : null };
+}
 
 /**
  * Numerele de comandă menționate în descrierea plății. Clientul e instruit în
@@ -103,7 +145,7 @@ const RULES: Array<{
     // stă DUPĂ `aport` (care are și el IBAN) și după Stripe, deci prinde doar
     // banii veniți de la terți. Fără ea, plățile prin IBAN cădeau pe „altele"
     // și nu se lega nimic de comandă (10.09.2026, E-260905-DMUZA).
-    test: (d, _t, c) => c && /\bRO\d{2}[A-Z]{4}[A-Z0-9]{16}\b/.test(d.replace(/\s+/g, '')),
+    test: (d, _t, c) => c && hasPayerIban(d),
     category: 'incasare_client',
     counterparty: (d) => payerFromDescription(d),
   },
@@ -443,11 +485,17 @@ async function matchClientPayments(
     // fura linia comenzii care chiar așteaptă banii.
     if (!hit) {
       const txMs = new Date(e.tx_date).getTime();
-      const sameAmount = rows.filter(
+      // On the EUR account the line is in euro cents; the order total is in
+      // lei, so compare with the RON value BT prints on the line, within 1 leu
+      // (the bank's rate, rounded). No RON value on the line → no amount match.
+      const foreign = accountCurrency(e.account) !== 'RON';
+      const ronBani = foreign ? ronEquivalent(e.description)?.bani ?? null : e.credit_bani;
+      const tolerance = foreign ? 100 : 0;
+      const sameAmount = ronBani === null ? [] : rows.filter(
         (o) =>
           !used.has(o.id) &&
           o.payment_status !== 'paid' &&
-          Math.round(Number(o.total_price ?? 0) * 100) === e.credit_bani &&
+          Math.abs(Math.round(Number(o.total_price ?? 0) * 100) - ronBani) <= tolerance &&
           new Date(o.created_at).getTime() <= txMs
       );
       if (sameAmount.length === 1) hit = sameAmount[0];

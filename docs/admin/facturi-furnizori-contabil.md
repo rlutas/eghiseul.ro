@@ -27,6 +27,16 @@ Cât timp o lună are furnizori nepredați, pe paginile Decontări și Extras ba
 
 Fiecare bifă salvează cine a bifat și când. Le vedeți sub bifă și când țineți mouse-ul pe ea. Luna se bifează pe furnizor, nu pe fiecare plată. TikTok cu 49 de plăți e un singur rând.
 
+## Stripe
+
+Stripe apare în listă în fiecare lună cu decontări, cu suma comisioanelor din
+luna respectivă. Comisioanele nu se văd în extras, pentru că Stripe le oprește
+din fiecare decontare; de aceea rândul nu are plăți dedesubt.
+
+Factura lunară o găsiți în dashboard.stripe.com → Settings → Documents (Tax
+invoices). Apare în jurul datei de 7 a lunii următoare: cea pe octombrie 2026 a
+venit pe 07.11.
+
 ## Lunile vechi
 
 În lista din stânga sunt toate lunile cu extras importat. Click pe oricare ca să vedeți ce s-a predat și ce nu. Lunile complete apar cu „✓ complet”.

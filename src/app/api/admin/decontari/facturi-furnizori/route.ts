@@ -13,7 +13,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
-import { CHECK_STEPS, groupBySupplier, type CheckStep } from '@/lib/accounting/supplier-invoices';
+import { CHECK_STEPS, groupBySupplier, stripeFeeGroup, type CheckStep } from '@/lib/accounting/supplier-invoices';
+import { loadPayoutsByAccountingDate } from '@/lib/accounting/payout-month';
 
 const MONTH_RE = /^\d{4}-\d{2}$/;
 
@@ -36,6 +37,39 @@ function monthRange(month: string): { start: string; end: string } {
   const [y, m] = month.split('-').map(Number);
   const end = new Date(Date.UTC(m === 12 ? y + 1 : y, m === 12 ? 0 : m, 1)).toISOString().slice(0, 10);
   return { start: `${month}-01`, end };
+}
+
+/**
+ * Payout count and Stripe fees per accounting month (bank date, see
+ * payout-month.ts). Fees = `fee_bani` of the payout's transactions.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function stripeFeesByMonth(admin: any): Promise<Map<string, { payouts: number; fee_bani: number }>> {
+  const payouts = await loadPayoutsByAccountingDate<{ id: string; arrival_date: string | null; created_at_stripe?: string | null }>(admin, { limit: 2000 });
+  const monthOf = new Map<string, string>();
+  const out = new Map<string, { payouts: number; fee_bani: number }>();
+  for (const p of payouts) {
+    const m = p.accounting_date?.slice(0, 7);
+    if (!m) continue;
+    monthOf.set(p.id, m);
+    const row = out.get(m) ?? { payouts: 0, fee_bani: 0 };
+    row.payouts++;
+    out.set(m, row);
+  }
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await admin
+      .from('stripe_payout_transactions')
+      .select('payout_id, fee_bani')
+      .order('id', { ascending: true })
+      .range(from, from + 999);
+    if (error) throw new Error(error.message);
+    for (const t of data ?? []) {
+      const m = monthOf.get(t.payout_id);
+      if (m) out.get(m)!.fee_bani += Number(t.fee_bani ?? 0);
+    }
+    if (!data || data.length < 1000) break;
+  }
+  return out;
 }
 
 type EntryRow = { reference: string; tx_date: string; description: string | null; debit_bani: number; needs_invoice: boolean };
@@ -89,7 +123,12 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      const suppliers = groupBySupplier(entriesRes.data as EntryRow[]).map((g) => {
+      // Stripe: fees are withheld from payouts, so no bank line brings it in.
+      const stripeByMonth = await stripeFeesByMonth(admin);
+      const stripe = stripeByMonth.get(month);
+      const stripeGroup = stripe ? stripeFeeGroup(stripe.payouts, stripe.fee_bani) : null;
+      const groups = [...groupBySupplier(entriesRes.data as EntryRow[]), ...(stripeGroup ? [stripeGroup] : [])];
+      const suppliers = groups.map((g) => {
         const c = checks.get(g.key);
         const step = (s: CheckStep) => {
           const at = c?.[`${s}_at` as const] ?? null;
@@ -121,7 +160,10 @@ export async function GET(request: NextRequest) {
     const checksRes = await (admin as any).from('supplier_invoice_checks').select('month, supplier_key, handed_at');
     if (checksRes.error) throw new Error(checksRes.error.message);
 
+    const stripeByMonth = await stripeFeesByMonth(admin);
     const byMonth = new Map<string, EntryRow[]>();
+    // A month with payouts but no imported statement still owes the Stripe invoice.
+    for (const m of stripeByMonth.keys()) byMonth.set(m, []);
     for (const e of allEntries) {
       const m = e.tx_date.slice(0, 7);
       const list = byMonth.get(m) ?? [];
@@ -135,7 +177,9 @@ export async function GET(request: NextRequest) {
     );
     const months = [...byMonth.entries()]
       .map(([m, list]) => {
-        const groups = groupBySupplier(list);
+        const st = stripeByMonth.get(m);
+        const stripeGroup = st ? stripeFeeGroup(st.payouts, st.fee_bani) : null;
+        const groups = [...groupBySupplier(list), ...(stripeGroup ? [stripeGroup] : [])];
         return {
           month: m,
           suppliers: groups.length,

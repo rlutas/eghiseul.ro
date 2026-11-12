@@ -2,6 +2,7 @@
  * GET /api/admin/decontari/banca?month=YYYY-MM — extras bancă importat:
  * mișcări categorisite + sumar per categorie. Auth: payments.verify.
  */
+import { accountCurrency, ronEquivalent } from '@/lib/accounting/bank-statement';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -42,6 +43,12 @@ export async function GET(request: NextRequest) {
     // factura, ca operatorul să vadă din extras dacă mai are ceva de făcut
     // (10.09.2026). Fără ele, coloana „Comandă" ar fi doar un UUID.
     const entries = (data ?? []) as Array<Record<string, unknown> & { matched_order_id?: string | null }>;
+    // Currency of each line (the EUR account holds euro cents) + the RON value
+    // BT prints on foreign-currency lines, so the page never adds euro to lei.
+    for (const e of entries) {
+      e.currency = accountCurrency(e.account as string | null);
+      e.ron_equivalent_bani = ronEquivalent(e.description as string | null)?.bani ?? null;
+    }
     const orderIds = [...new Set(entries.map((e) => e.matched_order_id).filter(Boolean))] as string[];
     if (orderIds.length > 0) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

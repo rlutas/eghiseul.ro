@@ -22,6 +22,10 @@ interface Entry {
   description: string | null;
   debit_bani: number;
   credit_bani: number;
+  /** Moneda contului din care vine linia (contul în euro ține eurocenți). */
+  currency?: string;
+  /** Echivalentul în lei tipărit de bancă pe liniile în valută. */
+  ron_equivalent_bani?: number | null;
   category: string;
   counterparty: string | null;
   needs_invoice: boolean;
@@ -101,11 +105,15 @@ export default function BancaPage() {
     }
   };
 
-  const summary = new Map<string, { count: number; debit: number; credit: number }>();
+  // Euro and lei are never added together: one summary tile per category AND
+  // currency.
+  const cur = (e: Entry) => e.currency || 'RON';
+  const summary = new Map<string, { cat: string; currency: string; count: number; debit: number; credit: number }>();
   for (const e of entries) {
-    const s = summary.get(e.category) ?? { count: 0, debit: 0, credit: 0 };
+    const key = `${e.category}|${cur(e)}`;
+    const s = summary.get(key) ?? { cat: e.category, currency: cur(e), count: 0, debit: 0, credit: 0 };
     s.count++; s.debit += e.debit_bani; s.credit += e.credit_bani;
-    summary.set(e.category, s);
+    summary.set(key, s);
   }
 
   return (
@@ -137,14 +145,15 @@ export default function BancaPage() {
       {summary.size > 0 && (
         <Card>
           <CardContent className="p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            {[...summary.entries()].sort((a, b) => (b[1].debit + b[1].credit) - (a[1].debit + a[1].credit)).map(([cat, s]) => {
-              const c = CATEGORY_LABEL[cat] ?? CATEGORY_LABEL.altele;
+            {[...summary.entries()].sort((a, b) => (b[1].debit + b[1].credit) - (a[1].debit + a[1].credit)).map(([key, s]) => {
+              const c = CATEGORY_LABEL[s.cat] ?? CATEGORY_LABEL.altele;
               return (
-                <div key={cat} className="rounded-lg border border-neutral-200 p-3">
+                <div key={key} className="rounded-lg border border-neutral-200 p-3">
                   <Badge className={c.cls}>{c.label}</Badge>
+                  {s.currency !== 'RON' && <Badge className="ml-1 bg-sky-100 text-sky-800">cont {s.currency}</Badge>}
                   <p className="text-xs text-neutral-500 mt-1.5">{s.count} mișcări</p>
-                  {s.credit > 0 && <p className="text-sm font-semibold text-green-700">+{ron(s.credit)}</p>}
-                  {s.debit > 0 && <p className="text-sm font-semibold text-red-700">−{ron(s.debit)}</p>}
+                  {s.credit > 0 && <p className="text-sm font-semibold text-green-700">+{ron(s.credit)} {s.currency}</p>}
+                  {s.debit > 0 && <p className="text-sm font-semibold text-red-700">−{ron(s.debit)} {s.currency}</p>}
                 </div>
               );
             })}
@@ -179,8 +188,15 @@ export default function BancaPage() {
                       <td className="px-3 py-2 max-w-[380px] truncate" title={e.description ?? ''}>
                         {e.counterparty ?? e.description?.slice(0, 80) ?? '—'}
                       </td>
-                      <td className="px-3 py-2 text-right text-red-700 whitespace-nowrap">{e.debit_bani ? ron(e.debit_bani) : ''}</td>
-                      <td className="px-3 py-2 text-right text-green-700 whitespace-nowrap">{e.credit_bani ? ron(e.credit_bani) : ''}</td>
+                      <td className="px-3 py-2 text-right text-red-700 whitespace-nowrap">
+                        {e.debit_bani ? `${ron(e.debit_bani)}${cur(e) !== 'RON' ? ` ${cur(e)}` : ''}` : ''}
+                      </td>
+                      <td className="px-3 py-2 text-right text-green-700 whitespace-nowrap">
+                        {e.credit_bani ? `${ron(e.credit_bani)}${cur(e) !== 'RON' ? ` ${cur(e)}` : ''}` : ''}
+                        {cur(e) !== 'RON' && e.ron_equivalent_bani ? (
+                          <span className="block text-xs font-normal text-neutral-500">≈ {ron(e.ron_equivalent_bani)} lei</span>
+                        ) : null}
+                      </td>
                       <td className="px-3 py-2 text-center">
                         {e.category === 'stripe_payout' ? (
                           e.matched_payout_id ? (

@@ -5,6 +5,7 @@
  * correctly (same pattern as number-registry export).
  * Auth: payments.verify.
  */
+import { loadPayoutsByAccountingDate } from '@/lib/accounting/payout-month';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -54,19 +55,11 @@ export async function GET(request: NextRequest) {
     const month = url.searchParams.get('month');
     const payoutId = url.searchParams.get('payout');
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let payoutQuery = (admin as any).from('stripe_payouts').select('*').order('arrival_date');
-    if (payoutId) payoutQuery = payoutQuery.eq('id', payoutId);
-    else if (month && /^\d{4}-\d{2}$/.test(month)) {
-      const start = `${month}-01`;
-      const [y, m] = month.split('-').map(Number);
-      const end = new Date(Date.UTC(m === 12 ? y + 1 : y, m === 12 ? 0 : m, 1)).toISOString().slice(0, 10);
-      payoutQuery = payoutQuery.gte('arrival_date', start).lt('arrival_date', end);
-    } else {
+    if (!payoutId && !(month && /^\d{4}-\d{2}$/.test(month))) {
       return NextResponse.json({ success: false, error: 'month=YYYY-MM sau payout=po_... obligatoriu' }, { status: 400 });
     }
-    const { data: payouts, error: pErr } = await payoutQuery;
-    if (pErr) throw new Error(pErr.message);
+    // Month = the bank month (statement date), oldest first for the accountant.
+    const payouts = (await loadPayoutsByAccountingDate(admin, { month, payoutId })).reverse();
 
     const ids = (payouts ?? []).map((p: { id: string }) => p.id);
     const byId = new Map((payouts ?? []).map((p: { id: string }) => [p.id, p]));
@@ -89,7 +82,7 @@ export async function GET(request: NextRequest) {
       const p = byId.get(r.payout_id as string) as any;
       lines.push(
         [
-          esc(p?.arrival_date),
+          esc(p?.accounting_date ?? p?.arrival_date),
           esc(r.payout_id),
           esc(p?.status),
           esc(['charge', 'payment'].includes(r.type as string) ? 'Încasare' : ['refund', 'payment_refund'].includes(r.type as string) ? 'Rambursare' : r.type),

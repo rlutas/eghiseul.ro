@@ -40,6 +40,30 @@ Clientul contestă plata la banca lui. Stripe retrage suma și reține **100 lei
   - **comisionul Stripe de 100 lei e cheltuială** și nu se trece pe factura clientului.
 - Comisioanele de dispută apar pe linii separate: „Comision Stripe pentru dispută (cheltuială, nu se trece pe factura clientului)”.
 
+## În ce lună intră o decontare
+
+Luna e cea din **extrasul de bancă**, nu data estimată de Stripe. Stripe
+anunță sosirea cu o zi lucrătoare mai târziu decât intră banii: decontarea
+trimisă vineri, 30.10.2026 (1.143,42 lei) era în bancă în aceeași zi, dar
+Stripe scria 02.11, așa că apărea la noiembrie.
+
+Din 12.11.2026, coloana se numește **„Data în bancă”**:
+
+- dacă extrasul lunii e importat, data e cea de pe linia din extras;
+- dacă nu, scrie „estimat” lângă dată și se folosește ziua în care Stripe a
+  trimis banii.
+
+Filtrul pe lună și exportul CSV pentru contabil folosesc aceeași dată, deci
+exportul pe octombrie conține și decontarea din ultima zi a lunii.
+
+## Contul în euro
+
+Extrasul contului în euro se importă din aceeași pagină („Extras bancă”), ca
+cel în lei. Liniile apar cu „EUR” lângă sumă și cu echivalentul în lei tipărit
+de bancă. Plătitorii cu IBAN străin apar ca „Încasare client” și se leagă de
+comandă după numărul comenzii din detaliile plății sau după referința trecută
+la „Confirmă plata”. Totalurile în euro stau separat de cele în lei.
+
 ## 5. Când sunt actualizate liniile
 
 - Sincronizarea rulează zilnic și reface decontările din ultimele 30 de zile.

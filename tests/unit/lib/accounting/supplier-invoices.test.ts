@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { groupBySupplier, posMerchant, supplierFor } from '@/lib/accounting/supplier-invoices';
+import { groupBySupplier, posMerchant, stripeFeeGroup, supplierFor } from '@/lib/accounting/supplier-invoices';
 
 const pos = (merchant: string, amount: string) =>
   `EPOS 01/09/2026 273707000580423 TID:99999999 ${merchant}  cc@x.com IE 42440827 valoare tranzactie: ${amount} RRN:624440417294 comision tranzactie 0.00 RON; EDIGITALIZARE S R L;`;
@@ -54,3 +54,16 @@ describe('groupBySupplier', () => {
     ]);
   });
 });
+
+describe('Stripe în lista de facturi', () => {
+  it('o lună cu decontări are un rând Stripe, cu comisioanele lunii', () => {
+    const g = stripeFeeGroup(22, 123456);
+    expect(g).toMatchObject({ key: 'stripe', count: 22, total_bani: 123456, payments: [] });
+    expect(g!.where).toContain('7 a lunii următoare');
+  });
+
+  it('fără decontări nu apare', () => {
+    expect(stripeFeeGroup(0, 0)).toBeNull();
+  });
+});
+

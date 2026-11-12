@@ -4,6 +4,7 @@
  * Query: ?month=YYYY-MM (optional filter on arrival_date).
  * Auth: payments.verify (contabil, manager, super_admin).
  */
+import { loadPayoutsByAccountingDate } from '@/lib/accounting/payout-month';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -25,20 +26,9 @@ export async function GET(request: NextRequest) {
 
     const admin = createAdminClient();
     const month = new URL(request.url).searchParams.get('month'); // YYYY-MM
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (admin as any)
-      .from('stripe_payouts')
-      .select('*')
-      .order('arrival_date', { ascending: false })
-      .limit(200);
-    if (month && /^\d{4}-\d{2}$/.test(month)) {
-      const start = `${month}-01`;
-      const [y, m] = month.split('-').map(Number);
-      const end = new Date(Date.UTC(m === 12 ? y + 1 : y, m === 12 ? 0 : m, 1)).toISOString().slice(0, 10);
-      query = query.gte('arrival_date', start).lt('arrival_date', end);
-    }
-    const { data, error } = await query;
-    if (error) throw new Error(error.message);
+    // The month is the BANK month (statement date), not Stripe's estimate —
+    // see src/lib/accounting/payout-month.ts.
+    const data = await loadPayoutsByAccountingDate(admin, { month, limit: 200 });
 
     return NextResponse.json({ success: true, data: { payouts: data ?? [] } });
   } catch (err) {
