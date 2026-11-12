@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyOrderSearch, orderSearchTerms, ORDER_SEARCH_FIELDS } from '@/lib/admin/order-search';
+import { applyOrderSearch, normalizeSearchTerm, orderSearchMode, orderSearchTerms, resetOrderSearchModeCache, ORDER_SEARCH_FIELDS } from '@/lib/admin/order-search';
 
 describe('orderSearchTerms', () => {
   it('desparte fraza în cuvinte', () => {
@@ -52,3 +52,48 @@ describe('applyOrderSearch', () => {
     expect(calls).toEqual([]);
   });
 });
+
+describe('căutarea pe coloana search_text (migrarea 206)', () => {
+  it('normalizează ca în baza de date: litere mici, fără diacritice', () => {
+    expect(normalizeSearchTerm('Luțaș')).toBe('lutas');
+    expect(normalizeSearchTerm('ŞTEFĂNIȚĂ')).toBe('stefanita');
+    expect(normalizeSearchTerm('E-261109-XUJCS')).toBe('e-261109-xujcs');
+  });
+
+  it('un ilike pe cuvânt, pe search_text', () => {
+    const calls: Array<[string, string]> = [];
+    const q = { ilike(c: string, v: string) { calls.push([c, v]); return q; } };
+    applyOrderSearch(q, 'Luțaș  Raul', 'column');
+    expect(calls).toEqual([['search_text', '%lutas%'], ['search_text', '%raul%']]);
+  });
+
+  it('ultimele caractere din cod ajung ca atare', () => {
+    const calls: Array<[string, string]> = [];
+    const q = { ilike(c: string, v: string) { calls.push([c, v]); return q; } };
+    applyOrderSearch(q, 'xujcs', 'column');
+    expect(calls).toEqual([['search_text', '%xujcs%']]);
+  });
+
+  it('coloana lipsă → căile JSON; coloana prezentă → reținut', async () => {
+    const client = (error: unknown) => {
+      let probes = 0;
+      return {
+        probes: () => probes,
+        from: () => ({ select: () => ({ limit: async () => { probes++; return { error }; } }) }),
+      };
+    };
+    resetOrderSearchModeCache();
+    const missing = client({ code: '42703' });
+    expect(await orderSearchMode(missing)).toBe('json');
+    expect(await orderSearchMode(missing)).toBe('json');
+    expect(missing.probes()).toBe(1); // re-probed only after a minute
+
+    resetOrderSearchModeCache();
+    const present = client(null);
+    expect(await orderSearchMode(present)).toBe('column');
+    expect(await orderSearchMode(present)).toBe('column');
+    expect(present.probes()).toBe(1);
+    resetOrderSearchModeCache();
+  });
+});
+

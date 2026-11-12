@@ -67,3 +67,9 @@ pașaportul nr. …”, nu „CI seria …”. Contractul are și adresa de emai
 clientului. Pe o comandă generată înainte de 11.11.2026 care scrie greșit
 „CI”, generează din nou „Contract prestări” și „Contract asistență” din pagina
 comenzii. Semnătura clientului și numărul contractului rămân aceleași.
+
+**Previzualizarea din formular** (contractul pe care clientul îl citește înainte
+să semneze) a mai arătat „CI” la clienții cu pașaport până pe 12.11.2026, deși
+contractul salvat ieșea corect. E reparat: clientul vede „pașaportul” din
+momentul în care redeschide formularul. La o comandă încă neterminată nu aveți
+ce regenera din admin: contractul se face abia când clientul semnează.

@@ -17,8 +17,11 @@ Căutarea din „Comenzi” găsea greu sau deloc. Ce s-a schimbat:
   rezultatul unei căutări mai vechi. Acum rămâne mereu ultima căutare.
 - Virgula sau paranteza în căsuță nu mai strică nimic.
 
-Puteți căuta după: cod comandă, AWB, email, telefon, nume și prenume, nume de
-firmă. Cifrele de pe taburi arată câte rezultate sunt în fiecare.
+Puteți căuta după: cod comandă (ajung ultimele caractere, de exemplu
+`XUJCS`), AWB, email, telefon, nume și prenume, nume de firmă. Cifrele de pe
+taburi arată câte rezultate sunt în fiecare.
+
+Procedura: [Cum cauți o comandă în admin](../admin/cautare-comenzi.md).
 
 ---
 
@@ -37,7 +40,12 @@ firmă. Cifrele de pe taburi arată câte rezultate sunt în fiecare.
   eroare lista se golește în loc să păstreze rezultatele dinainte.
 - Teste: `tests/unit/lib/admin/order-search.test.ts`.
 
-**Viteză.** Fiecare cale JSON costă ~110 ms pe interogare (JSON-ul comenzii e
-mare), deci o căutare de un cuvânt rămâne la ~0,9 s, ca înainte, iar una de
-două cuvinte ~1,8 s. Rezolvarea e o coloană de căutare precalculată pe
-`orders` (migrare), nefăcută încă: cere aprobare pentru schimbare de schemă.
+**Viteză și migrarea 206.** Fiecare cale JSON costă ~110 ms pe interogare
+(JSON-ul comenzii e mare), deci o căutare de un cuvânt ia ~0,9 s, iar una de
+două cuvinte ~1,8 s. `supabase/migrations/206_orders_search_text.sql` adaugă
+`orders.search_text`, o coloană generată cu tot textul căutabil (inclusiv CNP
+și CUI), cu litere mici și fără diacritice. Codul o folosește singur când
+există (`orderSearchMode()` verifică o dată pe instanță și reverifică la un
+minut cât lipsește), deci nu e nevoie de redeploy după migrare. Aplicare:
+`node scripts/apply-migration.mjs supabase/migrations/206_orders_search_text.sql`.
+La data commit-ului migrarea **nu era aplicată**.

@@ -8,6 +8,7 @@ e fiecare card cu butoanele lui, ce fac și când le folosiți. Scris pe
 ## Bara de sus
 
 - **Statusul** cu badge (și „Anulare solicitată”, „documentero”, „test”).
+- **„Site: eghiseul.ro / documentero.ro”** (din 12.11.2026): site-ul pe care a comandat clientul. Linkurile copiate de aici (status, continuare, plată) se deschid pe acel site.
 - **Copiază linkul de status**: linkul pe care îl trimiteți clientului (pre-completat, vede stadiul, primește email la fiecare pas). **Deschide pagina de status** ca s-o vedeți ca el.
 - **Modifică**: schimbă opțiuni / curier / limbă / țară după plată; refund automat sau link de plată extra ([procedura](modify-order.md)).
 - **Schimbă serviciul** (din 02.11.2026): clientul a plătit alt serviciu decât voia, când azi ambele costă la fel (ex. Cazier Judiciar în loc de Cazier Fiscal, sau Copie intabulare în loc de Copie contract de vânzare). Merge și pe comenzi finalizate, ca să corectați evidența. Pașii sunt în secțiunea „Schimbă serviciul” de mai jos.
@@ -227,3 +228,9 @@ Proveniența: de unde a venit clientul (campanie, prima vizită).
 
 Semnătura desenată, data, IP-ul semnării, amprenta documentului: dovada
 legală a contractului semnat în formular.
+
+**Contractul de asistență juridică** spune din 12.11.2026 documentul comenzii
+(„pe durata obținerii certificatului de celibat”, „…cazierului fiscal”), nu
+„cazierului judiciar” la toate. Pe o comandă mai veche, dacă clientul cere
+corectarea: generați din nou contractul de asistență din documente. Numărul de
+contract rămâne același, data devine cea de azi.

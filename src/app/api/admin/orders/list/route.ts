@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission, getUserPermissions } from '@/lib/admin/permissions';
 import { applyStatusFilter, parseTestFilter, resolveStatusFilter } from '@/lib/admin/orders-tabs';
-import { applyOrderSearch, orderSearchTerms } from '@/lib/admin/order-search';
+import { applyOrderSearch, orderSearchMode, orderSearchTerms } from '@/lib/admin/order-search';
 import { LAWYER_SERVICE_SLUGS } from '@/lib/documents/no-lawyer-services';
 import { applyQuickOrStage } from '@/lib/admin/order-quick-filters';
 import { getOpenOutages } from '@/lib/services/platform-services';
@@ -112,6 +112,7 @@ export async function GET(request: NextRequest) {
 
     // Every filter of the list, as one function: the page query, the id
     // prefix and the „Recuperare telefonică" lookups below must see the same rows.
+    const searchMode = search ? await orderSearchMode(adminClient) : 'json';
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const withFilters = (q: any): any => {
       // Apply status filter via the shared resolver — supports tab values
@@ -143,7 +144,7 @@ export async function GET(request: NextRequest) {
       if (quick) q = applyQuickOrStage(q, quick);
       // Search: every word must match some field (order code, AWB, email,
       // phone, CNP, person or company name) — src/lib/admin/order-search.ts.
-      q = applyOrderSearch(q, search);
+      q = applyOrderSearch(q, search, searchMode);
       return q;
     };
     // paid_at first: o comandă creată ca draft ieri și plătită azi trebuie

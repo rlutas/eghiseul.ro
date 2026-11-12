@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-12 | 🔴 **Previzualizarea contractului: „pașaportul”, nu „CI”** — `ContractPreview` trimite `idDocumentType` / `documentType` la `/api/contracts/preview` | [2026-11-12-previzualizare-contract-pasaport.md](2026-11-12-previzualizare-contract-pasaport.md) |
 | 2026-11-12 | 🔴 **Admin: căutarea de comenzi găsește ciornele, numele complet și firmele** — `applyOrderSearch()` comun listă + contoare, un `or()` pe cuvânt, „Toate” fără `HIDDEN_FROM_DEFAULT` la căutare, răspunsuri vechi ignorate | [2026-11-12-cautare-comenzi-admin.md](2026-11-12-cautare-comenzi-admin.md) |
 | 2026-11-12 | 🟣 **Portal colaborator: rubrici „CF 1, CF 2” la comenzile cu mai multe imobile** — `imobileForWork()` citește și `property.additionalImobile`; avertisment în „Date pentru lucrare”, etichetă „N CF” în listă | [2026-11-12-colaborator-mai-multe-cf-uri.md](2026-11-12-colaborator-mai-multe-cf-uri.md) |
 | 2026-11-12 | ✅ **Pagina de plată refăcută (toate site-urile)** — lățime 1200px ca wizardul, coloană rezumat 400px, cupon și metode de plată rescrise, logourile cardurilor, `BrandFooter` în locul `OrderFlowDisclosure` | [2026-11-12-pagina-de-plata-refacuta.md](2026-11-12-pagina-de-plata-refacuta.md) |

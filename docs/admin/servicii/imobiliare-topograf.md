@@ -70,6 +70,7 @@ imobilului, numele și telefonul solicitantului, motivul, notele.
   - **„Nu am găsit — depun certificat la OCPI”**: statusul devine „Identificare nereușită — certificat OCPI depus”, clientul primește emailul, termenul +10 zile lucrătoare.
   - **„Am depus cererea la OCPI”**: numărul de înregistrare, **termenul dat de OCPI** (clientul îl vede în pagina comenzii) + costul (precompletat cu taxa serviciului). La CF obținut direct online nu se cere depunere: costul se înregistrează singur la încărcare.
   - **„Mesaje cu clientul”**: îi scrie direct clientului (întrebări, lista imobilelor găsite după proprietar, cerere de act vechi); clientul primește email și răspunde din pagina comenzii. Vezi [Mesajele cu clientul](../mesaje-client.md).
+  - **Mai multe cărți funciare pe o comandă** (din 12.11.2026): în „Date pentru lucrare” apare un avertisment galben și câte o rubrică **CF 1, CF 2…** pentru fiecare imobil; în lista de comenzi, eticheta **„2 CF”** lângă cod. Cererile de depus rămân câte una pe imobil.
   - **„Acte trimise de client”** (în „Date pentru lucrare”): pozele/PDF-urile încărcate de client la comandă (extras CF vechi, titlu, contract).
   - **Statusul**: În lucru · Depusă la OCPI · Blocată — instituția indisponibilă (termenul pe pauză) · Problemă — necesare informații de la client (obligatoriu ce lipsește; comanda intră în „Așteptare client”, echipa îl contactează) · Documentul este eliberat · Finalizată · Livrată, încarcă document suplimentar.
   - **„Încarcă PDF și trimite clientului”**: documentul pleacă pe email, statusul se schimbă singur.

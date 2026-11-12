@@ -64,6 +64,7 @@ Index al documentației. Aceasta e o **hartă**, nu un jurnal — pentru jurnalu
 - **Plată prin transfer bancar (IBAN):** [`admin/plata-transfer-bancar.md`](admin/plata-transfer-bancar.md) — procedura echipei: tab „Așteptare plată", confirmarea încasării din extras, legătura cu decontările
 - **Meta Conversions API (tracking server-side):** [`technical/specs/meta-capi-tracking.md`](technical/specs/meta-capi-tracking.md)
 - **Webhook Resend (bounce → banner admin + alertă):** [`technical/specs/resend-bounce-webhook.md`](technical/specs/resend-bounce-webhook.md)
+- **Cum cauți o comandă în admin (cod parțial, nume, firmă, site-ul comenzii):** [`admin/cautare-comenzi.md`](admin/cautare-comenzi.md)
 - **Client blocat în formular / probleme la act:** [`admin/client-blocat-in-formular.md`](admin/client-blocat-in-formular.md)
 - **Comandă blocată din cauza clientului (contract 9.8/9.9, 90 de zile, oferta de 70% pe comenzi vechi):** [`admin/comanda-blocata-de-client.md`](admin/comanda-blocata-de-client.md)
 - **Credit Gemini (OCR) + Erori clienți:** [`admin/credit-gemini-si-erori-clienti.md`](admin/credit-gemini-si-erori-clienti.md); API: [`technical/api/monitoring-api.md`](technical/api/monitoring-api.md)

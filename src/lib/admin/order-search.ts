@@ -55,13 +55,64 @@ export function orderSearchTerms(raw: string | null | undefined): string[] {
     .slice(0, MAX_TERMS);
 }
 
-/** One `or(...)` group per word; PostgREST ANDs the groups. */
+/**
+ * Lowercase, no Romanian diacritics — the same transformation the
+ * `orders.search_text` column applies (migration 206), so „Lutas" finds „Luțaș".
+ */
+export function normalizeSearchTerm(term: string): string {
+  const FROM = 'ăâîșşțţáéíóöőúüű';
+  const TO = 'aaissttaeiooouuu';
+  return [...term.toLowerCase()].map((ch) => {
+    const at = FROM.indexOf(ch);
+    return at === -1 ? ch : TO[at];
+  }).join('');
+}
+
+/**
+ * 'column' — `orders.search_text` exists (migration 206): one short generated
+ *            text per order, every word matched against it. Fast, also finds
+ *            CNP / CUI and ignores diacritics.
+ * 'json'   — the column is not there (yet): match the JSON paths directly.
+ */
+export type OrderSearchMode = 'column' | 'json';
+
+let cachedMode: { mode: OrderSearchMode; at: number } | null = null;
+const JSON_MODE_RECHECK_MS = 60_000;
+
+/**
+ * Which matcher the database supports. Probed once per server instance; a
+ * missing column is re-probed every minute, so the fast path switches on by
+ * itself after the migration runs — no redeploy.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function applyOrderSearch<Q = any>(query: Q, raw: string | null | undefined): Q {
+export async function orderSearchMode(adminClient: any): Promise<OrderSearchMode> {
+  if (cachedMode && (cachedMode.mode === 'column' || Date.now() - cachedMode.at < JSON_MODE_RECHECK_MS)) {
+    return cachedMode.mode;
+  }
+  const { error } = await adminClient.from('orders').select('search_text').limit(1);
+  cachedMode = { mode: error ? 'json' : 'column', at: Date.now() };
+  return cachedMode.mode;
+}
+
+/** Test hook. */
+export function resetOrderSearchModeCache(): void {
+  cachedMode = null;
+}
+
+/**
+ * Every word must match. 'column': one ILIKE per word on `search_text`.
+ * 'json': one `or(...)` group per word over the JSON paths (PostgREST ANDs
+ * the groups).
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function applyOrderSearch<Q = any>(query: Q, raw: string | null | undefined, mode: OrderSearchMode = 'json'): Q {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let q: any = query;
   for (const term of orderSearchTerms(raw)) {
-    q = q.or(ORDER_SEARCH_FIELDS.map((f) => `${f}.ilike.%${term}%`).join(','));
+    q =
+      mode === 'column'
+        ? q.ilike('search_text', `%${normalizeSearchTerm(term)}%`)
+        : q.or(ORDER_SEARCH_FIELDS.map((f) => `${f}.ilike.%${term}%`).join(','));
   }
   return q as Q;
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { applyOrderSearch, orderSearchTerms } from '@/lib/admin/order-search';
+import { applyOrderSearch, orderSearchMode, orderSearchTerms } from '@/lib/admin/order-search';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requirePermission } from '@/lib/admin/permissions';
@@ -77,6 +77,7 @@ export async function GET(request: NextRequest) {
     // Build a fresh head-only count query and apply the shared filters
     // (test + service + search). Using a factory instead of a generic helper
     // keeps the Supabase builder narrow types intact.
+    const searchMode = search ? await orderSearchMode(adminClient) : 'json';
     const buildQuery = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let q: any = adminClient
@@ -87,7 +88,7 @@ export async function GET(request: NextRequest) {
       if (platform) q = q.eq('platform', platform);
       if (service) q = q.eq('service_id', service);
       // Same matcher as the list — the tab badge and the rows must agree.
-      q = applyOrderSearch(q, search);
+      q = applyOrderSearch(q, search, searchMode);
       return q;
     };
 

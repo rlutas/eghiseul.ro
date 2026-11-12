@@ -53,6 +53,12 @@ export default function ContractPreview() {
             firstName: state.personalKyc.firstName,
             lastName: state.personalKyc.lastName,
             cnp: state.personalKyc.cnp,
+            // Which document it is — without these the preview said „CI" for
+            // a passport holder, while the signed contract said „pașaport"
+            // (E-261109-XUJCS, 12.11.2026). Same two fields the server reads
+            // (`idDocumentKindFrom`).
+            idDocumentType: state.personalKyc.idDocumentType,
+            documentType: state.personalKyc.documentType,
             documentSeries: state.personalKyc.documentSeries,
             documentNumber: state.personalKyc.documentNumber,
             documentIssuedBy: state.personalKyc.documentIssuedBy,

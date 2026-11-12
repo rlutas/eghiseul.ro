@@ -127,6 +127,13 @@ export interface GuideLink {
  */
 export const CURATED_GUIDES: GuideLink[] = [
   {
+    title: 'Cum cauți o comandă în admin',
+    slug: 'admin/cautare-comenzi',
+    category: 'admin',
+    description:
+      'Ultimele caractere din cod, nume și prenume în orice ordine, firmă, email, telefon, AWB. Pe „Toate” caută și în ciorne și neplătite. Unde scrie de pe ce site e comanda.',
+  },
+  {
     title: 'Comandă blocată din cauza clientului: ce faci',
     slug: 'admin/comanda-blocata-de-client',
     category: 'comenzi',
