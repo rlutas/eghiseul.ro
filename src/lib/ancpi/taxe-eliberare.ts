@@ -26,7 +26,10 @@ export const TAXA_ELIBERARE_RON: Record<string, number> = {
  */
 export const TAXA_LIVRARE_DIRECTA_RON: Record<string, number> = {
   'extras-carte-funciara': 20,
-  'extras-cf-colectiv': 20,
+  // Cartea funciară colectivă nu ne costă nimic la eliberare (raport echipă
+  // 03.11.2026: apărea 20 lei și îl puneau de mână pe 0). Se înregistrează
+  // rândul cu 0, ca decontul să știe că taxa e cunoscută, nu lipsă.
+  'extras-cf-colectiv': 0,
   'extras-plan-cadastral': 15,
   // Identificarea livrată direct = un extras CF (20 lei) pentru imobilul
   // identificat, nu certificatul 2.7.8 de 100 lei de la ghișeu.
@@ -53,6 +56,8 @@ export function taxaEliberare(
   slug: string | null | undefined,
   processingConfig?: { ancpi_cost_ron?: number | string | null } | null
 ): number | null {
+  // Taxă cunoscută ca zero: bate tariful din config (care e informativ).
+  if (slug && TAXA_LIVRARE_DIRECTA_RON[slug] === 0) return 0;
   const dinConfig = Number(processingConfig?.ancpi_cost_ron);
   if (Number.isFinite(dinConfig) && dinConfig > 0) return dinConfig;
   if (!slug) return null;

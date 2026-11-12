@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { taxaEliberare } from '@/lib/ancpi/taxe-eliberare';
+import { taxaEliberare, taxaLivrareDirecta } from '@/lib/ancpi/taxe-eliberare';
 
 describe('taxaEliberare', () => {
   it('urmează tarifele oficiale ANCPI (Ordin 16/2019)', () => {
@@ -20,5 +20,14 @@ describe('taxaEliberare', () => {
     expect(taxaEliberare('cazier-judiciar-persoana-fizica')).toBeNull();
     expect(taxaEliberare(null)).toBeNull();
     expect(taxaEliberare(undefined)).toBeNull();
+  });
+
+  it('cartea funciară colectivă nu costă nimic: 0, nu „fără taxă”, și bate tariful din config', () => {
+    expect(taxaLivrareDirecta('extras-cf-colectiv')).toBe(0); // se înregistrează rândul cu 0
+    expect(taxaEliberare('extras-cf-colectiv')).toBe(0);
+    expect(taxaEliberare('extras-cf-colectiv', { ancpi_cost_ron: 20 })).toBe(0);
+    // celelalte rămân cum erau
+    expect(taxaLivrareDirecta('extras-carte-funciara')).toBe(20);
+    expect(taxaLivrareDirecta('actualizare-adresa-cf')).toBeNull();
   });
 });

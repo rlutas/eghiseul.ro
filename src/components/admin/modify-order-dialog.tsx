@@ -407,6 +407,14 @@ export function ModifyOrderDialog({
     (sum, o) => sum + (o.priceModifier ?? o.price_modifier ?? 0) * (o.quantity ?? 1),
     0
   );
+  // What is NEW vs what the customer already paid for. The single „Opțiuni
+  // selectate" sum included the paid ones (urgență 80 on E-261111-ZHVGM), so
+  // the team read it as „charged again" (12.11.2026).
+  const paidIds = new Set(seed.map((x) => x.optionId ?? x.option_id ?? x.code).filter(Boolean) as string[]);
+  const isPaidAlready = (o: OptionRow) => paidIds.has((o.optionId ?? o.option_id ?? o.code) as string);
+  const rowPrice = (o: OptionRow) => (o.priceModifier ?? o.price_modifier ?? 0) * (o.quantity ?? 1);
+  const livePaidTotal = options.filter(isPaidAlready).reduce((s, o) => s + rowPrice(o), 0);
+  const liveNewTotal = liveOptionsTotal - livePaidTotal;
   const liveCustomPrice = parseFloat(customExtraPrice) || 0;
   const liveTermShift = computeAddedTermShiftDays(seed, options);
 
@@ -556,10 +564,16 @@ export function ModifyOrderDialog({
             {optionRows.length > 0 && (
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                 <span>
-                  Opțiuni selectate:{' '}
+                  Opțiuni noi:{' '}
                   <span className="font-semibold text-foreground tabular-nums">
-                    {liveOptionsTotal.toFixed(2)} RON
+                    +{liveNewTotal.toFixed(2)} RON
                   </span>
+                  {livePaidTotal > 0 && (
+                    <>
+                      {' '}· deja plătite (nu se mai taxează):{' '}
+                      <span className="tabular-nums">{livePaidTotal.toFixed(2)} RON</span>
+                    </>
+                  )}
                   {liveCustomPrice > 0 && (
                     <>
                       {' '}+ custom{' '}
