@@ -1,12 +1,13 @@
 # Cerere către Google: cazierfiscal.com în afara politicii „Government documents and services”
 
-**Stare la 12.11.2026:** ciornă. Nimic depus, niciun cont creat. Pagina „Cont Google Ads nou” e deschisă pe loginul `r.lutas@yahoo.com`; contul îl creează Raul (facturare și card).
+**Stare la 12.11.2026:** cerere trimisă, în așteptare. Cont 933-520-0143, fără campanii.
 
 | Data | Ce s-a întâmplat |
 |---|---|
 | 12.11.2026 | Site pregătit: 404 pe alte servicii, texte verificate. Text de cerere scris. |
 | 12.11.2026 | Cont creat de Raul: **933-520-0143** („cazierfiscal.com”), login `r.lutas@yahoo.com`, România, RON, profil de plăți existent EDIGITALIZARE SRL (7217-8703-9580), Visa ••0827, plată ulterioară, **fără cod de ofertă**. Verificat în cont: 0 campanii. |
 | 12.11.2026 | Formularul de certificare completat de Claude, opțiunea 4: domeniu `cazierfiscal.com`, descrierea de mai jos, contact Raul Lutas, firmă EDIGITALIZARE S.R.L., ID 933-520-0143. **Nebifate și netrimise:** garanția, declarația de veridicitate, „Next”. Le face Raul. |
+| 12.11.2026 | **Trimis de Raul.** Confirmare Google: „Your email has been sent. Thanks for contacting Google Ads support.” Răspuns așteptat până pe ~26.11.2026, pe `r.lutas@yahoo.com`. Jurnalul comun: [`2026-11-12-google-ads-jurnal-incercari.md`](2026-11-12-google-ads-jurnal-incercari.md). |
 
 ## De ce pe cazierfiscal.com
 
