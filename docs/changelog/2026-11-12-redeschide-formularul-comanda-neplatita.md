@@ -23,6 +23,11 @@ Tot de azi, linkurile copiate din pagina comenzii (plată, status) se deschid
 pe site-ul de pe care a venit comanda: documentero.ro pentru comenzile
 documentero, nu eghiseul.ro.
 
+În capul paginii comenzii apare acum **„Site: documentero.ro”** sau **„Site:
+eghiseul.ro”**: site-ul pe care a comandat clientul. Adminul e același pentru
+ambele, deci până acum nu se vedea. Linkurile se fac singure pe site-ul
+comenzii; nu alegeți voi.
+
 Procedura: [Client blocat](../admin/ghid-echipa-ajutare-client-blocat.md).
 
 ---

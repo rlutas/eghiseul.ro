@@ -1,7 +1,7 @@
 'use client';
 
 import { classifyAttribution, CHANNEL_LABEL } from '@/lib/analytics/attribution-channel';
-import { appBaseForOrder } from '@/lib/brand/for-order';
+import { appBaseForOrder, brandForOrder } from '@/lib/brand/for-order';
 import { listUnbilledExtras } from '@/lib/accounting/extra-invoice-match';
 import { contentSource, PLACEMENT_LABEL } from '@/lib/analytics/content-attribution';
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
@@ -1103,6 +1103,15 @@ export default function AdminOrderDetailPage() {
               >
                 {(order.priority ?? 0) > 0 ? 'URGENT' : 'Marchează urgent'}
               </button>
+              {/* Site-ul pe care a comandat clientul (orders.platform). Adminul
+                  rulează pe eghiseul.ro pentru ambele, deci fără asta echipa nu
+                  are de unde ști (E-261111-EMRB4, luată drept eghiseul). */}
+              <span
+                title="Site-ul pe care clientul a făcut comanda — linkurile pentru client se deschid acolo"
+                className="inline-flex items-center rounded border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-xs font-medium text-slate-700"
+              >
+                Site: {brandForOrder(order as { platform?: string | null }).baseUrl.replace(/^https?:\/\//, '')}
+              </span>
               {order.friendly_order_id && (
                 <a
                   href={`/comanda/status?order=${encodeURIComponent(order.friendly_order_id)}&email=${encodeURIComponent(order.customer_data?.contact?.email ?? '')}`}
