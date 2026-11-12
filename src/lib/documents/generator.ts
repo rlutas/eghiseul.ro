@@ -343,7 +343,13 @@ export function idDocumentKindFrom(personal: unknown): 'ci' | 'passport' {
 function buildIdentityClause(client: ClientData): string {
   if (client.id_document_type === 'passport') {
     if (!client.ci_number) return '';
-    let text = `legitimat/ă cu pașaportul${client.ci_series ? ` seria ${client.ci_series}` : ''} nr. ${client.ci_number}`;
+    // „PE", „PS", „PD"… printed on a Romanian passport is its TYPE (pașaport
+    // electronic / simplu / diplomatic), not a series — the passport has none.
+    // The OCR / the customer put it in the series field, and the contract said
+    // „pașaportul seria PE" (E-261109-XUJCS, 12.11.2026).
+    const series = (client.ci_series ?? '').trim();
+    const isTypeCode = /^P[A-Z]?$/i.test(series);
+    let text = `legitimat/ă cu pașaportul${series && !isTypeCode ? ` seria ${series}` : ''} nr. ${client.ci_number}`;
     if (client.document_issued_by) text += `, emis de ${client.document_issued_by}`;
     return text;
   }

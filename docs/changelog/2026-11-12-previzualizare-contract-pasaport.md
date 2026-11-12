@@ -15,6 +15,8 @@ adresa de email, ca în contractul final.
 - La o comandă neterminată nu aveți ce regenera din admin: contractul se face
   când clientul semnează.
 - La comenzile deja semnate nu se schimbă nimic; acolo contractul era corect.
+- Pe pașapoartele românești, „PE” (sau „PS”) e tipul pașaportului, nu o serie.
+  Contractul nu mai scrie „pașaportul seria PE”, ci doar „pașaportul nr. …”.
 
 ---
 
@@ -28,3 +30,7 @@ adresa de email, ca în contractul final.
 Verificat pe datele unei comenzi reale cu pașaport: cererea veche întoarce „cu
 CI seria”, cea nouă „cu pașaportul”; contractul randat a fost privit în
 browser.
+
+**Tipul pașaportului luat drept serie.** `buildIdentityClause` sare peste
+`ci_series` când e un cod de tip (`P`, `PE`, `PS`, `PD`…); o serie reală de pe
+un pașaport străin rămâne. Test în `generator.test.ts`.

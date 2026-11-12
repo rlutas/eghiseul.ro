@@ -54,6 +54,19 @@ describe('buildClientDetailsBlock — PF (persoană fizică)', () => {
     expect(text).not.toContain('CI seria');
   });
 
+  it('does not print the passport TYPE (PE, PS, P) as a series (12.11.2026)', () => {
+    for (const typeCode of ['PE', 'pe', 'PS', 'P']) {
+      const text = buildClientDetailsBlock({ ...baseClient, ci_series: typeCode, ci_number: '064797599', id_document_type: 'passport' });
+      expect(text).toContain('legitimat/ă cu pașaportul nr. 064797599');
+      expect(text).not.toContain('seria');
+    }
+    // a real series on a foreign passport stays
+    const foreign = buildClientDetailsBlock({ ...baseClient, ci_series: 'AB', ci_number: '1234567', id_document_type: 'passport' });
+    expect(foreign).toContain('pașaportul seria AB nr. 1234567');
+    // the CI branch is untouched
+    expect(buildClientDetailsBlock({ ...baseClient, ci_series: 'PE', ci_number: '584285' })).toContain('CI seria PE nr. 584285');
+  });
+
   it('adds the e-mail address to the identification block', () => {
     expect(buildClientDetailsBlock(baseClient)).toContain('e-mail ion@example.com');
   });
