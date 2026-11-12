@@ -48,4 +48,6 @@ două cuvinte ~1,8 s. `supabase/migrations/206_orders_search_text.sql` adaugă
 există (`orderSearchMode()` verifică o dată pe instanță și reverifică la un
 minut cât lipsește), deci nu e nevoie de redeploy după migrare. Aplicare:
 `node scripts/apply-migration.mjs supabase/migrations/206_orders_search_text.sql`.
-La data commit-ului migrarea **nu era aplicată**.
+Migrarea a fost aplicată pe 12.11.2026: toate comenzile au `search_text`, iar
+o căutare (cod parțial, nume în ambele ordini, CNP, fără diacritice) ia
+~0,1 s în loc de 1–2 s.

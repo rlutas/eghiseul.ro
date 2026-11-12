@@ -2,11 +2,11 @@
 
 > **🟣 Update 2026-11-12 — admin: redeschidere formular, căutare, contracte, pagina de plată.**
 > - **Comandă trimisă și neplătită:** buton „Redeschide formularul” (înapoi pe ciornă + link de continuare); cronul de auto-abandon numără 30 de minute de la trimitere, nu de la începutul ciornei. [changelog](changelog/2026-11-12-redeschide-formularul-comanda-neplatita.md)
-> - **Căutarea de comenzi** găsește ciornele, numele complet și firmele; pe „Toate” caută în toate statusurile. Migrarea 206 (`orders.search_text`, căutare rapidă, fără diacritice, CNP/CUI) e scrisă, **neaplicată încă**. [ghid](admin/cautare-comenzi.md)
+> - **Căutarea de comenzi** găsește ciornele, numele complet și firmele; pe „Toate” caută în toate statusurile. Migrarea 206 (`orders.search_text`) aplicată: ~0,1 s pe căutare, fără diacritice, și după CNP/CUI. [ghid](admin/cautare-comenzi.md)
 > - **Contracte:** contractul de asistență numește documentul comenzii (era „cazierului judiciar” la toate); previzualizarea din formular arată „pașaportul” la clienții cu pașaport. ~157 de contracte vechi au fraza greșită, neregenerate.
 > - **Pagina de plată** refăcută pe toate site-urile (1200px, logouri carduri, footer complet); iconița documentero pe paginile de comandă; linkurile din admin pe site-ul comenzii, etichetă „Site: …”.
 > - **Portal colaborator:** rubrici „CF 1, CF 2” la comenzile cu mai multe imobile.
-> - **Deschise:** aplicarea migrării 206; sesiunile Stripe vechi de pe E-261111-EMRB4; plata pe ciornă prin linkul vechi de checkout (posibilă, de decis blocarea).
+> - **Deschise:** sesiunile Stripe vechi de pe E-261111-EMRB4; plata pe ciornă prin linkul vechi de checkout (posibilă, de decis blocarea).
 
 > **🔴 Update 2026-11-11 — contract: comenzi blocate de client, pașaport, acordul la termeni.**
 > - **Contract + Termeni pe toate 5 site-urile:** dacă actul nu se poate elibera din cauza a ceva ce doar clientul poate face (ex. transcrierea căsătoriei din străinătate), comanda se suspendă după un mesaj scris; după 90 de zile sau refuz reținem serviciul de bază + onorariul și rambursăm doar ce nu am început. Valabil pentru comenzile de pe 11.11. **De revizuit de avocată.** [procedura echipei](admin/comanda-blocata-de-client.md)

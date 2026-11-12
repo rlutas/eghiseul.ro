@@ -13,8 +13,9 @@ scrieți orice bucată din ce știți despre comandă și apare.
 | Email | adresa sau o parte din ea | `ion.pop`, `@yahoo` |
 | Telefon | ultimele cifre | `708181` |
 | AWB | numărul sau o parte | `2081234` |
+| CNP sau CUI | întreg sau o parte | `RO4927`, ultimele cifre din CNP |
 
-- Literele mari sau mici nu contează.
+- Literele mari sau mici și diacriticele nu contează: `lutas` găsește „Luțaș”.
 - Puteți scrie mai multe cuvinte: comanda trebuie să le conțină pe toate.
 - Căutarea pornește singură după 3 caractere; pentru 1–2 caractere apăsați Enter.
 
