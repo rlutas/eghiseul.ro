@@ -6,6 +6,8 @@
 export interface OrderLineSource {
   /** Service display name (e.g. "Cazier Judiciar"). */
   serviceName: string;
+  /** Shown under the service name on the Stripe page (who it is for, order number). */
+  serviceDescription?: string;
   /** Base service price in RON. */
   basePrice: number;
   /** Normalized options (addons + bundled secondary services). */
@@ -51,6 +53,9 @@ export function buildStripeLineItems(input: OrderLineSource): StripeLineItem[] {
       currency: 'ron',
       product_data: {
         name: input.serviceName.slice(0, MAX_LINE_ITEM_NAME),
+        ...(input.serviceDescription?.trim()
+          ? { description: input.serviceDescription.trim().slice(0, 500) }
+          : {}),
       },
       unit_amount: ronToBani(input.basePrice),
     },

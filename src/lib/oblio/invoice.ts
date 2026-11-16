@@ -248,14 +248,14 @@ export const CNP_PLACEHOLDER = '0000000000000';
 /**
  * The CNP as it should appear on the invoice.
  *
- * An empty CNP stays empty (Oblio accepts PF clients without one, and foreign
- * billing persons must not inherit anyone's CNP). A CNP that fails the check
- * digit becomes 13 zeros — otherwise Oblio blocks the invoice at "Trimite în
- * SPV" and it never reaches ANAF.
+ * A missing CNP, or one that fails the check digit, becomes 13 zeros: the
+ * identifier ANAF expects for a buyer without a valid CNP. Otherwise Oblio
+ * blocks the invoice at "Trimite în SPV" and it never reaches ANAF. Billing no
+ * longer requires a CNP (16.11.2026), so a missing one is an ordinary case.
  */
 export function sanitizePfCnp(raw: string | undefined | null): string {
   const cnp = (raw || '').replace(/[\s-]/g, '');
-  if (!cnp) return '';
+  if (!cnp) return CNP_PLACEHOLDER;
   return validateCNP(cnp).valid ? cnp : CNP_PLACEHOLDER;
 }
 
@@ -319,7 +319,8 @@ export function buildOblioClient(customerData: CustomerData): OblioClient {
     name:
       `${billing?.firstName || contact?.firstName || personal?.firstName || ''} ${billing?.lastName || contact?.lastName || personal?.lastName || ''}`.trim() ||
       'N/A',
-    cif: sanitizePfCnp(billing?.cnp || (pfIsForeign ? '' : personal?.cnp || '')),
+    // Abroad without a CNP: stays empty, as before (not a domestic e-Factura buyer).
+    cif: pfIsForeign && !billing?.cnp?.trim() ? '' : sanitizePfCnp(billing?.cnp || personal?.cnp || ''),
     address: resolved.address,
     city: resolved.city,
     state: resolved.state,

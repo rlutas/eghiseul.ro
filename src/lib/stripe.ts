@@ -169,6 +169,18 @@ export interface HostedCheckoutOptions {
     code: string;
     amountRon: number;
   };
+  /**
+   * Per-order look of the Stripe page. One Stripe account serves every brand,
+   * so without this the page shows the account's default (eghiseul) logo and
+   * name on documentero, cazierfiscal and constatator orders too.
+   */
+  branding?: {
+    displayName: string;
+    iconUrl: string;
+    logoUrl?: string;
+    buttonColor?: string;
+    backgroundColor?: string;
+  };
 }
 
 /**
@@ -206,7 +218,7 @@ export async function createHostedCheckoutSession(
     discounts = [{ coupon: stripeCoupon.id }];
   }
 
-  return stripe.checkout.sessions.create({
+  const params: Stripe.Checkout.SessionCreateParams = {
     mode: 'payment',
     line_items: opts.lineItems,
     customer: customerId,
@@ -223,7 +235,24 @@ export async function createHostedCheckoutSession(
       receipt_email: opts.receiptEmail ?? opts.customer?.email,
     },
     ...(discounts ? { discounts } : {}),
-  });
+  };
+  if (!opts.branding) return stripe.checkout.sessions.create(params);
+  try {
+    return await stripe.checkout.sessions.create({
+      ...params,
+      branding_settings: {
+        display_name: opts.branding.displayName,
+        icon: { type: 'url', url: opts.branding.iconUrl },
+        ...(opts.branding.logoUrl ? { logo: { type: 'url', url: opts.branding.logoUrl } } : {}),
+        ...(opts.branding.buttonColor ? { button_color: opts.branding.buttonColor } : {}),
+        ...(opts.branding.backgroundColor ? { background_color: opts.branding.backgroundColor } : {}),
+      },
+    });
+  } catch (err) {
+    // The look of the page must never cost a payment: fall back to the account default.
+    console.error('[stripe] checkout session with branding failed, retrying without:', err);
+    return stripe.checkout.sessions.create(params);
+  }
 }
 
 export async function retrieveCheckoutSession(sessionId: string) {

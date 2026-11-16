@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { appBaseForOrder } from '@/lib/brand/for-order'
+import { appBaseForOrder, stripeBrandingForOrder } from '@/lib/brand/for-order'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { createHostedCheckoutSession } from '@/lib/stripe'
@@ -342,8 +342,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       discountAmount: order.discount_amount ? Number(order.discount_amount) : undefined,
     })
 
+    // Who the document is for, shown under the service name on the Stripe page.
+    const cd = (order.customer_data ?? {}) as {
+      company?: { companyName?: string }
+      constatator?: { requesterName?: string }
+    }
+    const lineSubject = (cd.company?.companyName || cd.constatator?.requesterName || '').trim()
+    const serviceDescription = [lineSubject ? `Pentru: ${lineSubject}` : '', `Comanda ${orderNumber}`]
+      .filter(Boolean)
+      .join(' · ')
+
     const lineItems = buildStripeLineItems({
       serviceName,
+      serviceDescription,
       // The Stripe line items represent the GROSS prices (before coupon).
       // The coupon is applied as a Stripe `discounts` entry on the Session
       // so the customer sees "Subtotal − Cupon X = Total" in the embedded
@@ -387,6 +398,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       // the order checkout page so they can pick a different method or try
       // again with the card.
       cancelUrl: `${origin}/comanda/checkout/${order.id}?cancelled=1`,
+      branding: stripeBrandingForOrder(order as { platform?: string | null }),
       ...(order.coupon_code && order.discount_amount && Number(order.discount_amount) > 0
         ? {
             couponDiscount: {

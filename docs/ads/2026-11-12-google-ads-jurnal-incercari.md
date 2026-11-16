@@ -50,6 +50,8 @@ Cifre din cont, 11–16.11: 321 de afișări, 25 de clicuri, 137,16 lei, CPC med
 - Limită cunoscută: tag-ul se încarcă abia după acord. Cine acceptă cookie-urile pe altă pagină decât cea de aterizare pierde `gclid`-ul, iar vânzarea nu se leagă de reclamă.
 - Rămâne nedovedit: evenimentul de conversie de pe pagina de succes. Se dovedește doar cu o comandă plătită.
 
+**Comanda de test, 16.11 (plătită de Raul, 89 lei, cu cookie-uri acceptate):** pagina de succes a trimis evenimentul `conversion` către `AW-18568994286`, cu eticheta de conversie, valoarea 89 RON și numărul comenzii; cererea a primit răspuns 200. A plecat și `purchase` în GA4. Cookie-ul de clic din browserul de test era unul fals, deci Google nu leagă această conversie de un clic real. Conversiile îmbunătățite au fost pornite în cont în aceeași zi (metoda „Eticheta Google”), după acceptarea condițiilor. Rămâne de verificat: starea acțiunii „Purchase” în cont după câteva ore și dacă datele îmbunătățite (email, telefon) ajung.
+
 Contul 933-520-0143 (cazierfiscal.com) e gol, fără campanii. Răspunsul la cerere vine pe adresa de login a contului și nu a fost verificat.
 
 ## Ce știm sigur

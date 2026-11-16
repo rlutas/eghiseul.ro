@@ -27,3 +27,30 @@ export function appBaseForOrder(order: OrderWithPlatform | null | undefined): st
   }
   return brand.baseUrl;
 }
+
+/**
+ * How the Stripe payment page should look for this order's brand. One Stripe
+ * account serves every brand and its default logo is eghiseul's, so each
+ * session carries the brand's own logo, icon and name. Logos drawn in white
+ * (cazierfiscal, documentero) get the brand's dark background behind them.
+ */
+export function stripeBrandingForOrder(order: OrderWithPlatform | null | undefined): {
+  displayName: string;
+  iconUrl: string;
+  logoUrl: string;
+  buttonColor: string;
+  backgroundColor?: string;
+} {
+  const brand = brandForOrder(order);
+  // "Certificat Constatator Express <contact@…>" → the readable name.
+  const displayName = brand.emailFrom.split('<')[0].trim() || brand.name;
+  const iconPath = brand.id === 'eghiseul' ? '/apple-icon.png' : `/images/${brand.id}/apple-icon.png`;
+  const darkLogo = brand.id === 'eghiseul' || brand.id === 'constatator';
+  return {
+    displayName,
+    iconUrl: `${brand.baseUrl}${iconPath}`,
+    logoUrl: brand.id === 'eghiseul' ? `${brand.baseUrl}/images/brand/logo-wide.png` : brand.emailLogoUrl,
+    buttonColor: brand.emailHeaderBg,
+    ...(darkLogo ? {} : { backgroundColor: brand.emailHeaderBg }),
+  };
+}

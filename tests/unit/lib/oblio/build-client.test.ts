@@ -216,11 +216,11 @@ describe('CNP pe factură (blocaj SPV „Introdu un CNP valid")', () => {
     expect(c.cif).toBe(CNP_PLACEHOLDER);
   });
 
-  it('leaves a missing CNP empty — does not invent zeros', () => {
+  it('sends 13 zeros when the CNP is missing', () => {
     const c = buildOblioClient({
       billing: { type: 'persoana_fizica', firstName: 'Ion', lastName: 'Popescu', address: 'str. A 1', city: 'Cluj-Napoca', county: 'Cluj', country: 'Romania' },
     });
-    expect(c.cif).toBe('');
+    expect(c.cif).toBe(CNP_PLACEHOLDER);
   });
 
   it('sanitizePfCnp accepts a spaced CNP and strips the separators', () => {

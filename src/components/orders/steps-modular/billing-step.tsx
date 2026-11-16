@@ -429,9 +429,8 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
   }, [isPJOrder, billing?.source, billing?.firstName, prefillFromId, updateBilling]);
 
   // Certificat constatator pe persoană: default-bill the requester person,
-  // prefilling name + CNP from the request. The full "Nume complet" is split on
-  // whitespace (firstName+lastName concatenate back to the same name on the
-  // invoice). Address stays empty → the customer completes it (Oblio needs it).
+  // prefilling name + CNP from the request. The full name is split on
+  // whitespace, family name first, as the field asks for it. Address stays empty → the customer completes it (Oblio needs it).
   const requesterName = constatator?.requesterName;
   const requesterCnp = constatator?.requesterCnp;
   useEffect(() => {
@@ -441,8 +440,9 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       updateBilling({
         source: 'self',
         type: 'persoana_fizica',
-        firstName: parts[0] ?? '',
-        lastName: parts.slice(1).join(' '),
+        // The field asks for „Nume și prenume": family name first.
+        lastName: parts[0] ?? '',
+        firstName: parts.slice(1).join(' '),
         cnp: requesterCnp ?? '',
         country: 'Romania',
         isValid: false, // address still required for the invoice → customer completes it
@@ -506,7 +506,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         city: billingCity,
         county: billingCounty,
         country: billingCountry,
-      }, { cnpOptional: isCarteFunciara });
+      }, { cnpOptional: true });
       // Toggle checked but no country picked yet → must NOT validate under
       // domestic rules with the old RO data.
       if (foreignToggle && !isForeignBillingCountry(billingCountry)) {
@@ -598,7 +598,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
         companyAddress: undefined,
         cuiVerified: undefined,
         isValid: pf
-          ? isPfBillingComplete(pfFields, { cnpOptional: isCarteFunciara })
+          ? isPfBillingComplete(pfFields, { cnpOptional: true })
           : false,
       });
       setUsedSavedPfProfile(!!pf);
@@ -696,7 +696,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
       ...pfFields,
       companyName: undefined, cui: undefined, regCom: undefined,
       companyAddress: undefined, cuiVerified: undefined,
-      isValid: isPfBillingComplete(pfFields, { cnpOptional: isCarteFunciara }),
+      isValid: isPfBillingComplete(pfFields, { cnpOptional: true }),
     });
     setUsedSavedPfProfile(true);
     setCuiSuccess(false);
@@ -1057,9 +1057,7 @@ export default function BillingStepModular({ onValidChange }: BillingStepProps) 
 
           <div className="space-y-2">
             <Label htmlFor="cnp" className="text-secondary-900 font-medium">
-              CNP {(isCarteFunciara || isForeignBilling)
-                ? <span className="text-neutral-400 text-xs">(opțional{isForeignBilling && !isCarteFunciara ? ' — doar dacă ai CNP românesc' : ''})</span>
-                : <span className="text-red-500">*</span>}
+              CNP <span className="text-neutral-400 text-xs">(opțional{isForeignBilling && !isCarteFunciara ? ' — doar dacă ai CNP românesc' : ''})</span>
             </Label>
             <Input
               id="cnp"
