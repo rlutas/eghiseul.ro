@@ -26,3 +26,84 @@ export function varstaPensionare(gen: "f" | "b", year: number, month: number): V
   }
   return { ageY: (v[0] / 12) | 0, ageM: v[0] % 12, scY: (v[1] / 12) | 0, scM: v[1] % 12, sminY: (v[2] / 12) | 0, sminM: v[2] % 12 };
 }
+
+// ── Tabele derivate din Anexa 5, pentru pagina calculatorului ───────────────
+// Totul se calculează din datele de mai sus: nicio cifră scrisă de mână.
+
+const LUNI = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
+
+/** „62 de ani și 6 luni”, „65 de ani”. */
+export function formatAniLuni(ani: number, luni: number): string {
+  const a = `${ani} de ani`;
+  if (!luni) return a;
+  return `${a} și ${luni === 1 ? 'o lună' : `${luni} luni`}`;
+}
+
+/** „iulie 1963” dintr-un index year*12+(month-1). */
+export function formatLunaAn(ym: number): string {
+  return `${LUNI[ym % 12]} ${Math.floor(ym / 12)}`;
+}
+
+function varstaLuni(gen: 'f' | 'b', ym: number): { varsta: number; stagiu: number } {
+  const v = varstaPensionare(gen, Math.floor(ym / 12), (ym % 12) + 1);
+  return { varsta: v.ageY * 12 + v.ageM, stagiu: v.scY * 12 + v.scM };
+}
+
+export interface RandAnNastere {
+  an: number;
+  /** Vârsta standard, în luni, pentru cea născută în ianuarie, respectiv decembrie. */
+  varstaMin: number;
+  varstaMax: number;
+  stagiuMin: number;
+  stagiuMax: number;
+  /** Prima și ultima lună în care se deschide dreptul la pensie (year*12+month-1). */
+  iesireDeLa: number;
+  iesirePanaLa: number;
+}
+
+/** Un rând pe an de naștere: intervalul de vârstă standard și fereastra de ieșire la pensie. */
+export function tabelPeAnNastere(gen: 'f' | 'b', deLa: number, panaLa: number): RandAnNastere[] {
+  const randuri: RandAnNastere[] = [];
+  for (let an = deLa; an <= panaLa; an++) {
+    let varstaMin = Infinity, varstaMax = 0, stagiuMin = Infinity, stagiuMax = 0, iesireDeLa = Infinity, iesirePanaLa = 0;
+    for (let luna = 0; luna < 12; luna++) {
+      const ym = an * 12 + luna;
+      const { varsta, stagiu } = varstaLuni(gen, ym);
+      varstaMin = Math.min(varstaMin, varsta); varstaMax = Math.max(varstaMax, varsta);
+      stagiuMin = Math.min(stagiuMin, stagiu); stagiuMax = Math.max(stagiuMax, stagiu);
+      iesireDeLa = Math.min(iesireDeLa, ym + varsta); iesirePanaLa = Math.max(iesirePanaLa, ym + varsta);
+    }
+    randuri.push({ an, varstaMin, varstaMax, stagiuMin, stagiuMax, iesireDeLa, iesirePanaLa });
+  }
+  return randuri;
+}
+
+export interface GrupIesire {
+  /** Vârsta standard în luni. */
+  varsta: number;
+  /** Prima și ultima lună de naștere din grup (year*12+month-1). */
+  nascutDeLa: number;
+  nascutPanaLa: number;
+  /** Prima și ultima lună de ieșire la pensie din grup. */
+  iesireDeLa: number;
+  iesirePanaLa: number;
+}
+
+/** Cine împlinește vârsta standard într-un an calendaristic, grupat pe vârstă. */
+export function iesiriInAn(gen: 'f' | 'b', anIesire: number): GrupIesire[] {
+  const grupuri: GrupIesire[] = [];
+  // Vârsta standard e între 57 și 65 de ani: fereastra de naștere e largă, dar finită.
+  for (let ym = (anIesire - 66) * 12; ym < (anIesire - 56) * 12; ym++) {
+    const { varsta } = varstaLuni(gen, ym);
+    const iesire = ym + varsta;
+    if (Math.floor(iesire / 12) !== anIesire) continue;
+    const ultim = grupuri[grupuri.length - 1];
+    if (ultim && ultim.varsta === varsta && ultim.nascutPanaLa === ym - 1) {
+      ultim.nascutPanaLa = ym;
+      ultim.iesirePanaLa = iesire;
+    } else {
+      grupuri.push({ varsta, nascutDeLa: ym, nascutPanaLa: ym, iesireDeLa: iesire, iesirePanaLa: iesire });
+    }
+  }
+  return grupuri;
+}

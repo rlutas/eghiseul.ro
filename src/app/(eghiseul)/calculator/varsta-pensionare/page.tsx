@@ -2,6 +2,10 @@ import Link from 'next/link';
 import { buildPageMetadata } from '@/lib/seo';
 import { CalculatorLayout } from '@/components/calculators/calculator-layout';
 import { VarstaPensionareCalculator } from '@/components/calculators/varsta-pensionare-calculator';
+import { formatAniLuni, formatLunaAn, iesiriInAn, tabelPeAnNastere } from '@/lib/pensii-anexa5';
+
+const aniLuni = (luni: number) => formatAniLuni(Math.floor(luni / 12), luni % 12);
+const interval = (a: number, b: number, f: (n: number) => string) => (a === b ? f(a) : `${f(a)} – ${f(b)}`);
 
 const SLUG = 'varsta-pensionare';
 const TITLE = 'Calculator Vârstă de Pensionare 2026 — Când Ies la Pensie';
@@ -18,14 +22,23 @@ export const metadata = buildPageMetadata({
 });
 
 export default function Page() {
+  // Every figure below comes from Anexa 5 (src/lib/pensii-anexa5.ts), for the
+  // current year and the next one; the page revalidates daily.
+  const an = new Date().getFullYear();
+  const femeiAcum = iesiriInAn('f', an);
+  const femeiLaAnul = iesiriInAn('f', an + 1);
+  const femeiPeAni = tabelPeAnNastere('f', 1960, 1970);
+  const varsteFemeiAcum = [...new Set(femeiAcum.map((g) => g.varsta))].map(aniLuni).join(' sau la ');
+
   return (
     <CalculatorLayout
       slug={SLUG}
       title={TITLE}
       heading="Calculator Vârstă de Pensionare"
       description="Calculează vârsta standard de pensionare, data ieșirii la pensie și stagiile de cotizare, pe baza datei nașterii și a sexului (Anexa 5, Legea 360/2023)."
-      tldr="Vârsta standard de pensionare se egalizează la 65 de ani pentru femei și bărbați (Anexa 5, Legea 360/2023). Bărbații născuți după 1950 și femeile născute din ianuarie 1970 ies la 65 de ani, cu stagiu complet de 35 de ani și minim 15 ani de cotizare."
+      tldr={`În ${an}, femeile ies la pensie la ${varsteFemeiAcum}, iar bărbații la 65 de ani (Anexa 5, Legea 360/2023). Vârsta femeilor crește lună de lună și ajunge la 65 de ani pentru cele născute din ianuarie 1970. Stagiul minim de cotizare este de 15 ani, iar cel complet ajunge la 35 de ani.`}
       widget={<VarstaPensionareCalculator />}
+      dateModified="2026-11-16"
       faqs={[
         {
           q: 'Care este vârsta de pensionare în România în 2026?',
@@ -57,7 +70,7 @@ export default function Page() {
         },
       ]}
     >
-      <h2>Cum se stabilește vârsta de pensionare</h2>
+      <h2>Cum se stabilește vârsta de pensionare?</h2>
       <p>
         Vârsta standard de pensionare este stabilită în <strong>Anexa 5 din Legea 360/2023</strong>, în funcție de sex și
         de luna și anul nașterii. În perioada de tranziție, vârsta crește gradual, urmând ca femeile și bărbații să se
@@ -71,14 +84,14 @@ export default function Page() {
         cotizare ajunge la 35 de ani, iar stagiul minim rămâne 15 ani.
       </p>
 
-      <h2>Pensionare anticipată</h2>
+      <h2>Poți ieși la pensie mai devreme?</h2>
       <p>
         Dacă ai un stagiu de cotizare mai mare decât cel complet, te poți pensiona anticipat (cu până la 5 ani mai
         devreme). Vezi și <Link href="/calculator/impozit-pensie/">calculatorul de impozit pe pensie</Link> și{' '}
         <Link href="/calculator/vechime-in-munca/">calculatorul de vechime în muncă</Link>.
       </p>
 
-      <h2>Exemplu numeric pas cu pas</h2>
+      <h2>Exemplu pas cu pas: o femeie născută în ianuarie 1970</h2>
       <p>
         Să presupunem o <strong>femeie născută în ianuarie 1970</strong>. Pentru a estima când iese la pensie, parcurgem
         următorii pași:
@@ -109,41 +122,64 @@ export default function Page() {
         fără tranziție, iar data ieșirii la pensie se obține adăugând 65 de ani la luna nașterii.
       </p>
 
-      <h2>Tabel orientativ vârstă și stagiu</h2>
+      <h2>Cine iese la pensie în {an} și în {an + 1}?</h2>
       <p>
-        Tabelul de mai jos rezumă reperele din Anexa 5 pentru câteva situații tipice. Sunt valori de referință după
-        finalizarea tranziției; în interiorul perioadei de tranziție vârsta crește gradual, lună de lună.
+        Bărbații ies la pensie la <strong>65 de ani</strong>: în {an} cei născuți în {an - 65}, în {an + 1} cei născuți
+        în {an - 64}. La femei, vârsta standard depinde de luna nașterii:
       </p>
       <table>
         <thead>
           <tr>
-            <th>Categorie</th>
-            <th>Vârstă standard</th>
-            <th>Stagiu complet</th>
-            <th>Stagiu minim</th>
+            <th>Femei născute în</th>
+            <th>Vârsta standard</th>
+            <th>Ies la pensie în</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Bărbați născuți după 1950</td>
-            <td>65 de ani</td>
-            <td>35 de ani</td>
-            <td>15 ani</td>
-          </tr>
-          <tr>
-            <td>Femei născute din ianuarie 1970</td>
-            <td>65 de ani</td>
-            <td>35 de ani</td>
-            <td>15 ani</td>
-          </tr>
-          <tr>
-            <td>Femei în tranziție (generații mai vechi)</td>
-            <td>de la 57 spre 65 de ani</td>
-            <td>spre 35 de ani</td>
-            <td>15 ani</td>
-          </tr>
+          {[...femeiAcum, ...femeiLaAnul].map((g) => (
+            <tr key={g.nascutDeLa}>
+              <td>{interval(g.nascutDeLa, g.nascutPanaLa, formatLunaAn)}</td>
+              <td>{aniLuni(g.varsta)}</td>
+              <td>{interval(g.iesireDeLa, g.iesirePanaLa, formatLunaAn)}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
+      <p>
+        Dreptul la pensie se deschide în luna în care împlinești vârsta standard. Din cauza creșterii treptate, există
+        luni în care nicio femeie nu împlinește vârsta standard.
+      </p>
+
+      <h2>La ce vârstă ies la pensie femeile, după anul nașterii?</h2>
+      <p>
+        Tabelul arată vârsta standard și stagiul complet de cotizare pentru femeile născute între 1960 și 1970. În
+        același an de naștere, vârsta diferă după lună, de aceea apare un interval. Pentru luna ta exactă folosește
+        calculatorul de mai sus.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Anul nașterii</th>
+            <th>Vârsta standard</th>
+            <th>Stagiu complet</th>
+            <th>Ieșire la pensie</th>
+          </tr>
+        </thead>
+        <tbody>
+          {femeiPeAni.map((r) => (
+            <tr key={r.an}>
+              <td>{r.an}</td>
+              <td>{interval(r.varstaMin, r.varstaMax, aniLuni)}</td>
+              <td>{interval(r.stagiuMin, r.stagiuMax, aniLuni)}</td>
+              <td>{interval(r.iesireDeLa, r.iesirePanaLa, formatLunaAn)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p>
+        Femeile născute din ianuarie 1970 și bărbații născuți din ianuarie 1950 au vârsta standard de 65 de ani, stagiul
+        complet de 35 de ani și stagiul minim de 15 ani. Sursa: Anexa 5 la Legea 360/2023.
+      </p>
 
       <h2>Greșeli frecvente</h2>
       <ul>
