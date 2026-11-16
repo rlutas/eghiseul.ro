@@ -329,3 +329,54 @@ export function resolveInvoiceAddress(
 
   return { address: street, city, state: county, country, usedFallback };
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// Firme — județ și localitate din adresa ANAF scrisă pe un singur rând
+// ────────────────────────────────────────────────────────────────────────────
+
+const titleCase = (v: string) =>
+  v
+    .toLocaleLowerCase('ro-RO')
+    .replace(/(^|[\s-])(\p{L})/gu, (_, sep: string, ch: string) => sep + ch.toLocaleUpperCase('ro-RO'));
+
+/**
+ * Facturarea pe firmă ține adresa pe un singur rând, cum o dă ANAF:
+ * „JUD. SATU MARE, SAT ODOREU COM. ODOREU, STR. SALCÂMILOR, NR.2” sau
+ * „MUNICIPIUL BUCUREŞTI, SECTOR 3, STR. …”. Wizardul nu salvează județul și
+ * localitatea separat pentru firme, așa că facturile plecau la Oblio fără
+ * județ (EGH-0955, 0962, 0973, 0979, noiembrie 2026). De aici le scoatem.
+ *
+ * Întoarce șiruri goale când textul nu spune clar județul sau localitatea:
+ * mai bine gol decât un județ ghicit.
+ */
+export function parseCompanyAddress(value?: string | null): { county: string; city: string } {
+  const raw = (value || '').trim();
+  if (!raw) return { county: '', city: '' };
+  const parts = raw.split(',').map((x) => x.trim()).filter(Boolean);
+
+  let county = '';
+  for (const part of parts) {
+    const m = part.match(/^(?:JUD\.?|JUDE[TȚŢ]UL?)\s+(.+)$/iu);
+    if (m) {
+      county = canonicalCounty(m[1]) ?? '';
+      if (county) break;
+    }
+  }
+  if (!county && /BUCURE[SȘŞ]TI/iu.test(raw)) county = 'București';
+  // „Cluj, Str. …” fără „JUD.”: primul segment, doar dacă e chiar un județ.
+  if (!county && parts.length > 1) county = canonicalCounty(parts[0]) ?? '';
+
+  if (county === 'București') {
+    return { county, city: formatSector(raw) ?? '' };
+  }
+
+  let city = '';
+  for (const part of parts) {
+    const m = part.match(/^(?:MUN\.?|MUNICIPIUL|OR[SȘŞ]\.?|ORA[SȘŞ]\.?|ORA[SȘŞ]UL|SAT|SATUL|COM\.?|COMUNA|LOC\.?|LOCALITATEA)\s+(.+)$/iu);
+    if (!m) continue;
+    // „SAT ODOREU COM. ODOREU” → satul; comuna vine după.
+    city = m[1].split(/\s+(?:COM\.?|COMUNA|OR[SȘŞ]\.?|ORA[SȘŞ]\.?|ORA[SȘŞ]UL|MUN\.?|MUNICIPIUL)\s+/iu)[0].trim();
+    if (city) break;
+  }
+  return { county, city: city ? titleCase(city) : '' };
+}

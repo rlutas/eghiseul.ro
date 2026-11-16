@@ -12,6 +12,7 @@ import { validateCNP } from '@/lib/validations/cnp';
 import { RO_VAT_NAME, RO_VAT_RATE, assertVatOnAllLines } from './vat';
 import {
   resolveInvoiceAddress,
+  parseCompanyAddress,
   canonicalCounty,
   isBucharestCounty,
   hasBucharestSector,
@@ -283,6 +284,21 @@ export function buildOblioClient(customerData: CustomerData): OblioClient {
   );
 
   if (isPJ) {
+    // A firm's invoice carries the FIRM's address. The wizard keeps it on one
+    // line (`companyAddress`), without a separate county and locality, so
+    // those are read out of it. The buyer's own KYC address is never used
+    // here: it belongs to a person, not to the firm.
+    const companyLine = (billing?.companyAddress || billing?.address || '').trim();
+    const parsedCompany = parseCompanyAddress(companyLine);
+    const firm = resolveInvoiceAddress(
+      {
+        street: companyLine,
+        city: billing?.city?.trim() || parsedCompany.city,
+        county: billing?.county?.trim() || parsedCompany.county,
+        country: billing?.country,
+      },
+      null,
+    );
     const isVatPayer =
       company?.vatPayer ?? company?.autoCompleteData?.vatPayer ?? billingCui.toUpperCase().startsWith('RO');
     const cif = isVatPayer && /^\d/.test(billingCui) ? `RO${billingCui}` : billingCui;
@@ -290,10 +306,10 @@ export function buildOblioClient(customerData: CustomerData): OblioClient {
       name: billing?.companyName || company?.companyName || 'N/A',
       cif,
       rc: billing?.regCom,
-      address: resolved.address,
-      city: resolved.city,
-      state: resolved.state,
-      country: resolved.country,
+      address: firm.address,
+      city: firm.city,
+      state: firm.state,
+      country: firm.country,
       email: contact?.email,
       phone: contact?.phone,
       vatPayer: isVatPayer,

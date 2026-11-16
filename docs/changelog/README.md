@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-16 | 🔴 **Facturile pe firmă plecau la Oblio fără județ** — `parseCompanyAddress()` citește județul și localitatea din `billing.companyAddress`; `buildOblioClient()` nu mai folosește adresa persoanei pe factura firmei (EGH-0955/0962/0973/0979) | [2026-11-16-facturi-firma-fara-judet.md](2026-11-16-facturi-firma-fara-judet.md) |
 | 2026-11-16 | 🔵 **Estimare pensie: tabel pe ani de stagiu; verificări live; CJO pe zile** — `src/lib/pensii-estimare.ts` (formulă comună calculator + tabel), tag Ads cazierfiscal confirmat în bundle, CJO stabil la ~137 clicuri/zi | [2026-11-16-estimare-pensie-tabel-stagiu.md](2026-11-16-estimare-pensie-tabel-stagiu.md) |
 | 2026-11-16 | 🔵 **SERP real pe 10 căutări: digigov.ro peste noi; calculatorul de vârstă de pensionare refăcut** — `pws=0`, comparație pagini (5.286 vs 1.291 cuvinte); `iesiriInAn()`/`tabelPeAnNastere()` din Anexa 5, două tabele noi, rezumat cu cifrele anului | [2026-11-16-serp-real-digigov-pagina-pensionare.md](2026-11-16-serp-real-digigov-pagina-pensionare.md) |
 | 2026-11-16 | 🟣 **cazierfiscal.com: prima campanie Google Ads, publicată pe pauză** — cont 933-520-0143, `Search-CazierFiscal-2026-11`, conversia „Purchase”, variabilele Ads în Vercel | [2026-11-16-cazierfiscal-campanie-google-ads.md](2026-11-16-cazierfiscal-campanie-google-ads.md) |
