@@ -53,7 +53,9 @@ Cifre din cont, 11–16.11: 321 de afișări, 25 de clicuri, 137,16 lei, CPC med
 
 **Comanda de test, 16.11 (plătită de Raul, 89 lei, cu cookie-uri acceptate):** pagina de succes a trimis evenimentul `conversion` către `AW-18568994286`, cu eticheta de conversie, valoarea 89 RON și numărul comenzii; cererea a primit răspuns 200. A plecat și `purchase` în GA4. Cookie-ul de clic din browserul de test era unul fals, deci Google nu leagă această conversie de un clic real. Conversiile îmbunătățite au fost pornite în cont în aceeași zi (metoda „Eticheta Google”), după acceptarea condițiilor. Rămâne de verificat: starea acțiunii „Purchase” în cont după câteva ore și dacă datele îmbunătățite (email, telefon) ajung.
 
-Contul 933-520-0143 (cazierfiscal.com) e gol, fără campanii. Răspunsul la cerere vine pe adresa de login a contului și nu a fost verificat.
+**Reverificare, 16.11 după-amiaza:** acțiunea „Purchase” din 881-388-1795 a trecut din „Inactiv” în „Nu există conversii recente”, cu 0 conversii numărate: Google a primit semnalul comenzii de test, dar nu l-a legat de un clic (cookie-ul de clic din browserul de test era fals). Certificatul comenzii de test a fost eliberat de ONRC la 11:29.
+
+Contul 933-520-0143 (cazierfiscal.com) are din 16.11 o campanie pe pauză; vezi rândul din tabelul de mai sus.
 
 ## Ce știm sigur
 
