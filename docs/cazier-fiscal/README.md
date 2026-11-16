@@ -2,6 +2,8 @@
 
 **Stare (11.11.2026):** LIVE din 10.11.2026. GA4 propriu activ din 11.11. Rețeta, ca s-o repetăm pentru alte servicii: [`../seo/playbook-site-de-nisa-un-serviciu.md`](../seo/playbook-site-de-nisa-un-serviciu.md).
 
+Google Ads: [`google-ads-campanie.md`](google-ads-campanie.md) (cont 933-520-0143, prima campanie din 16.11.2026).
+
 ## De ce
 
 Raul a decis pe 10.11.2026, după ce a văzut cazierauto.ro peste noi pe „cazier auto”. cazierauto.ro e un site mic cu un singur subiect: domeniu înregistrat pe 12.11.2025, live din iunie 2026, 8 pagini.

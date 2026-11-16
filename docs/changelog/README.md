@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-16 | 🟣 **cazierfiscal.com: prima campanie Google Ads, publicată pe pauză** — cont 933-520-0143, `Search-CazierFiscal-2026-11`, conversia „Purchase”, variabilele Ads în Vercel | [2026-11-16-cazierfiscal-campanie-google-ads.md](2026-11-16-cazierfiscal-campanie-google-ads.md) |
 | 2026-11-16 | 🔵 **Organic pe 6 site-uri: stabil după căderea din octombrie, fără defecte tehnice** — GSC pe săptămâni și pe pagini (04–17.10 față de 01–14.11); grupul de pensii de pe eghiseul a pierdut afișările din 17.10; nicio schimbare cât rulează actualizarea Google din 10.11 | [2026-11-16-audit-organic-6-site-uri.md](2026-11-16-audit-organic-6-site-uri.md) |
 | 2026-11-16 | 🔴 **Facturare: CNP opțional, nume în ordinea corectă; pagina Stripe pe brand** — `cnpOptional: true` pe toate serviciile, `sanitizePfCnp()` trimite 13 zerouri la CNP lipsă, precompletarea de la constatator PF pune numele de familie la `lastName`; `stripeBrandingForOrder()` + `branding_settings` și `serviceDescription` pe linia de produs | [2026-11-16-facturare-cnp-optional-stripe-pe-brand.md](2026-11-16-facturare-cnp-optional-stripe-pe-brand.md) |
 | 2026-11-16 | 🔴 **Clicul din reclama Google se păstrează până la acordul de cookie-uri** — `buildGclAwCookie()` scrie `_gcl_aw` din `eg_attribution` când acordul de marketing vine pe altă pagină decât cea de aterizare; `click_param` nou pe atingere | [2026-11-16-clic-reclama-pastrat-pana-la-acord.md](2026-11-16-clic-reclama-pastrat-pana-la-acord.md) |

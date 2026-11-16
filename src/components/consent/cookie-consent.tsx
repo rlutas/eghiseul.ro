@@ -41,7 +41,7 @@ const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 // documentero.ro has its own Google Ads account (05.10.2026). No fallback to
 // the eghiseul account: documentero conversions must never land there.
 const ADS_ID_DOCUMENTERO = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID_DOCUMENTERO;
-// cazierfiscal.com: no Ads account yet, and no fallback to eghiseul's.
+// cazierfiscal.com: own Ads account (933-520-0143, 16.11.2026), no fallback to eghiseul's.
 const ADS_ID_CAZIERFISCAL = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID_CAZIERFISCAL;
 // certificat-constatator-express.ro: own Ads account, no fallback either.
 const ADS_ID_CONSTATATOR = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID_CONSTATATOR;

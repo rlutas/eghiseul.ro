@@ -13,7 +13,7 @@ Concurenții rulează reclame pe aceleași documente, în aceeași țară, pe SR
 | Cerere „în afara politicii” pentru cazierfiscal.com | formularul Google de certificare, cont 933-520-0143 | 12.11.2026, de Raul | ~26.11.2026 (10 zile lucrătoare), pe `r.lutas@yahoo.com` | confirmare „Your email has been sent” |
 | Contestație pe anunțul de constatator | cont 881-388-1795, Anunțuri → stare → „Contestați” → „Contestarea deciziei” | 12.11.2026, de Raul | de obicei câteva zile lucrătoare | în cont: „În așteptarea soluționării contestației, Respins” |
 
-Cât așteptăm: nicio campanie pe 933-520-0143, nicio a doua contestație pe 881-388-1795, nicio cerere nouă pe cazierfiscal.com.
+Cât așteptăm: nicio a doua contestație pe 881-388-1795, nicio cerere nouă pe cazierfiscal.com. Regula „nicio campanie pe 933-520-0143” a fost înlocuită pe 16.11.2026: Raul a decis un test, cu campania publicată pe pauză.
 
 ## Ce am încercat, în ordine
 
@@ -30,6 +30,7 @@ Cât așteptăm: nicio campanie pe 933-520-0143, nicio a doua contestație pe 88
 | 12.11.2026 | 881-388-1795 | contestație („Contestarea deciziei”) | în așteptare |
 | 12.11.2026 | cont nou 933-520-0143 | cerere „în afara politicii” pentru cazierfiscal.com, **înainte** de orice campanie | în așteptare |
 | 16.11.2026 | 881-388-1795 | verificare la 5 zile | anunțul nu mai e „Respins”, ci **„Eligibil (limitat)”**: „Acest anunț este difuzat unui public limitat”, motiv „Documente guvernamentale și servicii oficiale — Este obligatoriu un certificat”. Rulează. Rezultatul contestației nu a fost citit separat („Urmăriți contestația”). |
+| 16.11.2026 | 933-520-0143 | campanie de cazier fiscal `Search-CazierFiscal-2026-11`, la decizia lui Raul, fără să așteptăm răspunsul la cerere | publicată și pusă pe pauză; anunțul „În examinare”. Detalii: [`../cazier-fiscal/google-ads-campanie.md`](../cazier-fiscal/google-ads-campanie.md) |
 
 ## Verificarea din 16.11.2026 (campania de constatator)
 
@@ -97,5 +98,5 @@ De ce trec concurenții. Trei explicații posibile, niciuna confirmată:
 | 809-020-5311 | serviciiseonethut@gmail.com | documentero | celibat respins 07.10 |
 | 243-638-4990 | eghiseul@gmail.com | test 01.09 | nefolosit |
 | 881-388-1795 | r.lutas@yahoo.com | constatator | anunț respins, contestație în curs |
-| 933-520-0143 | r.lutas@yahoo.com | cazierfiscal.com | gol, cerere în curs; **doar cazier fiscal, permanent** |
+| 933-520-0143 | r.lutas@yahoo.com | cazierfiscal.com | o campanie pe pauză din 16.11, cerere în curs; **doar cazier fiscal, permanent** |
 | 889-005-5301 | eghiseul@gmail.com | erovinieta.net | în afara politicii; nu se folosește pentru teste |
