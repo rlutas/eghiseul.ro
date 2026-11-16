@@ -32,3 +32,11 @@ Comanda e de 1.308,80 lei, din 11.07, cu starea „Rambursată”. Suma rambursa
 Rândul e „nefacturat” pentru că pe comandă nu e înregistrată nicio factură de stornare. Asta se întâmplă când banii au fost returnați fără să treacă prin fluxul de anulare din admin, care emite stornarea și factura de 30%.
 
 Nu am putut citi comanda din baza de date în sesiunea asta, deci nu știu dacă stornarea lipsește cu adevărat din Oblio sau doar nu e legată de comandă. De verificat în Oblio: există o stornare pentru factura acestei comenzi și o factură nouă de 392,64 lei (30%)? Dacă nu, se emit din pagina comenzii, din fluxul de anulare, pe modul de reconciliere. Procedura: [`../admin/`](../admin/README.md), anulare cu reținere.
+
+### Verificat pe pagina comenzii, 16.11 după-amiaza
+
+Pagina comenzii din admin arată: „Refund: 0,00 RON din 1.308,80 RON — mod necunoscut”, „Factura inițială EGH-0026: NEstornată încă”, „Factura taxei de anulare (392,64 RON, 30% reținut): NEemisă”. Nota echipei din 11.11 spune că s-au returnat 70% cu acordul lui Raul; statusul a fost schimbat de mână din „Finalizată” în „Rambursată”.
+
+Deci sistemul nu are înregistrată nicio stornare. Raul știe că stornarea s-a făcut; dacă a fost făcută direct în Oblio, nu e legată de comandă.
+
+Butonul „Reconciliază (Stripe + facturi)” de pe pagina comenzii rezolvă ambele situații fără dubluri: caută rambursarea în Stripe, întreabă Oblio dacă EGH-0026 e deja stornată (dacă da, nu mai emite alta) și caută o factură de taxă deja emisă pe același client și aceeași sumă înainte să emită una. Dacă documentele nu există, le emite. Butonul nu a fost apăsat în sesiunea asta: emite documente fiscale, deci rămâne la decizia lui Raul.
