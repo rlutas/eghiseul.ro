@@ -10,7 +10,7 @@
  * Attribution order:
  *   1. charge metadata: app_id === 'cjo'  → cjo
  *   2. charge metadata: orderNumber / order number in description prefix
- *      E- → eghiseul · CJO-/CAO-/CFO-/CIC- (CJO) and EJC-/EFC- (ecazier,
+ *      E- → eghiseul · CJO-/CAO-/CFO-/CIC- (CJO) and EJC-/EFC-/EAC- (ecazier,
  *      same DB as CJO; rare, only when paid on our Stripe account) → cjo
  *   3. otherwise 'necunoscut' (still listed — signal for manual action)
  *
@@ -37,13 +37,15 @@ import {
 } from '@/lib/accounting/extra-invoice-match';
 import { refreshDisputeRows } from '@/lib/accounting/disputes';
 
-/** Order-number regex: E-260710-F3AYS, CJO-20260710-86615, CAO-, CFO-, CIC-, EJC-, EFC- */
-const ORDER_RE = /\b(E|EJC|EFC|CJO|CAO|CFO|CIC)-[A-Z0-9-]+\b/i;
+/** Order-number regex: E-260710-F3AYS, CJO-20260710-86615, CAO-, CFO-, CIC-, EJC-, EFC-, EAC- */
+const ORDER_RE = /\b(E|EJC|EFC|EAC|CJO|CAO|CFO|CIC)-[A-Z0-9-]+\b/i;
 
 const EGH_PREFIXES = new Set(['E']);
-// EJC-/EFC- are ecazier orders. They live in the CJO database; one landed on
-// our Stripe account on 02.10.2026 (EFC-20261002-61612) and stayed unmatched.
-const CJO_PREFIXES = new Set(['CJO', 'CAO', 'CFO', 'CIC', 'EJC', 'EFC']);
+// EJC-/EFC-/EAC- are ecazier orders (judiciar, fiscal, auto). They live in the
+// CJO database; one landed on our Stripe account on 02.10.2026
+// (EFC-20261002-61612) and stayed unmatched. EAC- was still missing on
+// 13.11.2026 (EAC-20261110-21848 showed as „nefacturat”, with no order).
+const CJO_PREFIXES = new Set(['CJO', 'CAO', 'CFO', 'CIC', 'EJC', 'EFC', 'EAC']);
 
 export interface PayoutSyncResult {
   payoutsSynced: number;
@@ -51,7 +53,7 @@ export interface PayoutSyncResult {
   errors: string[];
 }
 
-function platformFromOrderNumber(orderNumber: string | null): 'eghiseul' | 'cjo' | 'necunoscut' {
+export function platformFromOrderNumber(orderNumber: string | null): 'eghiseul' | 'cjo' | 'necunoscut' {
   if (!orderNumber) return 'necunoscut';
   const prefix = orderNumber.split('-')[0].toUpperCase();
   if (EGH_PREFIXES.has(prefix)) return 'eghiseul';
@@ -59,7 +61,7 @@ function platformFromOrderNumber(orderNumber: string | null): 'eghiseul' | 'cjo'
   return 'necunoscut';
 }
 
-function extractOrderNumber(source: Stripe.Charge | null, description: string | null): string | null {
+export function extractOrderNumber(source: Stripe.Charge | null, description: string | null): string | null {
   const metaOrder =
     (source?.metadata?.orderNumber as string | undefined) ||
     (source?.metadata?.order_number as string | undefined);
