@@ -2,6 +2,17 @@ import Link from 'next/link';
 import { buildPageMetadata } from '@/lib/seo';
 import { CalculatorLayout } from '@/components/calculators/calculator-layout';
 import { EstimarePensieCalculator } from '@/components/calculators/estimare-pensie-calculator';
+import { SAL_MEDIU, VPR, estimeazaPensia } from '@/lib/pensii-estimare';
+
+const lei = (n: number) => new Intl.NumberFormat('ro-RO', { maximumFractionDigits: 0 }).format(Math.round(n));
+const puncte = (n: number) => new Intl.NumberFormat('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+// The table is computed with the same formula as the calculator above.
+const ANI_STAGIU = [15, 20, 25, 30, 35, 40, 45];
+const NIVELURI = [
+  { raport: 0.5, eticheta: 'jumătate din medie' },
+  { raport: 1, eticheta: 'la medie' },
+  { raport: 1.5, eticheta: 'o dată și jumătate media' },
+];
 
 const SLUG = 'estimare-pensie';
 const TITLE = 'Calculator Estimare Pensie 2026 — Puncte și Cuantum';
@@ -26,6 +37,7 @@ export default function Page() {
       description="Estimează cuantumul pensiei pentru limită de vârstă pe baza stagiului de cotizare și a salariului, conform sistemului de puncte din Legea 360/2023."
       tldr="În 2026, pensia = total puncte × 81 lei (valoarea punctului de referință, înghețată prin Legea 141/2025). Punctele se compun din contributivitate (salariul tău ÷ media de ~9.192 lei/an) plus stabilitate peste 25 de ani de stagiu. Exemplu: 35 de ani la media pe economie = 41,25 puncte ≈ 3.341 lei/lună."
       widget={<EstimarePensieCalculator />}
+      dateModified="2026-11-16"
       faqs={[
         {
           q: 'Cum se calculează pensia în 2026?',
@@ -57,7 +69,45 @@ export default function Page() {
         },
       ]}
     >
-      <h2>Cum se calculează pensia în sistemul cu puncte</h2>
+      <h2>Ce pensie ai la 15, 20, 25, 30, 35, 40 sau 45 de ani de stagiu?</h2>
+      <p>
+        Tabelul arată pensia estimată pe lună în 2026, la {VPR} de lei valoarea punctului de referință, pentru trei
+        niveluri de salariu brut față de câștigul salarial mediu brut ({lei(SAL_MEDIU)} lei): jumătate din medie
+        ({lei(SAL_MEDIU * 0.5)} lei), la medie și o dată și jumătate media ({lei(SAL_MEDIU * 1.5)} lei). Se presupune
+        același raport față de medie pe tot stagiul.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Stagiu</th>
+            <th>Puncte de stabilitate</th>
+            {NIVELURI.map((n) => (
+              <th key={n.raport}>Salariu {n.eticheta}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {ANI_STAGIU.map((ani) => (
+            <tr key={ani}>
+              <td>{ani} de ani</td>
+              <td>{puncte(estimeazaPensia(ani, 1).puncteStabilitate)}</td>
+              {NIVELURI.map((n) => (
+                <td key={n.raport}>{lei(estimeazaPensia(ani, n.raport).pensie)} lei</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p>
+        Sunt estimări brute, înainte de eventualele rețineri. Casa de Pensii calculează pe venitul real din fiecare an,
+        deci suma ta poate ieși diferit. Pentru cifra ta, pune stagiul și salariul în calculatorul de mai sus.
+      </p>
+      <p>
+        Sumele mici din tabel sunt rezultatul formulei, nu neapărat ce primești: dacă pensia calculată iese sub
+        indemnizația socială pentru pensionari, statul plătește diferența până la acel prag.
+      </p>
+
+      <h2>Cum se calculează pensia în sistemul cu puncte?</h2>
       <p>
         Din 2024 (Legea 360/2023), pensia se calculează ca <strong>număr total de puncte × valoarea punctului de
         referință (VPR)</strong>. VPR este 81 de lei în 2026. Numărul de puncte are două componente: punctele de

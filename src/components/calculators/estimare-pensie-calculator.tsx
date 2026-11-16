@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { SAL_MEDIU, VPR, puncteStabilitate } from '@/lib/pensii-estimare';
 
 /**
  * Calculator estimare pensie (limită de vârstă) — Legea 360/2023.
@@ -11,15 +12,9 @@ import { Label } from '@/components/ui/label';
  * (BASS) 2026 ≈ 9.192 lei. Estimare orientativă — calculul exact CNPP folosește
  * istoricul real al venitului anual.
  */
-const VPR = 81;
-const SAL_MEDIU = 9192;
 const fmt = (n: number) => new Intl.NumberFormat('ro-RO', { maximumFractionDigits: 0 }).format(Math.round(n));
 const fmt2 = (n: number) => new Intl.NumberFormat('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 const parse = (s: string) => parseFloat(s.replace(/[.\s]/g, '').replace(',', '.'));
-
-function puncteStabilitate(ani: number): number {
-  return 0.5 * Math.min(Math.max(ani - 25, 0), 5) + 0.75 * Math.min(Math.max(ani - 30, 0), 5) + 1.0 * Math.max(ani - 35, 0);
-}
 
 export function EstimarePensieCalculator() {
   const [aniStr, setAni] = useState('');

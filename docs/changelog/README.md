@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-16 | 🔵 **Estimare pensie: tabel pe ani de stagiu; verificări live; CJO pe zile** — `src/lib/pensii-estimare.ts` (formulă comună calculator + tabel), tag Ads cazierfiscal confirmat în bundle, CJO stabil la ~137 clicuri/zi | [2026-11-16-estimare-pensie-tabel-stagiu.md](2026-11-16-estimare-pensie-tabel-stagiu.md) |
 | 2026-11-16 | 🔵 **SERP real pe 10 căutări: digigov.ro peste noi; calculatorul de vârstă de pensionare refăcut** — `pws=0`, comparație pagini (5.286 vs 1.291 cuvinte); `iesiriInAn()`/`tabelPeAnNastere()` din Anexa 5, două tabele noi, rezumat cu cifrele anului | [2026-11-16-serp-real-digigov-pagina-pensionare.md](2026-11-16-serp-real-digigov-pagina-pensionare.md) |
 | 2026-11-16 | 🟣 **cazierfiscal.com: prima campanie Google Ads, publicată pe pauză** — cont 933-520-0143, `Search-CazierFiscal-2026-11`, conversia „Purchase”, variabilele Ads în Vercel | [2026-11-16-cazierfiscal-campanie-google-ads.md](2026-11-16-cazierfiscal-campanie-google-ads.md) |
 | 2026-11-16 | 🔵 **Organic pe 6 site-uri: stabil după căderea din octombrie, fără defecte tehnice** — GSC pe săptămâni și pe pagini (04–17.10 față de 01–14.11); grupul de pensii de pe eghiseul a pierdut afișările din 17.10; nicio schimbare cât rulează actualizarea Google din 10.11 | [2026-11-16-audit-organic-6-site-uri.md](2026-11-16-audit-organic-6-site-uri.md) |
