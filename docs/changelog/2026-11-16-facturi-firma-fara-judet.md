@@ -7,7 +7,7 @@ Facturile emise pe firmă ajungeau în Oblio fără județ și fără localitate
 
 De acum, județul și localitatea firmei se completează singure, din adresa pe care o dă ANAF la verificarea CUI-ului. La București apare „Sector N” la localitate.
 
-Cele patru facturi deja emise nu se repară singure: Oblio nu permite modificarea unei facturi emise prin program. Se completează județul de mână în Oblio, apoi „Trimite în SPV”. Dacă mai vedeți o factură pe firmă fără județ după 16.11, spuneți imediat.
+Cele patru facturi semnalate au fost deja corectate în Oblio. Dacă mai vedeți o factură pe firmă fără județ după 16.11, spuneți imediat.
 
 ---
 
@@ -25,6 +25,18 @@ Diagnosticul e din cod. Cele patru comenzi nu au putut fi citite din baza de dat
 - `buildOblioClient()` în `src/lib/oblio/invoice.ts`: pentru firme, adresa se rezolvă doar din datele firmei. Adresa persoanei care a comandat nu mai ajunge pe factura firmei.
 - Dacă wizardul a salvat totuși un județ, acela are prioritate.
 
+## Completare, tot 16.11: Oblio își ia singur datele firmei
+
+Raul a amintit că, la firmă, Oblio își poate lua singur datele după CUI. Așa trimite de la început site-ul cazierjudiciaronline.com: cu `autocomplete: 1` pe client. În acest repo câmpul lipsea.
+
+- `buildOblioClient()` trimite acum `autocomplete: 1` pentru firme (nu și pentru persoane fizice).
+- Județul și localitatea citite din adresa ANAF rămân ca rezervă, dacă Oblio nu primește răspuns de la ANAF.
+- Verificat pe toate drumurile care emit documente: factura la plată, proforma și factura din proformă la plata suplimentară, factura de taxă la anulare. Toate construiesc clientul prin `buildOblioClient()`, deci primesc aceeași reparație.
+
+Nedovedit: ce face Oblio când primește și `autocomplete: 1`, și județul nostru (care are prioritate). Se vede la prima factură pe firmă emisă după deploy.
+
+Cele patru facturi semnalate au fost deja corectate de Raul în Oblio.
+
 ## Ce nu acoperă
 
 - Adrese de firmă fără „JUD.” și fără București în text: județul rămâne gol.
@@ -37,4 +49,4 @@ Verificarea automată a facturilor pentru SPV există (`einvoice-check`), cu ban
 
 ## Teste
 
-`tests/unit/lib/oblio/company-address.test.ts` (7).
+`tests/unit/lib/oblio/company-address.test.ts` (8).

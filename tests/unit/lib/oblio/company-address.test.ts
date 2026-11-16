@@ -48,6 +48,14 @@ describe('factura pe firmă: județ și localitate', () => {
     expect(c.address).toContain('SALCÂMILOR');
   });
 
+  it('asks Oblio to complete the firm from ANAF, and only for firms', () => {
+    expect(buildOblioClient({ billing, company: { cui: '47872731' } }).autocomplete).toBe(1);
+    const pf = buildOblioClient({
+      billing: { type: 'persoana_fizica', firstName: 'Ion', lastName: 'Pop', address: 'str. A 1', city: 'Cluj-Napoca', county: 'Cluj' },
+    });
+    expect(pf.autocomplete).toBeUndefined();
+  });
+
   it("never puts the buyer's own county on the firm's invoice", () => {
     const c = buildOblioClient({
       billing,

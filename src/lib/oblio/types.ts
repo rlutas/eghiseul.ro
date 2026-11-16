@@ -31,6 +31,8 @@ export interface OblioClient {
   contact?: string;
   vatPayer?: boolean; // Is client VAT payer
   save?: boolean; // Save client in Oblio database
+  /** 1 = Oblio completes the firm's data (address, county, locality) from ANAF by CIF. */
+  autocomplete?: number;
 }
 
 // ============================================================================

@@ -314,6 +314,10 @@ export function buildOblioClient(customerData: CustomerData): OblioClient {
       phone: contact?.phone,
       vatPayer: isVatPayer,
       save: true,
+      // Oblio fills the firm's address from ANAF by CIF, the way the sister
+      // site (cazierjudiciaronline.com) has always sent it. The county and
+      // locality parsed above stay as a backup if ANAF does not answer.
+      autocomplete: 1,
     };
   }
 
