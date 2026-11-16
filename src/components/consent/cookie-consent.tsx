@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { useBrand } from '@/lib/brand/client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { getAttribution } from '@/lib/analytics/attribution';
+import { buildGclAwCookie } from '@/lib/analytics/gclid-restore';
 import {
   CONSENT_OPEN_EVENT,
   deleteAnalyticsCookies,
@@ -168,6 +170,14 @@ function loadAds(brand: BrandKey) {
   const id = adsIdFor(brand);
   if (!id || adsConfigured) return;
   adsConfigured = true;
+  // Consent given on a later page than the ad landing: hand gtag the click id
+  // we kept in our own attribution, or the sale is never tied to the ad.
+  try {
+    const restored = buildGclAwCookie(getAttribution(), document.cookie, window.location.search);
+    if (restored) document.cookie = restored;
+  } catch {
+    // tracking must never break the page
+  }
   loadGtagScript(id);
   // Enhanced conversions: the success page sets `user_data` (email, phone)
   // before the purchase conversion; gtag hashes it and sends it only when

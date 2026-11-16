@@ -29,6 +29,28 @@ Cât așteptăm: nicio campanie pe 933-520-0143, nicio a doua contestație pe 88
 | 11.11.2026 | cont nou 881-388-1795 | campanie constatator pe certificat-constatator-express.ro | 12.11: anunț „Respins — Este obligatoriu un certificat”; cont activ, cuvinte cheie eligibile |
 | 12.11.2026 | 881-388-1795 | contestație („Contestarea deciziei”) | în așteptare |
 | 12.11.2026 | cont nou 933-520-0143 | cerere „în afara politicii” pentru cazierfiscal.com, **înainte** de orice campanie | în așteptare |
+| 16.11.2026 | 881-388-1795 | verificare la 5 zile | anunțul nu mai e „Respins”, ci **„Eligibil (limitat)”**: „Acest anunț este difuzat unui public limitat”, motiv „Documente guvernamentale și servicii oficiale — Este obligatoriu un certificat”. Rulează. Rezultatul contestației nu a fost citit separat („Urmăriți contestația”). |
+
+## Verificarea din 16.11.2026 (campania de constatator)
+
+Cifre din cont, 11–16.11: 321 de afișări, 25 de clicuri, 137,16 lei, CPC mediu 5,49 lei, **0 conversii**.
+
+- **Comenzi pe certificat-constatator-express.ro:** niciuna plătită. Există 3 ciorne din 13.11, toate cu același telefon și cu emailuri de formă, deci cel mai probabil teste (deducție, nu confirmare).
+- **Constatator pe eghiseul.ro, aceeași perioadă:** 3 comenzi plătite (11, 13 și 14.11), la 80,10 lei, adică prețul cu reducerea de Black Friday. Sunt pe eghiseul, nu vin din reclamă.
+- **Conversia „Purchase” din Ads e „Inactiv”:** Google nu a primit niciodată un semnal. Codul e în regulă la citire, iar eticheta `AW-18568994286/…` e în pagina de succes live. Testul cu o comandă reală (pasul 4 din `docs/certificat-constatator/google-ads-cont-nou.md`) nu a fost făcut, deci lanțul nu e dovedit cap-coadă. Tag-ul se încarcă doar după acordul pentru cookie-uri de marketing: cine refuză nu se numără.
+- **Cuvinte cheie:** „certificat constatator online” aduce cele mai multe clicuri (CTR 12%); `[certificat constatator]` are 95 de afișări și CTR 3%. Două cuvinte au scor de calitate scăzut („certificat constatator firma”, „certificat constatator rapid”).
+- **Pragul:** la CPC 5,5 lei și marjă de circa 41 lei pe comandă, trebuie o vânzare la 7–8 clicuri. 25 de clicuri fără nicio comandă începută e un semnal slab, dar prea puțin pentru o concluzie.
+
+**Verificarea tag-ului, 16.11 (în browser, pe site-ul live):**
+
+- Înainte de acord: consimțământ implicit „denied”, niciun script Google încărcat.
+- După „Accept toate”: `consent update` cu toate patru pe „granted”, se încarcă `G-X5Q7NDPHPL` și `AW-18568994286` (cu `allow_enhanced_conversions`), iar `gclid`-ul din URL ajunge în cookie-ul `_gcl_aw` și în cererile către Google (`gcs=G111`).
+- Cererile `collect` au apărut cu 503 în browserul de test, deși aceleași adrese răspund normal din afara lui. Cauza nu e stabilită (posibil o extensie); nu e dovadă că Google primește datele.
+- În cont: etichetarea automată e pornită; „Condiții privind datele despre clienți” sunt **neacceptate**, deci conversiile îmbunătățite nu funcționează, deși site-ul trimite emailul și telefonul.
+- Limită cunoscută: tag-ul se încarcă abia după acord. Cine acceptă cookie-urile pe altă pagină decât cea de aterizare pierde `gclid`-ul, iar vânzarea nu se leagă de reclamă.
+- Rămâne nedovedit: evenimentul de conversie de pe pagina de succes. Se dovedește doar cu o comandă plătită.
+
+Contul 933-520-0143 (cazierfiscal.com) e gol, fără campanii. Răspunsul la cerere vine pe adresa de login a contului și nu a fost verificat.
 
 ## Ce știm sigur
 

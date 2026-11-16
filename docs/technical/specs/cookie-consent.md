@@ -47,6 +47,7 @@ Montare: `<CookieConsent />` în `src/app/layout.tsx` (root). **GA4 NU mai e în
 - **Self-built, nu CMP** (CookieYes etc.): un singur vendor real (Google), zero cost, on-brand, fără script terț suplimentar.
 - **Load-after-consent, nu doar Consent Mode**: mai curat juridic — fără acord, gtag.js nici nu există în pagină (Consent Mode rămâne ca plasă de siguranță).
 - Categoria **Marketing** există în banner de pe acum (Google Ads measurement), chiar dacă azi nu setăm cookie-uri proprii de ads — future-proof.
+- **Clicul din reclamă se păstrează până la acord (16.11.2026).** `gtag.js` citește `gclid` doar din adresa paginii pe care se încarcă. Când acordul de marketing vine pe o pagină ulterioară, `loadAds()` scrie `_gcl_aw` din atribuirea proprie (`buildGclAwCookie()`, `src/lib/analytics/gclid-restore.ts`), înainte de `gtag.js`. Nimic nu se scrie fără acord.
 
 ## Cookie-urile de pe site (inventarul complet)
 

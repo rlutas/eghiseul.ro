@@ -35,6 +35,8 @@ export interface TouchPoint {
   /** Click ID-uri de platformă: Google (gclid/gbraid/wbraid), Meta (fbclid), Microsoft (msclkid), TikTok (ttclid), LinkedIn (li_fat_id). */
   click_id?: string;
   click_platform?: string;
+  /** Which URL parameter carried the click id (gclid, gbraid, fbclid…). Saved from 16.11.2026. */
+  click_param?: string;
   /** ChatGPT Ads: identificatorul de atribuire OpenAI (`?oppref=`), trimis server-side la plată. */
   oppref?: string;
   referrer?: string;
@@ -90,6 +92,7 @@ function readCurrentTouch(): TouchPoint {
     if (v) {
       touch.click_id = v.slice(0, 200);
       touch.click_platform = platform;
+      touch.click_param = param;
       break;
     }
   }
