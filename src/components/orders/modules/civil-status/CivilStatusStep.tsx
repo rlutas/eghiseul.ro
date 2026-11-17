@@ -204,7 +204,7 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
       req(!!cs.fatherName?.trim(), 'Prenumele tatălui');
       req(!!cs.motherName?.trim(), 'Prenumele mamei');
     }
-    if (fields.oldCertificateReason) req(!!cs.oldCertificateReason, 'Vechiul certificat mi-a fost (pierdut/distrus/furat)');
+    if (fields.oldCertificateReason) req(!!cs.oldCertificateReason, 'Vechiul certificat mi-a fost (alege o variantă)');
     if (fields.renouncedCitizenship) req(cs.renouncedRomanianCitizenship !== undefined, 'Dacă ai renunțat la cetățenia română');
     if (fields.purpose && !(fields.marriageAbroadIntent && cs.marriageAbroadIntent === true))
       req(!!cs.purpose?.trim(), 'Scopul solicitării');
@@ -230,21 +230,10 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
     onValidChange(missingItems.length === 0);
   }, [missingItems, onValidChange]);
 
-  // Naștere/căsătorie: „Vechiul certificat mi-a fost" are o SINGURĂ opțiune
-  // („Pierdut"). Un radio cu o singură opțiune, ne-preselectat, arată ca o
-  // etichetă → clienții nu-l bifează și rămân blocați la «Continuă» cu un mesaj
-  // care nici nu se potrivea cu eticheta (incident 2026-07-24, fdvasiliu –
-  // certificat naștere). Îl pre-selectăm automat: nu mai e blocaj, iar UI-ul îl
-  // arată bifat. Celibat păstrează alegerea manuală (pierdut/distrus/furat).
-  useEffect(() => {
-    if (
-      fields.oldCertificateReason &&
-      config?.documentType !== 'celibat' &&
-      !cs.oldCertificateReason
-    ) {
-      updateCivilStatus({ oldCertificateReason: 'pierdut' });
-    }
-  }, [fields.oldCertificateReason, config?.documentType, cs.oldCertificateReason, updateCivilStatus]);
+  // „Vechiul certificat mi-a fost" NU se mai pre-selectează (17.11.2026): de când
+  // există și „Predat autorităților" (dosar de cetățenie etc.), un „Pierdut"
+  // pus din oficiu ar declara pe cerere ceva ce clientul n-a spus. Cu două
+  // opțiuni câmpul arată ca o alegere, nu ca o etichetă (blocajul din 24.07).
 
   // «Continuă» tapped while incomplete → show the missing list below.
   // Baseline captured at mount: the counter is global, don't flash errors
@@ -567,15 +556,21 @@ export default function CivilStatusStep({ config, onValidChange }: CivilStatusSt
             <ChoiceRow
               current={cs.oldCertificateReason}
               onChange={(v) => updateCivilStatus({ oldCertificateReason: v as CivilStatusState['oldCertificateReason'] })}
-              // Naștere + căsătorie: doar „Pierdut". Celibat: pierdut/distrus/furat.
+              // Naștere + căsătorie: „Pierdut" sau „Predat autorităților" (originalul
+              // rămas la o autoritate, ex. dosar de cetățenie — raport echipă
+              // 16.11.2026). Celibat: și distrus/furat.
               options={
                 config?.documentType === 'celibat'
                   ? [
                       { value: 'pierdut', label: 'Pierdut' },
                       { value: 'distrus', label: 'Distrus' },
                       { value: 'furat', label: 'Furat' },
+                      { value: 'predat_autoritati', label: 'Predat autorităților' },
                     ]
-                  : [{ value: 'pierdut', label: 'Pierdut' }]
+                  : [
+                      { value: 'pierdut', label: 'Pierdut' },
+                      { value: 'predat_autoritati', label: 'Predat autorităților' },
+                    ]
               }
             />
           </Field>

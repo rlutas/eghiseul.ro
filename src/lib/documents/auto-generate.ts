@@ -189,6 +189,7 @@ export async function autoGenerateOrderDocuments(
     future_spouse_citizenship: civil.nationality || '',
     marriage_country: civil.countryOfUse || '',
     celibacy_purpose: civil.purpose || '',
+    old_certificate_reason: civil.oldCertificateReason || '',
     address_parts: domicile.parts,
   };
 

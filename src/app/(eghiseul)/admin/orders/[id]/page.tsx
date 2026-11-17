@@ -6169,6 +6169,7 @@ const CIVIL_STATUS_VALUE_LABELS: Record<string, string> = {
   pierdut: 'Pierdut',
   distrus: 'Distrus',
   furat: 'Furat',
+  predat_autoritati: 'Predat autorităților',
 };
 
 function formatCivilValue(v: unknown): string {

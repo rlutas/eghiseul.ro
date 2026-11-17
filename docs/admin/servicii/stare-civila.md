@@ -46,7 +46,7 @@ depășit promisiunea veche de 7-15 zile.
 1. **Contact** + motivul.
 2. **Date personale** (act scanat sau manual).
 3. **Date de stare civilă**, diferite pe act:
-   - **Naștere**: pentru cine (minor / adult), nașterea a avut loc în România / străinătate (la străinătate, avertisment: dacă nu a fost **transcrisă** în România la ambasadă / consulat / DEP, nu se poate elibera), „Sunteți căsătorit(ă) în prezent?”, istoricul marital (de câte ori, cum s-a încheiat: divorț / deces; divorțul din străinătate trebuie recunoscut în România), locul căsătoriei, numele de naștere, prenumele părinților, „Vechiul certificat mi-a fost: pierdut / deteriorat / furat / altul”, „Ați renunțat la cetățenia română?” (la „da”, certificatul nou **nu va mai avea CNP**), localitatea care a înregistrat actul, scopul și țara de folosire.
+   - **Naștere**: pentru cine (minor / adult), nașterea a avut loc în România / străinătate (la străinătate, avertisment: dacă nu a fost **transcrisă** în România la ambasadă / consulat / DEP, nu se poate elibera), „Sunteți căsătorit(ă) în prezent?”, istoricul marital (de câte ori, cum s-a încheiat: divorț / deces; divorțul din străinătate trebuie recunoscut în România), locul căsătoriei, numele de naștere, prenumele părinților, „Vechiul certificat mi-a fost: pierdut / predat autorităților” (din 17.11.2026; „predat autorităților” e pentru originalul rămas la o autoritate, de exemplu la dosarul de cetățenie, și apare ca atare pe cererea de duplicat), „Ați renunțat la cetățenia română?” (la „da”, certificatul nou **nu va mai avea CNP**), localitatea care a înregistrat actul, scopul și țara de folosire.
    - **Căsătorie**: data și locul căsătoriei, numele soțului / soției, „Sunteți căsătorit(ă) în prezent?”, istoricul marital, renunțarea la cetățenie, localitatea de înregistrare. Cine bifează că nu e și nu a fost căsătorit e oprit de formular (nu există ce certificat să cerem).
    - **Celibat**: starea civilă actuală (necăsătorit / căsătorit / divorțat / văduv), istoricul, dacă intenționează căsătoria în străinătate, dacă mai are vechiul certificat de căsătorie, naționalitatea, localitatea nașterii.
    - **Extrase multilingve**: aceleași întrebări ca actul de bază.
@@ -79,7 +79,7 @@ acel status e pentru instituție **indisponibilă** (portal picat, registru
 
 | Situație | Ce faceți |
 |---|---|
-| Clientul s-a blocat la „Vechiul certificat mi-a fost” | din 24.07 câmpul e pre-bifat; dacă e o comandă veche, îi trimiteți linkul de continuare din admin. |
+| Clientul s-a blocat la „Vechiul certificat mi-a fost” | din 17.11 câmpul are două variante („Pierdut”, „Predat autorităților”) și nu mai e pre-bifat: clientul alege una. |
 | Nașterea / căsătoria a avut loc în străinătate | întrebați dacă a fost **transcrisă** în România. Netranscrisă = nu există act românesc de duplicat; îi explicați că întâi se transcrie la consulat / DEP. Transcrisă = termen 30-45 zile. |
 | Divorț pronunțat în străinătate | trebuie recunoscut în România înainte să apară pe certificat. |
 | Cere certificat de căsătorie dar a bifat „nu am fost căsătorit” | formularul nu-l lasă; dacă a ajuns totuși, sunați și corectați datele din admin. |

@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-17 | 🟣 **Stare civilă: „Predat autorităților”; nume din pașaport fără text inventat; link de continuare CJO pe serviciul corect** — `{{MOTIV_CERTIFICAT_VECHI}}` pe cererile de duplicat naștere/căsătorie (`buildMotivCertificatVechi`), fără pre-selectare „Pierdut”; `correctNamesFromMrz` nu mai adaugă litere în fața numelui tipărit (E-261111-JUZ6Z); CJO `recoveryFormPath()` | [2026-11-17-predat-autoritatilor-nume-mrz-link-continuare.md](2026-11-17-predat-autoritatilor-nume-mrz-link-continuare.md) |
 | 2026-11-16 | 🔴 **Decontări: prefixul `EAC-` (ecazier auto) nerecunoscut** — rând fără comandă și „nefacturat” în payout-ul din 13.11; `ORDER_RE` + `CJO_PREFIXES` acoperă acum toate cele 7 prefixe; rambursarea E-260711-TFVDH rămâne de verificat în Oblio | [2026-11-16-decontari-prefix-eac-ecazier.md](2026-11-16-decontari-prefix-eac-ecazier.md) |
 | 2026-11-16 | 🔴 **Facturile pe firmă plecau la Oblio fără județ** — `parseCompanyAddress()` citește județul și localitatea din `billing.companyAddress`; `buildOblioClient()` nu mai folosește adresa persoanei pe factura firmei (EGH-0955/0962/0973/0979) | [2026-11-16-facturi-firma-fara-judet.md](2026-11-16-facturi-firma-fara-judet.md) |
 | 2026-11-16 | 🔵 **Estimare pensie: tabel pe ani de stagiu; verificări live; CJO pe zile** — `src/lib/pensii-estimare.ts` (formulă comună calculator + tabel), tag Ads cazierfiscal confirmat în bundle, CJO stabil la ~137 clicuri/zi | [2026-11-16-estimare-pensie-tabel-stagiu.md](2026-11-16-estimare-pensie-tabel-stagiu.md) |

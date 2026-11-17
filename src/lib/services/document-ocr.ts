@@ -1004,11 +1004,29 @@ export function correctNamesFromMrz(result: OCRResult): OCRResult {
   const mrzNames = recoverNamesFromMrz(data.mrz);
   if (!mrzNames.surname || !mrzNames.givenNames) return result;
 
-  const mrzSur = deburrName(mrzNames.surname);
+  let mrzSur = deburrName(mrzNames.surname);
   const mrzGiv = deburrName(mrzNames.givenNames);
 
   const visLast = (data.lastName || '').trim();
   const visFirst = (data.firstName || '').trim();
+
+  // The MRZ correction removes text stuck to the surname; it must never add any.
+  // When the printed surname is the END of the MRZ surname, glued to extra
+  // letters in front, the extra letters are an unknown prefix or invented text:
+  // on E-261111-JUZ6Z the real „PEROUMUNTEANU<<ANDREI" came back from the model as
+  // „P<ROUMOLDAVAMUNTEANU<<<<ANDREI", with the residence from the other page.
+  // The line length cannot be the test: the model often returns real lines longer
+  // than 44 characters, with a repeated prefix or extra fillers.
+  // A real double surname has a separator in the MRZ, so it is not caught here.
+  const visLastPlain = deburrName(visLast);
+  if (
+    visLastPlain.length >= 4 &&
+    mrzSur.length > visLastPlain.length &&
+    mrzSur.endsWith(visLastPlain) &&
+    /[A-Z]/.test(mrzSur[mrzSur.length - visLastPlain.length - 1])
+  ) {
+    mrzSur = visLastPlain;
+  }
 
   // Visual split already agrees with the MRZ → keep visual (has diacritics).
   // Hyphen-tolerant: MRZ scrie „CATALIN<ALEXANDRU" și pentru „CĂTĂLIN-ALEXANDRU";

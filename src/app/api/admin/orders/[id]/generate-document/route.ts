@@ -253,6 +253,7 @@ export async function POST(
       future_spouse_citizenship: civil.nationality || '',
       marriage_country: civil.countryOfUse || '',
       celibacy_purpose: civil.purpose || '',
+      old_certificate_reason: civil.oldCertificateReason || '',
       address_parts: domicile.parts,
       company_address_parts: companyAddress ? {
         county: companyAddress.county, city: companyAddress.city,

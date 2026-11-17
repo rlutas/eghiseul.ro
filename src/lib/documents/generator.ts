@@ -118,6 +118,9 @@ export interface ClientData {
    *  căsătoria în străinătate (civil_status.purpose, ex. „Pentru viza") —
    *  {{MOTIV_CELIBAT}} pe varianta „alte situații" a cererii. */
   celibacy_purpose?: string;
+  /** Ce s-a întâmplat cu vechiul certificat (civil_status.oldCertificateReason)
+   *  — {{MOTIV_CERTIFICAT_VECHI}} pe cererea de duplicat naștere/căsătorie. */
+  old_certificate_reason?: string;
   address_parts?: { county?: string; city?: string; sector?: string; street?: string; number?: string; building?: string; staircase?: string; floor?: string; apartment?: string; postalCode?: string };
   company_address_parts?: { county?: string; city?: string; street?: string; number?: string; building?: string; apartment?: string };
 }
@@ -780,6 +783,26 @@ export function buildFiliatie(fatherName?: string, motherName?: string, cnp?: st
 }
 
 /**
+ * Rubrica „Vechiul certificat mi-a fost … în următoarele împrejurări" de pe
+ * cererea de duplicat (naștere/căsătorie). Până pe 17.11.2026 șablonul avea
+ * „PIERDUT" scris fix; clienții care au predat originalul unei autorități
+ * (dosar de cetățenie etc.) declarau astfel o pierdere care nu avusese loc.
+ * Comenzile vechi, fără răspuns salvat, rămân pe „PIERDUT".
+ */
+export function buildMotivCertificatVechi(reason?: string | null): string {
+  switch ((reason || '').trim()) {
+    case 'predat_autoritati':
+      return 'PREDAT ÎN ORIGINAL AUTORITĂȚILOR';
+    case 'distrus':
+      return 'DISTRUS';
+    case 'furat':
+      return 'FURAT';
+    default:
+      return 'PIERDUT';
+  }
+}
+
+/**
  * Fraza «, motivul solicitării: X» de pe împuternicire, ca ÎNTREG.
  *
  * Trăia ca text fix în șablon lângă {{MOTIV}}, iar buildInstitutie o adăuga și
@@ -1376,6 +1399,7 @@ export function buildPlaceholderData(ctx: DocumentContext) {
     CETATENIE_SOT: ctx.client.future_spouse_citizenship || '',
     TARA_CASATORIE: ctx.client.marriage_country || '',
     MOTIV_CELIBAT: ctx.client.celibacy_purpose || '',
+    MOTIV_CERTIFICAT_VECHI: buildMotivCertificatVechi(ctx.client.old_certificate_reason),
 
     // Certificat de naștere — cererea de duplicat ANEXA 59 (template-ul lui
     // Raul, 22.07: certificat-nastere/cerere-eliberare-pf.docx). Tag-uri

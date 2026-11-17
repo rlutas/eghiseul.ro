@@ -123,6 +123,29 @@ describe('correctNamesFromMrz — end-to-end pe rezultatul OCR', () => {
     expect(out.extractedData.lastName).toBe('POPA');
     expect(out.issues ?? []).toHaveLength(0);
   });
+
+  // E-261111-JUZ6Z (raport echipă 16.11.2026): pe pașaport scrie MUNTEANU, în
+  // MRZ „PEROUMUNTEANU<<ANDREI". Modelul a întors o linie de 53 de caractere cu
+  // domiciliul de pe pagina alăturată lipit de nume, iar corecția l-a pus în
+  // contract, împuternicire și factură.
+  it('textul inventat de model în MRZ nu rescrie numele citit de pe act', () => {
+    const invented = 'P<ROUMOLDAVAMUNTEANU<<<<ANDREI<<<<<<<<<<<<<<<<<<<<<<<<';
+    const out = correctNamesFromMrz(build('MUNTEANU', 'ANDREI', invented));
+    expect(out.extractedData.lastName).toBe('MUNTEANU');
+    expect(out.extractedData.firstName).toBe('ANDREI');
+    expect(out.issues ?? []).toHaveLength(0);
+  });
+
+  it('text lipit în fața numelui tipărit nu intră în nume nici pe o linie de lungime corectă', () => {
+    const out = correctNamesFromMrz(build('MUNTEANU', 'ANDREI', 'P<ROUMOLDAVAMUNTEANU<<ANDREI<<<<<<<<<<<<<<<<<'));
+    expect(out.extractedData.lastName).toBe('MUNTEANU');
+    expect(out.extractedData.firstName).toBe('ANDREI');
+  });
+
+  it('un nume dublu real din MRZ rămâne întreg', () => {
+    const out = correctNamesFromMrz(build('POPESCU', 'ION', 'P<ROUIONESCU<POPESCU<<ION<<<<<<<<<<<<<<<<<<<'));
+    expect(out.extractedData.lastName).toBe('IONESCU POPESCU');
+  });
 });
 
 describe('recoverNamesFromMrz — numele în P nu se mutilează după IDROU (CJO-20260804-61939)', () => {
