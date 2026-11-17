@@ -1,5 +1,12 @@
 # eGhiseul.ro - Status Curent
 
+> **🟣 Update 2026-11-17 — rapoartele echipei din Ghid.** [changelog](changelog/2026-11-17-predat-autoritatilor-nume-mrz-link-continuare.md)
+> - **Stare civilă:** opțiunea „Predat autorităților” la vechiul certificat, pe eghiseul și documentero; cererea de duplicat tipărește alegerea clientului. Live.
+> - **Nume din pașaport:** OCR-ul nu mai lipește text inventat în fața numelui. E-261111-JUZ6Z are încă numele greșit pe documente și factură: de corectat manual.
+> - **cazierjudiciaronline:** linkul de continuare deschide formularul serviciului comenzii. Verificat live pe o sesiune de cazier auto.
+> - **Deschis:** E-261031-68SFJ, cost intern 75 lei înregistrat de colaborator și dispărut de pe comandă; tariful precompletat e 60.
+> - **Erori clienți 10–17.11:** niciun defect; erorile de CNP au fost greșeli de tastare.
+>
 > **🟣 Update 2026-11-16 — reclame Google, conversii, facturare, pagina Stripe, organic.** Tot ce s-a făcut azi, cu ce e verificat și ce a rămas; detaliile sunt în intrările din [changelog](changelog/README.md).
 > - **Constatator, Google Ads (cont 881-388-1795):** anunțul rulează „Eligibil (limitat)”. 11–16.11: 25 de clicuri, 137 lei, nicio comandă din reclamă. Conversia a fost dovedită cu o comandă de test plătită (89 lei, E-261111-ZNYPX); în cont, „Purchase” a trecut din „Inactiv” în „Nu există conversii recente”. Conversiile îmbunătățite sunt pornite. [jurnal](ads/2026-11-12-google-ads-jurnal-incercari.md)
 > - **Clicul din reclamă se păstrează până la acordul de cookie-uri**, pe toate brandurile; verificat că e în site-ul live pe cele 4 domenii. [changelog](changelog/2026-11-16-clic-reclama-pastrat-pana-la-acord.md)

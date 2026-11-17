@@ -13,6 +13,8 @@ Raportul din 03.11 cu extrasul de carte funciară colectivă (cost 20 lei în lo
 
 Rămâne deschis raportul E-261031-68SFJ (cost intern 75 lei, nu 60): vezi mai jos.
 
+**Erori clienți, ultimele 7 zile:** cele 3 erori de CNP de azi (2 pe documentero, 1 pe cazierjudiciaronline) au fost greșeli de tastare, corectate de client pe loc; nu e un defect. Toate celelalte comenzi cu erori în listă au fost plătite. Comanda E-261117-DEGWF (certificat de celibat, 798 lei) s-a oprit înainte de plată: merită un telefon.
+
 ---
 
 ## Rezumat tehnic
@@ -42,3 +44,22 @@ Rămâne deschis raportul E-261031-68SFJ (cost intern 75 lei, nu 60): vezi mai j
 ### 4. Rămas deschis: E-261031-68SFJ
 
 Colaboratorul a înregistrat la depunere „Cost eliberare: 75,00 lei” (istoric, 03.11.2026), dar rândul de cost nu mai există pe comandă, iar tariful precompletat pentru actualizarea adresei este 60 lei. De decis: se repune costul de 75 lei și, dacă 75 e tariful curent, se schimbă precompletarea din Setări → Servicii.
+
+### 5. Erori clienți, 10–17.11 (verificare, fără modificări de cod)
+
+| Site | Eroare | Câte | Ce a fost |
+|---|---|---|---|
+| documentero | CNP: lungime, apoi cifră de control | 2 | aceeași comandă (E-261117-DEGWF), tastare manuală; CNP-ul final e valid; comanda s-a oprit la plată |
+| cazierjudiciaronline | CNP: lungime, la ieșirea din câmp | 3 | 11.11, 13.11, 17.11; câmpul nu are `maxLength`, deci nu e tăierea la lipire din 09.11; sesiunea din 17.11 a trecut la pasul următor cu 13 cifre |
+| eghiseul | OCR eșuat pe pașaport PDF | 3 | aceeași comandă (E-261112-7A93Y), plătită |
+| eghiseul | salvare eșuată, HTTP 500 | 1 | E-261113-B2RLT, plătită și finalizată |
+| documentero | salvare eșuată, rețea / timeout | 2 | E-261111-EMRB4, plătită |
+| eghiseul | selfie identic cu actul | 1 | blocaj corect; E-261116-JSFZ3, plătită |
+| cazierjudiciaronline | poză HEIC prea mare | 1 | blocaj corect |
+
+### 6. Verificări după publicare
+
+- CJO: linkul vechi al sesiunii CAO-20261116-66355 (`/?recover=…`) redirecționează pe `/cazier-auto-online`. Paginile țintă răspund 200, inclusiv `ecazier.ro/cazier-auto` și `/cazier-fiscal`.
+- CAO-20261116-06023 nu există în baza CJO sub acest număr (nici comandă, nici sesiune), deci nu a putut fi verificat direct; cauza e aceeași.
+- Cererile de stare civilă se generează din șabloanele din repo; nu există variantă încărcată din admin care să le înlocuiască.
+- DNS: `openai-business-claim.eghiseul.ro` TXT adăugat în Vercel pentru verificarea profilului din ChatGPT Business Hub; răspunde la interogare.
