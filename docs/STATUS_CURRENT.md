@@ -1,5 +1,9 @@
 # eGhiseul.ro - Status Curent
 
+> **🔴 Update 2026-11-18 — documentele comenzilor anulate.** [changelog](changelog/2026-11-18-documente-vizibile-pe-comenzi-anulate.md)
+> - **Pagina comenzii:** pe „Anulată” / „Rambursată” cardul cu documente rămâne, doar pentru citit și descărcat, fără „Regenerează”. Livrat 18.11.
+> - **Deschis, E-260711-TFVDH:** suma rambursată neînregistrată, EGH-0026 nestornată, factura de 30% (392,64 lei) neemisă. Se închide cu „Reconciliază” de pe pagina comenzii.
+>
 > **🟣 Update 2026-11-17 — rapoartele echipei din Ghid.** [changelog](changelog/2026-11-17-predat-autoritatilor-nume-mrz-link-continuare.md)
 > - **Stare civilă:** opțiunea „Predat autorităților” la vechiul certificat, pe eghiseul și documentero; cererea de duplicat tipărește alegerea clientului. Live.
 > - **Nume din pașaport:** OCR-ul nu mai lipește text inventat în fața numelui. E-261111-JUZ6Z are încă numele greșit pe documente și factură: de corectat manual.

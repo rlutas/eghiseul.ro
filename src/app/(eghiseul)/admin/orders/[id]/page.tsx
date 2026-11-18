@@ -26,6 +26,7 @@ import { computeDelegationItems } from '@/lib/documents/delegation-items';
 import { computeCerereItems } from '@/lib/documents/cerere-items';
 import { REUPLOAD_DOC_SPECS, suggestedDocsForService } from '@/lib/reupload/doc-types';
 import { STEP_LABELS } from '@/lib/admin/wizard-steps';
+import { processingSectionMode } from '@/lib/admin/processing-section-mode';
 import {
   type KycPerDoc,
   extractKycByDocType,
@@ -5122,10 +5123,15 @@ function ProcessingSection({
   // secțiunea — cu tot cu lista de documente — dispărea. De aici „câteodată
   // dispare și nu o mai găsești". Butonul de acțiune are deja gate propriu
   // (`buttonConfig &&`), deci pe statusurile fără acțiune apar doar documentele.
-  const hiddenStatuses = ['draft', 'abandoned', 'cancelled', 'refunded'];
-  if (hiddenStatuses.includes(status)) {
+  //
+  // Anulate / rambursate: secțiunea rămâne, dar DOAR pentru citit — documentele
+  // generate sunt dovada muncii făcute (cei 30% reținuți), deci echipa trebuie
+  // să le poată deschide și descărca, fără să le poată regenera.
+  const sectionMode = processingSectionMode(status);
+  if (sectionMode === 'hidden') {
     return null;
   }
+  const readOnly = sectionMode === 'readonly';
 
   // Determine which document types to show. Fully-automated services with no
   // lawyer involvement (ONRC constatator, ANCPI carte funciară / plan cadastral /
@@ -5165,12 +5171,18 @@ function ProcessingSection({
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <ClipboardList className="h-5 w-5 text-blue-700" />
-          Procesare comanda
+          {readOnly ? 'Documente și demersuri — comandă anulată' : 'Procesare comanda'}
         </CardTitle>
+        {readOnly && (
+          <p className="text-xs text-muted-foreground">
+            Comanda e anulată: documentele generate rămân aici pentru consultare și descărcare. Nu se
+            mai pot genera sau regenera. Pașii făcuți sunt în „Istoric comanda”, mai jos.
+          </p>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Contextual Action Button */}
-        {buttonConfig && (
+        {!readOnly && buttonConfig && (
           <button
             onClick={() => handleAction(buttonConfig.action)}
             disabled={processing}
@@ -5202,7 +5214,7 @@ function ProcessingSection({
         {/* Send the order to a collaborator (topograph). Used when the internal
             team can't fulfil an identificare order — the collaborator then sees
             it in /colaborator and delivers it there. */}
-        <CollaboratorAssign order={order} onChanged={onStatusChange} />
+        {!readOnly && <CollaboratorAssign order={order} onChanged={onStatusChange} />}
 
         {/* Generated Documents - with generate + preview buttons */}
         <div>
@@ -5211,6 +5223,9 @@ function ProcessingSection({
             Documente generate
           </h4>
           <div className="space-y-1.5">
+            {readOnly && documents.length === 0 && (
+              <p className="text-sm text-muted-foreground">Pe această comandă nu s-a generat niciun document.</p>
+            )}
             {/* Auto-generated contracts. Împuternicirile sunt PER SERVICIU —
                 fiecare document oficial (cazier, apostilă, integritate...) are
                 delegația și fișierul lui, deci un rând per serviciu. Cererile
@@ -5266,6 +5281,9 @@ function ProcessingSection({
                 : documents.find(d => d.type === docType);
               const template = DOC_TEMPLATE_MAP[docType];
               const isGenerating = generatingDoc === (serviceType ? `${template}:${serviceType}` : template);
+
+              // Comandă anulată: doar ce s-a generat efectiv, fără rânduri goale.
+              if (readOnly && !doc) return null;
 
               return (
                 <div key={`${docType}${serviceType ? `:${serviceType}` : ''}`} className="flex items-center justify-between py-2 px-3 rounded-lg border bg-white text-sm">
@@ -5326,7 +5344,7 @@ function ProcessingSection({
                         )}
                       </>
                     )}
-                    {template && (
+                    {template && !readOnly && (
                       <Button
                         size="sm"
                         variant={doc ? 'outline' : 'default'}
@@ -5475,6 +5493,7 @@ function ProcessingSection({
                     <input
                       type="checkbox"
                       checked={opt.completed}
+                      disabled={readOnly}
                       onChange={() => handleAction('complete_option', { option_code: opt.option_code })}
                       className="rounded"
                     />

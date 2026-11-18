@@ -10,6 +10,11 @@ Comanda ajunge pe statusul **„Anulare solicitată"** (banner roșu) și **disp
 de la colaborator** (topograf) din listă și din pagina de detaliu — nu mai e o
 lucrare.
 
+După anulare, documentele comenzii **nu dispar**: pe pagina ei rămâne cardul
+„Documente și demersuri — comandă anulată”, cu contractele și împuternicirea de
+descărcat, iar pașii făcuți sunt în „Istoric comanda”. De acolo luați dovada
+muncii făcute când un client contestă cei 30% reținuți.
+
 ## Ce apeși
 
 1. **„Procesează refund … RON"** (banner roșu). Un singur click face tot:

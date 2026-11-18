@@ -194,6 +194,11 @@ semnătură)”**.
 Pe „Anulare solicitată”: **„Procesează refund”** (refund Stripe 70% +
 storno + factura de 30%), **„Am refundat manual”** (când Stripe refuză),
 **„Reconciliază”** (când lipsește o piesă). [Procedura](anulare-refund-70.md).
+
+Pe o comandă deja „Anulată” sau „Rambursată”, cardul de procesare devine
+**„Documente și demersuri — comandă anulată”**: documentele generate rămân de
+văzut și de descărcat, fără „Generează / Regenerează”. Pașii făcuți sunt în
+„Istoric comanda”, în josul paginii.
 Storno / reemitere factură: [procedura](storno-reemite.md).
 
 ## Procesare comandă
