@@ -57,6 +57,42 @@ Cifre din cont, 11–16.11: 321 de afișări, 25 de clicuri, 137,16 lei, CPC med
 
 Contul 933-520-0143 (cazierfiscal.com) are din 16.11 o campanie pe pauză; vezi rândul din tabelul de mai sus.
 
+## Verificare completă, 18.11.2026
+
+**Constatator, cont 881-388-1795, 11–17.11** (din contul Google Ads):
+
+| | |
+|---|---|
+| Afișări / clicuri / CTR | 588 / 61 / 10,37% |
+| Cost / CPC mediu | 328,14 lei / 5,38 lei |
+| Telefoane | 45 clicuri, 244,94 lei |
+| Computere | 16 clicuri, 83,20 lei |
+| Conversii înregistrate | 0 |
+| Stare anunț | „Eligibil (limitat)”, politica „Documente guvernamentale și servicii oficiale” |
+| Cuvinte cheie „Afișat rar (scor de calitate scăzut)” | 5 din 10, inclusiv [certificat constatator] și „certificat constatator firma” |
+
+**Ce s-a întâmplat pe site** (baza de date, comenzi reale pe certificat-constatator-express.ro):
+
+- Două comenzi începute de vizitatori veniți din reclamă: E-261116-4VKDT (a semnat, a ajuns la pagina de plată, nu a plătit; la telefon a spus că nu mai vrea) și E-261117-TCLAS (oprită la pasul de date).
+- Nicio comandă plătită din reclamă. Singura comandă plătită de pe site e cea de test din 16.11.
+- Google nu are deci nicio conversie reală de primit. „0 conversii” din cont e corect, nu o pierdere de raportare.
+
+**Ce arată Google Analytics** (proprietatea site-ului, 11–18.11): 502 vizitatori, din care 480 cu același profil: Chrome pe Linux, ecran 1920×1080, aterizare pe prima pagină, orașe diferite din România. Doar 2 vizitatori au ajuns pe formularul de comandă. Profilul e de trafic automat, nu de clienți. Google a facturat doar 16 clicuri de pe computere, deci cea mai mare parte a acestui trafic nu e plătită. Originea lui nu e stabilită.
+
+De pe telefoane: 45 de clicuri plătite, 15 sesiuni măsurate. Analytics și eticheta de conversie se încarcă doar după acordul de cookie-uri, deci cine nu apasă pe banner nu e măsurat, iar o eventuală comandă a lui nu ajunge la Google ca și conversie.
+
+**Cazier fiscal, cont 933-520-0143:** campania `Search-CazierFiscal-2026-11` e pe pauză din 16.11. Nu a rulat nicio zi. În cont, acțiunea „Purchase” apare cu eticheta neverificată, pentru că nu a existat nicio vizită din reclamă.
+
+**Organic, 04–15.11** (Search Console): cazierfiscal.com 69 afișări, 0 clicuri; certificat-constatator-express.ro 13 afișări, 1 clic.
+
+**Eroare reparată:** comenzile din reclamă erau etichetate „Căutare organică” în admin. Detalii: [`../changelog/2026-11-18-reclama-comenzi-etichetate-organic.md`](../changelog/2026-11-18-reclama-comenzi-etichetate-organic.md).
+
+**Decizii deschise (Raul):**
+
+1. Pornirea campaniei de cazier fiscal.
+2. Pe constatator: 328 lei pentru două comenzi începute și niciuna plătită, la un preț de 89 lei. De hotărât dacă testul continuă până la 14 zile sau se oprește.
+3. Raportarea conversiilor pentru cei care nu acceptă cookie-urile: se poate face prin încărcarea comenzilor plătite cu `gclid` în Google Ads. Trimite date la Google fără acordul din banner, deci e o decizie de conformitate, nu una tehnică.
+
 ## Ce știm sigur
 
 - **Nu e firma.** Reclamele imobiliare au rulat pe EDIGITALIZARE; ecazier a fost blocat pe numele cabinetului de avocat; motivul scris pe anunț e politica.

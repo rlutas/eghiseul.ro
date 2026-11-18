@@ -113,3 +113,31 @@ describe('youtube utm', () => {
     expect(classifyTouch({ utm_source: 'youtube', utm_medium: 'video' } as never)).toEqual({ channel: 'social', source: 'youtube' });
   });
 });
+
+describe('classifyAttribution: paid click followed by its stale referrer', () => {
+  const adClick = { at: '2026-11-17T18:39:04Z', click_id: 'abc', click_platform: 'google', referrer: 'https://www.google.com/' };
+
+  it('keeps Google Ads when the next page view repeats the google referrer', () => {
+    const last = { at: '2026-11-17T18:40:00Z', referrer: 'https://www.google.com/' };
+    expect(classifyAttribution({ first: adClick, last })).toEqual({ channel: 'google_ads', source: 'google' });
+  });
+
+  it('keeps Google Ads when the tab stayed open for hours', () => {
+    const last = { at: '2026-11-17T20:45:00Z', referrer: 'https://www.google.com/' };
+    expect(classifyAttribution({ first: adClick, last }).channel).toBe('google_ads');
+  });
+
+  it('a later source of another kind still wins', () => {
+    expect(classifyAttribution({ first: adClick, last: { at: '2026-11-17T19:00:00Z', utm_source: 'email', utm_medium: 'warmup' } }).channel).toBe('email');
+    expect(classifyAttribution({ first: adClick, last: { at: '2026-11-17T19:00:00Z', referrer: 'https://www.bing.com/' } })).toEqual({ channel: 'organic_search', source: 'bing' });
+  });
+
+  it('an organic visit weeks after the ad click is organic', () => {
+    const last = { at: '2026-12-20T10:00:00Z', referrer: 'https://www.google.com/' };
+    expect(classifyAttribution({ first: adClick, last }).channel).toBe('organic_search');
+  });
+
+  it('organic first touch is not turned into an ad', () => {
+    expect(classifyAttribution({ first: { referrer: 'https://www.google.com/' }, last: { referrer: 'https://www.google.com/' } }).channel).toBe('organic_search');
+  });
+});

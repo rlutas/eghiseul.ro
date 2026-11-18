@@ -78,6 +78,21 @@ const CLICK_IDS: Array<[string, string]> = [
   ['li_fat_id', 'linkedin'],
 ];
 
+/**
+ * `document.referrer` belongs to the DOCUMENT, not to the page view: it keeps
+ * its value across every client-side navigation in the same tab. It is a
+ * source only the first time we read it. Read again on the next route, it
+ * looked like a fresh visit from google.com and replaced the ad click that
+ * actually brought the visitor (orders from Google Ads counted as organic
+ * search, found 18.11.2026).
+ */
+let referrerConsumed = false;
+
+/** Test hook: a new document load. */
+export function resetReferrerForTests(): void {
+  referrerConsumed = false;
+}
+
 function readCurrentTouch(): TouchPoint {
   const params = new URLSearchParams(window.location.search);
   const touch: TouchPoint = { at: new Date().toISOString() };
@@ -115,9 +130,10 @@ function readCurrentTouch(): TouchPoint {
   // Întoarcerea de la plată (Stripe, 3-D Secure) nu e o sursă nouă: altfel
   // `last` devine „checkout.stripe.com" și pierdem canalul real.
   const ref = document.referrer;
-  if (ref && !ref.includes(window.location.host) && !isIgnoredReferrer(ref)) {
+  if (!referrerConsumed && ref && !ref.includes(window.location.host) && !isIgnoredReferrer(ref)) {
     touch.referrer = ref.slice(0, 300);
   }
+  referrerConsumed = true;
 
   touch.landing = window.location.pathname.slice(0, 200);
   return touch;

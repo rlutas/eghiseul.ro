@@ -49,6 +49,8 @@ export interface TouchLike {
   click_platform?: string | null;
   oppref?: string | null;
   referrer?: string | null;
+  /** ISO time of the touch; used only to pair a paid click with its echo. */
+  at?: string | null;
 }
 
 export interface AttributionLike {
@@ -248,7 +250,37 @@ export function classifyTouch(t: TouchLike | null | undefined): ChannelResult | 
   return null;
 }
 
+/** How long after a paid click a referrer-only touch from the same engine is its echo. */
+const PAID_CLICK_ECHO_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * True when `last` is only the stale referrer of the paid click in `first`.
+ *
+ * `document.referrer` never changes while a tab stays open. Until 18.11.2026
+ * every in-site navigation re-read it, so a visitor who clicked an ad
+ * (`gclid` on the landing URL, referrer google.com) got a second touch one
+ * page later: no click id, referrer still google.com. That touch replaced
+ * `last` and the order was counted as organic search. The capture is fixed;
+ * this keeps the orders stored before the fix on the right channel.
+ */
+function isEchoOfPaidClick(first: TouchLike | null | undefined, last: TouchLike | null | undefined): boolean {
+  if (!first || !last) return false;
+  if (last.utm_source || last.utm_medium || last.click_id || last.click_platform || last.oppref) return false;
+  const paid = classifyTouch(first);
+  if (!paid || (paid.channel !== 'google_ads' && paid.channel !== 'microsoft_ads')) return false;
+  if (!first.click_id && !first.click_platform) return false;
+  const organic = classifyTouch(last);
+  if (!organic || organic.channel !== 'organic_search' || organic.source !== paid.source) return false;
+  const t1 = first.at ? Date.parse(first.at) : NaN;
+  const t2 = last.at ? Date.parse(last.at) : NaN;
+  if (Number.isNaN(t1) || Number.isNaN(t2)) return true;
+  return t2 >= t1 && t2 - t1 <= PAID_CLICK_ECHO_MS;
+}
+
 /** Canalul comenzii: ultima atingere cu sursă (`last`, apoi `first`), altfel direct. */
 export function classifyAttribution(a: AttributionLike | null | undefined): ChannelResult {
+  if (isEchoOfPaidClick(a?.first, a?.last)) {
+    return classifyTouch(a?.first) ?? { channel: 'direct', source: 'direct' };
+  }
   return classifyTouch(a?.last) ?? classifyTouch(a?.first) ?? { channel: 'direct', source: 'direct' };
 }
