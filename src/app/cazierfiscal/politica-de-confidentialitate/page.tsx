@@ -36,7 +36,7 @@ export default function Page() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />
-      <LegalLayoutCazierFiscal title="Politica de confidențialitate" path={PATH}>
+      <LegalLayoutCazierFiscal title="Politica de confidențialitate" path={PATH} updated="18 noiembrie 2026">
         <p>
           <strong>eDigitalizare SRL</strong> (CUI RO49278701, Reg. Com. J2023001097301, sediul în Jud. Satu Mare,
           Com. Odoreu, Str. Salcâmilor nr. 2), operatorul platformei <strong>cazierfiscal.com</strong>, denumită în
@@ -101,6 +101,7 @@ export default function Page() {
           <li><strong>Obligații legale</strong>: conformarea cu obligațiile fiscale, contabile și de arhivare.</li>
           <li><strong>Securitate și prevenirea fraudelor</strong>: verificarea identității și prevenirea utilizării abuzive a serviciului.</li>
           <li><strong>Îmbunătățirea serviciilor</strong>: analiza agregată a utilizării platformei.</li>
+          <li><strong>Publicitate către clienții noștri</strong>: afișarea de reclame, prin Google Ads, persoanelor care au mai comandat la noi, sau excluderea lor din reclame (vezi secțiunea 5, litera d).</li>
         </ul>
 
         <h2>4. Temeiul legal</h2>
@@ -108,7 +109,7 @@ export default function Page() {
           <li><strong>Executarea contractului</strong> (art. 6 alin. 1 lit. b GDPR): pentru prestarea serviciului comandat.</li>
           <li><strong>Consimțământul</strong> (art. 6 alin. 1 lit. a GDPR): pentru verificarea identității pe bază de fotografie și pentru comunicări/cookie-uri neesențiale.</li>
           <li><strong>Obligația legală</strong> (art. 6 alin. 1 lit. c GDPR): pentru obligațiile fiscale, contabile și de arhivare.</li>
-          <li><strong>Interesul legitim</strong> (art. 6 alin. 1 lit. f GDPR): pentru securitatea platformei, prevenirea fraudelor și îmbunătățirea serviciilor.</li>
+          <li><strong>Interesul legitim</strong> (art. 6 alin. 1 lit. f GDPR): pentru securitatea platformei, prevenirea fraudelor și îmbunătățirea serviciilor și publicitatea către clienții noștri, descrisă la secțiunea 5, litera d. Te poți opune oricând acestei folosiri.</li>
         </ul>
 
         <h2>5. Destinatarii datelor și persoanele împuternicite</h2>
@@ -138,9 +139,22 @@ export default function Page() {
           <li><strong>Fan Courier, Sameday</strong> și, pentru livrări internaționale, <strong>DHL</strong> sau <strong>Poșta Română</strong>: livrarea actelor în original (doar nume, adresă și telefon).</li>
           <li><strong>CloudConvert</strong>: conversia/optimizarea documentelor (de ex. DOCX în PDF).</li>
         </ul>
+        <h3>d) Publicitate (Google Ads)</h3>
         <p>
-          <strong>Nu vindem, nu închiriem și nu transferăm</strong> datele tale către terți în scopuri de marketing
-          sau alte scopuri comerciale.
+          Putem folosi adresa ta de email și numărul de telefon pentru funcția „Direcționare după lista de clienți” din
+          Google Ads, oferită de <strong>Google Ireland Limited</strong>. Datele sunt transformate înainte de trimitere
+          într-un cod ireversibil (hash SHA-256); nu le trimitem în clar. Google compară codurile cu propriile conturi
+          ca să ne afișeze reclamele persoanelor care au mai comandat la noi sau ca să le excludă din reclame, apoi
+          șterge lista încărcată. Google nu primește acte, CNP, date despre comenzi sau documente.
+        </p>
+        <p>
+          Te poți opune oricând acestei folosiri, fără nicio explicație: scrie-ne la datele din secțiunea 12 și îți
+          scoatem datele din listă. Reclamele pe care le vezi le poți controla și din contul tău Google, la „Centrul
+          pentru anunțuri”.
+        </p>
+        <p>
+          <strong>Nu vindem și nu închiriem</strong> datele tale. În afară de folosirea descrisă la litera d), nu le
+          transferăm către terți în scopuri de marketing.
         </p>
 
         <h2>6. Transferuri internaționale de date</h2>
