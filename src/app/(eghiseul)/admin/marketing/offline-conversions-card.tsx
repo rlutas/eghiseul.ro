@@ -80,8 +80,10 @@ export function OfflineConversionsCard() {
         </div>
         <p className="text-sm text-muted-foreground">
           Comenzi plătite venite dintr-un clic pe reclamă. Cele marcate „neraportată” nu au ajuns la Google,
-          pentru că clientul nu a acceptat cookie-urile de marketing. Fișierul se încarcă în Google Ads la
-          Obiective → Conversii → Încărcări, în contul site-ului ales.
+          pentru că clientul nu a acceptat cookie-urile de marketing. Folosește tabelul ca să vezi câte
+          vânzări a adus de fapt reclama. Fișierul le trece pe cele neraportate cu acordul „Denied”: Google
+          cere, la conectarea datelor offline, confirmarea că datele respectă politica de consimțământ din
+          UE, deci încărcarea lor rămâne decizia lui Raul.
         </p>
 
         <div className="flex flex-wrap items-end gap-3">

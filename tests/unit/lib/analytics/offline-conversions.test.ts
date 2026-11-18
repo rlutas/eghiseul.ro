@@ -83,9 +83,18 @@ describe('googleOfflineRows + buildGoogleOfflineCsv', () => {
     const csv = buildGoogleOfflineCsv(googleOfflineRows(orders).filter((r) => !r.tagAlreadySent), 'Purchase offline');
     const lines = csv.trim().split('\n');
     expect(lines[0]).toBe('Parameters:TimeZone=Europe/Bucharest');
-    expect(lines[1]).toBe('Google Click ID,Conversion Name,Conversion Time,Conversion Value,Conversion Currency,Order ID');
+    expect(lines[1]).toBe(
+      'Google Click ID,Conversion Name,Conversion Time,Conversion Value,Conversion Currency,Order ID,Ad User Data,Ad Personalization',
+    );
     expect(lines).toHaveLength(3);
-    expect(lines[2]).toBe(`${GCLID},Purchase offline,2026-11-20 10:00:00,89.00,RON,E-261120-AAAAA`);
+    expect(lines[2]).toBe(`${GCLID},Purchase offline,2026-11-20 10:00:00,89.00,RON,E-261120-AAAAA,Denied,Denied`);
+  });
+
+  it('states consent truthfully: Granted only when the buyer accepted marketing cookies', () => {
+    const csv = buildGoogleOfflineCsv(googleOfflineRows(orders), 'Purchase offline');
+    const byOrder = Object.fromEntries(csv.trim().split('\n').slice(2).map((l) => [l.split(',')[5], l.split(',').slice(6).join(',')]));
+    expect(byOrder['E-261120-AAAAA']).toBe('Denied,Denied');
+    expect(byOrder['E-261120-BBBBB']).toBe('Granted,Granted');
   });
 });
 

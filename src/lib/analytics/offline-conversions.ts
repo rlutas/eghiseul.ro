@@ -132,17 +132,27 @@ const cell = (v: string) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v
 
 /**
  * The upload file for Google Ads (template "Conversions from clicks").
+ * Headers checked against Google Ads Help on 18.11.2026: Google Click ID,
+ * Conversion Name, Conversion Time, Conversion Value, Conversion Currency,
+ * Order ID, plus the two consent columns (values `Granted` / `Denied`).
+ *
+ * Consent is stated truthfully per row: `Granted` only when the buyer gave
+ * marketing consent in the banner (the Ads tag reported the sale, see
+ * `ads_tag_sent_at`), `Denied` otherwise. We never write `Granted` for a
+ * buyer who did not accept.
+ *
  * Only `gclid` rows go in: `gbraid` / `wbraid` use other columns and are
  * listed by the caller for manual handling.
  */
 export function buildGoogleOfflineCsv(rows: OfflineRow[], conversionName: string): string {
   const lines = [
     'Parameters:TimeZone=Europe/Bucharest',
-    'Google Click ID,Conversion Name,Conversion Time,Conversion Value,Conversion Currency,Order ID',
+    'Google Click ID,Conversion Name,Conversion Time,Conversion Value,Conversion Currency,Order ID,Ad User Data,Ad Personalization',
   ];
   for (const r of rows) {
     if (r.clickParam !== 'gclid') continue;
-    lines.push([r.clickId, conversionName, r.conversionTime, r.value, 'RON', r.orderNumber].map(cell).join(','));
+    const consent = r.tagAlreadySent ? 'Granted' : 'Denied';
+    lines.push([r.clickId, conversionName, r.conversionTime, r.value, 'RON', r.orderNumber, consent, consent].map(cell).join(','));
   }
   return lines.join('\n') + '\n';
 }

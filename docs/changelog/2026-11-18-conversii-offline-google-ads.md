@@ -22,9 +22,17 @@ Eticheta Google Ads se încarcă doar după acordul de cookie-uri. Pe certificat
 - Admin: cardul din `/admin/marketing` și rândul „Clic pe reclamă” din pagina comenzii.
 - Teste: `offline-conversions.test.ts` (7), două cazuri noi în `attribution-capture.test.ts`.
 
-## Înainte de prima încărcare
+## Verificat în cont și în documentația Google, 18.11 (după-amiaza)
 
-1. În contul Google Ads al site-ului trebuie creată o acțiune de conversie de tip „Import → conversii din clicuri”. Numele ei se scrie în card, identic. Nu se poate încărca în acțiunea „Purchase” existentă, care e de tip site web.
-2. Fișierul conține doar clicuri `gclid`. Clicurile `gbraid` / `wbraid` (iPhone, fără acord de urmărire) apar în tabelul din card, dar au alt format de încărcare; se tratează separat dacă apar.
-3. Comenzile plătite înainte de 18.11 nu au marcajul „raportată de etichetă”, deci apar toate ca neraportate. Pentru ele se verifică de mână în cont înainte de încărcare.
-4. Încărcarea trimite la Google identificatorul de clic al unui client care nu și-a dat acordul în banner. Decizia de a o face aparține lui Raul.
+- **Antetul fișierului** corespunde paginii de ajutor Google: `Google Click ID`, `Conversion Name`, `Conversion Time`, `Conversion Value`, `Conversion Currency`, `Order ID`, rândul `Parameters:TimeZone=…` și formatul de oră `yyyy-MM-dd HH:mm:ss`. Am adăugat coloanele `Ad User Data` și `Ad Personalization`, cu `Granted` doar pentru cumpărătorii care au acceptat cookie-urile de marketing și `Denied` pentru ceilalți.
+- **Încărcarea s-a mutat.** Pagina „Încărcări” din cont trimite acum la „Managerul de date”; sursele sunt Google Sheets sau un fișier de la o adresă, nu un fișier încărcat de mână. Conținutul fișierului nostru se lipește într-o foaie Google.
+- **Blocaj de conformitate.** La adăugarea sursei de date offline, Google cere bifa „Aceste date au fost colectate și sunt trimise la Google în conformitate cu Politica Google privind consimțământul utilizatorilor din UE”. Pentru cumpărătorii care nu au acceptat cookie-urile de marketing, bifa nu ar fi adevărată. Am oprit crearea acțiunii de conversie înainte de bifă; în cont nu s-a salvat nimic.
+- **Ce face Google cu rândurile `Denied`** la conversiile din clicuri nu e scris în documentație.
+
+Concluzie: încărcarea offline nu e o cale curată de a raporta vânzările celor care refuză cookie-urile. Cumpărătorii care acceptă sunt deja raportați de etichetă. Cardul rămâne util ca evidență proprie: arată câte vânzări a adus reclama în total, inclusiv cele pe care Google nu le vede.
+
+## Dacă Raul hotărăște totuși să încarce
+
+1. Acțiunea de conversie se creează din Obiective → Rezumat → „Creați o acțiune de conversie” → „Conversii offline”; bifa de conformitate o pune Raul. Numele ei se scrie în card, identic. După creare se așteaptă 4–6 ore.
+2. Fișierul conține doar clicuri `gclid`. Clicurile `gbraid` / `wbraid` apar în tabelul din card, dar au alt format.
+3. Comenzile plătite înainte de 18.11 nu au marcajul „raportată de etichetă”, deci apar toate ca neraportate.
