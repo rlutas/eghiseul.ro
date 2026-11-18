@@ -134,7 +134,7 @@ Sursa: interfața Google Ads, cont 881-388-1795, interval 11–17.11. Ce nu am c
 1. ~~Pornirea campaniei de cazier fiscal.~~ Pornită 18.11.
 2. Pe constatator: 328 lei pentru două comenzi începute și niciuna plătită, la un preț de 89 lei. De hotărât dacă testul continuă până la 14 zile sau se oprește.
 3. Raportarea conversiilor pentru cei care nu acceptă cookie-urile: exportul există din 18.11, dar Google cere la conectarea datelor offline o bifă de conformitate cu politica de consimțământ din UE, care nu ar fi adevărată pentru acești cumpărători. Acțiunea de conversie nu a fost creată. Detalii în changelog-ul din 18.11.
-4. Direcționarea după lista de clienți (Customer Match), întrebată de Raul pe 18.11: cere încărcarea emailurilor clienților la Google sub aceeași politică de consimțământ. Site-ul de constatator nu are clienți proprii, iar contactele din registrul eghiseul au acord doar pentru emailurile noastre. Nefăcut.
+4. Direcționarea după lista de clienți: făcută pe 18.11 doar în contul de constatator (881-388-1795). 21.033 de cumpărători eghiseul, în hash SHA-256; Google o permite pe acest cont doar pentru observare și excluderi. Neatașată încă la campanie; în contul de cazier fiscal (933-520-0143) nu e încărcată. Detalii: [`../changelog/2026-11-18-politica-confidentialitate-publicitate-google.md`](../changelog/2026-11-18-politica-confidentialitate-publicitate-google.md).
 
 ## Ce știm sigur
 

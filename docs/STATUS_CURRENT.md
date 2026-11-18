@@ -1,5 +1,13 @@
 # eGhiseul.ro - Status Curent
 
+> **🟣 Update 2026-11-18 — reclame Google pe site-urile noi.** [jurnal](ads/2026-11-12-google-ads-jurnal-incercari.md)
+> - **Constatator (881-388-1795):** 11–17.11, 61 de clicuri, 328 lei, nicio comandă plătită din reclamă. Limita de CPC coborâtă de la 6 la 3 lei. De urmărit afișările.
+> - **Cazier fiscal (933-520-0143):** campania pornită pe 18.11, anunț „Eligibilă”, 30 lei/zi. Fără date încă.
+> - **Canal corect în admin:** comenzile din reclamă nu mai apar ca „Căutare organică”. [changelog](changelog/2026-11-18-reclama-comenzi-etichetate-organic.md)
+> - **Clicul pe reclamă rămâne pe comandă;** card „Conversii Google Ads de încărcat” în Marketing. Acțiunea de conversie offline nu e creată: Google cere o confirmare de consimțământ pe care nu o putem da pentru cei care refuză cookie-urile. [changelog](changelog/2026-11-18-conversii-offline-google-ads.md)
+> - **Politica de confidențialitate** schimbată pe toate 4 site-urile; lista de 21.033 de cumpărători încărcată în contul de constatator, doar pentru observare și excluderi. Neatașată la campanie. [changelog](changelog/2026-11-18-politica-confidentialitate-publicitate-google.md)
+> - **Deschis:** atașarea listei după potrivire (24 h); pagina de constatator fără formular în primul ecran și cu linkuri spre portalul ONRC; aceeași eroare de canal neportată pe cazierjudiciaronline.com.
+>
 > **🔴 Update 2026-11-18 — documentele comenzilor anulate.** [changelog](changelog/2026-11-18-documente-vizibile-pe-comenzi-anulate.md)
 > - **Pagina comenzii:** pe „Anulată” / „Rambursată” cardul cu documente rămâne, doar pentru citit și descărcat, fără „Regenerează”. Livrat 18.11.
 > - **Deschis, E-260711-TFVDH:** suma rambursată neînregistrată, EGH-0026 nestornată, factura de 30% (392,64 lei) neemisă. Se închide cu „Reconciliază” de pe pagina comenzii.
