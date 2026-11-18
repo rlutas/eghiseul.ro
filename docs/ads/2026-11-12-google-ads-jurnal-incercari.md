@@ -87,6 +87,15 @@ De pe telefoane: 45 de clicuri plătite, 15 sesiuni măsurate. Analytics și eti
 
 **Eroare reparată:** comenzile din reclamă erau etichetate „Căutare organică” în admin. Detalii: [`../changelog/2026-11-18-reclama-comenzi-etichetate-organic.md`](../changelog/2026-11-18-reclama-comenzi-etichetate-organic.md).
 
+**Analiza traficului automat** (jurnalul de acorduri cookie, 05–18.11):
+
+- 607 acorduri cu exact același browser declarat (Chrome 156 pe Linux, desktop). Înainte de 13.11 erau 1–5 pe zi; apoi 134, 165, 165, 95, 46 pe zi (13–17.11) și 4 pe 18.11. Valul a început în ziua în care anunțul a devenit eligibil.
+- 348 de adrese IP diferite, cel mult 9 vizite de pe una. Aproape toate sunt din plajele de internet rezidențial ale unui singur furnizor din România. E tiparul unei rețele de proxy-uri rezidențiale: adresele sunt ale unor abonați reali și se schimbă la fiecare vizită.
+- 580 din 629 au apăsat „Accept” pe bannerul de cookie-uri și au stat în medie aproape 3 minute, cu derulare. Robotul imită un vizitator interesat.
+- Analytics a numărat 277 de sesiuni cu clic pe reclamă, iar Google a facturat 16 clicuri de pe computere (83,20 lei). Diferența arată că Google a filtrat singur cea mai mare parte ca trafic nevalid. Nu am citit coloana „Clicuri nevalide” din cont, deci cifra exactă a celor filtrate lipsește.
+
+Concluzii: paguba directă e de cel mult 83 lei până acum, nu tot bugetul; cele 45 de clicuri de pe telefoane (244,94 lei) nu au acest profil. Blocarea pe IP nu funcționează: sunt sute de adrese care se rotesc și aparțin unor clienți reali ai aceluiași furnizor, deci am bloca și cumpărători. Lista adreselor nu se ține în repo (date personale).
+
 **Decizii deschise (Raul):**
 
 1. Pornirea campaniei de cazier fiscal.
