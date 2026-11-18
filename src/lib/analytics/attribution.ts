@@ -60,9 +60,39 @@ export interface ContentClick {
   at: string;
 }
 
+/**
+ * The latest PAID click (Google or Microsoft Ads) that reached the site. Kept
+ * apart from `last`, which a later email link or search visit replaces: the
+ * click id is what ties a sale to the ad, also for the offline-conversion
+ * upload of buyers who never accepted marketing cookies.
+ */
+export interface AdClickTouch {
+  id: string;
+  /** gclid | gbraid | wbraid | msclkid */
+  param: string;
+  platform: string;
+  landing?: string;
+  at: string;
+}
+
+const PAID_CLICK_PLATFORMS = new Set(['google', 'microsoft']);
+
+function adClickFrom(touch: TouchPoint): AdClickTouch | null {
+  if (!touch.click_id || !touch.click_platform || !PAID_CLICK_PLATFORMS.has(touch.click_platform)) return null;
+  return {
+    id: touch.click_id,
+    param: touch.click_param || 'gclid',
+    platform: touch.click_platform,
+    ...(touch.landing ? { landing: touch.landing } : {}),
+    at: touch.at,
+  };
+}
+
 export interface Attribution {
   first: TouchPoint;
   last: TouchPoint;
+  /** Saved from 18.11.2026. */
+  ad_click?: AdClickTouch;
   content?: ContentClick;
   /** Momentul ultimei actualizări — folosit ca să detectăm sesiune nouă. */
   updated: string;
@@ -168,9 +198,11 @@ export function captureAttribution(): void {
     const stored = read();
 
     if (!stored) {
+      const adClick = adClickFrom(current);
       const fresh: Attribution = {
         first: current,
         last: current,
+        ...(adClick ? { ad_click: adClick } : {}),
         updated: current.at,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
@@ -185,6 +217,8 @@ export function captureAttribution(): void {
     if (hasSource(current) || isNewSession) {
       stored.last = current;
     }
+    const adClick = adClickFrom(current);
+    if (adClick) stored.ad_click = adClick;
     stored.updated = current.at;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
   } catch {

@@ -335,6 +335,10 @@ export default function SuccessPage() {
           currency: 'RON',
           transaction_id: order.friendly_order_id || order.id,
         });
+        // Tell the server the tag reported this sale, so the offline upload
+        // (for buyers without marketing consent) does not send it again.
+        // gtag exists only with consent, so this runs only for those buyers.
+        fetch(`/api/orders/${order.id}/ads-conversion`, { method: 'POST', keepalive: true }).catch(() => {});
       }
 
       setPurchaseTracked(true);

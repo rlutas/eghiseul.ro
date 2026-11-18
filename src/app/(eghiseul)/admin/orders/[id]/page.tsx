@@ -4,6 +4,7 @@ import { classifyAttribution, CHANNEL_LABEL } from '@/lib/analytics/attribution-
 import { appBaseForOrder, brandForOrder } from '@/lib/brand/for-order';
 import { listUnbilledExtras } from '@/lib/accounting/extra-invoice-match';
 import { contentSource, PLACEMENT_LABEL } from '@/lib/analytics/content-attribution';
+import { adClickOf } from '@/lib/analytics/offline-conversions';
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -2904,6 +2905,29 @@ export default function AdminOrderDetailPage() {
                   <span className="text-neutral-500">Canal: </span>
                   <span className="font-semibold text-neutral-900">{CHANNEL_LABEL[c.channel]}</span>
                   <span className="text-neutral-500"> · {c.source}</span>
+                </p>
+              );
+            })()}
+            {(() => {
+              const click = adClickOf(order.attribution);
+              if (!click) return null;
+              const sent = (order.attribution as { ads_tag_sent_at?: string | null }).ads_tag_sent_at;
+              return (
+                <p className="text-sm">
+                  <span className="text-neutral-500">Clic pe reclamă: </span>
+                  <span className="font-semibold text-neutral-900">
+                    {click.platform === 'google' ? 'Google Ads' : 'Microsoft Ads'}
+                  </span>
+                  <span className="text-neutral-500"> · {click.param} </span>
+                  <span className="font-mono text-xs text-neutral-700" title={click.id}>
+                    {click.id.slice(0, 14)}…
+                  </span>
+                  {order.payment_status === 'paid' && (
+                    <span className="text-neutral-500">
+                      {' '}
+                      · {sent ? 'conversie raportată de etichetă' : 'conversie neraportată (fără acord de cookie-uri)'}
+                    </span>
+                  )}
                 </p>
               );
             })()}

@@ -100,11 +100,40 @@ Concluzii: paguba directă e de cel mult 83 lei până acum, nu tot bugetul; cel
 
 **Cazier fiscal pornit, 18.11.2026:** la cererea lui Raul, campania `Search-CazierFiscal-2026-11` a fost trecută din „Întreruptă” în activă. Stare după pornire: campania „Eligibilă (învață)”, anunțul „Eligibilă”, fără mențiune de politică. Buget 30 lei/zi.
 
+### Audit de cont, 18.11.2026 (după-amiaza)
+
+Sursa: interfața Google Ads, cont 881-388-1795, interval 11–17.11. Ce nu am citit e trecut la sfârșit.
+
+| Zonă | Ce am găsit |
+|---|---|
+| Conversia de test | Nu apare în cont: „Achiziții: 0”. Explicație: testul din 16.11 a fost făcut cu un identificator de clic inventat, iar Google numără doar conversiile legate de un clic real pe reclamă. Eticheta a trimis evenimentul (răspuns 200); lipsa din cont nu arată o defecțiune. |
+| Dovada că măsurarea merge cap-coadă | Lipsește. Se obține doar cu o comandă plătită după un clic real pe anunț, cu cookie-urile acceptate. |
+| Strategie de licitare | „Maximizați numărul de clicuri”, cu limită de CPC. Campania e optimizată pe clicuri, nu pe vânzări; fără conversii nu se poate trece pe licitare după conversii. |
+| Limita de CPC | **Schimbată din 6,00 în 3,00 lei pe 18.11**, la cererea lui Raul. Verificată după salvare. |
+| Rețele, locație, program | Doar Căutare Google; România; toată ziua; fără ajustări pe dispozitive. Limba nu e setată. |
+| Extinderea URL-ului și personalizarea textului | Dezactivate. |
+| Stare | „Eligibil (limitat)”: licitare limitată, toate anunțurile limitate de politică. |
+| Anunț | Un singur anunț adaptabil, putere „Medie”. |
+| Cuvinte cheie | 10; 5 marcate „Afișat rar (scor de calitate scăzut)”. Cele două care aduc cele mai multe clicuri („obtinere…”, „…online”) sunt eligibile, cu CTR de 15–16%. |
+| Termeni de căutare | Cei vizibili sunt la obiect (constatator online, onrc, registrul comerțului). Apar și căutări de preț („cât costă un certificat constatator”, 4 clicuri) și „ieftin”. 227 lei din 328 sunt la „alți termeni”, pe care Google nu îi arată. |
+| Dispozitive | 45 de clicuri de pe telefoane, 16 de pe computere. |
+
+**De ce nu vinde, pe ce arată datele:**
+
+1. Volum prea mic pentru o concluzie: 61 de clicuri. La o rată obișnuită de câteva procente ar însemna 1–3 comenzi; zero e posibil și din întâmplare.
+2. Economia e strânsă la orice rată realistă: 43,55 lei rămași pe comandă, 5,38 lei pe clic. De aici limita de 3 lei.
+3. O parte din clicuri caută prețul oficial sau varianta ieftină. La ONRC certificatul costă mai puțin decât la noi, deci acești vizitatori compară și pleacă.
+4. Trei vizitatori reali au început comanda: doi au semnat și au ajuns la pagina de plată fără să plătească, unul s-a oprit la datele firmei. Jurnalul de erori al site-ului nu are nicio eroare de pe acest domeniu în perioadă.
+
+**Ce nu am verificat:** componentele scorului de calitate pe fiecare cuvânt cheie, cota de afișări și statisticile de licitație, coloana „Clicuri nevalide”, viteza paginii pe telefon. Cazier fiscal (933-520-0143) a pornit azi și nu are încă date de auditat.
+
+**Identificatorul de clic și încărcarea offline:** din 18.11 clicul pe reclamă rămâne pe comandă, pe toate site-urile, iar în Marketing există exportul pentru Google Ads. Detalii și pașii dinaintea primei încărcări: [`../changelog/2026-11-18-conversii-offline-google-ads.md`](../changelog/2026-11-18-conversii-offline-google-ads.md).
+
 **Decizii deschise (Raul):**
 
 1. ~~Pornirea campaniei de cazier fiscal.~~ Pornită 18.11.
 2. Pe constatator: 328 lei pentru două comenzi începute și niciuna plătită, la un preț de 89 lei. De hotărât dacă testul continuă până la 14 zile sau se oprește.
-3. Raportarea conversiilor pentru cei care nu acceptă cookie-urile: se poate face prin încărcarea comenzilor plătite cu `gclid` în Google Ads. Trimite date la Google fără acordul din banner, deci e o decizie de conformitate, nu una tehnică.
+3. Raportarea conversiilor pentru cei care nu acceptă cookie-urile: exportul există din 18.11. Rămâne de creat acțiunea de conversie de tip import în fiecare cont și de hotărât dacă se încarcă.
 
 ## Ce știm sigur
 

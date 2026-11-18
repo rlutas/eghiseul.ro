@@ -63,4 +63,22 @@ describe('captureAttribution', () => {
     expect(a.first.click_id).toBe('abc123');
     expect(a.last.utm_medium).toBe('warmup');
   });
+
+  it('keeps the paid click apart, even after an email link replaces the last touch', () => {
+    page('https://cazierfiscal.com/?gclid=abc123', 'https://www.google.com/');
+    captureAttribution();
+    resetReferrerForTests();
+    page('https://cazierfiscal.com/comanda/cazier-fiscal/?utm_source=email&utm_medium=recovery', '');
+    captureAttribution();
+
+    const a = stored() as unknown as { last: Record<string, string>; ad_click: Record<string, string> };
+    expect(a.last.utm_medium).toBe('recovery');
+    expect(a.ad_click).toMatchObject({ id: 'abc123', param: 'gclid', platform: 'google', landing: '/' });
+  });
+
+  it('does not invent a paid click for a social click id', () => {
+    page('https://eghiseul.ro/?fbclid=xyz', 'https://m.facebook.com/');
+    captureAttribution();
+    expect((stored() as unknown as { ad_click?: unknown }).ad_click).toBeUndefined();
+  });
 });
