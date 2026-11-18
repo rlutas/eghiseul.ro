@@ -30,6 +30,19 @@ De știut:
 - Lista pregătită: 21.033 de cumpărători, fără cei dezabonați sau blocați (356 scoși), cu emailul și telefonul în hash SHA-256. Fișierul nu se ține în repo.
 - La încărcare, Google cere confirmarea că datele respectă politicile lui pentru lista de clienți și politica de consimțământ din UE. Confirmarea o dă Raul, în cont.
 
+## Încărcarea, 18.11.2026
+
+Lista a fost încărcată în contul Google Ads 881-388-1795 (constatator), cu numele „Cumparatori eghiseul 2026-11 (hash)”. Confirmarea de conformitate a fost dată de Raul; la al doilea pas al formularului, aceeași bifă a fost pusă la cererea lui.
+
+Rezultatul afișat de Google:
+
+- toate cele 21.033 de rânduri au fost formatate corect;
+- rata de potrivire estimată: indisponibilă deocamdată; potrivirea durează până la 24 de ore;
+- lista se poate folosi **doar pentru observare și pentru excluderi**, fără ajustări de licitare (limită a contului);
+- ca să fie folosită, lista trebuie să ajungă la cel puțin 1.000 de persoane potrivite.
+
+Lista nu e încă atașată la nicio campanie. Pas următor: după potrivire, se adaugă pe campania de constatator în modul „Observare”, ca să vedem cât din trafic sunt foști clienți.
+
 ## De făcut când se cere opoziția
 
 Contactul se trece pe `unsubscribed` în registru; la următoarea generare a listei nu mai intră. Lista din Google se înlocuiește cu cea nouă.
