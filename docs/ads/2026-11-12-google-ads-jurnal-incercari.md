@@ -163,6 +163,35 @@ De ce trec concurenții. Trei explicații posibile, niciuna confirmată:
 | contestația la constatator e admisă | anunțul rulează; notăm exact ce s-a schimbat |
 | contestația e respinsă | confirmă că pe constatator calea e doar certificatul; nu mai contestăm |
 
+## Rețeta conturilor noi (ce am făcut diferit, 11–18.11.2026)
+
+Scrisă pe 18.11 ca să o putem repeta la alte servicii. Pe două conturi noi am ajuns la anunțuri care rulează, după ce pe conturile vechi totul era „Neeligibil” pe politica „Documente guvernamentale și servicii oficiale”.
+
+**Ce s-a întâmplat, exact:**
+
+- **Constatator (881-388-1795):** anunțul a fost **respins** pe 12.11 („Este obligatoriu un certificat”). Raul a apăsat „Contestați” în aceeași zi. Pe 16.11 anunțul era „Eligibil (limitat)”: rulează, dar unui public restrâns. Nu știm dacă a schimbat starea contestația sau reexaminarea automată.
+- **Cazier fiscal (933-520-0143):** anunțul **nu a fost respins niciodată**. „Neeligibilă” din 16.11 însemna „campania e pe pauză”, nu politică. După pornire, pe 18.11, anunțul e „Eligibilă”, fără „limitat” și fără mențiune de politică. Stare citită după ~40 de minute de rulare, fără nicio afișare încă, deci **neconfirmată la scară**: un anunț poate fi limitat sau respins și după primele afișări.
+
+**Pașii comuni ai ambelor conturi:**
+
+1. Cont Google Ads nou, pe aceeași firmă (EDIGITALIZARE), pentru un singur serviciu, permanent.
+2. Domeniu separat, dedicat acelui serviciu (certificat-constatator-express.ro, cazierfiscal.com), nu o pagină din eghiseul.ro.
+3. Landing cu neafiliere clară („serviciu privat, nu ANAF / ONRC”), datele firmei, ANPC/SOL, prețul total vizibil (cu onorariu și TVA).
+4. Textul anunțului spune ce suntem: „Serviciu privat, nu ANAF”, „Depunere prin avocat”, prețul, termenul. Fără „oficial”, „emis”, „portal”, „gratuit”, „urgent”.
+5. Doar Rețeaua de căutare: fără parteneri, fără Display, fără AI Max, fără potrivire amplă, fără elemente automate.
+6. Campania se publică **pe pauză**. Examinarea de politică se face și așa, fără cheltuială. Se pornește doar după ce anunțul nu mai e „În examinare”.
+7. La cazier fiscal, **înainte** de campanie: cererea „în afara politicii” din formularul de certificare (12.11), cu domeniul. La constatator: contestație imediat după respingere.
+8. Tag de conversie propriu pe domeniu, iar cookie-urile se încarcă doar după acord. Pentru vizitatorii care refuză: export de conversii offline din admin (Marketing).
+
+**Când îl aplicăm la alt serviciu:**
+
+- Merge pentru un serviciu care **nu** a fost respins încă pe alt cont: de exemplu căsătorie sau alt act nou.
+- Pentru un serviciu deja respins pe un cont (celibat pe 809-020-5311, cazier judiciar pe ecazier/eghiseul), un cont nou doar ca să-l repornim e exact „ocolirea sistemului” de mai jos. Acolo calea e contestația sau certificatul, pe contul unde a fost respins.
+- Serviciile cu avocat care sunt **în lista** politicii (cazier judiciar, stare civilă emisă de instituție) nu primesc cerere „în afara politicii”.
+- Un singur serviciu nou o dată. Notăm aici rezultatul înainte să trecem la următorul.
+
+**De confirmat (19–20.11):** cazier fiscal are afișări și clicuri, iar anunțul rămâne „Eligibilă” după primele afișări. Dacă devine „limitat” sau „respins”, rețeta nu e confirmată pentru cazier fiscal și notăm aici.
+
 ## Ce nu facem
 
 - Cont pe persoană fizică sau pe altă firmă pentru un anunț deja respins: Google o tratează ca ocolire a sistemului și poate suspenda toate conturile legate.
@@ -179,5 +208,5 @@ De ce trec concurenții. Trei explicații posibile, niciuna confirmată:
 | 809-020-5311 | serviciiseonethut@gmail.com | documentero | celibat respins 07.10 |
 | 243-638-4990 | eghiseul@gmail.com | test 01.09 | nefolosit |
 | 881-388-1795 | r.lutas@yahoo.com | constatator | anunț respins, contestație în curs |
-| 933-520-0143 | r.lutas@yahoo.com | cazierfiscal.com | o campanie pe pauză din 16.11, cerere în curs; **doar cazier fiscal, permanent** |
+| 933-520-0143 | r.lutas@yahoo.com | cazierfiscal.com | campanie activă din 18.11, anunț „Eligibilă”; cerere în curs; **doar cazier fiscal, permanent** |
 | 889-005-5301 | eghiseul@gmail.com | erovinieta.net | în afara politicii; nu se folosește pentru teste |
