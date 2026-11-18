@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   adClickOf,
+  adsTagReportsSale,
   bucharestTime,
   buildGoogleOfflineCsv,
   googleOfflineRows,
@@ -85,5 +86,13 @@ describe('googleOfflineRows + buildGoogleOfflineCsv', () => {
     expect(lines[1]).toBe('Google Click ID,Conversion Name,Conversion Time,Conversion Value,Conversion Currency,Order ID');
     expect(lines).toHaveLength(3);
     expect(lines[2]).toBe(`${GCLID},Purchase offline,2026-11-20 10:00:00,89.00,RON,E-261120-AAAAA`);
+  });
+});
+
+describe('adsTagReportsSale', () => {
+  it('is true only with marketing consent', () => {
+    expect(adsTagReportsSale({ marketing: true })).toBe(true);
+    expect(adsTagReportsSale({ marketing: false })).toBe(false); // refused, or analytics only
+    expect(adsTagReportsSale(null)).toBe(false); // banner never answered
   });
 });

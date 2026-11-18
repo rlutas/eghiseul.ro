@@ -24,6 +24,8 @@ import { suggestEmailCorrection } from '@/lib/email-typo';
 import { OrderFlowDisclosure } from '@/components/legal/order-flow-disclosure';
 import { AccountOfferCard } from '@/components/orders/account-offer-card';
 import { isIdentityDocumentType } from '@/lib/kyc/identity-documents';
+import { adsTagReportsSale } from '@/lib/analytics/offline-conversions';
+import { readConsent } from '@/lib/consent';
 
 interface SelectedOption {
   optionName?: string;
@@ -337,8 +339,11 @@ export default function SuccessPage() {
         });
         // Tell the server the tag reported this sale, so the offline upload
         // (for buyers without marketing consent) does not send it again.
-        // gtag exists only with consent, so this runs only for those buyers.
-        fetch(`/api/orders/${order.id}/ads-conversion`, { method: 'POST', keepalive: true }).catch(() => {});
+        // Only with marketing consent: the gtag stub also exists after a
+        // refusal, and then the event above reaches nobody.
+        if (adsTagReportsSale(readConsent())) {
+          fetch(`/api/orders/${order.id}/ads-conversion`, { method: 'POST', keepalive: true }).catch(() => {});
+        }
       }
 
       setPurchaseTracked(true);

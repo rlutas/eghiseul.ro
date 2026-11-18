@@ -146,3 +146,13 @@ export function buildGoogleOfflineCsv(rows: OfflineRow[], conversionName: string
   }
   return lines.join('\n') + '\n';
 }
+
+/**
+ * True only when the Ads tag really sends the conversion: marketing consent
+ * granted. `window.gtag` is not proof: the stub exists as soon as the visitor
+ * makes ANY choice in the banner (reject, or analytics only), and with
+ * `ad_storage` denied the conversion event goes nowhere.
+ */
+export function adsTagReportsSale(consent: { marketing?: boolean } | null | undefined): boolean {
+  return consent?.marketing === true;
+}
