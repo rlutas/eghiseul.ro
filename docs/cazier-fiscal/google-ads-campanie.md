@@ -68,3 +68,4 @@ Cuvinte ocolite, ca la constatator: „oficial”, „emis”, „portal”, „
 |---|---|
 | 16.11.2026 | Conversia „Purchase” creată; variabilele puse în Vercel; campania publicată și pusă pe pauză. Anunțul: „În examinare”. În cont, la Politică → Istoric: „No application history”; răspunsul la cererea din 12.11 vine pe email și nu a fost verificat. |
 | 16.11.2026, după-amiaza | Reverificare: anunțul nu mai e „În examinare”. Starea afișată e „Neeligibilă — Campania este întreruptă”, fără nicio mențiune de politică. Tag-ul `AW-18570965428` e în bundle-ul live, iar eticheta de conversie e în pagina de succes. |
+| 18.11.2026 | Campania pornită la cererea lui Raul. Stare: campania „Eligibilă (învață)”, anunțul „Eligibilă”, fără mențiune de politică. De urmărit: afișări, starea anunțului după examinare și prima conversie „Purchase”. |

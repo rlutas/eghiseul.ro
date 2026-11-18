@@ -96,9 +96,13 @@ De pe telefoane: 45 de clicuri plătite, 15 sesiuni măsurate. Analytics și eti
 
 Concluzii: paguba directă e de cel mult 83 lei până acum, nu tot bugetul; cele 45 de clicuri de pe telefoane (244,94 lei) nu au acest profil. Blocarea pe IP nu funcționează: sunt sute de adrese care se rotesc și aparțin unor clienți reali ai aceluiași furnizor, deci am bloca și cumpărători. Lista adreselor nu se ține în repo (date personale).
 
+**Rentabilitate constatator, la cifrele de până acum:** prețul e 89 lei cu TVA, adică 73,55 lei fără TVA. Taxa ONRC înregistrată pe comenzi e 30 lei, deci rămân 43,55 lei pe comandă înainte de comisionul de card. La 5,38 lei pe clic, reclama se acoperă doar dacă un clic din 8 plătește (12,4%). Până acum: 61 de clicuri, zero plăți. Verificat exact în baza de date: pe certificat-constatator-express.ro există 6 comenzi în total, una singură plătită, cea de test. Cele 11 comenzi de constatator plătite în noiembrie sunt de pe eghiseul.ro, venite direct sau din email.
+
+**Cazier fiscal pornit, 18.11.2026:** la cererea lui Raul, campania `Search-CazierFiscal-2026-11` a fost trecută din „Întreruptă” în activă. Stare după pornire: campania „Eligibilă (învață)”, anunțul „Eligibilă”, fără mențiune de politică. Buget 30 lei/zi.
+
 **Decizii deschise (Raul):**
 
-1. Pornirea campaniei de cazier fiscal.
+1. ~~Pornirea campaniei de cazier fiscal.~~ Pornită 18.11.
 2. Pe constatator: 328 lei pentru două comenzi începute și niciuna plătită, la un preț de 89 lei. De hotărât dacă testul continuă până la 14 zile sau se oprește.
 3. Raportarea conversiilor pentru cei care nu acceptă cookie-urile: se poate face prin încărcarea comenzilor plătite cu `gclid` în Google Ads. Trimite date la Google fără acordul din banner, deci e o decizie de conformitate, nu una tehnică.
 
