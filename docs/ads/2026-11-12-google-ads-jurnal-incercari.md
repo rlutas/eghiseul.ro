@@ -136,6 +136,17 @@ Sursa: interfața Google Ads, cont 881-388-1795, interval 11–17.11. Ce nu am c
 3. Raportarea conversiilor pentru cei care nu acceptă cookie-urile: exportul există din 18.11, dar Google cere la conectarea datelor offline o bifă de conformitate cu politica de consimțământ din UE, care nu ar fi adevărată pentru acești cumpărători. Acțiunea de conversie nu a fost creată. Detalii în changelog-ul din 18.11.
 4. Direcționarea după lista de clienți: făcută pe 18.11 doar în contul de constatator (881-388-1795). 21.033 de cumpărători eghiseul, în hash SHA-256; Google o permite pe acest cont doar pentru observare și excluderi. Neatașată încă la campanie; în contul de cazier fiscal (933-520-0143) nu e încărcată. Detalii: [`../changelog/2026-11-18-politica-confidentialitate-publicitate-google.md`](../changelog/2026-11-18-politica-confidentialitate-publicitate-google.md).
 
+**De verificat peste câteva zile (notat 18.11):**
+
+| Când | Ce | Cum |
+|---|---|---|
+| 19–20.11 | cazier fiscal: afișări, clicuri, iar anunțul rămâne „Eligibilă” după primele afișări | cont 933-520-0143 → Anunțuri; rezultatul intră în „Rețeta conturilor noi” |
+| 19.11 | constatator: afișările după plafonul de 3 lei pe clic; numărul de potriviri al listei de clienți (minim 1.000), apoi atașare la campanie pe „Observare” | cont 881-388-1795 → Segmente de public |
+| ~25.11 | favicon-ul certificat-constatator-express.ro apare în rezultatele Google | căutare `site:certificat-constatator-express.ro` cu `&pws=0`; detalii mai jos |
+| după 20.11, decizia lui Raul | lista de clienți și pe contul de cazier fiscal, pentru direcționare | Raul bifează acordul pentru datele clienților în 933-520-0143, apoi se încarcă același fișier hash |
+
+**Favicon constatator (verificat 18.11):** pe site nu e nimic stricat. `/favicon.ico` (48×48), `/icon.png` (192×192, fulger verde pe fond închis) și `/apple-icon.png` răspund 200 pe domeniul constatatorului, cu iconița lui, inclusiv pentru Googlebot. `robots.txt` le permite, iar pagina principală are `<link rel="icon">`. În Search Console pagina principală e „Submitted and indexed”, dar Google a citit-o **o singură dată, pe 11.11**, în ziua lansării. Google afișează favicon-ul abia după ce îl preia separat, iar la un site nou durează de la câteva zile la câteva săptămâni. Până atunci arată globul gri. Cazierfiscal.com are aceeași configurare și a fost citit ultima dată pe 13.11. Ce ar grăbi: „Solicitați indexarea” pe pagina principală, în Search Console. Detaliu minor: eticheta spune `sizes="512x512"`, iar fișierul are 192×192. E tot multiplu de 48, deci acceptat de Google; se poate înlocui cu un fișier de 512 când există sursa grafică.
+
 ## Ce știm sigur
 
 - **Nu e firma.** Reclamele imobiliare au rulat pe EDIGITALIZARE; ecazier a fost blocat pe numele cabinetului de avocat; motivul scris pe anunț e politica.
