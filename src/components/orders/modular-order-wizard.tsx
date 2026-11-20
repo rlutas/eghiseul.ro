@@ -35,6 +35,7 @@ import { OptionsStepModular } from './steps-modular/options-step';
 import { DeliveryStepModular } from './steps-modular/delivery-step';
 import BillingStepModular from './steps-modular/billing-step';
 import { ReviewStepModular } from './steps-modular/review-step';
+import { AcceptanceConsent, isAcceptanceGiven } from './steps-modular/acceptance-consent';
 import { SystemStatus } from '@/components/services/system-status';
 import { instantPlatformProvider, platformStatusProvider } from '@/lib/services/platform-services';
 import { useBrand } from '@/lib/brand/client';
@@ -373,7 +374,10 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
           consent: {
             termsAccepted: state.consent.termsAccepted,
             privacyAccepted: state.consent.privacyAccepted,
-            signatureConsent: state.signature?.termsAccepted || false,
+            // No signature step: the acceptance checkbox IS the signature consent.
+            signatureConsent:
+              state.signature?.termsAccepted ||
+              (!visibleSteps.some((st) => st.id === 'signature') && isAcceptanceGiven(state.consent)),
             withdrawalWaiver: state.consent.withdrawalWaiver,
           },
         }),
@@ -406,6 +410,13 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
     }
   }, [state.orderId, state.resumeToken, priceBreakdown.totalPrice, state.signature, state.consent, saveDraftNow, visibleSteps, goToStep]);
 
+  // Services without a signature step accept the contract with a checkbox on
+  // the last step (acceptance-consent.tsx). Phone orders are created by an
+  // operator, not the client, so they don't get it.
+  const needsAcceptance =
+    isLastStep && !phoneMode && !visibleSteps.some((st) => st.id === 'signature');
+  const [showAcceptanceError, setShowAcceptanceError] = useState(false);
+
   // Handle next
   const handleNext = () => {
     // The step's form is not on screen, so „câmpuri necompletate" would be false.
@@ -421,6 +432,12 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
       toast.error('Mai sunt câmpuri obligatorii necompletate pe acest pas.');
       // After the step renders its errors, take the user to the first one —
       // on mobile the problem field is usually off-screen.
+      scrollToFirstWizardError();
+      return;
+    }
+    if (isLastStep && needsAcceptance && !isAcceptanceGiven(state.consent)) {
+      setShowAcceptanceError(true);
+      toast.error('Bifează acordul cu termenii și contractul, apoi apasă din nou „Plătește”.');
       scrollToFirstWizardError();
       return;
     }
@@ -688,6 +705,7 @@ export function ModularOrderWizard({ initialService, initialOptions, headerExtra
               <Suspense fallback={<StepLoading />}>
                 {renderStep()}
               </Suspense>
+              {needsAcceptance && <AcceptanceConsent showError={showAcceptanceError} />}
             </CardContent>
 
             {/* Navigation — stays in the form on all sizes (Back/Continue). */}

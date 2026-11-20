@@ -23,7 +23,15 @@ import { Button } from '@/components/ui/button';
 const SIGNATURE_PLACEHOLDER_HTML = '<div class="sig-placeholder">Semnătura va apărea aici</div>';
 const SIGNATURE_PLACEHOLDER_REGEX = /<div class="sig-placeholder">Semnătura va apărea aici<\/div>/g;
 
-export default function ContractPreview() {
+interface ContractPreviewProps {
+  /**
+   * Service without a signature step: the contract is accepted with the terms
+   * checkbox and carries the typed signature, so the preview shows that.
+   */
+  typedSignature?: boolean;
+}
+
+export default function ContractPreview({ typedSignature = false }: ContractPreviewProps = {}) {
   const { state, service, priceBreakdown } = useModularWizard();
   const [baseHtml, setBaseHtml] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -88,6 +96,7 @@ export default function ContractPreview() {
           property: state.property || undefined,
           // PF/PJ pe contract = tipul SERVICIULUI (nu al facturării)
           clientType: state.clientType || undefined,
+          typedSignature: typedSignature || undefined,
         };
 
         const response = await fetch('/api/contracts/preview', {
@@ -147,7 +156,9 @@ export default function ContractPreview() {
           </Button>
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Citiți contractele de mai jos înainte de a semna
+          {typedSignature
+            ? 'Bifa de acord ține loc de semnătură: contractul poartă numele tău, data, ora și adresa IP.'
+            : 'Citiți contractele de mai jos înainte de a semna'}
         </p>
       </CardHeader>
       {expanded && (

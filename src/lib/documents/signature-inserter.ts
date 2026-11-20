@@ -1,6 +1,12 @@
 import PizZip from 'pizzip';
 
 /**
+ * Size in the DOCX (points) of the typed signature rendered by
+ * `typed-signature.tsx` (640×224 px PNG, same ratio).
+ */
+export const TYPED_SIGNATURE_SIZE = { widthPt: 200, heightPt: 70 } as const;
+
+/**
  * Describes a single signature to be inserted into a DOCX document.
  */
 export interface SignatureEntry {

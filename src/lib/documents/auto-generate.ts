@@ -27,6 +27,7 @@ import { allocateNumber, getRegistryClient, formatRegistryNumber } from '@/lib/r
 import { brandForOrder } from '@/lib/brand/for-order';
 import { formatPersonName, cleanNamePart } from '@/lib/format/person-name';
 import { formatRomanianAddress as formatAddress, resolveDomicile } from '@/lib/orders/domicile';
+import { resolveClientSignature } from '@/lib/documents/typed-signature';
 
 interface GenerateResult {
   template: string;
@@ -225,7 +226,14 @@ export async function autoGenerateOrderDocuments(
   })();
 
   // Get client signature from S3 (new) or inline base64 (legacy)
-  const clientSignatureBase64 = await getClientSignatureBase64(cd);
+  // No drawn signature (extras CF, identificare imobil, constatator…) → the
+  // name in a handwriting font with the acceptance caption, only when the
+  // order recorded terms_accepted (typed-signature.tsx).
+  const clientSignature = await resolveClientSignature({
+    drawnBase64: await getClientSignatureBase64(cd),
+    clientName: clientData.name,
+    signatureMetadata: cd.signature_metadata,
+  });
   const clientIp = cd.signature_metadata?.ip_address || 'N/A';
 
   // Download company and lawyer signatures from S3
@@ -345,7 +353,8 @@ export async function autoGenerateOrderDocuments(
 
       // Generate DOCX
       const buffer = generateDocument(serviceSlug, template, context, {
-        clientSignatureBase64,
+        clientSignatureBase64: clientSignature?.base64,
+        clientSignatureTyped: clientSignature?.typed,
         companySignatureBase64,
         lawyerSignatureBase64,
       });

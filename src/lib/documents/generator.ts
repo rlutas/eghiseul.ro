@@ -4,7 +4,7 @@ import { brandForOrder } from '@/lib/brand/for-order';
 import PizZip from 'pizzip';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { insertSignatureImages, type SignatureEntry } from './signature-inserter';
+import { insertSignatureImages, TYPED_SIGNATURE_SIZE, type SignatureEntry } from './signature-inserter';
 import { validateCNP, getCountyFromCNP } from '@/lib/validations/cnp';
 import { formatPersonName } from '@/lib/format/person-name';
 
@@ -1540,8 +1540,15 @@ function extractStrada(address: string | undefined | null): string {
 // ──────────────────────────────────────────────────────────────
 
 export interface GenerateDocumentOptions {
-  /** Client's drawn signature (base64 PNG) */
+  /** Client's drawn signature (base64 PNG), or the typed one — see below */
   clientSignatureBase64?: string;
+  /**
+   * True when `clientSignatureBase64` is the typed signature (name in a
+   * handwriting font + "semnat electronic prin acceptare" caption) rendered by
+   * `resolveClientSignature` for services without a drawn signature. It is
+   * taller than a drawn one because of the caption.
+   */
+  clientSignatureTyped?: boolean;
   /** Company/prestator predefined signature (base64 PNG) */
   companySignatureBase64?: string;
   /** Lawyer/avocat predefined signature (base64 PNG) */
@@ -1596,8 +1603,9 @@ export function generateDocument(
       marker: 'SIG_CLIENT',
       base64: options.clientSignatureBase64,
       name: 'signature_client',
-      widthPt: 120,
-      heightPt: 40,
+      ...(options.clientSignatureTyped
+        ? TYPED_SIGNATURE_SIZE
+        : { widthPt: 120, heightPt: 40 }),
     });
   }
   if (options?.companySignatureBase64) {

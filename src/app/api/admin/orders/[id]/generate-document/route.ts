@@ -12,6 +12,7 @@ import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
 import { canAllocateBarouNumbers } from '@/lib/documents/barou-allocation-gate';
 import { formatPersonName } from '@/lib/format/person-name';
 import { resolveDomicile } from '@/lib/orders/domicile';
+import { resolveClientSignature } from '@/lib/documents/typed-signature';
 
 /**
  * Format an AddressState object (or string) into a human-readable Romanian address.
@@ -437,7 +438,12 @@ export async function POST(
     };
 
     // Get client signature from S3 (new) or inline base64 (legacy)
-    const clientSignatureBase64 = await getClientSignatureBase64(cd);
+    // or, without one, the typed signature when terms_accepted was recorded.
+    const clientSignature = await resolveClientSignature({
+      drawnBase64: await getClientSignatureBase64(cd),
+      clientName: clientData.name,
+      signatureMetadata: cd.signature_metadata,
+    });
 
     // Get company and lawyer signatures from S3 (keys stored in company_data/lawyer_data)
     let companySignatureBase64: string | undefined;
@@ -461,7 +467,8 @@ export async function POST(
     }
 
     const buffer = generateDocument(serviceSlug, template, context, {
-      clientSignatureBase64,
+      clientSignatureBase64: clientSignature?.base64,
+      clientSignatureTyped: clientSignature?.typed,
       companySignatureBase64,
       lawyerSignatureBase64,
     });

@@ -6,6 +6,7 @@ import mammoth from 'mammoth';
 import { formatPersonName } from '@/lib/format/person-name';
 import { resolveDomicile } from '@/lib/orders/domicile';
 import { isNoLawyerService } from '@/lib/documents/no-lawyer-services';
+import { renderTypedSignaturePng } from '@/lib/documents/typed-signature';
 
 // Cache the company/lawyer signature PNGs (base64) — they almost never change,
 // so re-downloading them from S3 on every contract preview is wasteful and a
@@ -86,6 +87,11 @@ interface PreviewRequestBody {
   friendlyOrderId?: string;
   /** Date imobil + proprietar semnatar — pentru convenția cu topograful. */
   property?: DocumentContext['property'];
+  /**
+   * Service without a drawn signature: show the typed signature (name in a
+   * handwriting font + acceptance caption) the signed contract will carry.
+   */
+  typedSignature?: boolean;
 }
 
 /**
@@ -223,9 +229,22 @@ export async function POST(request: NextRequest) {
         ? ['contract-prestari', 'conventie']
         : ['contract-prestari']
       : ['contract-prestari', 'contract-asistenta'];
+    const typedSignatureBase64 = body.typedSignature && clientData.name.trim()
+      ? await renderTypedSignaturePng({
+          name: clientData.name,
+          signedAt: new Date().toISOString(),
+          ip: clientIp,
+        }).catch((e) => {
+          console.error('Typed signature preview failed:', e);
+          return undefined;
+        })
+      : undefined;
+
     const htmlParts = await Promise.all(
       templates.map(async (template) => {
         const buffer = generateDocument(body.serviceSlug, template, context, {
+          clientSignatureBase64: typedSignatureBase64,
+          clientSignatureTyped: !!typedSignatureBase64,
           companySignatureBase64,
           lawyerSignatureBase64,
         });
