@@ -31,6 +31,9 @@ Cât așteptăm: nicio a doua contestație pe 881-388-1795, nicio cerere nouă p
 | 12.11.2026 | cont nou 933-520-0143 | cerere „în afara politicii” pentru cazierfiscal.com, **înainte** de orice campanie | în așteptare |
 | 16.11.2026 | 881-388-1795 | verificare la 5 zile | anunțul nu mai e „Respins”, ci **„Eligibil (limitat)”**: „Acest anunț este difuzat unui public limitat”, motiv „Documente guvernamentale și servicii oficiale — Este obligatoriu un certificat”. Rulează. Rezultatul contestației nu a fost citit separat („Urmăriți contestația”). |
 | 16.11.2026 | 933-520-0143 | campanie de cazier fiscal `Search-CazierFiscal-2026-11`, la decizia lui Raul, fără să așteptăm răspunsul la cerere | publicată și pusă pe pauză; anunțul „În examinare”. Detalii: [`../cazier-fiscal/google-ads-campanie.md`](../cazier-fiscal/google-ads-campanie.md) |
+| 23.11.2026 | 881-388-1795 | verificare: clicurile căzuseră de la 17–20/zi (16–17.11, ~5,3 lei/clic) la 1–5/zi din 18.11, ziua plafonului de 3 lei; 16–22.11: 55 clicuri, 253 lei, 0 comenzi și 0 drafturi | plafon CPC **3 → 4,50 lei**, buget **50 → 60 lei/zi** (decizia lui Raul); de citit pe 26–27.11 |
+| 23.11.2026 | 933-520-0143 | verificare: „Eligibilă”, 18–22.11: 51 clicuri (20, 11, 10, 4, 6), 155 lei, 1 comandă plătită (E-261120-UYJE6); se cheltuie ~22 din 30 lei/zi; „cazier fiscal online gratuit” = 5 clicuri | cuvânt exclus **„gratuit”** pe campanie (potrivire amplă); bugetul rămâne 30 lei/zi |
+| 23.11.2026 | ambele | banda „Confirmați-vă identitatea”: verificarea advertiserului **până pe 23.12.2026**, altfel anunțurile se opresc; la salvarea bugetului Google a cerut și confirmarea identității contului (obligatorie după 25.11), făcută de Raul | verificarea advertiserului: de făcut de Raul, cu actul de identitate |
 
 ## Verificarea din 16.11.2026 (campania de constatator)
 
