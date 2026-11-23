@@ -60,12 +60,15 @@ acolo unde există.
 
 Mircea **nu vede**: anulările și rambursările (dispar din lista lui), datele
 de facturare ale clientului, comenzile altor servicii. Vede: datele
-imobilului, numele și telefonul solicitantului, motivul, notele.
+imobilului, numele solicitantului, motivul, mesajele cu clientul și **toate
+notele de pe comandă** (din 23.11.2026; înainte nu le vedea deloc). Ce notați
+pe comandă (adresă, CNP-ul proprietarului, ce ați vorbit cu clientul) ajunge
+singur la el, în caseta „Note pe comandă”, sub datele lucrării.
 
 ## Portalul lui Mircea, pe scurt
 
 - **Lista comenzilor** pe etape (de lucrat / depuse / gata / finalizate), cu urgențele și vechimea; căutarea găsește orice comandă după număr, CF, localitate sau **numărul de depunere OCPI**, indiferent de tab (reparat 21.09).
-- **Pagina comenzii**: datele imobilului, cererea generată de descărcat (la extras CF / plan cadastral), notă pentru echipă, și butoanele:
+- **Pagina comenzii**: datele imobilului, **notele de pe comandă** (ale echipei și ale lui, cele mai noi sus), cererea generată de descărcat (la extras CF / plan cadastral), notă pentru echipă, și butoanele:
   - **„Am identificat imobilul”** (la identificări): salvează CF-ul, generează cererea de extras.
   - **„Nu am găsit — depun certificat la OCPI”**: statusul devine „Identificare nereușită — certificat OCPI depus”, clientul primește emailul, termenul +10 zile lucrătoare.
   - **„Am depus cererea la OCPI”**: numărul de înregistrare, **termenul dat de OCPI** (clientul îl vede în pagina comenzii) + costul (precompletat cu taxa serviciului). La CF obținut direct online nu se cere depunere: costul se înregistrează singur la încărcare.

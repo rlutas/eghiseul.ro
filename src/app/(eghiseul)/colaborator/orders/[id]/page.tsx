@@ -39,6 +39,8 @@ interface OrderDetail {
   cereri: { index: number; name: string }[];
   /** Acte încărcate de client (extras CF vechi, titlu de proprietate…). */
   supportingDocuments?: { key: string; name: string; mimeType: string; size: number; url?: string }[];
+  /** Notele echipei și ale lui de pe comandă, cele mai noi primele. */
+  teamNotes?: { author: string; mine: boolean; text: string; createdAt: string }[];
 }
 
 /**
@@ -217,6 +219,7 @@ export default function CollaboratorOrderDetail() {
       if (!json.success) throw new Error(json.error || 'Eroare');
       toast.success('Notă adăugată — vizibilă echipei în istoricul comenzii.');
       setNote('');
+      await load();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Eroare');
     } finally {
@@ -417,6 +420,27 @@ export default function CollaboratorOrderDetail() {
           <p className="mt-3 text-xs text-slate-500">Clientul a spus că nu are acte pentru imobil.</p>
         ) : null}
       </div>
+
+      {/* Notele echipei de pe comandă: adresa, CNP-ul proprietarului, ce s-a
+          vorbit cu clientul. Înainte nu le vedea deloc (E-260813-LEWDD). */}
+      {(order.teamNotes?.length ?? 0) > 0 && (
+        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50/60 p-5">
+          <h2 className="mb-1 text-sm font-semibold text-slate-900">Note pe comandă ({order.teamNotes!.length})</h2>
+          <p className="mb-3 text-xs text-slate-500">Ce a notat echipa (și tu) pe comandă. Citește-le înainte să ceri date clientului.</p>
+          <ul className="space-y-2">
+            {order.teamNotes!.map((n, i) => (
+              <li key={`${n.createdAt}-${i}`} className={`rounded-md border px-3 py-2 text-sm ${n.mine ? 'border-slate-200 bg-white' : 'border-amber-200 bg-white'}`}>
+                <p className="mb-0.5 text-xs text-slate-500">
+                  <span className="font-semibold text-slate-700">{n.author}</span>
+                  {' · '}
+                  {new Date(n.createdAt).toLocaleString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </p>
+                <p className="whitespace-pre-wrap break-words text-slate-900">{n.text}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Angajamentul de execuție — contractul dintre client și executant,
           semnat de client în comandă. Exemplarul lui, de descărcat/tipărit. */}

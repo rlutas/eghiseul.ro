@@ -10,6 +10,7 @@ import { getDownloadUrl } from '@/lib/aws/s3';
 import { sanitizeClientFiles } from '@/lib/orders/client-files';
 import { identifiableName } from '@/lib/orders/abandoned-progress';
 import { formatPersonName } from '@/lib/format/person-name';
+import { teamNotesForCollaborator } from '@/lib/collaborator/team-notes';
 
 
 /**
@@ -139,10 +140,24 @@ export async function GET(
       })
     );
 
+    // Everything the team noted on the order (address, owner's CNP…) — he
+    // used to see none of it (E-260813-LEWDD). See team-notes.ts.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: historyRows } = await (admin as any)
+      .from('order_history')
+      .select('event_type, changed_by, notes, created_at')
+      .eq('order_id', orderId)
+      .in('event_type', ['note_added', 'status_changed'])
+      .not('notes', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(200);
+    const teamNotes = teamNotesForCollaborator(historyRows ?? []);
+
     return NextResponse.json({
       success: true,
       data: {
         ...sanitizedOrder,
+        teamNotes,
         supportingDocuments,
         deliverable,
         documents: documents ?? [],
