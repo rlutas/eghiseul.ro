@@ -35,6 +35,19 @@ Cât așteptăm: nicio a doua contestație pe 881-388-1795, nicio cerere nouă p
 | 23.11.2026 | 933-520-0143 | verificare: „Eligibilă”, 18–22.11: 51 clicuri (20, 11, 10, 4, 6), 155 lei, 1 comandă plătită (E-261120-UYJE6); se cheltuie ~22 din 30 lei/zi; „cazier fiscal online gratuit” = 5 clicuri | cuvânt exclus **„gratuit”** pe campanie (potrivire amplă); bugetul rămâne 30 lei/zi |
 | 23.11.2026 | ambele | banda „Confirmați-vă identitatea”: verificarea advertiserului **până pe 23.12.2026**, altfel anunțurile se opresc; la salvarea bugetului Google a cerut și confirmarea identității contului (obligatorie după 25.11), făcută de Raul | verificarea advertiserului: de făcut de Raul, cu actul de identitate |
 
+## Audit 23.11.2026 (ambele conturi)
+
+**Constatator (881-388-1795), de la lansare (11.11) până pe 22.11:**
+- 16–22.11: 551 afișări, 55 clicuri, CTR 10%, CPC mediu 4,60 lei, 253 lei. Un singur anunț, putere „Medie”, fără sitelinkuri; anunțul e „Eligibil (limitat)” pe politica de documente guvernamentale.
+- Termenii vizibili (14 clicuri) sunt relevanți („certificat constatator”, „… onrc”, „valabilitate …”). **41 din 55 de clicuri (196 lei, 77%) stau la „alți termeni”**, pe care Google nu îi arată.
+- Comenzi reale plătite din reclame: **0**. Singura comandă plătită pe constatator (E-261111-ZNYPX) e testul nostru (`click_id` = `TEST-claude-check2`). Din reclame au pornit doar 2 drafturi (16.11 și 17.11, cu gclid), abandonate înainte de plată.
+- Măsurarea nu e de vină: eticheta de conversie e setată în producție la fel ca la cazier fiscal, unde vânzarea s-a înregistrat corect. „Purchase” stă pe „Se așteaptă conversii” pentru că nu a existat nicio vânzare.
+- Aritmetica (din analiza din 18.08): marja ~55 lei pe comandă. La CPC 4,50 lei, o vânzare la cel mult ~12 clicuri ar fi pragul de rentabilitate. Real: 0 vânzări din ~120 de clicuri și doar 2 persoane au început formularul.
+
+**Cazier fiscal (933-520-0143), 18–22.11:**
+- 323 afișări, 51 clicuri, CTR 15,8%, CPC 3,05 lei, 155 lei; 1 vânzare de 198 lei (E-261120-UYJE6, gclid, înregistrată și în Google Ads). Termenii sunt relevanți; „gratuit” exclus din 23.11.
+- Se cheltuie ~22 din 30 lei pe zi: volumul de căutări e limita, nu bugetul. O vânzare e prea puțin ca să judecăm rentabilitatea.
+
 ## Verificarea din 16.11.2026 (campania de constatator)
 
 Cifre din cont, 11–16.11: 321 de afișări, 25 de clicuri, 137,16 lei, CPC mediu 5,49 lei, **0 conversii**.
