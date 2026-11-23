@@ -127,6 +127,13 @@ export interface GuideLink {
  */
 export const CURATED_GUIDES: GuideLink[] = [
   {
+    title: 'Agenție din străinătate vrea colaborare (B2B): ce răspundem',
+    slug: 'admin/colaborari-b2b-agentii-straine',
+    category: 'clienti',
+    description:
+      'Cum recunoști o cerere reală față de o țeapă; o comandă pe site per persoană, împuternicire, plata înainte, fără plăți din Rusia, fără arhive; factura pe firmă străină se face manual; răspuns-model în engleză.',
+  },
+  {
     title: 'Cum cauți o comandă în admin',
     slug: 'admin/cautare-comenzi',
     category: 'admin',
