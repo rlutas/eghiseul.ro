@@ -9,6 +9,7 @@
 
 import { stripEmailFromAddressBar } from '@/lib/url/strip-email-param';
 import { cachedEmailForOrder } from '@/lib/wizard/cached-order-email';
+import { clientTypeFromServerDraft } from '@/lib/wizard/restored-client-type';
 import {
   createContext,
   useContext,
@@ -929,7 +930,7 @@ function serverOrderToCache(order: any, serviceSlug: string): ModularDraftCache 
     serviceSlug,
     currentStepId: (order.current_step as ModularStepId) || 'contact',
     currentStepNumber: 1,
-    clientType: cd.company ? 'PJ' : cd.contact || cd.personal ? 'PF' : null,
+    clientType: clientTypeFromServerDraft(cd),
     data: {
       contact: cd.contact,
       personalKyc: cd.personal ?? null,

@@ -13,6 +13,7 @@ import { getMissingInvoiceClientFields } from '@/lib/oblio/invoice';
 import { computeServerPricing, type CouponRow, type OptionRow, type StoredOption } from '@/lib/orders/server-pricing';
 import { emailDomainAcceptsMail } from '@/lib/email-mx';
 import { isIdentityFrontType, isPassportType, isSelfieType, identityFrontTypes } from '@/lib/kyc/identity-documents';
+import { flippedCompanyClientType } from '@/lib/wizard/restored-client-type';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -596,6 +597,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         copyFile,
         uploadBase64,
       });
+    }
+
+    // PF orders flipped to „PJ" by the draft resume (E-261118-X6FMM, 4 paid
+    // orders by 18.11.2026): a picker service with PJ but no CUI and no company
+    // name is a person, so it is stored as PF before anything reads it.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const vc = (order.services as any)?.verification_config;
+      const corrected = flippedCompanyClientType(existingCustomerData, !!vc?.clientTypeSelection?.enabled);
+      if (corrected) {
+        console.warn(`[submit] clientType pj without company data, saved as pf: order ${id}`);
+        existingCustomerData.clientType = corrected;
+      }
     }
 
     // Company documents guard: the wizard step only exists when the service
