@@ -14,6 +14,7 @@ import {
 import { useModularWizard } from '@/providers/modular-wizard-provider';
 import type { ConstatatorConfig, ConstatatorState } from '@/types/verification-modules';
 import { cn } from '@/lib/utils';
+import { takeCuiPrefill } from '@/lib/constatator/cui-prefill';
 
 interface ConstatatorStepProps {
   config: ConstatatorConfig | null | undefined;
@@ -41,7 +42,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
 }
 
 export default function ConstatatorStep({ config, onValidChange }: ConstatatorStepProps) {
-  const { state, updateConstatator, validationAttempt } = useModularWizard();
+  const { state, updateConstatator, updateCompanyKyc, validationAttempt } = useModularWizard();
   const cs: ConstatatorState = useMemo(() => state.constatator ?? {}, [state.constatator]);
   const docTypes = useMemo(() => config?.documentTypes ?? [], [config]);
   const purposes = useMemo(() => config?.purposes ?? [], [config]);
@@ -57,6 +58,17 @@ export default function ConstatatorStep({ config, onValidChange }: ConstatatorSt
     preselectApplied.current = true;
     updateConstatator({ documentType: preset.documentType, reportType: preset.reportType });
   }, [cs.documentType, docTypes, updateConstatator]);
+
+  // CUI typed in the constatator homepage hero (24.11.2026): fill the company
+  // step with it, so the visitor does not type it twice. Only into an empty
+  // field — a restored draft or a CUI already typed wins.
+  const companyKycReady = !!state.companyKyc;
+  const companyCui = state.companyKyc?.cui;
+  useEffect(() => {
+    if (!companyKycReady || companyCui) return;
+    const cui = takeCuiPrefill();
+    if (cui) updateCompanyKyc({ cui });
+  }, [companyKycReady, companyCui, updateCompanyKyc]);
 
   const selectedType = docTypes.find((t) => t.value === cs.documentType);
   // Report types may be plain strings (legacy) or { name, purposes } objects.

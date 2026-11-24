@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { HeaderConstatator } from '@/components/constatator/header';
+import { HeroCuiLookup } from '@/components/constatator/hero-cui';
 import { Arrow, Card, Check, Eyebrow, FaqList, H2, InfoTable, Section } from '@/components/documentero/ui';
 import { fmtDateRo } from '@/lib/documentero/content';
 import { buildPageMetadata } from '@/lib/seo/metadata';
@@ -146,27 +147,27 @@ export default async function ConstatatorHome() {
                 <span className="rounded-full bg-d-soft px-3 py-1 text-[12px] font-bold text-d-ink">{speedShort}</span>
               </div>
               <span className="text-[14px] text-d-muted">Taxa ONRC și TVA incluse. Fără cont, fără taxă de urgență.</span>
+              {/* CUI first, in the first mobile screen (24.11.2026): this is how every
+                  competitor starts; the PF / istoric variants sit under it. */}
+              <HeroCuiLookup orderHref={ORDER} price={lei(p.firma)} />
               <div className="h-px bg-d-line" />
               {[
-                ['Pe persoană fizică', 'pentru PFA, II, IF sau o persoană', p.pf],
-                ['Cu istoric', 'toate modificările de la înființare', p.istoric],
-              ].map(([n, d, v]) => (
-                <div key={n as string} className="flex items-center justify-between gap-3 rounded-xl border border-d-line px-3.5 py-3 text-[15px]">
+                ['Pe persoană fizică', 'pentru PFA, II, IF sau o persoană', p.pf, 'pf'],
+                ['Cu istoric', 'toate modificările de la înființare', p.istoric, 'istoric'],
+              ].map(([n, d, v, tip]) => (
+                <Link key={n as string} href={`${ORDER}?tip=${tip}`} className="flex items-center justify-between gap-3 rounded-xl border border-d-line px-3.5 py-3 text-[15px] hover:border-d-ink">
                   <span className="flex flex-col">
                     <span className="font-semibold">{n}</span>
                     <span className="text-[12px] text-d-muted">{d}</span>
                   </span>
                   <span className="whitespace-nowrap font-bold">{lei(v as number)} lei</span>
-                </div>
+                </Link>
               ))}
-              <Link href={ORDER} className="inline-flex h-[54px] items-center justify-center gap-2 rounded-xl bg-d-ink text-[16px] font-bold text-white hover:opacity-90">
-                Începe comanda <Arrow />
-              </Link>
             </aside>
 
             <div className="flex flex-col gap-6 lg:col-span-7 lg:row-start-2">
               <p className="m-0 max-w-[600px] text-[18px] leading-[1.55] text-white/75 sm:text-[20px]">
-                Scrii emailul și CUI-ul, alegi scopul și plătești. Cererea pleacă automat la Registrul Comerțului, iar
+                Scrii CUI-ul firmei, lași emailul, alegi scopul și plătești. Cererea pleacă automat la Registrul Comerțului, iar
                 certificatul semnat electronic de ONRC îl primești pe email. Fără cont pe portalul ONRC.
               </p>
               <div className="flex flex-wrap items-center gap-3">
