@@ -134,6 +134,13 @@ export const CURATED_GUIDES: GuideLink[] = [
       'Cum recunoști o cerere reală față de o țeapă; o comandă pe site per persoană, împuternicire, plata înainte, fără plăți din Rusia, fără arhive; factura pe firmă străină se face manual; răspuns-model în engleză.',
   },
   {
+    title: 'Cerere de ștergere a datelor (GDPR): ce faci',
+    slug: 'admin/cereri-gdpr-stergere-date',
+    category: 'clienti',
+    description:
+      'Unde cauți clientul (și în comenzile din perioada WordPress), ce ștergem, ce păstrăm prin lege, cum îl marchezi în Clienți și ce îi scrii. Termen: o lună.',
+  },
+  {
     title: 'Cum cauți o comandă în admin',
     slug: 'admin/cautare-comenzi',
     category: 'admin',

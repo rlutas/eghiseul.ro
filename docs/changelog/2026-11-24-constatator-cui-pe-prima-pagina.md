@@ -26,7 +26,7 @@
 - GA4, trafic plătit pe mobil (doar cine acceptă cookie-urile): 18 utilizatori pe prima pagină, 3 în `/comanda/`, 1 la checkout. Cea mai mare pierdere e pe prima pagină, înainte de formular.
 - GA4 desktop: 325 de sesiuni „plătite” și 268 „organice”, deși Search Console arată 0 clicuri organice și Ads a facturat 17 clicuri de pe desktop. Sunt roboți; GA4 nu e o sursă de încredere pentru acest site.
 
-### Ce urmează (nefăcut)
+### Ce urmează
 
-- Telefon opțional doar pe brandul constatator: atinge `hasValidContactData` (alocarea codului de comandă), deci separat, cu test.
-- Sitelinkuri și extensii în Ads, la nivel de campanie; anunțul existent rămâne neatins (e „Eligibil (limitat)”, o editare îl retrimite la verificare).
+- Telefon opțional pe brandul constatator: **respins de Raul (24.11)**. Telefonul rămâne obligatoriu.
+- ~~Sitelinkuri și extensii în Ads, la nivel de campanie~~ făcute tot pe 24.11, vezi [contestație și extensii](2026-11-24-constatator-ads-contestatie-extensii.md). Anunțul a rămas neatins.
