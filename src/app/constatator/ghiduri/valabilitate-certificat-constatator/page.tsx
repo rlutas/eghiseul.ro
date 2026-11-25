@@ -9,8 +9,8 @@ import { CONSTATATOR_INDEXABLE, CONSTATATOR_ORDER_HREF } from '@/config/constata
 export const revalidate = 3600;
 
 const PATH = '/ghiduri/valabilitate-certificat-constatator/';
-const PUBLISHED = '2026-11-18';
-const UPDATED = '2026-11-18';
+const PUBLISHED = '2026-11-25';
+const UPDATED = '2026-11-25';
 const TITLE = 'Valabilitate certificat constatator: cât e bun și când îți trebuie unul nou';
 const DESCRIPTION =
   'Nicio lege nu fixează valabilitatea certificatului constatator. Certificatul arată firma în ziua emiterii, iar termenul de 30 de zile îl cere instituția care îl primește.';
@@ -18,7 +18,7 @@ const DESCRIPTION =
 export const metadata = buildPageMetadata({ brand: 'constatator', title: TITLE, description: DESCRIPTION, path: PATH, noindex: !CONSTATATOR_INDEXABLE });
 
 /**
- * Facts checked 11.11.2026: ONRC "Certificate constatatoare" page (contents,
+ * Facts checked 11.11.2026 and re-checked 25.11.2026: ONRC "Certificate constatatoare" page (contents,
  * "starea la zi", 30 lei, InfoCert 24/7, card only); Legea 265/2022 art. 11
  * alin. 1, 3 and 8 (consolidated text). No law sets a validity term, and no
  * primary source names which institutions ask for 30 days, so the page names
@@ -106,8 +106,8 @@ export default async function Page() {
 
       <h2 id="ce-se-schimba">Ce se poate schimba după emitere</h2>
       <p>
-        Orice înregistrare nouă în registru face certificatul vechi incomplet. Câteva exemple din lucrurile pe care
-        certificatul le arată, potrivit listei ONRC:
+        Orice înregistrare nouă în registru face certificatul vechi incomplet. Câteva exemple de schimbări care
+        apar în certificat:
       </p>
       <ul>
         <li>un administrator nou sau unul care a plecat;</li>

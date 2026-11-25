@@ -13,8 +13,9 @@ export interface ConstatatorSitemapEntry {
 
 export const CONSTATATOR_SITEMAP: ConstatatorSitemapEntry[] = [
   // Served only when CONSTATATOR_INDEXABLE is true (src/config/constatator-nav.ts).
-  { path: '/', lastModified: '2026-11-11', changeFrequency: 'weekly', priority: 1.0 },
-  // /ghiduri/ joins when the first guide is live (it is noindex while empty).
+  { path: '/', lastModified: '2026-11-25', changeFrequency: 'weekly', priority: 1.0 },
+  // /ghiduri/ is listed since the first guide went live (25.11.2026); it is noindex while empty.
+  { path: '/ghiduri/', lastModified: '2026-11-25', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/despre/', lastModified: '2026-11-11', changeFrequency: 'yearly', priority: 0.5 },
   { path: '/contact/', lastModified: '2026-11-11', changeFrequency: 'yearly', priority: 0.4 },
   { path: '/termeni-si-conditii/', lastModified: '2026-11-11', changeFrequency: 'yearly', priority: 0.3 },

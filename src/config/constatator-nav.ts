@@ -18,6 +18,7 @@ export const CONSTATATOR_NAV = [
   { label: 'Cum funcționează', href: '/#cum-functioneaza' },
   { label: 'Tipuri și prețuri', href: '/#preturi' },
   { label: 'Întrebări', href: '/#intrebari' },
+  { label: 'Ghiduri', href: '/ghiduri/' },
   { label: 'Despre', href: '/despre/' },
   { label: 'Contact', href: '/contact/' },
 ] as const;
@@ -50,8 +51,8 @@ export const CONSTATATOR_ALL_GUIDES: ReadonlyArray<ConstatatorGuideEntry> = [
     href: '/ghiduri/valabilitate-certificat-constatator/',
     label: 'Valabilitatea certificatului constatator',
     hint: 'Ce spune legea, de unde vin cele 30 de zile și când îți trebuie unul nou.',
-    updated: '2026-11-18',
-    published: false,
+    updated: '2026-11-25',
+    published: true,
     planned: '2026-11-18',
   },
   {

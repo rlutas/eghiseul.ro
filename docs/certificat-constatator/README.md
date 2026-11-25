@@ -90,8 +90,8 @@ Candidate, în ordinea cererii: tipurile de certificat constatator (de bază, ex
 
 | Data | Ghid | Cum îl publici |
 |---|---|---|
-| 18.11 | `/ghiduri/valabilitate-certificat-constatator/` | în `src/config/constatator-nav.ts`: `published: true`, `updated` = data; în pagină `PUBLISHED`/`UPDATED` = data; la primul ghid live adaugă `/ghiduri/` în `src/config/constatator-sitemap.ts` și „Ghiduri” în `CONSTATATOR_NAV`; deploy; IndexNow |
-| 25.11 | `/ghiduri/certificat-constatator-pfa-punct-de-lucru/` | idem |
+| 18.11 → **publicat 25.11** | `/ghiduri/valabilitate-certificat-constatator/` | în `src/config/constatator-nav.ts`: `published: true`, `updated` = data; în pagină `PUBLISHED`/`UPDATED` = data; la primul ghid live adaugă `/ghiduri/` în `src/config/constatator-sitemap.ts` și „Ghiduri” în `CONSTATATOR_NAV`; deploy; IndexNow |
+| 25.11 → **ținut** | `/ghiduri/certificat-constatator-pfa-punct-de-lucru/` | idem. **Blocat 25.11:** ghidul spune că PFA/II/IF se cer pe CUI (formularul 11-10-188, pct. 2), dar pagina principală, pagina eghiseul și practica noastră spun „pe persoană fizică, pe CNP-ul titularului”. Se publică după ce Raul confirmă care e regula; ghidul mai susținea că formularul recunoaște un PFA după CUI, ceea ce nu e adevărat. |
 | 02.12 | `/ghiduri/certificat-constatator-extins/` | idem |
 | 09.12 | `/ghiduri/raport-istoric-onrc/` | idem |
 | 16.12 | `/ghiduri/certificat-constatator-licitatie-fonduri/` | idem |

@@ -320,8 +320,8 @@ export default async function ConstatatorHome() {
             <H2>Certificat constatator pentru PFA, II sau punct de lucru</H2>
             <p className="m-0 text-[17px] leading-[1.7] text-d-body">
               PFA-ul, întreprinderea individuală și cea familială nu sunt societăți, așa că primesc certificatul pe
-              persoană fizică, pe numele titularului. Prețul e același. Când scrii CUI-ul unui PFA, formularul îți
-              spune ce să alegi.
+              persoană fizică, pe numele titularului. Prețul e același. În formular alegi varianta pe persoană fizică
+              și scrii CNP-ul titularului.
             </p>
             <p className="m-0 text-[17px] leading-[1.7] text-d-body">
               Punctul de lucru nu are CUI propriu. Comanzi certificatul pe CUI-ul firmei, iar punctele de lucru și
@@ -334,7 +334,12 @@ export default async function ConstatatorHome() {
             <p className="m-0 text-[17px] leading-[1.7] text-d-body">
               Legea nu îi stabilește un termen: certificatul arată firma așa cum era în ziua emiterii. Cine ți-l cere
               hotărăște cât de recent să fie. Băncile și licitațiile cer de obicei un certificat emis în ultimele 30
-              de zile, uneori mai puțin. Verifică termenul în dosar și comandă-l aproape de data depunerii.
+              de zile, uneori mai puțin. Verifică termenul în dosar și comandă-l aproape de data depunerii. Detalii în
+              ghidul despre{' '}
+              <Link href="/ghiduri/valabilitate-certificat-constatator/" className="underline underline-offset-2">
+                valabilitatea certificatului constatator
+              </Link>
+              .
             </p>
           </div>
         </Section>
