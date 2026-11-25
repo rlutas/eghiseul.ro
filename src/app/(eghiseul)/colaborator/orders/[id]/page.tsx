@@ -13,6 +13,8 @@ import { IDENTIFICARE_SLUGS } from '@/lib/ancpi/cerere-scope';
 import { COUNTY_NAMES } from '@/lib/ancpi/judete';
 import { imobileForWork } from '@/lib/ancpi/imobile-for-work';
 import { OrderMessagesPanel, type MessageTemplate } from '@/components/orders/OrderMessagesPanel';
+import { identifiableName } from '@/lib/orders/abandoned-progress';
+import { formatPersonName } from '@/lib/format/person-name';
 
 interface OrderDoc {
   id: string;
@@ -806,7 +808,18 @@ export default function CollaboratorOrderDetail() {
           proprietar, cerere de act vechi. Clientul primește email și răspunde
           din pagina comenzii. */}
       <OrderMessagesPanel
+        key={orderId}
         endpoint={withPreview(`/api/collaborator/orders/${orderId}/messages`, previewAs)}
+        recipient={{
+          orderNumber: order.friendly_order_id || order.id.slice(0, 8),
+          clientName: (() => {
+            const n = identifiableName(order.customer_data);
+            return n ? formatPersonName(n.lastName, n.firstName) : order.customer_data?.requester_name ?? null;
+          })(),
+          closedLabel: ['completed', 'cancelled', 'refunded', 'shipped', 'delivered'].includes(order.status)
+            ? findStatusLabel(order.status)
+            : null,
+        }}
         readOnly={readOnly}
         templates={(IDENTIFICARE_SLUGS as readonly string[]).includes(order.services?.slug ?? '') ? IDENTIFICARE_TEMPLATES : undefined}
       />

@@ -57,6 +57,12 @@ interface Props {
   /** Hide the card heading — the pop-up brings its own title. */
   bare?: boolean;
   onSent?: () => void;
+  /**
+   * Who receives the message. Shown above the box and repeated in a confirm
+   * step before sending. Added 25.11.2026: a reply meant for one client was
+   * sent from another order's page in the topograph portal.
+   */
+  recipient?: { orderNumber: string; clientName?: string | null; /** Order is finished: warn before writing on it. */ closedLabel?: string | null };
 }
 
 const AUTHOR_LABEL: Record<StaffMessage['author_type'], string> = {
@@ -74,13 +80,14 @@ function when(iso: string): string {
   });
 }
 
-export function OrderMessagesPanel({ endpoint, readOnly, templates, className, bare, onSent }: Props) {
+export function OrderMessagesPanel({ endpoint, readOnly, templates, className, bare, onSent, recipient }: Props) {
   const [messages, setMessages] = useState<StaffMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
   const [files, setFiles] = useState<ClientFile[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -123,6 +130,7 @@ export function OrderMessagesPanel({ endpoint, readOnly, templates, className, b
 
   const send = async () => {
     if (!canSend) return;
+    setConfirming(false);
     setSending(true);
     try {
       const res = await fetch(endpoint, {
@@ -232,9 +240,23 @@ export function OrderMessagesPanel({ endpoint, readOnly, templates, className, b
           ))}
         </div>
       )}
+      {recipient && !readOnly && (
+        <p className="mb-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-900">
+          Scrii clientului <strong>{recipient.clientName || 'acestei comenzi'}</strong>, pe comanda{' '}
+          <strong>{recipient.orderNumber}</strong>. Mesajul pleacă pe emailul lui.
+        </p>
+      )}
+      {recipient?.closedLabel && !readOnly && (
+        <p className="mb-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          Atenție: comanda e <strong>{recipient.closedLabel}</strong>. Verifică dacă scrii pe comanda potrivită.
+        </p>
+      )}
       <textarea
         value={draft}
-        onChange={(e) => setDraft(e.target.value)}
+        onChange={(e) => {
+          setDraft(e.target.value);
+          setConfirming(false);
+        }}
         disabled={readOnly || sending}
         rows={4}
         maxLength={4000}
@@ -291,10 +313,30 @@ export function OrderMessagesPanel({ endpoint, readOnly, templates, className, b
         ) : (
           <span />
         )}
-        <Button onClick={send} disabled={readOnly || sending || uploading || !canSend} size="sm">
-          <Send className="mr-1.5 h-4 w-4" />
-          {sending ? 'Se trimite...' : 'Trimite clientului'}
-        </Button>
+        {recipient && confirming ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm text-slate-700">
+              {recipient.closedLabel ? 'Comanda e închisă. Sigur trimiți' : 'Trimiți'} lui{' '}
+              <strong>{recipient.clientName || 'client'}</strong> ({recipient.orderNumber})?
+            </span>
+            <Button type="button" variant="outline" size="sm" onClick={() => setConfirming(false)} disabled={sending}>
+              Nu
+            </Button>
+            <Button type="button" size="sm" onClick={send} disabled={sending}>
+              <Send className="mr-1.5 h-4 w-4" />
+              {sending ? 'Se trimite...' : 'Da, trimite'}
+            </Button>
+          </div>
+        ) : (
+          <Button
+            onClick={recipient ? () => setConfirming(true) : send}
+            disabled={readOnly || sending || uploading || !canSend}
+            size="sm"
+          >
+            <Send className="mr-1.5 h-4 w-4" />
+            {sending ? 'Se trimite...' : 'Trimite clientului'}
+          </Button>
+        )}
       </div>
     </div>
   );
