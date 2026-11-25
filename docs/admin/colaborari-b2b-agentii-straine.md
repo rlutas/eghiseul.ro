@@ -35,6 +35,16 @@ Condițiile de eligibilitate rămân aceleași ca la orice client:
 - stare civilă: doar pentru persoane care au sau au avut cetățenie română;
 - cazier judiciar: doar pentru persoane care locuiesc sau au locuit în România.
 
+## 2b. Verificăm firma înainte de orice condiție specială
+
+Un răspuns-model (secțiunea 4) se poate trimite oricui. Altceva nu facem până nu verificăm firma: factură pe firma lor, proces adaptat, contract de colaborare.
+
+- **Cerem** numele exact al firmei, numărul de înregistrare (în Grecia GEMI, în Rusia OGRN/OGRNIP, în UE numărul de TVA) și, dacă spun că sunt avocați, baroul și numărul lor.
+- **Comparăm** ce scriu în email cu site-ul lor, mai ales cu pagina de contract sau de „ofertă publică”, unde apare firma reală. Exemplu din noiembrie 2026: o agenție se prezenta ca avocați la Atena, dar site-ul arăta o PFA din Rusia, care scrie explicit că nu e avocat.
+- **„Avocat” în altă țară nu înseamnă avocat în România.** Împuternicirea avocațială se semnează cu avocata noastră, nu cu ei.
+- **Plata din Rusia sau în ruble = nu.** Contează și când clienții lor sunt ruși: plătește agenția, dintr-un cont din UE pe numele firmei.
+- Înainte de orice condiție specială, verificarea și decizia sunt ale lui Raul. Notițele despre fiecare agenție nu se pun în `docs/`, pentru că repo-ul e public.
+
 ## 3. Factura pe firma lor
 
 - Formularul de pe site **nu știe să factureze o firmă din străinătate**.
