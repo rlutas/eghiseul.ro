@@ -1,5 +1,15 @@
 # eGhiseul.ro - Status Curent
 
+> **🟣 Update 2026-11-25 — audit complet: vânzări, reclame, organic; ghiduri noi pe cazierfiscal.com și pe site-ul de constatator.**
+> - **Vânzări 1–24.11 față de 1–24.10, pe toate site-urile:** ~41,0k lei față de ~37,5k (+9%, cu Black Friday). eghiseul 98 comenzi / 28,2k lei (în oct. 77 / 25,4k), CJO 24 / 7,2k (în oct. 42 / 11,0k), documentero 5 / 5,1k lei.
+> - **Organic Google, 1–23.11 față de octombrie:** eghiseul −38% clicuri, fără semn de revenire. CJO −60%, dar +35% săptămână la săptămână: primul semn de revenire. Bing pe eghiseul doar −9%.
+> - **Cazier fiscal Ads (933-520-0143):** 18–24.11, 80 de clicuri, 248 lei, 1 vânzare reală (198 lei). Conversia se înregistrează corect. Anunțul apare la 17% din căutări; restul se pierde pe buget și pe poziție.
+> - **Constatator Ads (881-388-1795):** 18–24.11, 34 de clicuri, 115 lei, 0 vânzări. „Purchase” apare „Configurată greșit” doar pentru că n-a fost nicio vânzare în 7 zile; tag-ul e bun. Verdictul rămâne pe 01.12.
+> - **Ambele conturi Ads:** confirmarea identității advertiserului până pe **23.12.2026**. O face Raul.
+> - **cazierfiscal.com:** ghidurile de valabilitate și administrator/PFA sunt publicate, verificate pe OG 39/2015 și trimise în GSC. Ghidul de administrator spune acum explicit că cazierul fiscal îl obținem doar pentru persoane fizice. [changelog](changelog/2026-11-25-cazierfiscal-doua-ghiduri-noi.md)
+> - **certificat-constatator-express.ro:** audit făcut. Site-ul e tehnic curat (PSI 97), dar subțire: doar homepage-ul e indexat, pe poziția ~60. Ghidurile de valabilitate și PFA/punct de lucru sunt publicate și trimise în GSC. **Regula PFA, confirmată de Raul:** pentru PFA/II/IF, certificatul pe persoană fizică, după CNP-ul titularului; arată și funcțiile din trecut. A fost scoasă afirmația falsă „formularul recunoaște PFA după CUI”. [changelog](changelog/2026-11-25-constatator-primul-ghid-audit.md)
+> - **Deschis:** certificatul pe persoană fizică, „automat în câteva minute” (pe eghiseul) sau „îl depune echipa” (pe constatator)? Se aliniază după primul test plătit pe persoană fizică. Următoarele ghiduri: cazier fiscal sau certificat fiscal pe 01.12, constatator „extins” pe 02.12.
+>
 > **🟣 Update 2026-11-18 — reclame Google pe site-urile noi.** [jurnal](ads/2026-11-12-google-ads-jurnal-incercari.md)
 > - **Constatator (881-388-1795):** 11–17.11, 61 de clicuri, 328 lei, nicio comandă plătită din reclamă. Limita de CPC coborâtă de la 6 la 3 lei. De urmărit afișările.
 > - **Cazier fiscal (933-520-0143):** campania pornită pe 18.11, anunț „Eligibilă”, 30 lei/zi. Fără date încă.
