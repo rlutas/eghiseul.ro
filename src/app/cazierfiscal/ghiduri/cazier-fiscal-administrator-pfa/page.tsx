@@ -61,7 +61,7 @@ export default async function Page() {
         ['cine-il-poate-cere', 'Cine poate cere certificatul pentru firmă'],
       ]}
       readMinutes={4}
-      orderLead="Dacă îți cere cineva certificatul pe hârtie sau PDF și nu ai SPV, cererea o depune avocatul nostru, pe baza împuternicirii semnate pe telefon. Certificatul vine pe email. Gratuit îl iei de la ANAF, din SPV sau de la ghișeu."
+      orderLead="Dacă îți cere cineva certificatul tău, ca persoană fizică, și nu ai SPV, cererea o depune avocatul nostru, pe baza împuternicirii semnate pe telefon. Pentru firmă nu îl obținem. Certificatul vine pe email. Gratuit îl iei de la ANAF, din SPV sau de la ghișeu."
     >
       <h2 id="cand-e-obligatoriu">Când e obligatoriu</h2>
       <p>Articolul 8 alin. 1 din OG 39/2015 enumeră situațiile:</p>
@@ -132,7 +132,8 @@ export default async function Page() {
       </p>
       <p>
         Ca împuternicit, un avocat folosește împuternicirea avocațială, nu formularul ANAF (Codul de procedură fiscală,
-        art. 18 alin. 3). Așa lucrăm și noi: <Link href="/">cazier fiscal prin avocat</Link>, {lei(p.basePrice)} lei.
+        art. 18 alin. 3). Așa lucrăm și noi, doar pentru persoane fizice: pentru tine ca asociat, administrator sau
+        titular de PFA, nu pentru firmă. <Link href="/">Cazier fiscal prin avocat</Link>, {lei(p.basePrice)} lei.
       </p>
     </CazierFiscalGuide>
   );
