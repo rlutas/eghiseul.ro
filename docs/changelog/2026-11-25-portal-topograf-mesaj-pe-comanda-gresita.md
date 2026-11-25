@@ -4,7 +4,7 @@
 ## Pentru echipă
 
 - **Ce s-a întâmplat:** pe 24.11, răspunsul topografului pentru clientul comenzii E-260813-LEWDD (copia unui act notarial) a fost trimis din pagina altei comenzi, E-261124-L79M5. Acea comandă era deja finalizată. Clientul de pe LEWDD nu a primit răspunsul, iar celălalt client a primit pe email un mesaj care nu era pentru el.
-- **Ce s-a reparat:** răspunsul a fost retrimis pe comanda corectă. Clientul care l-a primit din greșeală a primit un mesaj de scuze.
+- **De făcut de echipă (25.11):** retrimiteți răspunsul pe comanda corectă (LEWDD), apoi trimiteți pe L79M5 un mesaj scurt de scuze că mesajul anterior a ajuns acolo din greșeală.
 - **Ce se schimbă în portalul topografului:**
   - deasupra căsuței de mesaj scrie acum cui îi scrii: numele clientului și numărul comenzii;
   - la „Trimite clientului” apare o confirmare: „Trimiți lui … (comanda …)?”, cu butoanele „Nu” și „Da, trimite”;
