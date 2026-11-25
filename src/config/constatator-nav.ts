@@ -60,7 +60,7 @@ export const CONSTATATOR_ALL_GUIDES: ReadonlyArray<ConstatatorGuideEntry> = [
     label: 'Certificat constatator pentru PFA și punct de lucru',
     hint: 'Cele două documente cu același nume și pe care ți-l cere instituția.',
     updated: '2026-11-25',
-    published: false,
+    published: true,
     planned: '2026-11-25',
   },
   {

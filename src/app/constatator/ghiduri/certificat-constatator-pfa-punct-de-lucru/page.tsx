@@ -18,7 +18,7 @@ const DESCRIPTION =
 export const metadata = buildPageMetadata({ brand: 'constatator', title: TITLE, description: DESCRIPTION, path: PATH, noindex: !CONSTATATOR_INDEXABLE });
 
 /**
- * Facts checked 11.11.2026: Legea 265/2022 art. 4 alin. 1, art. 7 alin. 1
+ * Facts checked 11.11.2026, re-checked 25.11.2026: Legea 265/2022 art. 4 alin. 1, art. 7 alin. 1
  * lit. c, art. 11 alin. 1, art. 121 alin. 1, art. 122 alin. 1, 4, 7, 9
  * (consolidated text); ONRC "Certificate constatatoare" (contents list, 30
  * lei); ONRC "Informații RC" section IV (duplicates of the art. 122
@@ -27,6 +27,11 @@ export const metadata = buildPageMetadata({ brand: 'constatator', title: TITLE, 
  * reprezentanți pentru sucursale/subunități/sedii secundare" but does not say
  * the address of each punct de lucru is printed, so the page does not claim it.
  * We do not obtain the art. 122 certificate or its duplicate.
+ * 25.11.2026 (Raul): for PFA/II/IF we issue the certificate on the natural
+ * person, by the holder's CNP (form pct. 3), never by the PFA's CUI. The PF
+ * certificate also lists past roles: the ONRC tariff note says 30 lei
+ * "indiferent dacă este/nu este/a fost/nu a fost identificat cu funcții și
+ * calități". The form does NOT detect a PFA from a CUI; do not claim it.
  */
 const SOURCES = [
   ['Legea nr. 265/2022 privind registrul comerțului, text consolidat (legislatie.just.ro)', 'https://legislatie.just.ro/Public/DetaliiDocumentAfis/288036'],
@@ -59,7 +64,7 @@ export default async function Page() {
       price={lei(p.firma)}
       summary={[
         <>PFA-ul, întreprinderea individuală și cea familială sunt înregistrate la Registrul Comerțului, cu sediul profesional și punctele de lucru (Legea 265/2022, art. 7).</>,
-        <>Certificatul constatator de informare se cere oricând și costă 30 de lei, la fel ca pentru un SRL.</>,
+        <>Pentru PFA, II sau IF, certificatul de informare se cere pe persoană fizică, după CNP-ul titularului. Taxa ONRC e 30 de lei.</>,
         <>La înregistrarea unui sediu sau a unui punct de lucru, ONRC eliberează un alt certificat constatator, care atestă declarația pe propria răspundere (art. 122 alin. 7).</>,
         <>Dacă l-ai pierdut pe al doilea, ceri un duplicat de la ONRC. Pe acesta nu îl obținem noi.</>,
       ]}
@@ -72,7 +77,7 @@ export default async function Page() {
         ['pe-care-il-ceri', 'Pe care îl ceri'],
       ]}
       readMinutes={6}
-      orderLead="Dacă ți se cere certificatul de informare, cu situația la zi a PFA-ului sau a firmei, îl comanzi aici pe CUI. Formularul recunoaște CUI-ul unui PFA și îți spune ce variantă să alegi. Certificatul vine pe email, ca PDF semnat."
+      orderLead="Dacă ți se cere certificatul de informare pentru un PFA, II sau IF, alegi în formular varianta pe persoană fizică și scrii CNP-ul titularului. Pentru o firmă, îl comanzi pe CUI. Certificatul vine pe email, ca PDF semnat."
     >
       <h2 id="pfa-in-registru">PFA-ul e în registrul comerțului</h2>
       <p>
@@ -122,8 +127,14 @@ export default async function Page() {
       <p>
         Taxa ONRC e de 30 de lei, aceeași pentru SRL, PFA, II sau IF (Ordinul MJ 380/C/2024, anexa, pct. 1). Pe
         formularul ONRC de cerere, 11-10-188, alegi la început pentru cine ceri: pentru un profesionist, cu numărul
-        de ordine și CUI-ul lui (pct. 2), sau pentru o persoană fizică, după CNP (pct. 3). Al doilea arată în ce
-        firme apare persoana, nu situația unui anumit PFA.
+        de ordine și CUI-ul lui (pct. 2), sau pentru o persoană fizică, după CNP (pct. 3).
+      </p>
+      <p>
+        Pentru un PFA, o întreprindere individuală sau una familială, noi cerem certificatul pe persoană fizică,
+        după CNP-ul titularului. Certificatul pe persoană fizică arată calitățile persoanei în registru: titular,
+        asociat, administrator. Apar și funcțiile din trecut. Dacă persoana a fost administrator la o firmă, o vezi
+        în certificat. ONRC percepe aceeași taxă de 30 de lei „indiferent dacă este/nu este/a fost/nu a fost
+        identificat cu funcții și calități”.
       </p>
       <p>
         Activitățile autorizate din certificat sunt cele pentru care s-a înregistrat declarația pe propria
@@ -190,12 +201,16 @@ export default async function Page() {
           „Certificatul constatator privind autorizarea funcționării” sau „cel primit la înregistrarea punctului de
           lucru”: e documentul de la art. 122, pe care îl ai deja sau pentru care ceri duplicat.
         </li>
-        <li>Situația unei persoane, în ce firme e asociat sau administrator: e certificatul pe persoană fizică, după CNP.</li>
+        <li>
+          Situația unui PFA, II sau IF, ori a unei persoane, adică în ce firme este sau a fost asociat sau
+          administrator: e certificatul pe persoană fizică, după CNP.
+        </li>
       </ul>
       <p>
         La noi, certificatul de informare costă {lei(p.firma)} lei pe firmă și {lei(p.pf)} lei pe persoană fizică,
-        cu taxa ONRC și TVA-ul incluse. Când scrii CUI-ul unui PFA, formularul îți spune ce variantă să alegi. Certificatul de bază pe firmă se emite automat, de obicei în
-        câteva minute. Varianta pe persoană fizică o preia echipa, în programul de lucru. Poți{' '}
+        cu taxa ONRC și TVA-ul incluse. Pentru un PFA, II sau IF alegi varianta pe persoană fizică și scrii CNP-ul
+        titularului. Certificatul de bază pe firmă se emite automat, de obicei în câteva minute. Varianta pe persoană
+        fizică o preia echipa, în programul de lucru. Poți{' '}
         <Link href={CONSTATATOR_ORDER_HREF}>comanda certificatul aici</Link> sau citi mai întâi{' '}
         <Link href="/">ce primești și cât costă</Link>.
       </p>

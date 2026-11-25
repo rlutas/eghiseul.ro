@@ -73,7 +73,7 @@ function faq(p: { firma: number; istoric: number }) {
     },
     {
       q: 'Am PFA. Ce certificat comand?',
-      a: 'Pentru PFA, întreprindere individuală sau familială se emite certificatul pe persoană fizică, pe numele titularului. Formularul îți spune asta când introduci CUI-ul unui PFA.',
+      a: 'Pentru PFA, întreprindere individuală sau familială se emite certificatul pe persoană fizică, pe numele titularului. În formular alegi varianta pe persoană fizică și scrii CNP-ul titularului. Certificatul arată și firmele în care persoana este sau a fost asociat ori administrator.',
     },
     {
       q: 'Am nevoie de certificat pentru un punct de lucru.',
@@ -235,7 +235,7 @@ export default async function ConstatatorHome() {
             head={['Certificat', 'Ce arată', 'Preț total']}
             rows={[
               ['Pe firmă', 'Situația la zi: denumire, CUI, sediu, capital, asociați, administratori, coduri CAEN, puncte de lucru', `${lei(p.firma)} lei`],
-              ['Pe persoană fizică', 'În ce firme o persoană e asociat sau administrator; se emite și pentru PFA, II și IF', `${lei(p.pf)} lei`],
+              ['Pe persoană fizică', 'În ce firme o persoană este sau a fost asociat ori administrator; se emite și pentru PFA, II și IF', `${lei(p.pf)} lei`],
               ['Cu istoric', 'Raportul istoric ONRC: mențiunile din registru, de la înființare sau pe o perioadă aleasă. ONRC îl emite în cel mult 30 de zile', `${lei(p.istoric)} lei`],
             ]}
           />
