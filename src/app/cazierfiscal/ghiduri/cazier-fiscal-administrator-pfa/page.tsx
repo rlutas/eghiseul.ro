@@ -8,8 +8,8 @@ import { CAZIERFISCAL_INDEXABLE } from '@/config/cazierfiscal-nav';
 export const revalidate = 3600;
 
 const PATH = '/ghiduri/cazier-fiscal-administrator-pfa/';
-const PUBLISHED = '2026-11-24';
-const UPDATED = '2026-11-24';
+const PUBLISHED = '2026-11-25';
+const UPDATED = '2026-11-25';
 const TITLE = 'Cazier fiscal pentru administrator, firmă sau PFA';
 const DESCRIPTION =
   'Când îți trebuie cazierul fiscal la înființarea unei firme, a unui PFA, la cesiune sau la numirea unui administrator, când îl verifică singur Registrul Comerțului și cum te afectează o firmă inactivă.';
@@ -17,7 +17,7 @@ const DESCRIPTION =
 export const metadata = buildPageMetadata({ brand: 'cazierfiscal', title: TITLE, description: DESCRIPTION, path: PATH, noindex: !CAZIERFISCAL_INDEXABLE });
 
 /**
- * Facts checked 11.11.2026 on the consolidated texts (legislatie.just.ro):
+ * Facts checked 11.11.2026 and re-checked 25.11.2026 on the consolidated texts (legislatie.just.ro):
  * OG 39/2015 art. 4 alin. 4–7, art. 6 alin. 1 lit. h–j, art. 8 alin. 1–5, art. 9 alin. 2.
  */
 const SOURCES = [
@@ -98,7 +98,7 @@ export default async function Page() {
         <GuideLink href="/ghiduri/valabilitate-cazier-fiscal/">cât e valabil cazierul fiscal și ce conține</GuideLink>.
       </p>
       <p>
-        Ești persoană străină și nu ai cod fiscal în România? Pentru situațiile de mai sus nu ți se cere certificatul.
+        Ești persoană străină și nu ești înregistrat fiscal în România? Pentru situațiile de mai sus nu ți se cere certificatul.
         Ajunge o declarație pe propria răspundere, autentificată, din care să reiasă că n-ai fapte de natura celor din
         cazier și că nu ești înregistrat fiscal în România (art. 8 alin. 4).
       </p>

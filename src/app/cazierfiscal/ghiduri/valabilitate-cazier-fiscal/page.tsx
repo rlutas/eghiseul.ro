@@ -8,8 +8,8 @@ import { CAZIERFISCAL_INDEXABLE } from '@/config/cazierfiscal-nav';
 export const revalidate = 3600;
 
 const PATH = '/ghiduri/valabilitate-cazier-fiscal/';
-const PUBLISHED = '2026-11-17';
-const UPDATED = '2026-11-17';
+const PUBLISHED = '2026-11-25';
+const UPDATED = '2026-11-25';
 const TITLE = 'Cazier fiscal: cât e valabil, ce conține și când se șterge';
 const DESCRIPTION =
   'Certificatul de cazier fiscal e valabil 30 de zile și doar pentru scopul din cerere. Ce fapte se înscriu, ce nu se înscrie și după cât timp ies din evidență, cu articolele din OG 39/2015.';
@@ -17,7 +17,7 @@ const DESCRIPTION =
 export const metadata = buildPageMetadata({ brand: 'cazierfiscal', title: TITLE, description: DESCRIPTION, path: PATH, noindex: !CAZIERFISCAL_INDEXABLE });
 
 /**
- * Facts checked 11.11.2026 on the consolidated texts (legislatie.just.ro):
+ * Facts checked 11.11.2026 and re-checked 25.11.2026 on the consolidated texts (legislatie.just.ro):
  * OG 39/2015 art. 4, 5, 6 (lit. h as amended by L 179/2025), 7, 9, 10, 11;
  * HG 1000/2015 annex as replaced by HG 1568/2022 (MO 1279/30.12.2022).
  */
@@ -128,7 +128,7 @@ export default async function Page() {
           iese la 3 zile lucrătoare după plată. Dacă n-o plătești deloc, iese după 5 ani.
         </li>
         <li>Contravenție pe regimul produselor accizabile: la un an de la înscriere, cu aceleași reguli de plată.</li>
-        <li>Infracțiune pedepsită cu amendă penală: după 5 ani de la înscriere, dacă n-ai mai săvârșit fapte de același fel.</li>
+        <li>Infracțiune pedepsită cu amendă penală sau avertisment: după 5 ani de la înscriere, dacă n-ai mai săvârșit fapte de același fel.</li>
         <li>
           Infracțiune cu pedeapsă executată: după 5 ani de la executarea pedepsei, dacă n-ai mai săvârșit fapte de același fel. Aici e singurul caz în care
           trebuie să ceri tu scoaterea (art. 6 alin. 2). Celelalte se fac din oficiu.
