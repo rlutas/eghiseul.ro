@@ -96,6 +96,7 @@ import { hasDeliveryAddressData, isEmailOnlyDelivery } from '@/lib/delivery/addr
 import { assessStartWorkOnProof } from '@/lib/orders/start-work-on-proof';
 import { SupplierCostsDialog } from '@/components/admin/supplier-costs-dialog';
 import { OrderMessagesLauncher } from '@/components/orders/OrderMessagesPanel';
+import { SignatureRequestComposer } from '@/components/orders/signature-requests/SignatureRequestComposer';
 import {
   SUPPLIER_CATEGORIES,
   SUPPLIER_CATEGORY_LABELS,
@@ -1362,6 +1363,14 @@ export default function AdminOrderDetailPage() {
               pop-up ajunge la client. */}
           {!['draft', 'pending', 'abandoned'].includes(order.status ?? '') && (
             <OrderMessagesLauncher endpoint={`/api/admin/orders/${order.id}/messages`} />
+          )}
+          {/* Documente de semnat de client (cerere arhivă OCPI, convenție) —
+              același card ca în portalul topografului. */}
+          {!['draft', 'pending', 'abandoned', 'cancelled', 'refunded'].includes(order.status ?? '') && (
+            <SignatureRequestComposer
+              base={`/api/admin/orders/${order.id}/signature-requests`}
+              docHref={(d) => `/api/admin/orders/${order.id}/preview-document?key=${encodeURIComponent(d.s3Key ?? '')}`}
+            />
           )}
         </div>
         {/* Service & Options — grouped to match what the customer saw in

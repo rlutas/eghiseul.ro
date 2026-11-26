@@ -83,7 +83,9 @@ export async function GET(
       .from('order_documents')
       .select('id, type, file_name, file_size, mime_type, visible_to_client, metadata, created_at')
       .eq('order_id', orderId)
-      .eq('type', 'conventie')
+      // + the documents the client signed on the platform after the order
+      // (Documente de semnat): the OCPI archive request he files.
+      .in('type', ['conventie', 'cerere_arhiva_ocpi'])
       .order('created_at', { ascending: false });
 
     // Privacy: only the work data (property) reaches the collaborator —

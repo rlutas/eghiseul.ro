@@ -59,6 +59,11 @@ const nextConfig: NextConfig = {
     '/admin/ghid/[...slug]': ['./docs/**/*.md'],
     '/api/admin/knowledge/feed': ['./docs/changelog/**/*.md'],
     '/api/admin/knowledge/search': ['./docs/**/*.md'],
+    // Documente de semnat: the DOCX templates are read with fs at request time.
+    '/api/admin/orders/[id]/signature-requests/preview': ['./src/templates/shared/*.docx'],
+    '/api/collaborator/orders/[id]/signature-requests/preview': ['./src/templates/shared/*.docx'],
+    '/api/orders/[id]/signature-requests/[requestId]/preview': ['./src/templates/shared/*.docx'],
+    '/api/orders/[id]/signature-requests/[requestId]/sign': ['./src/templates/shared/*.docx'],
   },
   env: {
     // Momentul build-ului, afișat în Knowledge Center lângă versiune.

@@ -13,6 +13,7 @@ import { IDENTIFICARE_SLUGS } from '@/lib/ancpi/cerere-scope';
 import { COUNTY_NAMES } from '@/lib/ancpi/judete';
 import { imobileForWork } from '@/lib/ancpi/imobile-for-work';
 import { OrderMessagesPanel, type MessageTemplate } from '@/components/orders/OrderMessagesPanel';
+import { SignatureRequestComposer } from '@/components/orders/signature-requests/SignatureRequestComposer';
 import { identifiableName } from '@/lib/orders/abandoned-progress';
 import { formatPersonName } from '@/lib/format/person-name';
 
@@ -444,16 +445,28 @@ export default function CollaboratorOrderDetail() {
         </div>
       )}
 
+      {/* Documente de semnat de client — cererea de copii din arhiva OCPI și
+          convenția, completate din comandă; clientul le semnează în pagina
+          comenzii, iar exemplarele semnate apar aici și în lista de mai jos. */}
+      <div className="mb-6">
+        <SignatureRequestComposer
+          base={`/api/collaborator/orders/${orderId}/signature-requests`}
+          query={previewAs ? `?as=${encodeURIComponent(previewAs)}` : ''}
+          readOnly={readOnly}
+          docHref={(d) => withPreview(`/api/collaborator/orders/${orderId}/document?docId=${d.id}`, previewAs)}
+        />
+      </div>
+
       {/* Angajamentul de execuție — contractul dintre client și executant,
           semnat de client în comandă. Exemplarul lui, de descărcat/tipărit. */}
       {(order.conventii?.length ?? 0) > 0 && (
         <div className="mb-6 rounded-lg border border-slate-200 bg-white p-5">
           <h2 className="mb-1 text-sm font-semibold text-slate-900">
-            Angajament de execuție documentație
+            Documente semnate de client (angajament, cerere arhivă OCPI)
           </h2>
           <p className="mb-3 text-xs text-slate-500">
-            Semnat electronic de client odată cu comanda. Îl poți descărca și tipări pentru dosarul
-            de la BCPI.
+            Semnate electronic de client, la comandă sau prin „Documente de semnat”. Le poți
+            descărca și tipări pentru dosarul de la BCPI.
           </p>
           <ul className="space-y-2">
             {order.conventii.map((d) => (

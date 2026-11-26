@@ -4,6 +4,7 @@
  
  | Data | Ce s-a livrat | Detalii |
  |---|---|---|
+| 2026-11-26 | 🟣 **Documente de semnat după comandă (cerere arhivă OCPI + convenție)** — migrarea 207 `order_signature_requests`, șabloane `cerere-arhiva-ocpi`/`conventie-semnare`, compozitor în admin + portal topograf, card client cu semnătură pe ecran și cerere de buletin, PDF-uri semnate în `order_documents` | [2026-11-26-documente-de-semnat.md](2026-11-26-documente-de-semnat.md) |
 | 2026-11-25 | 🔴 **Portal topograf: mesaj pe comanda greșită** — banda cu destinatarul, confirmare la trimitere, avertisment pe comenzi închise (`OrderMessagesPanel.recipient`) | [2026-11-25-portal-topograf-mesaj-pe-comanda-gresita.md](2026-11-25-portal-topograf-mesaj-pe-comanda-gresita.md) |
 | 2026-11-25 | ✅ **certificat-constatator-express.ro: primul ghid (valabilitate) + audit** — `published: true` pe valabilitate, „Ghiduri” în nav, `/ghiduri/` în sitemap, link din pagina principală; fraza falsă „formularul recunoaște PFA” scoasă; ghidul PFA corectat (PFA/II/IF pe persoană fizică după CNP, apar și funcțiile din trecut) și publicat; audit GSC/tehnic/similaritate | [2026-11-25-constatator-primul-ghid-audit.md](2026-11-25-constatator-primul-ghid-audit.md) |
 | 2026-11-25 | ✅ **cazierfiscal.com: ghidurile de valabilitate și administrator/PFA publicate** — `published: true` în `cazierfiscal-nav.ts`, date 2026-11-25, fapte recitite pe OG 39/2015 consolidat (2 formulări strânse: art. 6 lit. d, art. 8 alin. 4) | [2026-11-25-cazierfiscal-doua-ghiduri-noi.md](2026-11-25-cazierfiscal-doua-ghiduri-noi.md) |

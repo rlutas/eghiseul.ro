@@ -33,6 +33,7 @@ import { cn } from '@/lib/utils';
 import { customerStatus, STATUS_TONE_CLASSES, type StatusTone } from '@/lib/orders/customer-status';
 import TrackingTimeline from '@/components/orders/tracking-timeline';
 import { CustomerMessages } from '@/components/orders/CustomerMessages';
+import { CustomerSignatureRequests } from '@/components/orders/signature-requests/CustomerSignatureRequests';
 
 interface OrderDocument {
   id: string;
@@ -657,7 +658,10 @@ export default function OrderDetailPage() {
           {/* Mesaje cu echipa / topograful — contul folosește sesiunea, nu
               token-ul paginii publice de status. */}
           {!['draft', 'pending', 'abandoned'].includes(order.status) && (
-            <CustomerMessages orderId={order.id} />
+            <>
+              <CustomerSignatureRequests orderId={order.id} />
+              <CustomerMessages orderId={order.id} />
+            </>
           )}
 
           {/* Billing Data */}

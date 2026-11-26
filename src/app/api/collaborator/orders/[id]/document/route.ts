@@ -26,7 +26,7 @@ import { downloadFile, uploadFile, fileExists, getDownloadUrl } from '@/lib/aws/
 import { convertDocxToPdf } from '@/lib/documents/docx-to-pdf';
 
 /** Tipurile pe care colaboratorul are voie să le descarce. */
-const COLLABORATOR_READABLE_TYPES = ['conventie'];
+const COLLABORATOR_READABLE_TYPES = ['conventie', 'cerere_arhiva_ocpi'];
 
 export async function GET(
   request: NextRequest,

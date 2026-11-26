@@ -239,6 +239,13 @@ export const CURATED_GUIDES: GuideLink[] = [
       'Echipa și topograful scriu clientului direct pe comandă; clientul primește email, răspunde din pagina comenzii cu poze atașate, iar răspunsul vine pe email la echipă și la topograf.',
   },
   {
+    title: 'Documente de semnat: cererea de arhivă OCPI și convenția, semnate pe platformă',
+    slug: 'admin/documente-de-semnat',
+    category: 'documente',
+    description:
+      'Topograful sau echipa cer semnătura clientului din pagina comenzii; documentele vin completate din comandă, clientul încarcă buletinul și semnează cu degetul, iar PDF-urile semnate apar la topograf și în comandă.',
+  },
+  {
     title: 'documentero.ro: al doilea site, doar acte de stare civilă',
     slug: 'admin/documentero',
     category: 'comenzi',

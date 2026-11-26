@@ -799,6 +799,23 @@ Tot în 186: `identificare-imobil` și `identificare-imobile-proprietar` →
 `estimated_days = 3`, `estimated_days_display = '1-3 zile lucrătoare'`;
 `deliverable` nou pe proprietar (un extras, pentru imobilul ales).
 
+## order_signature_requests (migrarea 207, 26.11.2026)
+
+Cereri de semnătură după comandă („Documente de semnat”). RLS fără politici: doar service role.
+
+| coloană | tip | ce e |
+|---|---|---|
+| `order_id` | uuid FK → orders (cascade) | comanda |
+| `kinds` | text[] | `cerere-arhiva-ocpi`, `conventie` |
+| `fields` | jsonb | câmpurile documentelor; după semnare = valorile semnate |
+| `ask_identity` | boolean | clientul completează buletinul + încarcă poza |
+| `status` | text | `pending` / `signed` / `cancelled` |
+| `requested_by`, `requested_by_type`, `requested_by_name` | uuid, text, text | `team` / `collaborator` |
+| `signed_at`, `signature_s3_key`, `signature_metadata`, `signed_document_ids` | | audit (IP, UA, acorduri, SHA-256 per document) + rândurile `order_documents` |
+| `cancelled_at`, `note` | | |
+
+Index: `(order_id, created_at DESC)`. Spec: `docs/technical/specs/documente-de-semnat.md`.
+
 ## supplier_invoice_checks (migrarea 195, 14.10.2026)
 
 Checklist lunar pentru facturile de furnizor care nu vin prin SPV (Meta, Google,

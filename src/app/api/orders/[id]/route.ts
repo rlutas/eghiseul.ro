@@ -337,6 +337,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       cerere_eliberare_pf: 'Cerere Eliberare PF',
       cerere_eliberare_pj: 'Cerere Eliberare PJ',
       conventie: 'Angajament de Execuție Documentație',
+      cerere_arhiva_ocpi: 'Cerere copii din arhiva OCPI',
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

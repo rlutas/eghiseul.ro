@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import TrackingTimeline from '@/components/orders/tracking-timeline';
 import { CustomerMessages } from '@/components/orders/CustomerMessages';
+import { CustomerSignatureRequests } from '@/components/orders/signature-requests/CustomerSignatureRequests';
 import { BrandFooter as Footer } from '@/components/shared/brand-footer';
 
 // Order status mapping - complete workflow
@@ -79,6 +80,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
 
   // Document events
   document_generated: { label: 'Documente generate', color: 'bg-blue-100 text-blue-800', icon: FileText },
+  documents_signed: { label: 'Documente semnate', color: 'bg-green-100 text-green-800', icon: CheckCircle },
 
   // Post-issuance processing stages
   la_tradus: { label: 'La tradus', color: 'bg-cyan-100 text-cyan-800', icon: FileText },
@@ -99,7 +101,8 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof
 };
 
 /** Contracts the client signed at order time — not „the document” they wait for. */
-const CONTRACT_DOC_TYPES = ['contract_prestari', 'contract-prestari', 'contract_asistenta', 'contract-asistenta', 'conventie'];
+// Signed by the client, not delivered to him: no „Vezi documentul” shortcut.
+const CONTRACT_DOC_TYPES = ['contract_prestari', 'contract-prestari', 'contract_asistenta', 'contract-asistenta', 'conventie', 'cerere_arhiva_ocpi'];
 
 interface OrderDocument {
   id: string;
@@ -752,6 +755,12 @@ function OrderStatusContent() {
             </Card>
           )}
 
+
+          {/* Documente de semnat — cererea OCPI / convenția pe care topograful
+              sau echipa le-au cerut după comandă. Nimic dacă nu există. */}
+          {orderData.messagesToken && (
+            <CustomerSignatureRequests orderId={orderData.id} token={orderData.messagesToken} />
+          )}
 
           {/* Timeline */}
           {orderData.timeline.length > 0 && (

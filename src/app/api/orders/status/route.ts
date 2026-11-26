@@ -197,6 +197,9 @@ export async function GET(request: NextRequest) {
       let status = newValue?.status || h.event_type;
       if (h.event_type === 'payment_confirmed') {
         status = 'payment_confirmed';
+      } else if (h.event_type === 'document_generated' && h.new_value?.signatureRequestId) {
+        // Documente de semnat: the client signed on the status page.
+        status = 'documents_signed';
       } else if (h.event_type === 'order_created' || h.event_type === 'draft_created') {
         status = 'order_created';
       }
@@ -263,6 +266,7 @@ export async function GET(request: NextRequest) {
       cerere_eliberare_pf: 'Cerere Eliberare PF',
       cerere_eliberare_pj: 'Cerere Eliberare PJ',
       conventie: 'Angajament de Execuție Documentație',
+      cerere_arhiva_ocpi: 'Cerere copii din arhiva OCPI',
       'collaborator-document': 'Document eliberat',
       'extras-carte-funciara': 'Extras de Carte Funciară',
       'ancpi-chitanta': 'Chitanță ANCPI',
