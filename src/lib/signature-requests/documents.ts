@@ -272,7 +272,6 @@ export function placeholderData(fields: Record<string, string>, opts: RenderOpti
   const join = (...parts: (string | undefined)[]) => parts.map((p) => p?.trim()).filter(Boolean).join(', ');
   const when = opts.signedAt ?? new Date();
   const com = fields.comunicare || 'email';
-  const stamp = when.toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' });
 
   return {
     NUME: v('nume'),
@@ -307,9 +306,9 @@ export function placeholderData(fields: Record<string, string>, opts: RenderOpti
     NRCOMANDA: opts.orderNumber,
     DATA: roDate(when),
     SEMNATURA_CLIENT: opts.signatureBase64 ? 'SIG_CLIENT' : '',
-    NOTA_SEMNARE: opts.signatureBase64
-      ? `Semnat electronic de ${v('nume')} la ${stamp}, IP ${opts.ip || 'necunoscut'}, prin platforma ${opts.brandName || 'eghiseul.ro'} (comanda ${opts.orderNumber}).`
-      : 'Previzualizare — documentul nu este încă semnat.',
+    // The signed copy is filed at OCPI as is: no platform / IP line on it. The
+    // audit trail (IP, time, hashes, consent) lives in signature_metadata.
+    NOTA_SEMNARE: opts.signatureBase64 ? '' : 'Previzualizare — documentul nu este încă semnat.',
   };
 }
 

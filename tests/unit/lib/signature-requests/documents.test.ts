@@ -117,7 +117,7 @@ describe('renderSignableDocx', () => {
     expect(data.SEMNATURA_CLIENT).toBe('');
   });
 
-  it('embeds the signature image and the audit line when signed', () => {
+  it('embeds the signature image, with no platform / IP line, when signed', () => {
     // 1×1 transparent PNG
     const png =
       'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
@@ -131,8 +131,9 @@ describe('renderSignableDocx', () => {
     expect(zip.file('word/media/signature_client.png')).toBeTruthy();
     const text = docxText(buffer);
     expect(text).not.toContain('SIG_CLIENT');
-    expect(text).toContain('Semnat electronic de Popescu Ion');
-    expect(text).toContain('IP 203.0.113.7');
+    expect(text).not.toContain('Semnat electronic');
+    expect(text).not.toContain('IP ');
+    expect(text).not.toContain('Previzualizare');
   });
 });
 

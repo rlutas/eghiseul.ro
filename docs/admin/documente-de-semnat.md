@@ -62,18 +62,21 @@ apare **„Așteaptă semnătura clientului”**.
 ## Ce vede clientul
 
 În pagina comenzii (`Urmărește comanda` sau din contul lui) apare un card
-galben, **„Documente de semnat (2)”**, cu trei pași:
+galben, **„Documente de semnat (2)”**. Sus are lista **„Ca să poți semna”**,
+care se bifează pe măsură ce o completează. Câmpurile obligatorii au o
+**steluță roșie (*)**. Sunt trei pași:
 
 1. **Datele din actul de identitate**, doar dacă le-ai cerut: câmpurile vin
    precompletate cu ce avem, plus butonul „Încarcă poza buletinului”.
-2. **Citește documentele**: butonul „Deschide” arată fiecare PDF completat cu
-   datele lui.
-3. **Semnează o singură dată**: cu degetul pe telefon sau cu mouse-ul, bifează
-   că a citit și că e de acord, apoi apasă „Semnează documentele”. Semnătura
-   intră în toate documentele.
+2. **Citește documentele**: butonul „Citește” deschide fiecare document **chiar
+   în pagină**, fără descărcare. Din aceeași fereastră îl poate și descărca.
+3. **Semnează o singură dată**: chenarul de semnătură e **blocat** până când
+   completează datele, încarcă poza și deschide fiecare document. Apoi
+   semnează cu degetul, bifează cele două acorduri și apasă „Semnează
+   documentele”. Semnătura intră în toate documentele.
 
-Platforma nu îl lasă să semneze fără CNP valid, fără serie și număr și fără poza
-buletinului, atunci când le-ai cerut.
+Dacă schimbă datele din buletin după ce a citit, trebuie să redeschidă
+documentele, ca să vadă ce semnează.
 
 ## După ce semnează
 
@@ -85,16 +88,18 @@ buletinului, atunci când le-ai cerut.
 - **În portalul topografului** documentele semnate apar și în secțiunea
   **„Documente semnate de client”**, cu „Deschide PDF” și „Word”, de printat
   pentru dosarul de la BCPI.
-- **Clientul** le găsește la „Documente” în pagina comenzii, iar în istoric
-  apare „Documente semnate”.
+- **Clientul** le vede imediat în același card, la „Documente semnate”, cu
+  butoanele **„Vezi”** și **„Descarcă”**. Le are și la „Documente”, iar în
+  istoric apare „Documente semnate”.
 - **Statusul comenzii nu se schimbă.** Mută-l tu după ce depui.
 
 ## Ce scrie pe document
 
-Sub semnătură apare un rând mic: *„Semnat electronic de [nume] la [data, ora],
-IP …, prin platforma eGhișeul.ro (comanda …)”*. Pe server se păstrează și
-amprenta fiecărui fișier semnat, ora exactă, IP-ul, browserul și acordurile
-bifate. E aceeași dovadă pe care o avem la contractele semnate în formular.
+Documentul semnat arată ca unul semnat de mână: data și semnătura clientului,
+**fără niciun rând despre platformă sau IP**, ca să poată fi depus la OCPI așa
+cum e. Dovada semnării (ora exactă, IP-ul, browserul, acordurile bifate și
+amprenta fiecărui fișier) se păstrează doar pe server, ca la contractele
+semnate în formular.
 
 > ⚠️ Semnătura de pe ecran e o **semnătură electronică simplă**. Unele birouri
 > OCPI pot cere semnătură olografă sau procură notarială. Dacă ghișeul refuză,

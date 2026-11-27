@@ -80,8 +80,9 @@ a convention signed months after the order needs today as the term start. Keep
 the legal text of both files in step.
 
 Empty fields render as `……………` so the paper copy can still be filled by hand.
-`NOTA_SEMNARE` reads „Previzualizare…” unsigned and „Semnat electronic de … la …,
-IP …” signed.
+`NOTA_SEMNARE` reads „Previzualizare…” unsigned and is EMPTY once signed: the
+signed copy is filed at OCPI as is, so it carries no platform / IP line (asked
+27.11.2026). The audit stays in `signature_metadata`.
 
 The routes that read templates are listed in `outputFileTracingIncludes`
 (`next.config.ts`).
@@ -108,8 +109,12 @@ The routes that read templates are listed in `outputFileTracingIncludes`
   `new_value.signatureRequestId`; the status API maps it to `documents_signed`
   („Documente semnate”). `cerere_arhiva_ocpi` is in the status page's
   `CONTRACT_DOC_TYPES`, so it does not trigger „Vezi documentul”.
-- **Phones.** On mobile the client card downloads the PDF (handed to the phone's
-  viewer) instead of opening a blob tab, which Android Chrome shows blank.
+- **Reading.** Documents open in an in-page reader (`PdfPreviewModal`, pages
+  drawn with pdf.js, „Descarcă” in the header), the same on phones and desktop.
+  The signature pad stays locked until the identity data, the ID photo and
+  every document are done; editing the identity resets „read”.
+- **Signed copies.** Once signed, the client preview route serves the stored
+  signed DOCX (as PDF) and the card lists each document with „Vezi” / „Descarcă”.
 
 ## Limits / open
 

@@ -9,6 +9,8 @@
 - Clientul primește mesaj și email, deschide documentele în pagina comenzii și semnează o singură dată, cu degetul.
 - Documentele semnate (PDF/Word) apar în cardul comenzii, la topograf în „Documente semnate de client”, iar poza buletinului vine în mesaje.
 - Statusul comenzii nu se schimbă singur.
+- Pe documentul semnat nu apare niciun rând cu platforma sau IP-ul: se depune la OCPI așa cum e (actualizat 27.11).
+- Clientul citește documentele direct în pagină și poate semna doar după ce le-a deschis pe toate; câmpurile obligatorii au steluță (actualizat 27.11).
 - Nu mai trimitem documente de printat și scanat. Dacă un ghișeu OCPI refuză semnătura de pe ecran, spune-ne.
 
 Ghid complet: [Documente de semnat](../admin/documente-de-semnat.md).

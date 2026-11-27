@@ -10,6 +10,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { formatPersonName } from '@/lib/format/person-name';
 import { identifiableName } from '@/lib/orders/abandoned-progress';
 import { convertDocxToPdf } from '@/lib/documents/docx-to-pdf';
+import { downloadFile } from '@/lib/aws/s3';
 import { brandForOrder } from '@/lib/brand/for-order';
 import {
   SIGNABLE_DOCUMENTS,
@@ -165,6 +166,38 @@ export async function renderPreview(
         'Content-Disposition': `inline; filename="${base}.pdf"`,
         'Cache-Control': 'private, no-store',
       },
+    });
+  }
+  return new NextResponse(new Uint8Array(docx), {
+    headers: {
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'Content-Disposition': `attachment; filename="${base}.docx"`,
+      'Cache-Control': 'private, no-store',
+    },
+  });
+}
+
+/** The SIGNED copy of one document (as PDF when a converter is available). */
+export async function renderSignedCopy(
+  admin: Admin,
+  req: { signed_document_ids: string[] | null },
+  kind: SignableKind
+) {
+  const ids = req.signed_document_ids ?? [];
+  if (!ids.length) return NextResponse.json({ success: false, error: 'Documentul nu a fost găsit' }, { status: 404 });
+  const { data: doc } = await admin
+    .from('order_documents')
+    .select('s3_key, file_name')
+    .in('id', ids)
+    .eq('type', SIGNABLE_DOCUMENTS[kind].docType)
+    .maybeSingle();
+  if (!doc?.s3_key) return NextResponse.json({ success: false, error: 'Documentul nu a fost găsit' }, { status: 404 });
+  const docx = await downloadFile(doc.s3_key);
+  const base = String(doc.file_name || kind).replace(/\.docx$/i, '');
+  const pdf = await convertDocxToPdf(docx);
+  if (pdf) {
+    return new NextResponse(new Uint8Array(pdf), {
+      headers: { 'Content-Type': 'application/pdf', 'Content-Disposition': `inline; filename="${base}.pdf"`, 'Cache-Control': 'private, no-store' },
     });
   }
   return new NextResponse(new Uint8Array(docx), {
