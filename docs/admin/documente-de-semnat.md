@@ -1,7 +1,7 @@
 # Documente de semnat: cererea de arhivă OCPI și convenția, semnate de client pe platformă
 <!-- audienta: colaborator -->
 
-Din 26.11.2026 clientul poate semna **după comandă**, direct în pagina comenzii,
+Din 27.11.2026 clientul poate semna **după comandă**, direct în pagina comenzii,
 documentele de care topograful are nevoie ca să depună în numele lui:
 
 - **Cererea pentru copii din arhiva OCPI** (Anexa 1). Exemple: un act notarial,
