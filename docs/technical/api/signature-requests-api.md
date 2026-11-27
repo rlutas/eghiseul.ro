@@ -29,7 +29,7 @@ on the account page.
 | method | path | body | result |
 |---|---|---|---|
 | GET | `/api/orders/[id]/signature-requests?token=` | none | `{ requests[]: { id, status, documents[], askIdentity, identity, note, createdAt, signedAt } }`; cancelled requests are hidden |
-| POST | `/api/orders/[id]/signature-requests/[requestId]/preview` | `{ token, kind, identity? }` | PDF as it will be signed |
+| POST | `/api/orders/[id]/signature-requests/[requestId]/preview` | `{ token, kind, identity? }` | pending: PDF as it will be signed; signed: the stored signed copy (PDF) |
 | POST | `/api/orders/[id]/signature-requests/[requestId]/sign` | `{ token, signatureBase64 (PNG data URL), identity?, identityFiles?: ClientFile[], consent: { documentsRead, signatureConsent } }` | `{ documentIds }` |
 
 Sign errors (Romanian messages): 400 = missing consent, invalid signature, missing

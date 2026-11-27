@@ -656,14 +656,15 @@ Rămas: test live cu o comandă reală (formular + mesaj + răspuns); cele 11 co
 vechi din „Așteptare client” de mutat de Mircea.
 Changelog: `docs/changelog/2026-09-25-identificare-acte-mesaje-client.md`.
 
-### DOCUMENTE DE SEMNAT DUPĂ COMANDĂ — 26.11.2026 (branch, nemerge-uit)
+### DOCUMENTE DE SEMNAT DUPĂ COMANDĂ — LIVE 27.11.2026
 
 Topograful/echipa cer semnătura clientului pe cererea de arhivă OCPI (Anexa 1) și
 pe convenție; clientul semnează o dată, cu degetul, în pagina comenzii; poate fi
 rugat să încarce buletinul (comenzile imobiliare nu îl au). Stare:
 - ✅ migrarea 207 (`order_signature_requests`) aplicată;
 - ✅ E2E local pe comandă de test: API, handlere, semnare din UI pe mobil;
-- ⏳ merge + deploy după acordul lui Raul; primul test cu Mircea pe o comandă reală;
+- ✅ live 27.11 (citire în pagină, semnare doar după citire, fără rând IP pe document);
+- ⏳ primul test cu Mircea pe o comandă reală; ștergerea comenzii de test E-261127-TSEMN după testul lui Raul;
 - ❓ de confirmat că BCPI acceptă semnătura electronică simplă.
 Spec: `docs/technical/specs/documente-de-semnat.md`. Ghid: `docs/admin/documente-de-semnat.md`.
 
